@@ -1,0 +1,982 @@
+/* font-size: 20px;
+    font-weight: 800;
+    font-style: normal;
+    color: var(--green);
+    text-decoration: underline; 
+*/
+
+
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@100;200;300;400;500;600;700;800;900&display=swap');
+
+:root{
+    --green:rgb(30, 165, 9);
+    --orange: rgb(255,165,0);
+    --transition-short: all .2s ease-in-out;
+}
+
+* {
+    padding: 0px;
+    margin: 0px;
+    box-sizing: border-box;
+    font-family: 'Poppins',sans-serif;
+}
+
+.account_section{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100vh;
+    width: 100%;
+    padding-top: 1%;
+}
+
+.profile_section{
+    /* border: 5px solid red; */
+
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+
+    /* padding: 20px 10px;
+    width: 100%;
+    height: 100%;
+    z-index: 200; */
+} 
+
+#profileImageSection{
+    /* border: 5px solid  green; */
+    
+    width: 100%;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    flex-direction: column;
+}
+
+/* Profile image */
+.account_details {
+    /* border: 1px solid green; */
+
+    background: rgba(128, 128, 128, 0.118);
+}
+
+#profileImageInput{
+    /* border: 1px solid red; */
+
+    width: inherit;
+    margin: 5px;
+    text-align: center;
+}
+
+.essential_image{
+    /* border: 3px solid red; */
+
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 5px ;
+}
+
+.essential_details{
+    /* border: 1px solid purple; */
+
+    
+    position: relative;
+    /* margin-top: 1%; */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+}
+
+.profile_img_div{
+    /* border: 3px solid purple; */
+
+    width: 70%; 
+    height: 100%; 
+    object-fit: contain;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+}
+
+.account_profile_img{
+    border: 1px solid var(--orange);
+
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+}
+
+.image_button{
+    /* border: 1px solid red; */
+    
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    width: 100%;
+    gap: 10px;
+}
+
+.essentialDetailsSection{
+    
+}
+
+.essential_grid{
+    /* border: 5px solid red; */
+
+    width: 80%;
+    /* display: grid;
+    grid-template-columns: 1fr 1fr; */
+    /* gap: 5px; */
+}
+
+.essential_grid_content{
+    /* border: 1px solid red; */
+
+    display: grid;
+    grid-template-columns: 1fr;
+    height: fit-content;
+    /* padding: 5px 10px; */
+}
+
+.content_label{
+    margin-bottom: 5px;
+}
+
+.content_span{
+    border-bottom: 1px solid var(--green);
+
+    padding: 10px 5px;
+    width: 80%;
+}
+
+/*  OTHER CONTACTS */
+.other_contacts_div{
+    /* border: 1px solid red; */
+
+    margin-top: 3%;
+    text-align: center;
+    position: relative;
+    margin-bottom: 1%;
+}
+
+.other_contact_grid{
+    /* border: 1px solid blue; */
+
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    padding: 0px 5px;
+    gap: 5px;
+}
+
+.other_titles{
+    border: 1px solid rgba(0, 0, 0, 0.121);
+
+    /* margin-bottom: 10px; */
+    color: white;
+    background: var(--green);
+    font-size: 18px;
+    padding: 5px 0px;
+}
+
+.other_sub_titles{
+    background: var(--orange);
+}
+
+.other_ul{
+    /* border: 1px solid blue; */
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+}
+
+.other_li{
+    /* border: 1px solid blue; */
+
+    list-style: none;
+    border-bottom: 1px solid var(--green);
+    margin-bottom: 5%;
+    width: 80%;
+    justify-items: center
+}
+
+.other_contact_phone{
+    /* border: 1px solid red; */
+    width: 100%;
+    text-align: center;
+}
+
+/* OTHER SERVICES OFFERED */
+.other_services_div{
+    text-align: center;
+}
+
+.other_services_list{
+    /* border: 5px solid green; */
+
+    display: grid;
+    grid-template-columns: repeat(5,1fr);
+    gap: 5px;
+    padding: 5px;
+}
+
+.other_service_labels{
+    font-size: 16px;
+    margin-left: 5px;
+}
+
+.radio_btn_div{
+    /* border: 5px solid red; */
+
+    width: 100%;
+    display: flex; 
+    align-items: center; 
+    flex-direction: row;
+    justify-content: center;
+    /* text-align: center; */
+}
+
+.other_service_radio:hover{
+    cursor: pointer;
+}
+
+.profilePicBtn{
+    padding: 5px;
+    cursor: pointer;
+    background-color: var(--green); 
+    color: white;
+    border: none;
+    width: 40%;
+    margin-top: 5px;
+    transition: ease-in .2s;
+}
+
+.profilePicBtn:hover{
+    background: white;
+    color: orange;
+    outline: 1px solid var(--orange);
+}
+
+.editprofileButton{
+    position: absolute;
+    top: 0%; 
+    right: -5%; 
+    background-color: var(--orange); 
+    color: white;
+    border: none;
+    padding: 5px 10px;
+    transition: ease-in .2s;
+} 
+
+.editprofileButton:hover{
+    background-color: white; 
+    color: var(--orange);
+    cursor: pointer;
+    outline: 1px solid var(--orange);
+} 
+
+.contactNumBtn{
+    position: absolute;
+    top: 4%; 
+    right: -4%; 
+    background-color: var(--green); 
+    color: white;
+    border: none;
+    padding: 5px 10px;
+    cursor: pointer;
+    outline: 1px solid var(--orange);
+    transition: ease-in .2s;
+}
+
+.contactNumBtn:hover{
+    background-color: white; 
+    color: var(--orange);
+    cursor: pointer;
+    outline: 1px solid var(--orange);
+}
+
+.radioDivDiv{
+    /* border: 1px solid; */
+
+    margin-top: 5%;
+    position: relative;
+}
+
+.radioDivBtn{
+    position: absolute;
+    top: 10%; 
+    right: -4%; 
+    background-color: var(--green); 
+    outline: 1px solid var(--orange);
+    color: white;
+    border: none;
+    padding: 5px 10px;
+    transition: ease-in .2s;
+}
+
+.radioDivBtn:hover{ 
+    background-color: white; 
+    outline: 1px solid var(--orange);
+    color: orange;
+    border: none;
+    cursor: pointer;
+}
+
+.content_input { 
+    padding: 5px;
+    border: 1px solid #ccc;
+}
+
+.editButton, .saveButton {
+    margin-top: 3px;
+    padding: 5px 10px;
+    border: none;
+    background: var(--orange);
+} 
+
+.editButton:hover, .saveButton:hover {
+    cursor: pointer;
+    background: white;
+    color: var(--orange);
+    outline: 1px solid var(--orange);
+} 
+
+.deleteButton{
+    padding: 5px 10px;
+    border: none;
+    background: red;
+    transition: ease-in .2s; 
+}
+
+.deleteButton:hover{
+    cursor: pointer;
+    background: white;
+    color: red;
+    outline: 1px solid red;
+}
+
+/* OTHER PROFILE CONTENT */
+.profile_content{
+    width: 95%;
+    height: 100%;
+}
+
+.categories_div{
+    /* border: 1px solid greenyellow; */
+
+    display: flex;
+    align-items: center;
+    justify-content: space-around;
+    flex-direction: row;
+    height: 5%;
+}
+
+
+.profile_category {
+    font-size: 18px;
+    font-weight: 600;
+    padding: 3px 10px;
+    color: var(--green);
+    background-color: rgba(128, 128, 128, 0.351);
+    border: none;
+    transition: linear 0.2s;
+    /* border-radius: 3px; */
+    width: 10%;
+}
+
+.profile_category:hover , .profile_category:focus {
+    color: var(--orange);
+    background-color: white;
+    outline: 1px solid var(--orange);
+    cursor: pointer;
+}
+
+.service_drop {
+    position: absolute;
+    min-width: 160px;
+    z-index: 5;
+    top: 7%;
+    left: 33%;
+}
+
+.service_drop_link{
+    border: 1px solid rgba(0, 0, 0, 0.308);
+    color: white;
+    padding: 12px 16px;
+    text-decoration: none;
+    display: block;
+    transition: background-color 0.3s ease;
+    background: var(--green);
+    transition: ease-in .3s;
+    margin-bottom: 2px;
+}
+
+.service_drop_link:hover {
+    background-color:white; 
+    color: var(--orange);
+    border: 1px solid var(--orange);
+    /* border-radius: 10px; */
+} 
+
+/* DISPLAY AREA FOR DIFFERENT CATEGORY SECTION */
+.dispay_area_div{
+    /* border: 5px solid green; */
+
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+
+/* THE MENU DEFINITION PART */
+.category_menu{
+    width: 100%;
+    height: 100%;
+}
+
+/* MENU SEARCH INPUT FIELD */
+.label_input{
+    display: flex;
+    flex-direction: row;
+    width: 40%;
+}
+
+.search_new{
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 5px 10px;
+    margin-top: 10px;
+    height: 6%;
+}
+
+/* search_menu_btn */
+.search_menu {
+    width: 100%;
+    border: none;
+    outline: 1px solid rgba(128, 128, 128, 0.119);
+    /* padding: 5px 10px; */
+    font-size: 15px;
+    height: 3rem;
+    padding: 3px;
+    transition: ease-in 0.2s;
+}
+
+.search_menu:hover ,.search_menu:focus{
+    outline: 1px solid var(--green);
+    cursor: pointer;
+    padding: 5px 10px;
+}
+
+.search_menu_btn{
+    font-size: 15px;
+    padding: 5px 10px;
+    border: none;
+    background: var(--green);
+    color: white;
+    transition: ease-in 0.2s;
+    /* border-radius: 3px; */
+    height: 3rem;
+}
+
+.search_menu_btn:hover{
+    background-color: white;
+    color: var(--orange);
+    /* outline: 1px solid var(--orange); */
+    border-left: .1px solid var(--orange);
+    cursor: pointer;
+}
+
+/* ADDING NEW DISH BTN */
+.new_dish_btn{
+    font-size: 15px;
+    padding: 5px 15px;
+    background: var(--green);
+    border: none;
+    color: white;
+    transition: ease-in 0.2s;
+    border-radius: 3px;
+}
+
+.new_dish_btn:hover{
+    background: white;
+    color: var(--orange);
+    cursor: pointer;
+    outline: 1px solid var(--orange);
+}
+
+.menu_table{
+    height: 98%;
+    margin-top: 0.4%;
+    display: flex;
+    justify-content: center;
+    /* background-image: linear-gradient(to top, #7BD4CC 0%, #037367 100%); display: flex; align-items: center; align-content: center; */
+}
+
+
+.left_panel{ 
+    /* border: 1px solid red; */
+
+    height: 100%;
+}
+
+/* DIV HOLDING THE ICONS IN TABLE */
+.iconHeader{ 
+    border: 1px solid red;
+    background-color: var(--orange); 
+    padding: 20px 10px;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+}
+
+.tableTitileChart{
+   
+}
+
+#chart_title{
+    /* border: 5px solid red; */
+    width: 25rem;
+}
+
+/*  TITTLE CHANGING INPUT  FIELD*/
+.inputHide{
+    width: 100%;
+    /* padding: 5px 10px; */
+    margin-bottom: 25px;
+    font-size: 15px;
+    height: 3rem;
+    border: none;
+    padding-left: 5px;
+
+    -webkit-transition: var(--transition-short);  -moz-transition: var(--transition-short);  
+    -o-transition: var(--transition-short); 
+    transition: var(--transition-short);
+}
+
+.inputHide:hover,.inputHide:focus{ 
+    cursor: pointer; 
+    outline: 1px solid var(--green);
+    padding: 5px 10px;
+}
+
+/* TABLE TITLE */
+.h2TableTitle{
+    color: white;
+    font-size: 30px;
+}
+
+/* PENCIL ICON TO EDIT MENU TABLE TITLE  */
+.hideshow { 
+    color: var(--white); 
+    font-size: .8rem;
+    width: 6%;
+    background: var(--green);
+    border: none;
+    color: white;
+    margin-left: 5px;
+}
+
+.hideshow:hover{ 
+    color: var(--white); 
+    background: white;
+    color: var(--orange);
+    outline: 1px solid var();
+    cursor: pointer;
+}
+
+.addRestaurantButton{
+    padding: 3px 20px;
+    border: none;
+    background: var(--green);
+    color: white;
+    transition: ease-in .2s;
+    margin-bottom: 1%;
+}
+
+.addRestaurantButton:hover{
+    cursor: pointer;
+    background: white;
+    color: orange;
+    outline: 1px solid green;
+}
+
+.choose_select{
+    border: none;
+    padding: 5px 10px;
+    border-radius: 0px;
+}
+
+.choose_select:hover,.choose_select:focus{
+    border: none;
+    cursor: pointer;
+    outline: 1px solid var(--green);
+}
+
+.choose_select_options{
+    padding: 5px 10px;
+}
+
+/* PLUS ICON TO ADD TABLE ROWS INTO TTHE TABLE */
+.addRowBtn{
+    width: auto; 
+    position: absolute; 
+    left: 95%;     
+    font-size: 2rem;    
+    background-color: var(--green);    
+    padding: .1rem .9rem; 
+    border-radius: 2rem; 
+    margin-top: -6%; 
+    z-index: 999999999999999; 
+    opacity:1; 
+    border: none;
+    /* -webkit-box-shadow: 0px 3px 1px 0px rgba(0,0,0,0.45); */
+    /* -moz-box-shadow: 0px 3px 1px 0px rgba(0,0,0,0.45); */
+    /* box-shadow: 0px 3px 1px 0px rgba(0,0,0,0.45);  */
+    -webkit-transition: var(--transition-short);  -moz-transition: var(--transition-short);  
+    -o-transition: var(--transition-short);
+    transition: var(--transition-short); 
+}
+
+.addRowBtn:hover {
+    background: white;
+    /* opacity:.8;  */
+    cursor: pointer;
+    outline: 1px solid var(--orange); 
+}
+
+/* DIV HOLDING INPUT FIELDS TO FILL THE TABLE  */
+#chart_table{
+    padding:0.1rem; 
+}
+
+/* FORM HOLDING INPUT FIELDS TO FILL THE TABLE */
+#chart_datas{ 
+    /* border: 1px solid green; */
+
+    width: 100%;
+    height: fit-content;
+    position: relative;
+    padding: 10px 0px; 
+    margin-top: 0.5%;
+}
+
+.input_wrp{
+    /* border: 1px solid red; */
+
+    display: grid;
+    grid-template-columns: repeat( 7, 1fr);
+    gap: 5px;
+    height: 1.8rem;
+}
+
+.headerInputs{ 
+    border-top: 0px; 
+    border-left: 0px; 
+    border-right: 0px; 
+    background-color: rgba(255,255,255,.30); 
+    border-bottom: 1px solid var(--orange);
+    transition: ease-in 0.2s;
+    padding-left: 2px;
+}
+
+.headerInputs:hover, .headerInputs:focus{ 
+    border: none;
+    cursor: pointer;
+    outline: 1px solid var(--orange);
+    padding: 2px 5px;
+}
+
+#addingPlus{
+    color: white;
+    transition: ease-in .2s;
+}
+
+.addRowBtn:hover #addingPlus{
+    color: var(--orange);
+}
+
+.small-1-input{
+    width: 100%;
+    border: none;
+}
+
+.small-1-input:hover{
+    padding: 2px 0px;
+}
+
+.menu_top_icon, .right_nav .fa-heart, .right_nav .fa-li{               
+    font-size:1.3rem; 
+    color:var(--sangria);
+}
+
+.right_nav .fa-user-circle{ 
+    font-size:1.3rem; 
+    margin-left:1rem; 
+}
+
+.right_nav .fa-link{ 
+    margin-left:1rem;
+}
+
+.right_nav{
+    float:right;
+}
+
+/* CREATING AND ADDING A ROW INTO THE MENU TABLE */
+.tableRows{
+    width: 100%;
+    display: flex;
+    flex-wrap: nowrap;
+    justify-content: space-around; 
+    margin-top: 10px;
+    margin-bottom: 10px;
+    border-bottom: 1px solid #ccc; 
+}
+
+.headerDiv {
+    padding: 5px 10px;
+    /* background-color: #f2f2f2;  */
+    background-color: var(--green); 
+    color: white;
+    font-weight: bold; 
+    text-align: center;
+    width: 12%; 
+    font-size: 15px;
+}
+
+.headerspecial{
+    width: 10%; 
+}
+
+.dishDiv{
+    /* border: 1px solid green; */
+
+    text-align: center;
+    width: 12%; 
+    padding: 5px 10px;
+}
+
+.dishdiv_button{
+    display: flex;
+    flex-direction: row;
+    justify-content: space-around;
+    align-items: center;
+    /* width: 8%; */
+}
+
+.dishImagePartner {
+    width: 60px;
+    height: auto;
+}
+/* CONFERENCE STYLINGS */
+.conference_wapper{
+    width: 100%;
+}
+
+.conference-form-grid{
+    border: 1px solid grey;
+
+    padding: 10px 5px; 
+}
+
+.conference-input-grid{
+    /* border: 1px solid grey; */
+
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 5px;
+    padding: 10px 5px;
+    width: 90%;
+}
+
+.conference-inputs{
+    padding: 5px ;
+    border: none;
+    outline: 1px solid rgba(128, 128, 128, 0.247);
+}
+
+.conference-inputs:hover,.conference-inputs:focus{
+  cursor: pointer;
+  outline: 1px solid var(--orange);
+  color: var(--orange);
+}
+
+
+.checkbox-input-grid{
+    /* border: 1px solid grey; */
+
+    display: grid;
+    grid-template-columns: repeat(4 , 1fr);
+    gap: 5px;
+    width: 100%;
+}
+
+.checkbox_divs{
+    border: 1px solid rgba(128, 128, 128, 0.279);
+    padding: 0px 5px;
+}
+
+.checkbox_divs:hover,.checkbox_divs:focus{
+    cursor: pointer;
+    outline: 1px solid var(--orange);
+}
+
+.check_box_containers{
+    width: 50%;
+    display: grid;
+    grid-template-columns: repeat(2,1fr);
+}
+
+.check_box_containers .yesNo-grids input{
+    cursor: pointer;
+}
+
+.yesNo-grids{
+  display: flex;  
+  flex-direction: row;
+}
+
+.conference_submit_btn{
+    background: var(--green);
+    color: white;
+    padding:  5px;
+    border: none;
+    cursor: pointer;
+    transition: ease-in .2s;
+}
+
+.conference_submit_btn:hover{
+    background: white;
+    color: var(--orange);
+    outline: 1px solid var(--orange);
+}
+
+
+/* CONFERENCE DISPALY TABLE */
+.tableHeader{
+    border:1px solid red;
+
+    width: 100%;
+    background: var(--orange);
+    display: grid;
+    grid-template-columns: repeat(2 ,1fr);
+    gap: 10px;
+    padding: 10px 5px;
+    margin-bottom: .5%;
+}
+
+.confereenceTitileChart{
+    /* border:  5px solid green; */
+    width: 100%;
+}
+
+.CONFERENCE_input{
+    /* border:  5px solid green; */
+    width: 100%;
+}
+
+.conference-pencil { 
+    color: var(--white); 
+    font-size: .9rem;
+    width: 5%;
+    background: var(--green);
+    border: none;
+    color: white;
+    margin-left: 5px;
+    padding: 2px;
+}
+
+.conference-pencil:hover{ 
+    color: var(--white); 
+    background: white;
+    color: var(--orange);
+    outline: 1px solid var();
+    cursor: pointer;
+}
+
+/* search_menu_btn */
+.CONFERENCE_input {
+    display: flex;
+    flex-direction: row;
+}
+
+.conference-search_menu {
+    width: 100%;
+    border: none;
+    outline: 1px solid rgba(128, 128, 128, 0.119);
+
+    font-size: 15px;
+    height: 3rem;
+    padding: 3px;
+    transition: ease-in 0.2s;
+}
+
+.conference-search_menu:hover ,.conference-search_menu:focus{
+    outline: 1px solid var(--green);
+    cursor: pointer;
+    padding: 5px 10px;
+}
+
+.search_conference_btn{
+    font-size: 15px;
+    padding: 5px 10px;
+    border: none;
+    background: var(--green);
+    color: white;
+    transition: ease-in 0.2s;
+    /* border-radius: 3px; */
+    height: 3rem;
+}
+
+.search_conference_btn:hover{
+    background-color: white;
+    color: var(--orange);
+    /* outline: 1px solid var(--orange); */
+    border-left: .1px solid var(--orange);
+    cursor: pointer;
+}
+
+.conference_add_div{
+    /* border: 1px solid red; */
+    text-align: right;
+    padding-right: 2%;
+}
+
+.conference_add_btn{
+    padding: 3px 15px;
+    background: var(--green);
+    color: white;
+    border: none;
+    border-radius: none;
+}
+
+.conference-modal{
+    border: 5px solid red;
+    width: 100%;
+    height: 100vh;
+}
+
+.conference_table_headers{
+    width: 100%;
+    display: flex;
+    justify-content: space-around; 
+    margin-top: 10px;
+    margin-bottom: 10px;
+    border-bottom: 1px solid #ccc; 
+    gap: 5px;
+    margin-top: 1%;
+}
+.modal {
+    width: 100%;
+    --bs-modal-content: 1000px
+}
+.conference-modal{
+    width: 100%;
+}

@@ -1,0 +1,127 @@
+/* Center the modal vertically and horizontally */
+.modal-dialog {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+}
+.modal {
+  background-color: rgb(0, 0, 0, 0.7);
+  width: 80%;
+  margin-left: 20%;
+}
+/* Styling for the form elements */
+.form-group {
+  margin-bottom: 15px;
+}
+
+.form-control {
+  border-radius: 4px;
+  padding: 10px;
+  font-size: 16px;
+}
+
+.btn-primary {
+  background-color: #007bff;
+  border-color: #007bff;
+  padding: 10px 20px;
+  font-size: 16px;
+}
+
+.btn-primary:hover {
+  background-color: #0056b3;
+  border-color: #004085;
+}
+
+/* Hide the map initially */
+#map {
+  height: 300px;
+  width: 100%;
+  margin-top: 10px;
+  display: none;
+}
+
+/* Additional styling for the modal header and body */
+.modal-header {
+  background-color: #f2490c;
+  border-bottom: 1px solid #dee2e6;
+  display: flex;
+  justify-content: space-between;
+  color: #ffff;
+}
+
+.modal-title {
+  font-size: 20px;
+  font-weight: 600;
+}
+
+.modal-body {
+  padding: 20px;
+}
+
+/* Styling for the close button */
+.close {
+  font-size: 24px;
+  color: #000;
+  float: right;
+  border-radius: 10px;
+}
+
+.close:hover {
+  color: #0056b3;
+  text-decoration: none;
+}
+/* Styling for screens below 700px */
+@media (max-width: 700px) {
+  .modal {
+    width: 100%;
+    margin-left: 0;
+    font-size: 12px;
+  }
+   .hero-background {
+    height: 300px;
+    background-size: contain;
+  } 
+}
+
+.special-order-section {
+  margin-bottom: 50px; 
+  height: auto;
+  background-color: #dee2e6;
+  padding: 30px;
+  color: #ffff;
+}
+/* #special-order {
+    height: 100vh;
+} */
+
+.hero-background {
+  /* background-image: url("../assets/heroimage.jpg"); 
+  background-size: contain;
+  background-position: center;
+  height: 100%; */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  opacity: 0.9; /* Adjust for overlay effect */
+}
+
+.hero-content {
+  background: rgba(0, 0, 0, 0.5); /* Dark overlay for readability */
+  padding: 20px;
+  border-radius: 8px;
+  margin-top: 20%;
+}
+
+.cta-button {
+  padding: 10px 20px;
+  background-color: #ff5733; /* Customize button color */
+  border: none;
+  border-radius: 5px;
+  color: white;
+  cursor: pointer;
+}
+
+.cta-button:hover {
+  background-color: #ff451a; /* Darker shade on hover */
+}

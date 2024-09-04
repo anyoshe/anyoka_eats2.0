@@ -1,0 +1,310 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap');
+
+:root{
+    --green:rgb(30, 165, 9);
+    --orange: rgb(255,165,0);
+}
+
+.landing-fresh-food {
+    padding: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    width: 100%;
+    margin-left: 0px;
+}
+
+.fresh_nav_position{
+    position: relative;
+    width: 100%;
+    z-index: 1000;
+}
+
+.landing-fresh-foods-header {
+    background-color: var(--orange);
+    padding: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    position: fixed;
+    width: 100%;
+}
+
+.fresh_bar{
+    border: 1px solid;
+    width: 50%;
+    display: flex;
+    flex-direction: row;
+    border: none;
+}
+
+.fresh_bar_input {
+    padding: 5px;
+    border: none;
+    width: 90%;
+    transition: ease-in .2s;
+}
+
+.fresh_bar_input:hover,.fresh_bar_input:focus {
+    color: var(--orange);
+    cursor: pointer;
+    padding-left: 10px;
+}
+
+.fresh_glass{
+    width: 10%;
+    background: var(--green);
+    height: inherit;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    border: none;
+}
+
+.fresh_glass:hover{
+    color: var(--orange);
+    outline: 1px solid var(--orange);
+    cursor: pointer;
+    background: white;
+}
+
+.fresh_bar_input:hover,.fresh_bar_input:focus {
+   outline: 1px solid var(--orange);
+   color: var(--orange);
+}
+
+.landing-fresh-foods-header .icons a {
+    margin: 0 10px;
+    text-decoration: none;
+    color: #333;
+}
+
+.homeIcon{
+    transition: ease-in .2s;
+}
+
+.homeIcon:hover{
+    color: white;
+}
+
+.main-category{
+    margin-top: 8%;
+    width: 90%;
+    padding: 0px;
+}
+
+.fresh-list{
+    width: 100%;
+    margin-bottom: 2%;
+}
+
+.fresh_page_heading{
+    font-size: 25px;
+    font-weight: 800;
+    font-style: normal;
+    color: var(--green);
+    text-decoration: underline;
+}
+
+.fresh_category{
+    border: none;
+    outline: 1px solid #ccc;
+}
+
+.main-category ul {
+    padding: 20px;
+    display: flex;
+    align-content: center;
+    justify-content: space-around;
+    height: 15%;
+    width: 100%;
+}
+
+.main-category ul li {
+    list-style: none;
+}
+
+.fresh_link{
+    padding: 10px 5px;
+    border-bottom: 1px solid green; 
+    font-size: 16px;
+    transition: ease-in 0.2s;
+    margin: 0px 10px;
+}
+
+.fresh_link:hover, .fresh_link:focus{
+    padding: 10px 5px;
+    border: none;
+    outline: 1px solid var(--orange);
+    outline-offset: -2px; 
+    color: white;
+    background: var(--green);
+}
+
+.fresh-page-offers-section{
+    width: 90%;
+    margin-bottom: 2%;
+}
+
+.fresh-page-offers-title{
+    font-size: 25px;
+    font-weight: 600;
+    padding: 5px 10px;
+    margin-top: 1%;
+    margin-bottom: 1%;
+    font-style: normal;
+    color: var(--green);
+    text-decoration: underline; 
+}
+
+.offer-page-grid {
+    display: grid;
+    grid-template-columns: repeat( 5 ,1fr);
+    gap: 10px;
+}
+
+.wholesale{
+    border-top: 1px solid grey;
+    width: 90%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 10px 5px;
+}
+
+.fresh-wholesale-title{
+    margin-top: 2%;
+}
+
+.fresh-wholesale-para{
+    margin-top: 1%;
+    margin-bottom: 1%;
+    font-size: 18px;
+}
+
+.wholesale-cta-button{
+    margin-top: 0px;
+    background-color: var(--green);
+    border: none;
+    color: #fff;
+    padding: 10px 20px;
+    text-decoration: none;
+    border-radius: 5px;
+    font-size: 18px;
+}
+
+.wholesale-cta-button:hover, .wholesale-cta-button:focus{
+    background-color: white;
+    outline: 1px solid var(--orange);
+    color: var(--orange);
+    padding: 10px 20px;
+    text-decoration: none;
+    border-radius: 5px;
+    font-size: 18px;
+}
+
+.hero {
+    background-image: url("../../assets/images/foodstocks.jpg");
+    background-size: contain;
+    color: #fff;
+    text-align: center;
+    padding: 100px 20px;
+}
+
+.hero .cta-button {
+    background-color: #f39c12;
+    color: #fff;
+    padding: 10px 20px;
+    text-decoration: none;
+    border-radius: 5px;
+}
+
+.hero-text{
+    background-color: #333;
+    padding-bottom: 20px;
+}
+
+
+.main-category, .featured-products, .offers, .testimonials, .newsletter {
+    padding: 20px;
+}
+
+.category-grid {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 15px;
+    background-color: white;
+    color: #333;
+}
+
+.food-grid{
+    display: grid;
+    grid-template-columns: repeat(5 , 1fr);
+    column-gap: 5px;
+    row-gap: 10px;
+    align-items: center;
+}
+
+.product-grid, .testimonial-grid {
+    display: flex;
+    gap: 15px;
+    flex-wrap: wrap;
+    background-color: white;
+    color: #333;
+}
+
+.product, .offer, .testimonial {
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    padding: 10px;
+    text-align: center;
+}
+
+.newsletter form {
+    display: flex;
+    gap: 10px;
+}
+
+.newsletter input {
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    flex: 1;
+}
+
+.newsletter .cta-button {
+    background-color: #f39c12;
+    color: #fff;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+footer {
+    background-color: #f8f8f8;
+    padding: 20px;
+    text-align: center;
+}
+
+.footer-links a {
+    margin: 0 10px;
+    text-decoration: none;
+    color: #333;
+}
+
+.social-media {
+    margin: 10px 0;
+}
+
+.contact-info {
+    margin: 10px 0;
+}
+
+.payment-methods {
+    margin: 10px 0;
+}
