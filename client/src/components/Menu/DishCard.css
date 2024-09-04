@@ -1,0 +1,174 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap');
+
+:root{
+  --green:rgb(30, 165, 9);
+  --orange: rgb(255,165,0);
+}
+
+*{
+  box-sizing: border-box;
+}
+
+/* whole dish card  */
+.dish-card {
+  width: 250px; 
+  height: auto;
+  list-style: none; 
+  border-radius: 8px; 
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background-color: var(--orange);
+  transition: transform 0.2s, box-shadow 0.2s;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  transition: background-color 0.2s;
+}
+  
+.dish-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+  cursor: pointer;
+  z-index: 50;
+}
+
+/* common name for all dish card contents */
+.dishcontent{
+  width: 100%;
+  text-align: center;
+  margin-bottom: 5px;
+}
+
+  /* dish card image  */
+.dish-image {
+  width: 100%;
+  height: 200px;
+  border-radius: 8px;
+  object-fit: cover;
+}
+
+/* dish name */
+.dishName{
+  text-transform: uppercase;
+  font-weight: 600;
+  font-size: 18px;
+  font-style: normal;
+  padding: 10px 0px;
+}
+
+/* dish card price */
+.dishPrice {
+  font-weight: 300;
+  font-size: 18px;
+  font-style: normal;
+  margin: 0px;
+}
+
+/* dish card restaurant */
+.dishRestaurant{
+  font-weight: 900;
+  font-size: 60px;
+  font-style: normal;
+  color: white;
+  background-color: white;
+  text-transform: uppercase;
+  padding: 5px 0px;
+  margin-bottom: 10px;
+}
+
+/* add to cart button */
+.dishAddToCart {
+  background-color: var(--green);
+  color: white;
+  border: none;
+  border-radius: 4px;
+  padding: 8px 16px;
+  width: 80%;
+  cursor: pointer;
+  transition: background-color 0.2s;
+  margin-bottom: 0px;
+  background: var(--green);
+}
+  
+.dishAddToCart:hover {
+  background-color: white;
+  color: var(--green);
+  outline: 1px solid var(--orange);
+  font-weight: 500;
+  border: none;
+}
+  
+/* dish card restaurant */
+.dishRestaurant {
+  font-size: 14px;
+  color: #666;
+}
+
+/* rating star */
+.rating{
+  display: flex;
+  justify-content: center;
+  margin: 0px 0px;
+}
+
+.rating .filled{
+  color: var(--green);
+}
+
+.rating .star{
+  color: grey;
+}
+
+/* average rating in words */
+.average{
+  margin-top: 0px;
+  margin-bottom: 0px;
+  padding-bottom: 5px;
+}
+
+.original-price-offer {
+  margin-bottom: 5px;
+  padding: 5px;
+  font-size: 1em;
+}
+
+.diagonal-strikethrough {
+  position: relative;
+  display: inline-block;
+  font-size: 1.1em;
+  font-weight: bold;
+}
+
+.diagonal-strikethrough::before {
+  content: "";
+  position: absolute;
+  top: 50%; 
+  left: 0;
+  right: 0;
+  border-top: 2px solid; 
+  border-color: inherit;
+  transform: rotate(-5deg);
+  color: red; 
+}
+
+
+.discounted-price {
+  color: green;
+  font-weight: bold;
+}
+.dish-image-wrapper {
+  position: relative;
+  display: inline-block;
+}
+
+.discounted-price-circle {
+  position: absolute;
+  top: -15%;
+  right: -3%;
+  background-color: red; 
+  color: white;
+  font-weight: normal;
+  padding: 5px 5px;
+  z-index: 10;
+  text-align: center;
+}

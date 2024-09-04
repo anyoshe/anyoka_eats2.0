@@ -1,0 +1,102 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap');
+
+:root{
+    --green:rgb(30, 165, 9);
+    --orange: rgb(255,165,0);
+}
+
+#cartModal{
+    border: 1px solid red;
+    height: 100vh;
+    width: 100%;
+    margin-top: 4%;
+}
+
+#cartModalLabel{
+    font-size: 20px;
+    font-weight: 800;
+    font-style: normal;
+    color: var(--green);
+    text-decoration: underline;
+}
+
+#cart2{
+    margin-right: 5%;
+}
+
+#cartItems{
+    padding-left: 0px;
+}
+
+.restaurantNameDiv{
+    margin-bottom: 10px;
+}
+
+.restaurantName{
+    font-weight: 600;
+    font-size: 16px;
+}
+
+.itemDishName{
+    display: grid;
+    grid-template-columns:100% 40%;
+}
+
+.d-flex{
+    border: 1px solid rgba(128, 128, 128, 0.393);
+    margin-bottom: 2px;
+    padding: 5px ;
+}
+
+.minus{
+    background: var(--orange);
+    color: white;
+    border: none;
+}
+
+.plus{
+    background: var(--green);
+    color: white;
+    border: none;
+}
+
+.itemTotal{
+    font-weight: 600;
+    font-size: 18px;   
+}
+
+.bottomBtn{
+    color: white;
+    background: var(--green);
+    border: none;
+}
+
+.bottomBtn:hover{
+    color: var(--orange);
+    background: white;
+    outline: 1px solid var(--orange);
+}
+
+/* cart icon */
+.fa-shopping-cart{
+    font-size: 20px;
+    color: var(--green);
+}
+
+.fa-shopping-cart:hover{
+    color: var(--orange);
+cursor: pointer;
+}
+
+.cart-icon-wrapper {
+    position: relative;
+}
+  
+#cartCount {
+    position: absolute;
+    top: 2%; 
+    right: 4.4%;
+    font-weight: 600;
+    font-size: 18px;
+    color: red;
+}

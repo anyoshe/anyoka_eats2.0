@@ -1,0 +1,16 @@
+.fresh_count{
+    position: absolute;
+    top: 5%; 
+    right: 5%;
+    font-weight: 600;
+    font-size: 18px;
+    color: red;
+}
+
+#fresh_cart{
+   transition: ease-in .2s;
+}
+
+#fresh_cart:hover{
+    color: white;
+}
