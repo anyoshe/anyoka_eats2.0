@@ -66,7 +66,7 @@ const LandingPage = () => {
         const fetchDiscountedFoods = async () => {
             try {
                 const response = await axios.get(`${config.backendUrl}/api/discounts`);
-                console.log("Full response:", response.data); 
+                // console.log("Full response:", response.data); 
                 const fetchedFoods = response.data; 
                 const discountedFoods = fetchedFoods.slice(0, 5); 
                 setDiscountedFoods(discountedFoods);
@@ -83,7 +83,7 @@ const LandingPage = () => {
         const fetchTopRatedRestaurants = async () => {
             try {
                 const response = await axios.get(`${config.backendUrl}/api/dishes-and-restaurants`);
-                console.log('Restaurants response:', response.data);
+                // console.log('Restaurants response:', response.data);
                 const restaurants = response.data.restaurants || [];
 
                 const topRated = [...restaurants].sort((a, b) => b.averageRating - a.averageRating).slice(0, 4);
@@ -165,7 +165,7 @@ const LandingPage = () => {
                             </Link>
 
                             {/* Outside Catering */}
-                            <Link to={'/outsideCatering'}>
+                            <Link to={'/outside-catering'}>
                                 <div id="cateringService" className="serviceDiv">
                                     <img src={cateringImg} alt="Outside Catering" className="serviceImg" />
                                     <p>Outside Catering</p>
@@ -331,80 +331,90 @@ const LandingPage = () => {
                 </div>
             </section>
 
-            <section class="join_team_section">
-                <div class="join_team_div">
+            <section className="join_team_section">
+                <div className="join_team_div">
                     {/* <!-- PARAGRAPH  DIV --> */}
-                    <div class="paragraph_div">
-                        <h3 class="join_team_heading">
+                    <div className="paragraph_div">
+                        <h3 className="join_team_heading">
                            Join our ever evolving and  growing community as :
                         </h3>
                     </div>
 
                     {/* <!-- JOIN TEAM GRID CHOICES --> */}
-                    <div class="join_team_grid_div">
-                        <div class="join_team_choices">
-                            <h3 class="join_title">Service Provider</h3>
+                    <div className="join_team_grid_div">
+                        <div className="join_team_choices">
+                            <h3 className="join_title">Service Provider</h3>
 
-                            <p class="join_explanation">Register your hotel, catering  or fresh food bussiness offer services</p>
+                            <p className="join_explanation">Register your hotel, catering  or fresh food bussiness offer services</p>
 
                             {/* <!-- IMAGE DIV AND IMAGE --> */}
-                            <div class="join_team_image_div">
+                            <div className="join_team_image_div">
                                 <img src={serviceProviderImg} alt="Service Provider" className="join_img" />
                             </div>
 
                              {/* <!-- SIGN UP BUTTON --> */}
-                            <button class="signup">Sign Up</button>
+                            <button className="signup">Sign Up</button>
                         </div>
 
-                        <div class="join_team_choices">
-                            <h3 class="join_title">User</h3>
+                        <div className="join_team_choices">
+                            <h3 className="join_title">User</h3>
 
-                            <p class="join_explanation">Sign up and order food together with other services of your choice</p>
+                            <p className="join_explanation">Sign up and order food together with other services of your choice</p>
 
                             {/* <!-- IMAGE DIV AND IMAGE --> */}
-                            <div class="join_team_image_div">
+                            <div className="join_team_image_div">
                                 <img src={userPersonImg} alt="User Person" className="join_img" />
                             </div>
 
                             {/* <!-- SIGN UP BUTTON --> */}
-                            <button class="signup">Sign Up</button>
+                            <button className="signup">Sign Up</button>
                         </div>
 
-                        <div class="join_team_choices">
-                            <h3 class="join_title">Deliver Person</h3>
+                        <div className="join_team_choices">
+                            <h3 className="join_title">Deliver Person</h3>
 
-                            {/* <!-- <p class="join_explanation">Deliver food orders for people and earn</p> --> */}
-                            <p class="join_explanation">Do you have a job.Fulfill delivery orders for customers and earn per trip</p>
+                            {/* <!-- <p className="join_explanation">Deliver food orders for people and earn</p> --> */}
+                            <p className="join_explanation">Do you have a job.Fulfill delivery orders for customers and earn per trip</p>
                              {/* <!-- IMAGE DIV AND IMAGE --> */}
-                            <div class="join_team_image_div">
+                            <div className="join_team_image_div">
                                 <img src={deliveryParsonImg} alt="Delivery Person" className="join_img" />
 
                             </div>
 
                             {/* <!-- SIGN UP BUTTON --> */}
-                            <button class="signup">Sign Up</button>
+                            <button className="signup">Sign Up</button>
                         </div>
                     </div>
                 </div>
             </section>
             {/* <!-- ABOUT US PAGE  --> */}
-            <section class="about_us_section">
-                <div class="about_us_div">
-                    <div class="about_title_div">
-                        <h3 class="about_us_title">About Us</h3>
+            <section className="about_us_section">
+                <div className="about_us_div">
+                    <div className="about_title_div">
+                        <h3 className="about_us_title">About Us</h3>
                     </div>
 
-                    <div class="about_us_content">
+                    <div className="about_us_content">
 
-                        <div class="aboutUs_img_div aboutUs_img_div1">
-                            <img src={profileImg} alt="Founder's Picture" class="about_us_img"/>
+                        <div className="aboutUs_img_div aboutUs_img_div1">
+                            <img src={profileImg} alt="Founder's Picture" className="about_us_img"/>
                         </div>
 
-                        <div class="aboutUs_img_div aboutUs_img_div2">
-                            <img src={profileImg2} alt="Co-founder's Picture" class="about_us_img"/>
+                        <div className="aboutUs_img_div aboutUs_img_div2">
+                            <img src={profileImg2} alt="Co-founder's Picture" className="about_us_img"/>
                         </div>
 
-                        <p class="aboutUs_paragraph">Lorem ipsum, dolor sit amet consectetur adipisicing elit. Harum voluptas laboriosam quos quia corporis, deserunt nihil magnam officia nulla ad magni dolores, ab iste fugit doloremque maiores odit tempore voluptatum!Quibusdam ab molestias est dolore praesentium officia quos vitae ipsam temporibus a vel omnis incidunt enim, earum neque sit laborum itaque, reprehenderit excepturi. Quo exercitationem perferendis veniam praesentium laborum eos.Sapiente ea dolores culpa inventore maiores qui deleniti quas molestiae voluptas blanditiis! Iure, totam accusantium odit quaerat, architecto earum dolor beatae veniam ea excepturi, velit mollitia itaque veritatis libero ut!Similique in modi voluptatibus, sed unde totam voluptatem, expedita facere possimus esse, non enim iste quae. Tempore quia fugiat reiciendis corporis exercitationem commodi, quis nobis tempora ab enim? Ipsum, in?Animi ipsa, eaque odio sapiente cum praesentium deleniti consequatur, temporibus corporis ea cumque minima id voluptatem amet minus saepe. Ea vitae fuga, aliquam minus asperiores voluptatum suscipit voluptate hic veritatis?Autem tempora vitae tenetur culpa inventore dolor dolore doloribus, ad aut incidunt molestias debitis neque animi adipisci atque quae veniam et cumque libero aspernatur ex quaerat eveniet ipsa harum. Illo.Doloremque recusandae beatae quae, dolore, voluptas id nihil, vitae fugiat et nam numquam alias. Quae quo veniam sapiente neque aut dicta deleniti,</p>
+                        <p className="aboutUs_paragraph">At Anyoka Eats, our mission is to transform the dining experience with a seamless, innovative online restaurant platform. Founded by a passionate team dedicated to enhancing food discovery and ordering, we combine cutting-edge technology with a love for great food.
+
+Our platform brings together a diverse range of restaurants and cuisines, allowing users to effortlessly browse, order, and enjoy their favorite dishes. With features like real-time order tracking, personalized recommendations, and a user-friendly interface, we strive to make every meal memorable.
+
+In addition to exceptional dining options, Anyoka Eats offers a variety of services to cater to your unique needs. Explore our conference and meeting spaces, perfect for business gatherings and special events. With detailed information on venue capacity, location, and available services, planning your next event has never been easier.
+
+Our special ordering feature allows you to request customized meals that are made to your specific preferences, ensuring a home-cooked feel with every bite. We also offer a selection of fresh foods, delivered hot and ready to enjoy, to elevate your dining experience.
+
+Our team, composed of experts in web development, user experience design, and culinary arts, works tirelessly to ensure that our platform not only meets but exceeds customer expectations. From dynamic dish updates to intuitive search functionalities, we are committed to providing an exceptional online dining experience.
+
+Join us on this culinary journey and discover how Anyoka Eats is redefining the future of dining, events, and personalized food experiences.</p>
 
                     </div>
 

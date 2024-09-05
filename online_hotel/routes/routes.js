@@ -19,6 +19,8 @@ const fs = require('fs');
 const axios = require('axios');
 const { type } = require("os");
 require('dotenv').config();
+const nodemailer = require('nodemailer');
+
 
 //USER SCHEMA AND ROUTES
 const userSchema = new mongoose.Schema({
@@ -39,18 +41,18 @@ userSchema.pre('save', async function (next) {
 const User = mongoose.model('User', userSchema); 
 
 router.post('/auth/userSignup', async (req, res) => {
-  console.log(req.body);
+  // console.log(req.body);
   const { username, names, email, phoneNumber, password } = req.body;
-  console.log(req.body);
+  // console.log(req.body);
   try {
     let user = await User.findOne({ email });
     if (user) {
       return res.status(400).json({ success: false, message: 'Email already registered' });
     }
     user = new User({ username, names, email, phoneNumber, password });
-    console.log(user);
+    // console.log(user);
     await user.save();
-    console.log(user);
+    // console.log(user);
     res.json({ success: true, message: 'User registered successfully' });
   } catch (err) {
     res.status(500).json({ success: false, message: 'Server error' });
@@ -115,10 +117,10 @@ const Partner = mongoose.model('Partner', partnerSchema);
 // Define the sign-up route
 router.post('/signup', async (req, res) => {
   const { businessName, businessType, contactNumber, email, location, password } = req.body;
-  console.log('Request body:', req.body);
+  // console.log('Request body:', req.body);
   // Check if a partner with the same businessName or contactNumber already exists
   try {
-    console.log('Request body:', req.body);
+    // console.log('Request body:', req.body);
       const existingPartner = await Partner.findOne({
           $or: [
               { businessName: businessName },
@@ -147,7 +149,7 @@ router.post('/signup', async (req, res) => {
       await newPartner.save();
 
       res.status(201).json(newPartner);
-      console.log(newPartner);
+      // console.log(newPartner);
   } catch (error) {
       console.error('Error during partner sign-up:', error);
       res.status(500).json('An error occurred during sign-up.');
@@ -184,8 +186,8 @@ router.get('/partner/:contactNumber', async (req, res) => {
 });
 
 router.put('/partners/:id', async (req, res) => {
-  console.log('Received update for partner partnersection:', req.params.id);
-  console.log('Request body:', req.body);
+  // console.log('Received update for partner partnersection:', req.params.id);
+  // console.log('Request body:', req.body);
   
   try {
     const partnerId = req.params.id;
@@ -327,7 +329,7 @@ router.put('/contacts/:contactId', async (req, res) => {
       { new: true, upsert: true }
     );
 
-    console.log(updatedContact);
+    // console.log(updatedContact);
 
     res.status(200).json({
       message: 'Contact updated successfully',
@@ -452,7 +454,7 @@ const Dish = model("Dish", dishSchema);
 
 //add dish to database and restaurant
 router.post('/dishes', (req, res) => {
-  console.log('Received request to add dish:', req.body);
+  // console.log('Received request to add dish:', req.body);
   upload(req, res, async (err) => { 
     if (err) {
       console.error('Error uploading image:', err);
@@ -492,7 +494,7 @@ router.post('/dishes', (req, res) => {
       });
 
       await newDish.save();
-      console.log('New dish created:', newDish);
+      // console.log('New dish created:', newDish);
       res.status(201).json({ success: true, dish: newDish });
     } catch (error) {
       console.error('Error creating dish:', error);
@@ -503,7 +505,7 @@ router.post('/dishes', (req, res) => {
 
 //route to put or update a dish
 router.put('/dishes/:dishCode', (req, res) => {
-  console.log(req.body); // Log the request body to see what's received
+  // console.log(req.body); // Log the request body to see what's received
 
   upload(req, res, async (err) => {
     if (err) {
@@ -578,7 +580,7 @@ router.delete('/dishes/:identifier', async (req, res) => {
     const { identifier } = req.params;
 
     // Log the identifier for debugging
-    console.log('Identifier received:', identifier);
+    // console.log('Identifier received:', identifier);
 
     if (!identifier) {
       return res.status(400).json({ error: 'Identifier not provided' });
@@ -829,29 +831,6 @@ router.get('/restaurants/:partnerId', async (req, res) => {
   }
 });
 // Fetch partner's restaurants
-// router.get('/partners/:_id/restaurants', async (req, res) => {
-//   // console.log('Partner ID:', partner?._id);
-
-//   try {
-//     const partnerId = req.params._id;
-//     console.log('Partner ID:', partner?._id);
-
-//     // Find the partner
-//     const partner = await Partner.findById(partnerId);
-    
-//     if (!partner) {
-//       return res.status(404).json({ message: 'Partner not found' });
-//     }
-
-//     // Get the partner's restaurants
-//     const partnerRestaurants = await partner.restaurants;
-
-//     res.json(partnerRestaurants);
-//   } catch (error) {
-//     console.error(error);
-//     res.status(500).json({ message: 'An error occurred while fetching restaurants' });
-//   }
-// });
 router.get('/partners/:_id/restaurants', async (req, res) => {
   try {
     const partnerId = req.params._id;
@@ -1130,8 +1109,8 @@ router.get('/orders/delivered', async (req, res) => {
 
 //WORKINGS AFTER MPESA PAYMENT HAS BEEN DONE
 router.post('/paidOrder', async (req, res) => {
-  console.log('Received order data:', req.body);
-  console.log('OrderDetails');
+  // console.log('Received order data:', req.body);
+  // console.log('OrderDetails');
   try {
     const orderDetails = req.body;
 
@@ -1179,7 +1158,7 @@ async function saveOrder(orderDetails) {
 
   try {
     await order.save();
-    console.log('Order saved successfully');
+    // console.log('Order saved successfully');
   } catch (error) {
     console.error('Error saving order:', error);
     throw error; // Rethrow the error so that it can be handled by the caller
@@ -1348,10 +1327,10 @@ router.post('/conferences', (req, res) => {
       return res.status(500).json({ error: 'Failed to upload files.' });
     }
 
-    console.log('req.files:', req.files);
-    console.log('req.body:', req.body);
-    console.log('req.files:', JSON.stringify(req.files, null, 2));
-    console.log('req.body:', JSON.stringify(req.body, null, 2));
+    // console.log('req.files:', req.files);
+    // console.log('req.body:', req.body);
+    // console.log('req.files:', JSON.stringify(req.files, null, 2));
+    // console.log('req.body:', JSON.stringify(req.body, null, 2));
     
     const {
       venueName, address, gpsCoordinates, seatingCapacity, layoutOptions, roomDimensions,
@@ -1375,7 +1354,7 @@ router.post('/conferences', (req, res) => {
 
     try {
       const savedConference = await newConference.save();
-      console.log('Conference saved:', savedConference); // Debug log
+      // console.log('Conference saved:', savedConference); // Debug log
       res.status(201).json({ message: 'Conference added successfully!', data: savedConference });
     } catch (error) {
       console.error('Error during conference creation:', error);
@@ -1413,8 +1392,8 @@ router.get('/venue/:venueName', async (req, res) => {
 
 router.put('/conferences/:id', upload, async (req, res) => {
   try {
-    console.log('req.files:', req.files);
-    console.log('req.body:', JSON.stringify(req.body, null, 2));
+    // console.log('req.files:', req.files);
+    // console.log('req.body:', JSON.stringify(req.body, null, 2));
 
     const id = req.params.id;
     const conferenceId = req.body.conferenceId || req.query.conferenceId;
@@ -1552,7 +1531,7 @@ module.exports = Rating;
 router.post('/rating', async (req, res) => {
   // console.log(item_id, item_type, rating);
   const { item_id, item_type, rating } = req.body;
-console.log(item_id, item_type, rating);
+// console.log(item_id, item_type, rating);
   try {
     // Validate input
     if (!item_id || !item_type || rating == null) {
@@ -1699,9 +1678,9 @@ router.get('/details', async (req, res) => {
   }
 });
 router.get('/search', async (req, res) => {
-  console.log('query', req.query);
+  // console.log('query', req.query);
   const { query, type } = req.query;
-  console.log('query', req.query);
+  // console.log('query', req.query);
   
   if (!query) {
     return res.status(400).json({ message: 'Query is required' });
@@ -1814,12 +1793,12 @@ async function searchData(query, type) {
 }
 
 router.get('/searchAny', async (req, res) => {
-  console.log('Received search request');
+  // console.log('Received search request');
   const searchTerm = req.query.q;
   const type = req.query.type;
-  console.log('Received request:', req.query);
+  // console.log('Received request:', req.query);
   if (!searchTerm || !type) {
-    console.log('Bad request: Missing required query parameters');
+    // console.log('Bad request: Missing required query parameters');
     return res.status(400).json({ error: 'Bad Request', message: 'Missing required query parameters: q and type' });
   }
 
@@ -1839,7 +1818,7 @@ router.get('/searchAny', async (req, res) => {
 
   try {
     const results = await Dish.find(filter).exec(); // Use the model to find documents
-    console.log('Search results:', results);
+    // console.log('Search results:', results);
     res.json(results);
   } catch (err) {
     console.error('Error occurred during the search:', err);
@@ -1899,9 +1878,9 @@ router.post('/trackSearch', async (req, res) => {
 
 //PAYMENTS AND UPDATE ROUTES
 router.post('/updatePaidStatus', async (req, res) => {
-  console.log('Received updatePaidStatus request');
+  // console.log('Received updatePaidStatus request');
   const { restaurant, orderIds } = req.body;
-  console.log(restaurant, orderIds);
+  // console.log(restaurant, orderIds);
   //console.log(Order.find().explain('executionStats'));
   try {
     // Execute the updateMany operation
@@ -1911,7 +1890,7 @@ router.post('/updatePaidStatus', async (req, res) => {
     );
 
     // Log the response from the update operation
-    console.log(result);
+    // console.log(result);
 
   } catch (error) {
     console.error('Error updating orders:', error);
@@ -1929,26 +1908,26 @@ const ngrokUrl = process.env.NGROK_URL;
 
 router.post('/mpesa/callback', (req, res) => {
   const callbackData = req.body;
-  console.log('M-Pesa Callback Received:', callbackData);
+  // console.log('M-Pesa Callback Received:', callbackData);
 
   // Your logic to handle the callback data goes here...
   // Extract relevant information from the callback data
   const { Body, ResultCode, ResultDesc } = callbackData;
 
   // Log the callback data for debugging or auditing
-  console.log('Callback Body:', Body);
-  console.log('Result Code:', ResultCode);
-  console.log('Result Description:', ResultDesc);
+  // console.log('Callback Body:', Body);
+  // console.log('Result Code:', ResultCode);
+  // console.log('Result Description:', ResultDesc);
 
   // Example: Process the callback based on ResultCode
   if (ResultCode === 0) {
     // Successful transaction
     // Update your database, notify user, etc.
-    console.log('Payment successful. Update database...');
+    // console.log('Payment successful. Update database...');
   } else {
     // Failed transaction
     // Handle failure scenario
-    console.log('Payment failed:', ResultDesc);
+    // console.log('Payment failed:', ResultDesc);
   }
   // Respond with a success status to acknowledge receipt
   res.sendStatus(200);
@@ -1964,7 +1943,7 @@ router.get('/token', async (req, res) => {
       }
     });
 
-    console.log('Access Token Response:', response.data);
+    // console.log('Access Token Response:', response.data);
     res.json(response.data);
   } catch (error) {
     console.error('Error fetching access token:', error.response ? error.response.data : error.message);
@@ -2010,9 +1989,9 @@ router.post('/mpesa/pay', async (req, res) => {
     const password = Buffer.from(`${shortcode}${passkey}${timestamp}`).toString('base64');
 
 
-    console.log('Access Token:', access_token);
-    console.log('Timestamp:', timestamp);
-    console.log('Password:', password);
+    // console.log('Access Token:', access_token);
+    // console.log('Timestamp:', timestamp);
+    // console.log('Password:', password);
 
     const paymentData = {
       BusinessShortCode: shortcode,
@@ -2028,7 +2007,7 @@ router.post('/mpesa/pay', async (req, res) => {
       TransactionDesc: 'Test Payment'
     };
 
-    console.log('Payment Data:', paymentData);
+    // console.log('Payment Data:', paymentData);
 
     const paymentResponse = await axios.post('https://sandbox.safaricom.co.ke/mpesa/stkpush/v1/processrequest', paymentData, {
       headers: {
@@ -2037,7 +2016,7 @@ router.post('/mpesa/pay', async (req, res) => {
       }
     });
 
-    console.log('Payment Response:', paymentResponse.data);
+    // console.log('Payment Response:', paymentResponse.data);
     res.json(paymentResponse.data);
   } catch (error) {
     console.error('Error initiating M-Pesa payment:', error.response ? error.response.data : error.message);
@@ -2082,5 +2061,39 @@ router.get('/testimonials', (req, res) => {
   res.json({ testimonials });
 });
 
+//MAILS POST
+
+// Configure your email service
+const transporter = nodemailer.createTransport({
+  service: 'gmail',
+  auth: {
+    user: 'anyokaanyoka@gmail.com',
+    pass: 'bpyw vmqq kyab cfaw', 
+  },
+});
+
+// Route to handle form submission
+router.post('/send-email', (req, res) => {
+  const { email, message } = req.body; 
+  // console.log(req.body);
+
+  const mailOptions = {
+    from: email,
+    to: 'anyokaanyoka@gmail.com', // replace with your email
+    subject: 'New Contact Form Submission', 
+    text: `Message from ${email}: ${message}`,
+  };
+
+  transporter.sendMail(mailOptions, (error, info) => {
+    if (error) {
+      console.error('Error sending email:', error); // Log the error details
+      return res.status(500).send(error.toString());
+    } else {
+      // console.log('SMTP Server is ready to take our messages');
+    }
+    // console.log('Email sent: ' + info.response); // Log success message
+    res.status(200).send('Email sent successfully'); 
+  });
+});
 
 module.exports = router;

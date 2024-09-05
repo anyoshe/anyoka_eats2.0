@@ -4,7 +4,7 @@ import OrderSummaryModal from './FoodOrderSummaryModal';
 
 // Accessing in React
 const googleApiKey = process.env.REACT_APP_GOOGLE_API_KEY;
-console.log('googleApiKey', googleApiKey);
+
 
 
 const fallbackLocations = {
@@ -27,6 +27,7 @@ const FoodLocationModal = ({ show, handleClose, vendorName, orderedFoods = [] })
       const script = document.createElement('script');
       script.src = `https://maps.googleapis.com/maps/api/js?key=${googleApiKey}&callback=initMap&libraries=places`;
       script.async = true;
+      // script.defer = true;
       document.head.appendChild(script);
 
       window.initMap = function () {

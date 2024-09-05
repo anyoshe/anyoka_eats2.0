@@ -78,7 +78,7 @@ const FoodCard = ({ food }) => {
         </div>
       )}
   
-      <h7 className="dishName">{food.foodName}</h7>
+      <h6 className="dishName">{food.foodName}</h6>
   
       {food.discount > 0 ? (
         <div>
