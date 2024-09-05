@@ -1,0 +1,73 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap');
+
+:root{
+  --green:rgb(30, 165, 9);
+  --orange: rgb(255,165,0);
+}
+
+#locationModal{
+    background: rgba(0, 0, 0, 0.338);
+    overflow-y: hidden;
+}
+
+.modal-dialog{
+    margin-top: 6%;
+}
+
+#locationModalLabel{
+    font-size: 20px;
+    font-weight: 800;
+    font-style: normal;
+    color: var(--green);
+    text-decoration: underline;
+}
+
+.fromSpan{
+    font-weight: 500;
+    font-size: 18px;
+    font-style: normal; 
+}
+
+#mapContainer{
+    height: 40vh;
+}
+
+.useMylocation{
+   margin-top: 10px;
+}
+
+.InputBtn{
+    border: none;
+    width: 25%;
+    margin-bottom: 0px;
+    background: var(--green);
+    color: white;
+}
+
+.InputBtn:hover{
+    background:white;
+    color: orange;
+    outline: 1px solid orange;
+}
+
+
+#customerLocation{
+    margin-top: 0px;
+    width: 90%;
+    margin-bottom: 0px;
+    height: 3em;
+}
+
+.cancel_Ok_btn{
+    color: white;
+    background: var(--green);
+    border: none;
+}
+
+.cancel_Ok_btn:hover{
+    color: var(--orange);
+    background: white;
+    outline: 1px solid orange;
+}
+
+
