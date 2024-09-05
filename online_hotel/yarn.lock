@@ -331,8 +331,10 @@ express-session@^1.18.0:
     safe-buffer "5.2.1"
     uid-safe "~2.1.5"
 
-express-validator@^7.1.0:
-  version "7.1.0"
+express-validator@^7.2.0:
+  version "7.2.0"
+  resolved "https://registry.npmjs.org/express-validator/-/express-validator-7.2.0.tgz"
+  integrity sha512-I2ByKD8panjtr8Y05l21Wph9xk7kk64UMyvJCl/fFM/3CTJq8isXYPLeKW/aZBCdb/LYNv63PwhY8khw8VWocA==
   dependencies:
     lodash "^4.17.21"
     validator "~13.12.0"
@@ -766,6 +768,11 @@ node-fetch@^3.3.2:
     data-uri-to-buffer "^4.0.0"
     fetch-blob "^3.1.4"
     formdata-polyfill "^4.0.10"
+
+nodemailer@^6.9.15:
+  version "6.9.15"
+  resolved "https://registry.npmjs.org/nodemailer/-/nodemailer-6.9.15.tgz"
+  integrity sha512-AHf04ySLC6CIfuRtRiEYtGEXgRfa6INgWGluDhnxTZhHSKvrBu7lc1VVchQ0d8nPc4cFaZoPq8vkyNoZr0TpGQ==
 
 nodemon@^3.1.0:
   version "3.1.4"

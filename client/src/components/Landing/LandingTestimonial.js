@@ -15,17 +15,17 @@ function Testimonials() {
   };
 
   return (
-    <div class="testimonials">
-      <h1 class="testimonial_title">Testimonials</h1>
+    <div className="testimonials">
+      <h1 className="testimonial_title">Testimonials</h1>
       
-      <p class="testimonial_description">What our customer feel and say about Anyoka Eats.</p>
+      <p className="testimonial_description">What our customer feel and say about Anyoka Eats.</p>
       
     
-      <div class="slider">
+      <div className="slider">
         
-        <div class="slide-box active">
+        <div className="slide-box active">
           
-          <p class="comment">
+          <p className="comment">
           Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do
           eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut
           enim ad minim veniam, quis nostrud exercitation ullamco laboris
@@ -36,15 +36,15 @@ function Testimonials() {
           src="https://images.unsplash.com/photo-1595152452543-e5fc28ebc2b8?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=500&q=80"
           />
 
-          <h3 class="name">Albert Sinelly</h3>
+          <h3 className="name">Albert Sinelly</h3>
 
-          <h4 class="job">Driver</h4>
+          <h4 className="job">Driver</h4>
         </div>
 
     
-        <div class="slide-box">
+        <div className="slide-box">
 
-          <p class="comment">
+          <p className="comment">
           Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do
           eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut
           enim ad minim veniam, quis nostrud exercitation ullamco laboris
@@ -55,15 +55,15 @@ function Testimonials() {
           src="https://images.unsplash.com/photo-1627541718143-1adc1b582e62?ixid=MnwxMjA3fDB8MHxzZWFyY2h8N3x8bXVzbGltfGVufDB8MnwwfHw%3D&ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60"
           />
 
-          <h3 class="name">Hirok Meryam</h3>
+          <h3 className="name">Hirok Meryam</h3>
 
-          <h4 class="job">User</h4>
+          <h4 className="job">User</h4>
         </div>
 
      
-        <div class="slide-box">
+        <div className="slide-box">
           
-            <p class="comment">
+            <p className="comment">
             Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do
             eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut
             enim ad minim veniam, quis nostrud exercitation ullamco laboris
@@ -74,15 +74,15 @@ function Testimonials() {
             src="https://images.unsplash.com/photo-1610216705422-caa3fcb6d158?ixid=MnwxMjA3fDB8MHxzZWFyY2h8MzJ8fGZhY2V8ZW58MHwyfDB8fA%3D%3D&ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60"
             />
 
-            <h3 class="name">Sebastian Sert</h3>
+            <h3 className="name">Sebastian Sert</h3>
 
-            <h4 class="job">Service Provider</h4>
+            <h4 className="job">Service Provider</h4>
         </div>
 
       
-        <div class="slide-box">
+        <div className="slide-box">
        
-          <p class="comment">
+          <p className="comment">
           Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do
           eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut
           enim ad minim veniam, quis nostrud exercitation ullamco laboris
@@ -93,15 +93,15 @@ function Testimonials() {
           src="https://images.unsplash.com/photo-1595152452543-e5fc28ebc2b8?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=500&q=80"
           />
 
-          <h3 class="name">Albert Sinelly</h3>
+          <h3 className="name">Albert Sinelly</h3>
 
-          <h4 class="job">Driver</h4>
+          <h4 className="job">Driver</h4>
         </div>
 
      
-        <div class="slide-box">
+        <div className="slide-box">
          
-          <p class="comment">
+          <p className="comment">
           Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do
           eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut
           enim ad minim veniam, quis nostrud exercitation ullamco laboris
@@ -112,15 +112,15 @@ function Testimonials() {
           src="https://images.unsplash.com/photo-1627541718143-1adc1b582e62?ixid=MnwxMjA3fDB8MHxzZWFyY2h8N3x8bXVzbGltfGVufDB8MnwwfHw%3D&ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60"
           />
 
-          <h3 class="name">Hirok Meryam</h3>
+          <h3 className="name">Hirok Meryam</h3>
 
-          <h4 class="job">User</h4>
+          <h4 className="job">User</h4>
         </div>
 
        
-        <div class="slide-box">
+        <div className="slide-box">
           
-            <p class="comment">
+            <p className="comment">
             Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do
             eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut
             enim ad minim veniam, quis nostrud exercitation ullamco laboris
@@ -131,14 +131,14 @@ function Testimonials() {
             src="https://images.unsplash.com/photo-1610216705422-caa3fcb6d158?ixid=MnwxMjA3fDB8MHxzZWFyY2h8MzJ8fGZhY2V8ZW58MHwyfDB8fA%3D%3D&ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60"
             />
 
-            <h3 class="name">Sebastian Sert</h3>
+            <h3 className="name">Sebastian Sert</h3>
 
-            <h4 class="job">Service Provider</h4>
+            <h4 className="job">Service Provider</h4>
         </div>
 
         {/* SLIDER SEVEN  */}
-        <div class="slide-box">
-          <p class="comment">
+        <div className="slide-box">
+          <p className="comment">
           Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do
           eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut
           enim ad minim veniam, quis nostrud exercitation ullamco laboris
@@ -149,9 +149,9 @@ function Testimonials() {
           src="https://images.unsplash.com/photo-1610216705422-caa3fcb6d158?ixid=MnwxMjA3fDB8MHxzZWFyY2h8MzJ8fGZhY2V8ZW58MHwyfDB8fA%3D%3D&ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60"
           />
 
-          <h3 class="name">Sebastian Sert</h3>
+          <h3 className="name">Sebastian Sert</h3>
 
-          <h4 class="job">Service Provider</h4>
+          <h4 className="job">Service Provider</h4>
         </div>
 
         </div>
