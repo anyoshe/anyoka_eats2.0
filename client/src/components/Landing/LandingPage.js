@@ -1,0 +1,423 @@
+
+import React, { useState, useEffect } from 'react';
+import axios from 'axios';
+import config from '../../config';
+import DishCard from '../Menu/DishCard';
+import RestaurantCard from '../Menu/RestaurantCard';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faPlusSquare, faSearch } from '@fortawesome/free-solid-svg-icons';
+import { Link } from 'react-router-dom';
+import './LandingPage.css';
+import OrderTrackingModal from '../Tracking/OrderTrackingModal';
+import SearchBar from './SearchBar';
+import SpecialOrderModal from '../SpecialOrderModal';
+import FoodCard from '../FreshFood/FoodCard';
+import NavBar from '../Header/navbar';
+import Testimonials from '../Landing/LandingTestimonial';
+import FooterComponent from '../Landing/LandingFooter';
+
+import foodImg from '../../assets/images/flying-fried-chicken-with-bucket-cartoon.png';
+import cateringImg from '../../assets/images/cooking-people-colored-composition.png';
+import specialOrderImg from '../../assets/images/abstract-star-burst-with-rays-flare.png';
+import conferencingImg from '../../assets/images/people-business-meeting-office-conference-room-concept-teamwork-communication-company-brainstorming-discussion-team-vector-flat-illustration-people-with-speech-bubbles.png';
+import trackOrderImg from '../../assets/images/delivery-boy-picks-up-parcel-from-online-store-sending-customer-with-location-application-by-motorcycle-vector-illustration.png';
+import freshFoodImg from '../../assets/images/vegetables-concept-illustration.png';
+import serviceProviderImg from '../../assets/images/service_Provider.png';
+import userPersonImg from '../../assets/images/userPerson.png';
+import deliveryParsonImg from '../../assets/images/deliveryPerason.png';
+import profileImg from '../../assets/images/Eliud.jpg';
+import profileImg2 from '../../assets/images/mzeepassport.JPG';
+
+const LandingPage = () => {
+    const [dropdownOpen, setDropdownOpen] = useState(false);
+    const [isModalOpen, setIsModalOpen] = useState(false);
+    const [topRatedRestaurants, setTopRatedRestaurants] = useState([]);
+    const [dishes, setDishes] = useState([]);
+    const [specialOrderModalOpen, setSpecialOrderModalOpen] = useState(false);
+    const [discountedFoods, setDiscountedFoods] = useState([]);
+    const [searchTerm, setSearchTerm] = useState('');
+    const [searchResults, setSearchResults] = useState([]);
+
+
+    const handleSearch = async () => {
+        try {
+            const response = await axios.get(`${config.backendUrl}/api/universal-search?q=${searchTerm}`);
+            setSearchResults(response.data.results);
+        } catch (error) {
+            console.error('Error fetching search results:', error);
+        }
+    };
+
+    useEffect(() => {
+        const fetchDiscountedDishes = async () => {
+            try {
+                const response = await axios.get(`${config.backendUrl}/api/discounted-dishes`);
+                const fetchedDishes = response.data.dishes || [];
+
+               
+                const discountedDishes = fetchedDishes.filter(dish => dish.discount && dish.discount > 0).slice(0, 5);
+
+                setDishes(discountedDishes);
+            } catch (error) {
+                console.error('Error fetching discounted dishes:', error);
+            }
+        };
+
+        const fetchDiscountedFoods = async () => {
+            try {
+                const response = await axios.get(`${config.backendUrl}/api/discounts`);
+                console.log("Full response:", response.data); 
+                const fetchedFoods = response.data; 
+                const discountedFoods = fetchedFoods.slice(0, 5); 
+                setDiscountedFoods(discountedFoods);
+            } catch (error) {
+                console.error('Error fetching discounted foods:', error);
+            }
+        };
+
+        fetchDiscountedDishes();
+        fetchDiscountedFoods();
+    }, []);
+
+    useEffect(() => {
+        const fetchTopRatedRestaurants = async () => {
+            try {
+                const response = await axios.get(`${config.backendUrl}/api/dishes-and-restaurants`);
+                console.log('Restaurants response:', response.data);
+                const restaurants = response.data.restaurants || [];
+
+                const topRated = [...restaurants].sort((a, b) => b.averageRating - a.averageRating).slice(0, 4);
+                setTopRatedRestaurants(topRated);
+            } catch (error) {
+                console.error('Error fetching top-rated restaurants:', error);
+            }
+        };
+
+        fetchTopRatedRestaurants();
+    }, []);
+
+    const getTopRatedDishes = () => {
+        return [...dishes].sort((a, b) => b.averageRating - a.averageRating).slice(0, 5);
+    };
+
+    const handleMouseOver = () => {
+        setDropdownOpen(true);
+    };
+
+    const handleMouseOut = () => {
+        setDropdownOpen(false);
+    };
+
+    const selectOption = () => {
+        setDropdownOpen(false);
+    };
+
+    const openModal = () => {
+        setIsModalOpen(true)
+    };
+
+    const closeModal = () => {
+        setIsModalOpen(false)
+    };
+
+    const openSpecialOrderModal = () => {
+        setSpecialOrderModalOpen(true);
+    };
+
+    const closeSpecialOrderModal = () => {
+        setSpecialOrderModalOpen(false);
+    };
+
+    return (
+        
+        <div className="containerDiv">
+            {/* <NavBar/> */}
+            {/* header section - logo, searchBar, signIn & logIn, slogan, services */}
+            <section className="headerSection">
+                {/* logo */}
+                <div className="logo-CTA">
+                    <div className="logoDiv">
+                        <h2 className="logo">Anyoka Eats</h2>
+                    </div>
+                  
+                    <div className="signCta_div">
+                        <Link to="/sign-up-sign-in" className="landing_sign">Log In</Link>
+                    </div>
+                </div>
+                {/* searchBar & services */}
+                <div className="services-serchBar">
+                    <SearchBar />
+
+                    {/* welcome message/slogan */}
+                    <div className="services_slogan">
+                        <div className="slogan">
+                            <p className="sloganParagraph">Best services at your own comfort</p>
+                        </div>
+
+                        {/* services offered */}
+                        <div className="services">
+                            {/* Food */}
+                            <Link to="/menu">
+                                <div id="foodService" className="serviceDiv">
+                                    <img src={foodImg} alt="Food" className="serviceImg" />
+                                    <p>Food</p>
+                                </div>
+                            </Link>
+
+                            {/* Outside Catering */}
+                            <Link to={'/outsideCatering'}>
+                                <div id="cateringService" className="serviceDiv">
+                                    <img src={cateringImg} alt="Outside Catering" className="serviceImg" />
+                                    <p>Outside Catering</p>
+                                </div>
+                            </Link>
+
+                            {/* Special Order */}
+                            <div id="specialOrderService" className="serviceDiv">
+                                <img src={specialOrderImg} alt="Special Order" className="serviceImg" onClick={openSpecialOrderModal} />
+                                <p>Special Order</p>
+                            </div>
+
+                            {/* More */}
+                            <Link to={'/user'}>
+                                <div id="moreServices" className="serviceDiv">
+                                    <FontAwesomeIcon icon={faPlusSquare} className="faIcons fa-7x" />
+                                    <p>More</p>
+                                </div>
+                            </Link>
+
+                            {/* Conferencing & Meeting */}
+                            <Link to={'/conferences'}>
+                                <div id="conferencingService" className="serviceDiv">
+                                    <img src={conferencingImg} alt="Conferencing & Meeting" className="serviceImg" />
+                                    <p>Conference & Meeting</p>
+                                </div>
+                            </Link>
+
+                            {/* Track Your Order */}
+
+                            <div id="trackOrder" className="serviceDiv" onClick={openModal}>
+                                <img src={trackOrderImg} alt="Track Your Order" className="serviceImg" />
+                                <p>Track Your Order</p>
+                            </div>
+
+                            {/* Fresh Foods */}
+                            <Link to={'freshfood'}>
+                                <div id="freshFoodService" className="serviceDiv">
+                                    <img src={freshFoodImg} alt="Fresh Foods" className="serviceImg" />
+                                    <p>Fresh Foods</p>
+                                </div>
+                            </Link>
+                        </div>
+                    </div>
+                </div>
+            </section> 
+
+            {/* offers section */}
+            <section className="offersSection">
+                {/* offer title and offer search bar */}
+                <div className="title-offerSearch">
+                    <div className="title">
+                        <h2 className='offerTitle'>OFFERS</h2>
+                    </div>
+                </div>
+
+                <div className="category-dispaly">
+                    {/* offer categories */}
+                    <div className="offerNavContainer">
+                        <div className="offerNav">
+                            <button className="categories allBtn">All</button>
+                            <button className="categories categoryBtn" onMouseOver={handleMouseOver} onMouseOut={handleMouseOut}>
+                                Categories
+                            </button>
+                            {dropdownOpen && (
+                                <div className="dropdown-content" onMouseOver={handleMouseOver} onMouseOut={handleMouseOut}>
+                                    <a href="#Food" onClick={selectOption}>Food</a>
+                                    <a href="#Special_Orders" onClick={selectOption}>Special Orders</a>
+                                    <a href="#Outside_Catering" onClick={selectOption}>Outside Catering</a>
+                                    <a href="#Conferencing_&_Meeting" onClick={selectOption}>Conferencing & Meeting</a>
+                                    <a href="#Fresh_Foods" onClick={selectOption}>Fresh Foods</a>
+                                </div>
+                            )}
+                        </div>
+                       
+                        <div className="search-container">
+                            <input
+                                type="text"
+                                name="search"
+                                placeholder="Search for anything..."
+                                className="search-input"
+                                value={searchTerm}
+                                onChange={(e) => setSearchTerm(e.target.value)}
+                                onKeyPress={(e) => {
+                                    if (e.key === 'Enter') {
+                                        handleSearch();
+                                    }
+                                }}
+                            />
+                            <a href="#" className="search-btn" onClick={handleSearch}>
+                                <FontAwesomeIcon icon={faSearch} />
+                            </a>
+
+
+                            {/* Display Search Results */}
+                        {searchResults.length > 0 && (
+                            <div className="search-results">
+                                {searchResults.map((result, index) => (
+                                    <div key={index} className="search-result-item">
+                                        <a href={`/${result.type}/${result._id}`}>
+                                            <p>{result.name || result.dishName || result.restaurant}</p>
+                                        </a>
+                                    </div>
+                                ))}
+                            </div>
+                        )}
+                        </div>
+                    </div>
+
+                    <div className="offers-container">
+                        {/* offer display */}
+                        <div className="offerDispaly">
+                             
+                            <div className="offerDisplay">
+                                {dishes.map(dish => (
+                                    <DishCard key={dish.dishCode} dish={dish} />
+                                ))}
+                            </div>
+                        </div> 
+
+                        
+                       {/* Discounted Foods */}
+                       {discountedFoods.length > 0 && (
+                            <div>
+                               
+                                <div className="food-cards-container">
+                                    {discountedFoods.map((food, index) => (
+                                        <FoodCard key={index} food={food} />
+                                    ))}
+                                </div>
+                            </div>
+                        )}
+                    </div>
+                </div>
+            </section>
+
+            {/* featured section */}
+            <section className="featuredSection">
+                <div className='divHotel divFeatured'>
+                    {/* hotels heading */}
+                    <div className="FeaturedDiv">
+                        <h2 className="FeaturedHeading">Featured Hotels</h2>
+                    </div>
+                    <div className="DishCards">
+                        {topRatedRestaurants.map((restaurant, index) => (
+                            <RestaurantCard key={index} restaurant={restaurant} />
+                        ))}
+                    </div>
+                </div>
+                
+                <div className='divFood divFeatured'>
+                    {/* Food heading */}
+                    <div className="FeaturedDiv">
+                        <h2 className="FeaturedHeading">Featured Food</h2>
+                    </div>
+
+                    {/* Food features */}
+                    <div className="featuredFood featured">
+                        {getTopRatedDishes().map(dish => (
+                            <DishCard key={dish.dishCode} dish={dish} />
+                        ))}
+                    </div>
+                </div>
+            </section>
+
+            <section class="join_team_section">
+                <div class="join_team_div">
+                    {/* <!-- PARAGRAPH  DIV --> */}
+                    <div class="paragraph_div">
+                        <h3 class="join_team_heading">
+                           Join our ever evolving and  growing community as :
+                        </h3>
+                    </div>
+
+                    {/* <!-- JOIN TEAM GRID CHOICES --> */}
+                    <div class="join_team_grid_div">
+                        <div class="join_team_choices">
+                            <h3 class="join_title">Service Provider</h3>
+
+                            <p class="join_explanation">Register your hotel, catering  or fresh food bussiness offer services</p>
+
+                            {/* <!-- IMAGE DIV AND IMAGE --> */}
+                            <div class="join_team_image_div">
+                                <img src={serviceProviderImg} alt="Service Provider" className="join_img" />
+                            </div>
+
+                             {/* <!-- SIGN UP BUTTON --> */}
+                            <button class="signup">Sign Up</button>
+                        </div>
+
+                        <div class="join_team_choices">
+                            <h3 class="join_title">User</h3>
+
+                            <p class="join_explanation">Sign up and order food together with other services of your choice</p>
+
+                            {/* <!-- IMAGE DIV AND IMAGE --> */}
+                            <div class="join_team_image_div">
+                                <img src={userPersonImg} alt="User Person" className="join_img" />
+                            </div>
+
+                            {/* <!-- SIGN UP BUTTON --> */}
+                            <button class="signup">Sign Up</button>
+                        </div>
+
+                        <div class="join_team_choices">
+                            <h3 class="join_title">Deliver Person</h3>
+
+                            {/* <!-- <p class="join_explanation">Deliver food orders for people and earn</p> --> */}
+                            <p class="join_explanation">Do you have a job.Fulfill delivery orders for customers and earn per trip</p>
+                             {/* <!-- IMAGE DIV AND IMAGE --> */}
+                            <div class="join_team_image_div">
+                                <img src={deliveryParsonImg} alt="Delivery Person" className="join_img" />
+
+                            </div>
+
+                            {/* <!-- SIGN UP BUTTON --> */}
+                            <button class="signup">Sign Up</button>
+                        </div>
+                    </div>
+                </div>
+            </section>
+            {/* <!-- ABOUT US PAGE  --> */}
+            <section class="about_us_section">
+                <div class="about_us_div">
+                    <div class="about_title_div">
+                        <h3 class="about_us_title">About Us</h3>
+                    </div>
+
+                    <div class="about_us_content">
+
+                        <div class="aboutUs_img_div aboutUs_img_div1">
+                            <img src={profileImg} alt="Founder's Picture" class="about_us_img"/>
+                        </div>
+
+                        <div class="aboutUs_img_div aboutUs_img_div2">
+                            <img src={profileImg2} alt="Co-founder's Picture" class="about_us_img"/>
+                        </div>
+
+                        <p class="aboutUs_paragraph">Lorem ipsum, dolor sit amet consectetur adipisicing elit. Harum voluptas laboriosam quos quia corporis, deserunt nihil magnam officia nulla ad magni dolores, ab iste fugit doloremque maiores odit tempore voluptatum!Quibusdam ab molestias est dolore praesentium officia quos vitae ipsam temporibus a vel omnis incidunt enim, earum neque sit laborum itaque, reprehenderit excepturi. Quo exercitationem perferendis veniam praesentium laborum eos.Sapiente ea dolores culpa inventore maiores qui deleniti quas molestiae voluptas blanditiis! Iure, totam accusantium odit quaerat, architecto earum dolor beatae veniam ea excepturi, velit mollitia itaque veritatis libero ut!Similique in modi voluptatibus, sed unde totam voluptatem, expedita facere possimus esse, non enim iste quae. Tempore quia fugiat reiciendis corporis exercitationem commodi, quis nobis tempora ab enim? Ipsum, in?Animi ipsa, eaque odio sapiente cum praesentium deleniti consequatur, temporibus corporis ea cumque minima id voluptatem amet minus saepe. Ea vitae fuga, aliquam minus asperiores voluptatum suscipit voluptate hic veritatis?Autem tempora vitae tenetur culpa inventore dolor dolore doloribus, ad aut incidunt molestias debitis neque animi adipisci atque quae veniam et cumque libero aspernatur ex quaerat eveniet ipsa harum. Illo.Doloremque recusandae beatae quae, dolore, voluptas id nihil, vitae fugiat et nam numquam alias. Quae quo veniam sapiente neque aut dicta deleniti,</p>
+
+                    </div>
+
+                </div>
+            </section>
+
+            <Testimonials />
+            <FooterComponent />
+
+            <OrderTrackingModal isOpen={isModalOpen} onClose={closeModal} />
+            {specialOrderModalOpen && <SpecialOrderModal closeModal={closeSpecialOrderModal} />}
+        </div>
+    );
+};
+
+export default LandingPage;

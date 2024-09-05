@@ -1,0 +1,48 @@
+:root{
+  --green:rgb(30, 165, 9);
+  --orange: rgb(255,165,0);
+}
+
+* {
+  margin: 0;
+  box-sizing: border-box;
+}
+
+.NavBarContainer{
+  margin-top: 5%; 
+  position: relative;
+}
+
+#navline{
+  /* border: 1px solid red; */
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-direction: row;
+  width: 100%;
+  position: fixed;
+  z-index: 500;
+  background: white;
+  top: 0;
+  margin-top: 1%;
+}
+
+.homeLink{
+  margin-left: 5%;
+}
+
+.homeIcon{
+  font-size: 20px;
+  color: var(--green);
+}
+
+.homeIcon:hover{
+  color: var(--orange);
+  cursor: pointer;
+}
+
+.menu-container{
+  margin-top: 2%; 
+}
+
