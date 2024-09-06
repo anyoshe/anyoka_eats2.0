@@ -63,14 +63,14 @@ const FoodCard = ({ food }) => {
   };
 
   return (
-    <li className="food-card">
+    <li className="dish-card">
       {imageUrl && (
-        <div className="food-image-wrapper1">
+        <div className="dish-image-wrapper">
 
           <img src={imageUrl} alt={food.foodName} className="food-image" />
 
           {food.discount > 0 && (
-            <span className="discounted-price-circle-land">
+            <span className="discounted-price-circle">
               Now <br/>Ksh{(food.discountedPrice).toFixed(2)}
             </span>
           )}

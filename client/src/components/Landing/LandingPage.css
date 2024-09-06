@@ -556,3 +556,264 @@ animation: hoverShake 0.15s linear 3;
     font-size: 18px;
     font-weight: 350;
 }
+
+/* MEDIA QUERIES */
+/* @media only screen and (min-width: 1200px) {
+    .containerDiv {
+        width: 100%;
+    }
+
+    .services {
+        grid-template-columns: repeat(7, 1fr);
+    }
+
+    .search__input {
+        width: 800px;
+    }
+
+    .DishCards, .featured {
+        grid-template-columns: repeat(5, 1fr);
+    }
+
+    .join_team_grid_div {
+        grid-template-columns: repeat(3, 1fr);
+    }
+} */
+
+@media only screen and (max-width: 1199px) and (min-width: 992px) {
+    .containerDiv {
+        width: 95%;
+    }
+
+    .services {
+        grid-template-columns: repeat(4, 1fr);
+    }
+
+    .search__input {
+        width: 600px;
+    }
+
+    .DishCards, .featured {
+        grid-template-columns: repeat(3, 1fr);
+    }
+
+    .join_team_grid_div {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media only screen and (max-width: 991px) and (min-width: 768px) {
+    .containerDiv {
+        width: 100%;
+    }
+
+    .services {
+        grid-template-columns: repeat(3, 1fr);
+    }
+
+    .search__input {
+        width: 500px;
+    }
+    .offerDisplay{
+        grid-template-columns: repeat(3, 1fr);
+    }
+
+    .DishCards, .featured {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .join_team_grid_div {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media only screen and (max-width: 767px) {
+    .containerDiv {
+        width: 100%;
+    }
+
+    .services {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .search__input {
+        width: 100%;
+    }
+
+    .DishCards, .featured {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .offerDisplay{
+        display: flex;
+        /* flex-direction: column; */
+    }
+    .food-cards-container{
+       display: flex;
+    }
+    .join_team_grid_div {
+        grid-template-columns: 1fr;
+    }
+
+    .sloganParagraph {
+        font-size: 24px;
+        text-align: center;
+    }
+
+    .categories {
+        font-size: 12px;
+    }
+
+    .serviceDiv {
+        width: 150px;
+        height: 180px;
+    }
+
+    .serviceImg {
+        width: 100px;
+        height: 100px;
+    }
+
+    .join_team_heading {
+        font-size: 24px;
+    }
+} 
+ 
+
+
+/* Tablets (portrait and landscape) */
+@media (max-width: 1199px) and (min-width: 768px) {
+    .join_team_section {
+      padding: 20px;
+    }
+  
+    .join_team_div {
+      width: 90%;
+      margin: 0 auto;
+    }
+  
+    .join_team_grid_div {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 20px;
+    }
+  
+    .join_team_choices {
+      text-align: center;
+    }
+  
+    .join_team_image_div {
+      width: 100%;
+      display: flex;
+      justify-content: center;
+    }
+  
+    .join_img {
+      width: 100px;
+      height: auto;
+    }
+  
+    .signup {
+      padding: 10px 15px;
+      font-size: 16px;
+    }
+  
+    .about_us_section {
+      padding: 40px 20px;
+    }
+  
+    .about_us_div {
+      width: 90%;
+      margin: 0 auto;
+    }
+  
+    .about_us_content {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+  
+    .aboutUs_img_div {
+      width: 100%;
+      text-align: center;
+      margin-bottom: 20px;
+    }
+  
+    .about_us_img {
+      width: 150px;
+      height: auto;
+      border-radius: 50%;
+    }
+  
+    .aboutUs_paragraph {
+      font-size: 16px;
+      line-height: 1.6;
+      text-align: justify;
+    }
+  }
+  
+  /* Mobile phones */
+  @media (max-width: 767px) {
+    .join_team_section {
+      padding: 10px;
+    }
+  
+    .join_team_div {
+      width: 100%;
+    }
+  
+    .join_team_grid_div {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 10px;
+    }
+  
+    .join_team_choices {
+      text-align: center;
+    }
+  
+    .join_img {
+      width: 80px;
+      height: auto;
+    }
+  
+    .signup {
+      padding: 8px 12px;
+      font-size: 14px;
+    }
+  
+    .about_us_section {
+      padding: 20px 10px;
+    }
+  
+    .about_us_div {
+      width: 100%;
+      margin: 0 auto;
+    }
+  
+    .about_us_content {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+  
+    .aboutUs_img_div {
+      width: 100%;
+      text-align: center;
+      margin-bottom: 15px;
+    }
+  
+    .about_us_img {
+      width: 100px;
+      height: auto;
+      border-radius: 50%;
+    }
+  
+    .aboutUs_paragraph {
+      font-size: 14px;
+      line-height: 1.5;
+      text-align: justify;
+      padding: 0 10px;
+    }
+  }
+  

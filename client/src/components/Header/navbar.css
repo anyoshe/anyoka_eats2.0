@@ -72,3 +72,102 @@
     background: var(--green);
     color: white;
 }
+
+/* MEDIA QUERIES */
+
+@media only screen and (min-width: 1200px) {
+    .containerDiv {
+        width: 100%;
+    }
+
+    .headerSection {
+        width: 100%;
+    }
+
+    .logo-CTA {
+        width: 100%;
+        padding: 15px 30px;
+    }
+
+    .signCta {
+        padding: 10px 35px;
+        font-size: 18px;
+    }
+}
+
+@media only screen and (max-width: 1199px) and (min-width: 992px) {
+    .containerDiv {
+        width: 85%;
+    }
+
+    .headerSection {
+        width: 90%;
+    }
+
+    .logo-CTA {
+        width: 95%;
+        padding: 12px 25px;
+    }
+
+    .signCta {
+        padding: 8px 30px;
+        font-size: 16px;
+    }
+}
+
+@media only screen and (max-width: 991px) and (min-width: 768px) {
+    .containerDiv {
+        width: 90%;
+    }
+
+    .headerSection {
+        width: 95%;
+        margin-bottom: 0.8cm;
+    }
+
+    .logo-CTA {
+        padding: 10px 20px;
+        box-shadow: rgba(33, 35, 38, 0.1) 0px 5px 5px -5px;
+    }
+
+    .signCta {
+        padding: 7px 20px;
+        font-size: 15px;
+    }
+
+    .logIn {
+        margin-right: 1cm;
+    }
+}
+
+
+@media only screen and (max-width: 767px) {
+    .containerDiv {
+        width: 100%;
+    }
+
+    .headerSection {
+        width: 100%;
+        margin-bottom: 0.5cm;
+    }
+
+    .logo-CTA {
+        flex-direction: column;
+        padding: 8px 15px;
+        box-shadow: rgba(33, 35, 38, 0.1) 0px 5px 5px -5px;
+    }
+
+    .signCta {
+        padding: 6px 15px;
+        font-size: 14px;
+    }
+
+    .logIn {
+        margin-right: 0;
+    }
+
+    .logo {
+        font-size: 18px;
+    }
+}
+ 

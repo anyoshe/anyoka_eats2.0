@@ -4,12 +4,23 @@ import DishCard from './DishCard';
 import config from '../../config';
 import RestaurantCard from './RestaurantCard.js';
 import './DishCategories.css';
+import { useLocation } from 'react-router-dom';
 
 
 const DishCategories = () => {
   const [dishes, setDishes] = useState([]);
   const [restaurants, setRestaurants] = useState([]);
   const [topRatedHotels, setTopRatedHotels] = useState([]);
+  const [discountedDishes, setDiscountedDishes] = useState([]);
+
+  const location = useLocation();
+  const [view, setView] = useState('all'); 
+  useEffect(() => {
+    // Check if the location state has a view
+    if (location.state && location.state.view) {
+      setView(location.state.view);
+    }
+  }, [location.state]); 
 
   useEffect(() => {
     const fetchData = async () => {
@@ -25,41 +36,87 @@ const DishCategories = () => {
 
         const topRated = [...restaurants].sort((a, b) => b.averageRating - a.averageRating).slice(0, 4);
         setTopRatedHotels(topRated);
-
-      
       } catch (error) {
         console.error('Error fetching dishes:', error);
       }
     };
       
     fetchData();
-    }, []);
+  }, []);
 
-    const getTopRatedDishes = () => {
-      return [...dishes].sort((a, b) => b.averageRating - a.averageRating).slice(0, 4);
-    };
+  // Fetch discounted dishes when the view changes to 'discounted'
+  useEffect(() => {
+    if (view === 'discounted') {
+      const fetchDiscountedDishes = async () => {
+        try {
+          const response = await axios.get(`${config.backendUrl}/api/discounted-dishes`);
+          setDiscountedDishes(response.data.dishes || []);
+        } catch (error) {
+          console.error('Error fetching discounted dishes:', error);
+        }
+      };
+      fetchDiscountedDishes();
+    }
+  }, [view]);
 
+  const getTopRatedDishes = () => {
+    return [...dishes].sort((a, b) => b.averageRating - a.averageRating).slice(0, 4);
+  };
 
-    const getPopularDishes = () => {
-      return [...dishes].sort((a, b) => b.averageRating - a.averageRating).slice(0, 12);
-    };
+  const getPopularDishes = () => {
+    return [...dishes].sort((a, b) => b.averageRating - a.averageRating).slice(0, 12);
+  };
 
-    const getPopularRestaurants = () => {
-      return [...restaurants].sort((a, b) => b.averageRating - a.averageRating).slice(0, 3);
-    };
+  const getPopularRestaurants = () => {
+    return [...restaurants].sort((a, b) => b.averageRating - a.averageRating).slice(0, 3);
+  };
 
   return (
     <div id="dish-categories">
-      
-      <div className='popularDishDiv menuDivs'>
-        <h5 className='menuHeader'>Popular Dishes</h5>
-        <ul id="popular-dishes" className="dish-list">
-          {getPopularDishes().map(dish => (
-            <DishCard key={dish.dishCode} dish={dish} addToCart={() => {}} />
-          ))}
-        </ul>
+      <section className='dishesSection'>
+      {/* Buttons for category selection */}
+      <div className="category-buttons">
+        <button onClick={() => setView('all')}>All Dishes</button>
+        <button onClick={() => setView('popular')}>Popular Dishes</button>
+        <button onClick={() => setView('discounted')}>Discounted and Offers</button>
       </div>
-        
+     <div className="dishes-to-display">
+      {/* Conditionally render sections based on selected view */}
+      {view === 'popular' && (
+        <div className='popularDishDiv menuDivs'>
+          <h5 className='menuHeader'>Popular Dishes</h5>
+          <ul id="popular-dishes" className="dish-list">
+            {getPopularDishes().map(dish => (
+              <DishCard key={dish.dishCode} dish={dish} addToCart={() => {}} />
+            ))}
+          </ul>
+        </div>
+      )}
+
+      {view === 'all' && (
+        <div className='allDishDiv menuDivs'>
+          <h5 className='menuHeader'>All Dishes</h5>
+          <ul id="all-dishes" className="dish-list">
+            {dishes.map(dish => (
+              <DishCard key={dish.dishCode} dish={dish} addToCart={() => {}} />
+            ))}
+          </ul>
+        </div>
+      )}
+
+      {view === 'discounted' && (
+        <div className='discountedDishDiv menuDivs'>
+          <h5 className='menuHeader'>Discounted and Offers</h5>
+          <ul id="discounted-dishes" className="dish-list">
+            {discountedDishes.map(dish => (
+              <DishCard key={dish.dishCode} dish={dish} addToCart={() => {}} />
+            ))}
+          </ul>
+        </div>
+      )}
+     </div>
+     </section>
+     <section className="restaurantSection">
       <div className='popularHotelDiv menuDivs'>
         <h5 className='restaurantHeader'>Popular Restaurants</h5>
         <ul id="popular-restaurants" className="restaurant-list">
@@ -67,7 +124,8 @@ const DishCategories = () => {
             <RestaurantCard key={restaurant._id} restaurant={restaurant} />
           ))}
         </ul>
-      </div> 
+      </div>
+      </section>
     </div>
   );
 };
