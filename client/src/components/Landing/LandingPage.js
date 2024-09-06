@@ -240,12 +240,12 @@ const LandingPage = () => {
                                 </div>
                             )}
                         </div>
-                       
+                    
                         <div className="search-container">
                             <input
                                 type="text"
                                 name="search"
-                                placeholder="Search for anything..."
+                                placeholder="Search for any offer!!!"
                                 className="search-input"
                                 value={searchTerm}
                                 onChange={(e) => setSearchTerm(e.target.value)}
@@ -261,12 +261,12 @@ const LandingPage = () => {
 
 
                             {/* Display Search Results */}
-                        {searchResults.length > 0 && (
+                            {searchResults.length > 0 && (
                             <div className="search-results">
                                 {searchResults.map((result, index) => (
                                     <div key={index} className="search-result-item">
-                                        <a href={`/${result.type}/${result._id}`}>
-                                            <p>{result.name || result.dishName || result.restaurant}</p>
+                                        <a href={`/${result.type}/${result.dishCode}`}      className="search-result-item-a">
+                                            {result.dishName && result.restaurant}
                                         </a>
                                     </div>
                                 ))}
@@ -278,7 +278,7 @@ const LandingPage = () => {
                     <div className="offers-container">
                         {/* offer display */}
                         <div className="offerDispaly">
-                             
+                            
                             <div className="offerDisplay">
                                 {dishes.map(dish => (
                                     <DishCard key={dish.dishCode} dish={dish} />
@@ -288,9 +288,9 @@ const LandingPage = () => {
 
                         
                        {/* Discounted Foods */}
-                       {discountedFoods.length > 0 && (
+                    {discountedFoods.length > 0 && (
                             <div>
-                               
+                            
                                 <div className="food-cards-container">
                                     {discountedFoods.map((food, index) => (
                                         <FoodCard key={index} food={food} />
@@ -404,18 +404,18 @@ const LandingPage = () => {
                             <img src={profileImg2} alt="Co-founder's Picture" className="about_us_img"/>
                         </div>
 
-                        <p className="aboutUs_paragraph">At Anyoka Eats, our mission is to transform the dining experience with a seamless, innovative online restaurant platform. Founded by a passionate team dedicated to enhancing food discovery and ordering, we combine cutting-edge technology with a love for great food.
+                            <p className="aboutUs_paragraph">At Anyoka Eats, our mission is to transform the dining experience with a seamless, innovative online restaurant platform. Founded by a passionate team dedicated to enhancing food discovery and ordering, we combine cutting-edge technology with a love for great food.
 
-Our platform brings together a diverse range of restaurants and cuisines, allowing users to effortlessly browse, order, and enjoy their favorite dishes. With features like real-time order tracking, personalized recommendations, and a user-friendly interface, we strive to make every meal memorable.
+                            Our platform brings together a diverse range of restaurants and cuisines, allowing users to effortlessly browse, order, and enjoy their favorite dishes. With features like real-time order tracking, personalized recommendations, and a user-friendly interface, we strive to make every meal memorable.
 
-In addition to exceptional dining options, Anyoka Eats offers a variety of services to cater to your unique needs. Explore our conference and meeting spaces, perfect for business gatherings and special events. With detailed information on venue capacity, location, and available services, planning your next event has never been easier.
+                            In addition to exceptional dining options, Anyoka Eats offers a variety of services to cater to your unique needs. Explore our conference and meeting spaces, perfect for business gatherings and special events. With detailed information on venue capacity, location, and available services, planning your next event has never been easier.
 
-Our special ordering feature allows you to request customized meals that are made to your specific preferences, ensuring a home-cooked feel with every bite. We also offer a selection of fresh foods, delivered hot and ready to enjoy, to elevate your dining experience.
+                            Our special ordering feature allows you to request customized meals that are made to your specific preferences, ensuring a home-cooked feel with every bite. We also offer a selection of fresh foods, delivered hot and ready to enjoy, to elevate your dining experience.
 
-Our team, composed of experts in web development, user experience design, and culinary arts, works tirelessly to ensure that our platform not only meets but exceeds customer expectations. From dynamic dish updates to intuitive search functionalities, we are committed to providing an exceptional online dining experience.
+                            Our team, composed of experts in web development, user experience design, and culinary arts, works tirelessly to ensure that our platform not only meets but exceeds customer expectations. From dynamic dish updates to intuitive search functionalities, we are committed to providing an exceptional online dining experience.
 
-Join us on this culinary journey and discover how Anyoka Eats is redefining the future of dining, events, and personalized food experiences.</p>
-
+                            Join us on this culinary journey and discover how Anyoka Eats is redefining the future of dining, events, and personalized food experiences.
+                            </p>
                     </div>
 
                 </div>

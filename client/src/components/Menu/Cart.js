@@ -93,9 +93,9 @@ const Cart = () => {
 
       {/* Location Modal */}
       <LocationModal show={showLocationModal}
-       handleClose={closeLocationModal} 
-       restaurantName={state.firstDishRestaurant}
-       orderedDishes={state.items}
+      handleClose={closeLocationModal} 
+      restaurantName={state.firstDishRestaurant}
+      orderedDishes={state.items}
         />
 
       
@@ -103,7 +103,7 @@ const Cart = () => {
       <a href="#" id="cart2" onClick={handleCartClick}>
         <i className="fas fa-shopping-cart"></i><span id="cartCount">{state.cartCount}</span>
       </a>
-   </>
+  </>
   );
 };
 
