@@ -285,12 +285,6 @@
     cursor: pointer;
 }
 
-footer {
-    background-color: #f8f8f8;
-    padding: 20px;
-    text-align: center;
-}
-
 .footer-links a {
     margin: 0 10px;
     text-decoration: none;

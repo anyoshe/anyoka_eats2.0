@@ -163,9 +163,8 @@ const Footer = () => {
               </div>
 
               <div className="footer-text">
-                <p className="footer-logo-text">
-                  
-                "Savor Every Moment, Anytime, Anywhere.""Anyoka Eats – Savor Every Moment, Anytime, Anywhere."
+                <p className="footer-logo-text"> 
+                  "Anyoka Eats – Savor Every Moment, Anytime, Anywhere."
                 </p>
               </div>
 

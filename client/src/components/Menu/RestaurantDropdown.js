@@ -3,6 +3,7 @@ import DishCard from './DishCard';
 import config from '../../config';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap/dist/js/bootstrap.bundle.min';
+import './RestraurantDropdown.css';
 
 const RestaurantDropdown = ({ addToCart, searchQuery }) => {
   const [restaurants, setRestaurants] = useState([]);
@@ -69,13 +70,14 @@ const RestaurantDropdown = ({ addToCart, searchQuery }) => {
   };
 
   return (
-    <div>
-      <select value={selectedRestaurant} onChange={handleSelectChange}>
+    <div className='by_reataurant_wrapper'>
+      <select value={selectedRestaurant} onChange={handleSelectChange} className='by_reataurant_select'>
         <option value="" disabled>Order by Restaurant</option>
         {filteredRestaurants.map((restaurant) => (
           <option key={restaurant} value={restaurant}>{restaurant}</option>
         ))}
       </select>
+
       {modalVisible && (
         <div className="modal fade show" id="dishesModal" tabIndex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true" style={{ display: 'block' }}>
           <div className="modal-dialog modal-lg">

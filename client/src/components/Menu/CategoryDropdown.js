@@ -69,8 +69,8 @@ const CategoryDropdown = ({ addToCart, searchQuery }) => {
 
   return (
     <div>
-      <select value={selectedCategory} onChange={handleSelectChange}>
-        <option value="" disabled>Order by Cuisine/Dish Type</option>
+      <select value={selectedCategory} onChange={handleSelectChange} className='by_reataurant_select'>
+        <option value="" disabled>Order by Dish Type</option>
         {filteredCategories.map((category) => (
           <option key={category} value={category}>{category}</option>
         ))}

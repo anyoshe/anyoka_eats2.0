@@ -4,6 +4,8 @@ import 'bootstrap/dist/js/bootstrap.bundle.min';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faHome } from '@fortawesome/free-solid-svg-icons';
 import MainSearchBar from './MainSearchBar';
+import CategoryDropdown from './CategoryDropdown';
+import RestaurantDropdown from './RestaurantDropdown';
 
 import './MenuPage.css';
 import DishCategories from './DishCategories';
@@ -29,8 +31,6 @@ return (
         {<MainSearchBar addToCart={addToCart}  />}
         <Cart />
       </div>
-
-      <hr></hr>
 
       <div className="menu-container">
         <DishCategories />

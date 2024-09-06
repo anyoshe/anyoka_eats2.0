@@ -9,12 +9,12 @@
 }
 
 .NavBarContainer{
-  margin-top: 5%; 
+  /* margin-top: 5%;  */
   position: relative;
 }
 
 #navline{
-  /* border: 1px solid red; */
+  /* border: 5px solid red; */
 
   display: flex;
   align-items: center;
@@ -23,9 +23,10 @@
   width: 100%;
   position: fixed;
   z-index: 500;
-  background: white;
+  padding: 0.1rem 0rem;
+  background: var(--orange);
   top: 0;
-  margin-top: 1%;
+  padding-top: 0.5rem;
 }
 
 .homeLink{
@@ -43,6 +44,6 @@
 }
 
 .menu-container{
-  margin-top: 2%; 
+  margin-top: 4%; 
 }
 

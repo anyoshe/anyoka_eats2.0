@@ -243,13 +243,13 @@ function SignUpSignIn() {
 
                         <div className="overlay-panel overlay-left">
                             <h1>Welcome Back!</h1>
-                            <p>To keep connected with us please login with your Account info</p>
+                            <p  className='sign-message'>To keep connected with us please login with your Account info</p>
                             <button className="signBtn btnScaled loginBtn" onClick={handleToggle}>Log In</button>
                         </div>
 
                         <div className="overlay-panel overlay-right">
                             <h1>Hello, Friend!</h1>
-                            <p>Enter your Account details and start journey with us</p>
+                            <p className='sign-message'>Enter your Account details and start journey with us</p>
                             <button id="signUpBtn" className="signBtn btnScaled loginBtn" onClick={handleToggle}>Sign Up</button>
                         </div>
 

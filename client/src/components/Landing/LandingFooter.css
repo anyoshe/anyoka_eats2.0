@@ -16,6 +16,7 @@
 .footer-section {
   background: #151414;
   position: relative;
+  width: 100%;
 }
 
 .top_header_div{
@@ -56,9 +57,11 @@
 .footer-content {
     position: relative;
     padding: 0px 5%; 
-    margin-bottom: 1%;
-    background: url("https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEigB8iI5tb8WSVBuVUGc9UjjB8O0708X7Fdic_4O1LT4CmLHoiwhanLXiRhe82yw0R7LgACQ2IhZaTY0hhmGi0gYp_Ynb49CVzfmXtYHUVKgXXpWvJ_oYT8cB4vzsnJLe3iCwuzj-w6PeYq_JaHmy_CoGoa6nw0FBo-2xLdOPvsLTh_fmYH2xhkaZ-OGQ/s16000/footer_bg.png") no-repeat scroll center 0;
     overflow-x: hidden;
+    /* background-image: url(../../assets/footerBackground.jpg); */
+    background-repeat: none;
+    background-position: center;
+    background-size: contain;
 }
 
 .row_two{
@@ -247,28 +250,31 @@
 }
 
 .copyright_div{
+  /* border: 5px solid red; */
+
   background: var(--orange);
-  padding: 25px 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  padding: 1rem 0px;
+  text-align: center;
 }
 
 .copyright_text {
-  font-size: 14px;
+  /* border: 5px solid red; */
+
+  font-size: 1rem;
   color: white;
 }
 
 .car {
     background: url("https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEia0PYPxwT5ifToyP3SNZeQWfJEWrUENYA5IXM6sN5vLwAKvaJS1pQVu8mOFFUa_ET4JuHNTFAxKURFerJYHDUWXLXl1vDofYXuij45JZelYOjEFoCOn7E6Vxu0fwV7ACPzArcno1rYuVxGB7JY6G7__e4_KZW4lTYIaHSLVaVLzklZBLZnQw047oq5-Q/s16000/volks.gif") no-repeat center center;
-    width: 20%;
-    height: 20%;
+    width: 15%;
+    height: 26%;
     background-size:100%;
     position: absolute;
     bottom: 15%;
     left: 30%;
     -webkit-animation: myfirst 22s linear infinite;
     animation: myfirst 22s linear infinite;
+    z-index: 1;
 }
 
 .bike {
@@ -281,6 +287,7 @@
     position: absolute;
     -webkit-animation: myfirst 30s linear infinite;
     animation: myfirst 30s linear infinite;
+    z-index: 2;
 }
 
 @-moz-keyframes myfirst {
