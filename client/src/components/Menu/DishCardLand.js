@@ -1,33 +1,32 @@
 import React, { useState } from 'react';
-import { useFreshFoodCart } from './FreshFoodCartContext';
+import { useCart } from './CartContext';
 import config from '../../config';
-import './FoodCard.css';
+import './DishCard.css';
 import { useNavigate } from 'react-router-dom';
 
-const FoodCardLand = ({ food }) => {
-
-  const imageUrl = `${config.backendUrl}${food.imageUrl}`;
-  const [averageRating, setAverageRating] = useState(food.averageRating);
-  const [ratingCount, setRatingCount] = useState(food.ratingCount);
+const DishCardLand = ({ dish }) => {
+  const imageUrl = `${config.backendUrl}${dish.imageUrl}`;
+  const [averageRating, setAverageRating] = useState(dish.averageRating);
+  const [ratingCount, setRatingCount] = useState(dish.ratingCount);
   const [hoverRating, setHoverRating] = useState(0);
 
-  const { dispatch } = useFreshFoodCart();
-  const navigate = useNavigate(); // Create navigate instance for redirection
+  const { dispatch } = useCart();
+  const navigate = useNavigate();
 
   const handleAddToCart = () => {
     dispatch({
       type: 'ADD_TO_CART',
       payload: {
-        foodDetails: food,
-      },
+        dishDetails: dish
+      }
     });
-     // Redirect to discounted food page
-     navigate('/discounts#special-offers'); // Adjust the route based on your app's routing structure
+    navigate('/offers', { state: { view: 'discounted' } });
   };
-
+  
   const submitRating = async (itemId, itemType, rating) => {
     try {
-      const response = await fetch(`${config.backendUrl}/api/foodRating`, {
+      console.log('Submitting rating:', { item_id: itemId, item_type: itemType, rating });
+      const response = await fetch(`${config.backendUrl}/api/rating`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -38,9 +37,11 @@ const FoodCardLand = ({ food }) => {
       const data = await response.json();
 
       if (response.ok) {
+        // Update the average rating and rating count
         setAverageRating(data.newAverageRating);
         setRatingCount(data.newRatingCount);
       } else {
+        // Handle errors
         console.error('Failed to submit rating:', data.message);
       }
     } catch (error) {
@@ -49,7 +50,7 @@ const FoodCardLand = ({ food }) => {
   };
 
   const handleStarClick = (value) => {
-    submitRating(food._id, 'Food', value);
+    submitRating(dish._id, 'Dish', value);
   };
 
   const handleStarMouseEnter = (value) => {
@@ -70,33 +71,33 @@ const FoodCardLand = ({ food }) => {
     <li className="dish-card">
       {imageUrl && (
         <div className="dish-image-wrapper">
-
-          <img src={imageUrl} alt={food.foodName} className="food-image" />
-
-          {food.discount > 0 && (
+          <img src={imageUrl} alt={dish.dishName} className='dish-image' />
+          {dish.discount > 0 && (
             <span className="discounted-price-circle">
-              Now <br/>Ksh{(food.discountedPrice).toFixed(2)}
+              Now <br/> Ksh {(dish.discountedPrice)}
             </span>
           )}
-          
         </div>
       )}
   
-      <h6 className="dishName">{food.foodName}</h6>
+      <h6 className='dishName'>{dish.dishName}</h6>
   
-      {food.discount > 0 ? (
-        <div>
-          <span className="fresh_original">
-            Was <span className='fresh-original-strikethrough'> Kes.{(food.foodPrice * 1.2).toFixed(2)}</span>
-          </span>
-        </div>
+      {dish.discount > 0 ? (
+
+        <span className="original-price-offer">
+          Was <span className='diagonal-strikethrough linePrice'>Ksh {(dish.dishPrice * 1.2).toFixed(2)}</span>
+        </span>
+
+
       ) : (
-        <h6 className="dishPrice dishcontent">Kes.{(food.foodPrice * 1.2).toFixed(2)}</h6>
+        <p className='dishPrice dishContent'>
+          Ksh {(dish.dishPrice * 1.2).toFixed(2)}
+        </p>
       )}
   
-      <p className="dishRestaurant dishcontent">{food.vendor || 'Unknown Vendor'}</p>
+      <p className='dishRestaurant dishcontent'>{dish.restaurant || 'Unknown Restaurant'}</p>
   
-      <button onClick={handleAddToCart} className="dishAddToCart dishcontent">Order</button>
+      <button onClick={handleAddToCart} className='dishAddToCart dishcontent'>Order</button>
   
       <div className="rating dishcontent" onMouseLeave={handleStarMouseLeave}>
         {[...Array(5)].map((_, index) => {
@@ -114,12 +115,13 @@ const FoodCardLand = ({ food }) => {
         })}
       </div>
   
-      <p className="average dishcontent">
-        Average Rating: {averageRating?.toFixed(2)} <br />({ratingCount} ratings)
+      <p className='average dishcontent'>
+        Average Rating : {averageRating?.toFixed(2)}
+        <br /> ({ratingCount} user)
       </p>
     </li>
   );
 };
 
-export default FoodCardLand;
+export default DishCardLand;
 

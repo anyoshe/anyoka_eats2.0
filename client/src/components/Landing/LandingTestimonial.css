@@ -126,3 +126,178 @@
     padding: 0 55px;
   }
 }
+
+/* For Mobile Phones (Portrait & Landscape) */
+@media only screen and (max-width: 600px) {
+  .testimonials {
+    padding: 1rem 0px;
+  }
+
+  .testimonial_title {
+    font-size: 1.5rem;
+  }
+
+  .testimonial_description {
+    font-size: 1.2rem;
+  }
+
+  .testimonial-cards {
+    flex-direction: column;
+    height: auto;
+  }
+
+  .testimonial-card {
+    width: 100%;
+    padding: 15px;
+  }
+
+  .slider {
+    flex-direction: column;
+    gap: 15px;
+  }
+
+  .slide-box {
+    width: 90%;
+    height: auto;
+    padding: 10px;
+  }
+
+  .slide-box img {
+    max-width: 60px;
+  }
+
+  .comment {
+    font-size: 0.8rem;
+    padding: 0.8rem;
+  }
+}
+
+/* For Tablets (Portrait) */
+@media only screen and (min-width: 601px) and (max-width: 768px) {
+  .testimonials {
+    padding: 1.5rem 0px;
+  }
+
+  .testimonial_title {
+    font-size: 1.8rem;
+  }
+
+  .testimonial_description {
+    font-size: 1.4rem;
+  }
+
+  .testimonial-cards {
+    flex-direction: column;
+    height: auto;
+  }
+
+  .testimonial-card {
+    width: 100%;
+    padding: 20px;
+  }
+
+  .slider {
+    flex-direction: column;
+    gap: 15px;
+  }
+
+  .slide-box {
+    width: 80%;
+    height: auto;
+    padding: 15px;
+  }
+
+  .slide-box img {
+    max-width: 70px;
+  }
+
+  .comment {
+    font-size: 0.85rem;
+    padding: 0.9rem;
+  }
+}
+
+/* For Laptops and Tablets (Landscape) */
+@media only screen and (min-width: 769px) and (max-width: 1024px) {
+  .testimonials {
+    padding: 2rem 0px;
+  }
+
+  .testimonial_title {
+    font-size: 2rem;
+  }
+
+  .testimonial_description {
+    font-size: 1.5rem;
+  }
+
+  .testimonial-cards {
+    flex-direction: row;
+    gap: 15px;
+  }
+
+  .testimonial-card {
+    width: 45%;
+  }
+
+  .slider {
+    flex-direction: row;
+    gap: 20px;
+  }
+
+  .slide-box {
+    width: 70%;
+  }
+
+  .slide-box img {
+    max-width: 75px;
+  }
+
+  .comment {
+    font-size: 0.9rem;
+    padding: 1rem;
+  }
+}
+
+/* For Desktops */
+@media only screen and (min-width: 1025px) {
+  .testimonials {
+    padding: 2rem 0px;
+  }
+
+  .testimonial_title {
+    font-size: 2.5rem;
+  }
+
+  .testimonial_description {
+    font-size: 1.8rem;
+  }
+
+  .testimonial-cards {
+    flex-direction: row;
+    gap: 25px;
+  }
+
+  .testimonial-card {
+    width: 30%;
+  }
+
+  .slider {
+    flex-direction: row;
+    gap: 30px;
+  }
+
+  .slide-box {
+    width: 60%;
+  }
+
+  .slide-box img {
+    max-width: 80px;
+  }
+
+  .comment {
+    font-size: 1rem;
+    padding: 1.2rem;
+  }
+}
+ 

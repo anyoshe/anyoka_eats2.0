@@ -54,6 +54,7 @@ import ConferenceLandingPage from './components/Conferences/ConferenceLandingPag
 import OutsideCateringLandingPage from './components/OutsideCatering/OutsideCateringLandingPage';
 import UserProfileDashBoard from './components/User/UserProfileDashBoard';
 import { PartnerProvider } from './contexts/PartnerContext';
+import DishCategories from './components/Menu/DishCategories';
 
 function App() {
     return (
@@ -71,6 +72,7 @@ function App() {
                             <MenuPage />
                         </CartProvider>
                     } />
+                    <Route path="/offers" element={<MenuPage />} />
                     <Route path='/outside-catering' element={<OutsideCateringLandingPage />} />
                     <Route path="/user" element={<UserProfileDashBoard />} />
                     <Route path="/conferences" element={<ConferenceLandingPage />} />
@@ -80,6 +82,8 @@ function App() {
                             <LandingFreshFood />
                         </FreshFoodCartProvider>
                     } />
+                    <Route path="/discounts" element={<LandingFreshFood />} />
+                    
                 </Routes>
                 </FreshFoodCartProvider>
                 </CartProvider>
