@@ -11,10 +11,15 @@ import './LandingPage.css';
 import OrderTrackingModal from '../Tracking/OrderTrackingModal';
 import SearchBar from './SearchBar';
 import SpecialOrderModal from '../SpecialOrderModal';
-import FoodCard from '../FreshFood/FoodCard';
+// import FoodCard from '../FreshFood/FoodCard';
 import NavBar from '../Header/navbar';
 import Testimonials from '../Landing/LandingTestimonial';
 import FooterComponent from '../Landing/LandingFooter';
+import FoodCardLand from '../FreshFood/FoodCardLand';
+import DishCardLand from '../Menu/DishCardLand';
+
+
+
 
 import foodImg from '../../assets/images/flying-fried-chicken-with-bucket-cartoon.png';
 import cateringImg from '../../assets/images/cooking-people-colored-composition.png';
@@ -27,6 +32,7 @@ import userPersonImg from '../../assets/images/userPerson.png';
 import deliveryParsonImg from '../../assets/images/deliveryPerason.png';
 import profileImg from '../../assets/images/Eliud.jpg';
 import profileImg2 from '../../assets/images/mzeepassport.JPG';
+
 
 const LandingPage = () => {
     const [dropdownOpen, setDropdownOpen] = useState(false);
@@ -281,7 +287,7 @@ const LandingPage = () => {
                             
                             <div className="offerDisplay">
                                 {dishes.map(dish => (
-                                    <DishCard key={dish.dishCode} dish={dish} />
+                                    <DishCardLand key={dish.dishCode} dish={dish} />
                                 ))}
                             </div>
                         </div> 
@@ -290,10 +296,10 @@ const LandingPage = () => {
                        {/* Discounted Foods */}
                     {discountedFoods.length > 0 && (
                             <div>
-                            
-                                <div className="food-cards-container">
-                                    {discountedFoods.map((food, index) => (
-                                        <FoodCard key={index} food={food} />
+                               
+                                <div className="offerDisplay">
+                                    {discountedFoods.map(food => (
+                                        <FoodCardLand key={food.foodCode} food={food} />
                                     ))}
                                 </div>
                             </div>

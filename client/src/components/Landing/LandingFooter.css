@@ -316,3 +316,104 @@
     left: 100%;
   }
 }
+
+
+/* MEDIA QUERIES */
+
+/* Default: Large devices (desktops, laptops) */
+/* No media query needed, as the current setup assumes large screens */
+
+/* Medium devices (tablets) */
+@media only screen and (max-width: 1024px) {
+  .top_header_div {
+    grid-template-columns: 1fr; /* Stack the top header divs vertically */
+  }
+
+  .row_two {
+    grid-template-columns: 1fr 1fr; /* Adjust for 2 columns */
+    gap: 20px; /* Add more space between columns */
+  }
+
+  .footer-logo-text {
+    font-size: 15px;
+    text-align: center; /* Center text for better readability */
+  }
+
+  .footer_logo_head {
+    font-size: 4em; /* Slightly smaller heading */
+  }
+
+  .footer-logo img {
+    max-width: 150px; /* Reduce logo size for tablets */
+  }
+
+  .contact_form_btn {
+    font-size: 14px;
+    padding: 10px; /* Increase padding for larger button tap area */
+  }
+}
+
+/* Small devices (mobile phones) */
+@media only screen and (max-width: 768px) {
+  .top_header_div {
+    grid-template-columns: 1fr; /* Stack all items vertically */
+    text-align: center;
+  }
+
+  .footer-logo img {
+    max-width: 120px; /* Smaller logo for mobile */
+  }
+
+  .footer_logo_head {
+    font-size: 3em; /* Reduce heading size for mobile */
+  }
+
+  .row_two {
+    grid-template-columns: 1fr; /* Stack the columns */
+    gap: 15px;
+  }
+
+  .footer-logo-text {
+    font-size: 13px;
+  }
+
+  .contact_form_btn {
+    font-size: 12px;
+    padding: 8px; /* Smaller button on mobile */
+  }
+
+  #social_list {
+    font-size: 20px;
+    width: 35px;
+    height: 35px;
+  }
+
+  .car, .bike {
+    width: 15%; /* Adjust animated vehicles for smaller screens */
+    height: 15%;
+  }
+}
+
+/* Very small devices (small mobile phones) */
+@media only screen and (max-width: 480px) {
+  .footer_logo_head {
+    font-size: 2.5em; /* Reduce heading size further */
+  }
+
+  .footer-logo-text {
+    font-size: 12px;
+  }
+
+  .row_two {
+    grid-template-columns: 1fr;
+  }
+
+  .car, .bike {
+    width: 12%;
+    height: 12%; /* Further reduce size of animations */
+  }
+
+  .contact_form_btn {
+    padding: 7px; /* Adjust button padding for very small screens */
+  }
+}
