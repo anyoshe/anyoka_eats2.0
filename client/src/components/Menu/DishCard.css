@@ -172,3 +172,116 @@
   z-index: 10;
   text-align: center;
 }
+
+/* MEDIA QUERIES */
+/* Large desktops and laptops *
+@media (min-width: 1200px) {
+  .dish-card {
+    width: 300px;
+    height: auto;
+  }
+
+  .dish-image {
+    height: 250px;
+  }
+
+  .dishName {
+    font-size: 20px;
+  }
+
+  .dishPrice {
+    font-size: 20px;
+  }
+
+  .dishRestaurant {
+    font-size: 16px;
+  }
+
+  .dishAddToCart {
+    padding: 10px 20px;
+  }
+
+  .rating .star {
+    font-size: 20px;
+  }
+}
+
+/* Tablets (portrait and landscape) */
+@media (max-width: 1199px) and (min-width: 768px) {
+  .dish-card {
+    width: 260px;
+    height: auto;
+  }
+
+  .dish-image {
+    height: 220px;
+  }
+
+  .dishName {
+    font-size: 18px;
+  }
+
+  .dishPrice {
+    font-size: 18px;
+  }
+
+  .dishRestaurant {
+    font-size: 14px;
+  }
+
+  .dishAddToCart {
+    padding: 8px 18px;
+  }
+
+  .rating .star {
+    font-size: 18px;
+  }
+
+  .discounted-price-circle {
+    top: -10%;
+    right: 0%;
+    padding: 4px 5px;
+  }
+}
+
+/* Mobile phones */
+@media (max-width: 767px) {
+  .dish-card {
+    width: 200px;
+    height: auto;
+  }
+
+  .dish-image {
+    height: 180px;
+  }
+
+  .dishName {
+    font-size: 16px;
+  }
+
+  .dishPrice {
+    font-size: 16px;
+  }
+
+  .dishRestaurant {
+    font-size: 12px;
+  }
+
+  .dishAddToCart {
+    padding: 6px 14px;
+  }
+
+  .rating .star {
+    font-size: 16px;
+  }
+
+  .discounted-price-circle {
+    top: -5%;
+    right: 5%;
+    padding: 3px 4px;
+  }
+
+  .diagonal-strikethrough {
+    font-size: 0.9em;
+  }
+}
