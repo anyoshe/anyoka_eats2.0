@@ -8,6 +8,9 @@ const FoodCart = () => {
   const [showLocationModal, setShowLocationModal] = useState(false);
   const [showCartModal, setShowCartModal] = useState(false);
 
+  // Assuming vendor location is part of the state; extract it here.
+  const selectedVendorLocation = state.vendorLocation;
+
   const handleCartClick = () => {
     setShowCartModal(true);
   };
@@ -62,6 +65,7 @@ const FoodCart = () => {
                 ))}
               </ul>
               <div>Total Price: Kes.<span id="totalPrice">{state.totalPrice.toFixed(2)}</span></div>
+              {/* <div>Items in Cart: <span id="cartCount">{state.cartCount}</span></div> */}
             </div>
             <div className="modal-footer">
               <button type="button" className="btn btn-secondary" data-bs-dismiss="modal" aria-label="Close" onClick={closeCartModal}>
@@ -76,20 +80,21 @@ const FoodCart = () => {
       </div>
 
       {/* Location Modal */}
-      <FoodLocationModal show={showLocationModal}
-       handleClose={closeLocationModal} 
-       vendorName={state.firstFoodVendor}
-       orderedFoods={state.items}
-        />
+      <FoodLocationModal 
+        show={showLocationModal}
+        handleClose={closeLocationModal} 
+        vendorName={state.firstFoodVendor}
+        orderedFoods={state.items}
+        vendorLocation={selectedVendorLocation} // Passing the vendor location here
+      />
+     
 
       {/* Cart Trigger */}
       <a href="#" id="cart2" onClick={handleCartClick}>
-        <i className="fas fa-shopping-cart" id='fresh_cart'></i>
-        <span id="cartCount2" className='fresh_count'>{state.cartCount}</span>
+        <i className="fas fa-shopping-cart"></i><span id="cartCount2">{state.cartCount}</span>
       </a>
     </>
   );
 };
 
 export default FoodCart;
-

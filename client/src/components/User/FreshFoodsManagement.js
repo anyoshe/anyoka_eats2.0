@@ -92,10 +92,11 @@ const FreshFoodsManagement = ({ partner }) => {
     }));
   };
 
+
   const handleFormSubmit = async (e) => {
     e.preventDefault();
-
-
+  
+    // Construct form data
     const formDataToSend = new FormData();
     formDataToSend.append('foodCode', formData.foodCode);
     formDataToSend.append('foodName', formData.foodName);
@@ -110,16 +111,23 @@ const FreshFoodsManagement = ({ partner }) => {
     if (formData.image) {
       formDataToSend.append('image', formData.image);
     }
-
+  
     try {
       const response = await fetch(`${config.backendUrl}/api/foods`, {
         method: 'POST',
         body: formDataToSend,
       });
-
+  
       if (response.ok) {
         const result = await response.json();
+        console.log('Food added successfully:', result);
+  
+        // Update the foods state with the newly added food item
+        setFoods(prevFoods => [...prevFoods, result.food]);
+  
         alert('Food added successfully!');
+  
+        // Clear the form
         setFormData({
           foodCode: '',
           foodName: '',
@@ -130,14 +138,17 @@ const FreshFoodsManagement = ({ partner }) => {
           discount: '',
           foodDescription: ''
         });
+  
         setIsEditing(false);
       } else {
+        console.error('Failed to add food');
         alert('Failed to add food. Please check the details.');
       }
     } catch (error) {
       console.error('Error submitting the form:', error);
     }
   };
+  
 
   const handleTitleToggle = () => {
     setEditTitle(prevEditTitle => !prevEditTitle);
@@ -199,8 +210,7 @@ const FreshFoodsManagement = ({ partner }) => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
-
+  
     // Construct form data
     const formDataToSend = new FormData();
     formDataToSend.append('foodCode', formData.foodCode);
@@ -216,16 +226,24 @@ const FreshFoodsManagement = ({ partner }) => {
     if (formData.image) {
       formDataToSend.append('image', formData.image);
     }
-
+  
     try {
       const response = await fetch(`${config.backendUrl}/api/foods/${formData.foodCode}`, {
         method: 'PUT',
         body: formDataToSend,
       });
-
+  
       if (response.ok) {
         const result = await response.json();
         console.log('Food updated successfully:', result);
+  
+        // Update the food item in the state
+        setFoods(prevFoods =>
+          prevFoods.map(food =>
+            food.foodCode === result.food.foodCode ? result.food : food
+          )
+        );
+  
         alert('Food updated successfully!');
         // Reset editing state and clear the form
         setIsEditing(false);
@@ -236,34 +254,68 @@ const FreshFoodsManagement = ({ partner }) => {
           foodCategory: '',
           quantity: '',
           image: null,
-          discount: '', // Reset discount
+          discount: '',
+          foodDescription: ''
         });
       } else {
         console.error('Failed to update food');
+        alert('Failed to update food. Please check the details.');
       }
     } catch (error) {
       console.error('Error submitting the form:', error);
       alert('Failed to update food. Please check the details.');
     }
   };
+  
 
+  // const handleDelete = async (foodId) => {
+  //   try {
+  //     const response = await fetch(`${config.backendUrl}/api/foods/${foodId}`, {
+  //       method: 'DELETE'
+  //     });
 
+  //     if (response.ok) {
+  //       setFoods(prevFoods => prevFoods.filter(food => food.foodCode !== foodId));
+  //       alert('Food deleted successfully!');
+  //     } else {
+  //       alert('Failed to delete food. Please try again later.');
+  //     }
+  //   } catch (error) {
+  //     alert('An error occurred while trying to delete the food.');
+  //   }
+  // };
   const handleDelete = async (foodId) => {
     try {
+      console.log('Deleting food with ID:', foodId); // Log the identifier being passed
+  
       const response = await fetch(`${config.backendUrl}/api/foods/${foodId}`, {
         method: 'DELETE'
       });
-
+  
       if (response.ok) {
-        setFoods(prevFoods => prevFoods.filter(food => food.foodCode !== foodId));
-        alert('Food deleted successfully!');
+        // Log success and filter out the deleted food
+        console.log('Food deleted successfully');
+  
+        // Update the foods state to reflect the deletion
+        setFoods(prevFoods => {
+          const updatedFoods = prevFoods.filter(food => food.foodCode !== foodId);
+          console.log('Updated foods list:', updatedFoods);
+          return updatedFoods;
+        });
+  
+        alert('Food deleted successfully!'); // Notify the user
       } else {
-        alert('Failed to delete food. Please try again later.');
+        console.error('Failed to delete food');
+        alert('Failed to delete food. Please try again later.'); // Notify the user
       }
     } catch (error) {
-      alert('An error occurred while trying to delete the food.');
+      console.error('Error deleting food:', error);
+      alert('An error occurred while trying to delete the food.'); // Notify the user
     }
   };
+  
+  
+  
 
   return (
     <div className="menu_table" id="hotelRestaurantSection">
@@ -450,11 +502,11 @@ const FreshFoodsManagement = ({ partner }) => {
               <div className="dishDiv headerspecial">{food.quantity}</div>
 
               <div className="dishDiv dishdiv_button">
-                <button className="editButton" onClick={() => handleEdit(food)} style={{ display: food.foodCode === editingFoodCode ? 'none' : 'block' }}><i class="fas fa-edit"></i></button>
+                <button className="editButton" onClick={() => handleEdit(food)} style={{ display: food.foodCode === editingFoodCode ? 'none' : 'block' }}><i className="fas fa-edit"></i></button>
 
                 <button className="saveButton" onClick={handleSubmit} style={{ display: food.foodCode === editingFoodCode ? 'block' : 'none' }}>Save</button>
 
-                <button className="deleteButton" onClick={() => handleDelete(food._id)}><i class="fas fa-trash"></i></button>
+                <button className="deleteButton" onClick={() => handleDelete(food._id)}><i className="fas fa-trash"></i></button>
 
               </div>
             </div>
