@@ -1,24 +1,47 @@
-import React, { useState, useRef, useContext } from 'react';
+import React, { useState, useEffect, useRef, useContext } from 'react';
 import './Profile.css';
 import profileImg from "../../assets/images/abstract-star-burst-with-rays-flare.png";
 import { PartnerContext } from '../../contexts/PartnerContext';
 import axios from 'axios';
 import config from '../../config';
 
-
-const Profile = ({ partner: propPartner, onSave }) => {
+const Profile = ({ onSave }) => {
     const { partner, updatePartnerDetails } = useContext(PartnerContext);
     const [editImageMode, setEditImageMode] = useState(false);
     const [editSectionMode, setEditSectionMode] = useState(false);
     const [formData, setFormData] = useState({
-        businessName: partner?.businessName || '',
-        contactNumber: partner?.contactNumber || '',
-        location: partner?.location || '',
-        businessType: partner?.businessType || '',
+        businessName: '',
+        contactNumber: '',
+        location: '',
+        businessType: '',
     });
 
     const profileImageRef = useRef(null);
     const profileImageInputRef = useRef(null);
+
+    useEffect(() => {
+        // Fetch partner details if partner is not set or refresh the details
+        if (partner?._id) {
+            const fetchPartnerDetails = async () => {
+                try {
+                    const response = await axios.get(`${config.backendUrl}/api/partners/${partner._id}`);
+                    if (response.data) {
+                        updatePartnerDetails(response.data);
+                        setFormData({
+                            businessName: response.data.businessName || '',
+                            contactNumber: response.data.contactNumber || '',
+                            location: response.data.location || '',
+                            businessType: response.data.businessType || '',
+                        });
+                    }
+                } catch (error) {
+                    console.error('Error fetching partner details:', error);
+                }
+            };
+
+            fetchPartnerDetails();
+        }
+    }, [partner?._id, updatePartnerDetails]);
 
     const toggleEditImageMode = () => setEditImageMode(!editImageMode);
     const toggleEditSection = () => setEditSectionMode(!editSectionMode);
@@ -28,7 +51,7 @@ const Profile = ({ partner: propPartner, onSave }) => {
         if (file) {
             const formData = new FormData();
             formData.append('profileImage', file);
-            formData.append('partnerId', partner._id);  // Append partnerId
+            formData.append('partnerId', partner._id); // Append partnerId
 
             try {
                 const response = await fetch(`${config.backendUrl}/api/upload-profile-image`, {
@@ -55,8 +78,7 @@ const Profile = ({ partner: propPartner, onSave }) => {
 
     const saveSection = async () => {
         try {
-            const partnerId = partner._id;
-            const response = await axios.put(`${config.backendUrl}/api/partners/${partnerId}`, formData);
+            const response = await axios.put(`${config.backendUrl}/api/partners/${partner._id}`, formData);
             console.log('Update successful:', response.data);
 
             updatePartnerDetails(response.data);
@@ -79,33 +101,22 @@ const Profile = ({ partner: propPartner, onSave }) => {
         <div id="profileImageSection" className="account_details">
             {/* Profile Image Section */}
             <div className="essential_image">
-                    <input
-                        type="file"
-                        id="profileImageInput"
-                        className="profile-image-input"
-                        onChange={saveProfileImage}
-                        ref={profileImageInputRef}
-                        style={{ display: editImageMode ? 'block' : 'none' }}
-                    />
+                <input
+                    type="file"
+                    id="profileImageInput"
+                    className="profile-image-input"
+                    onChange={saveProfileImage}
+                    ref={profileImageInputRef}
+                    style={{ display: editImageMode ? 'block' : 'none' }}
+                />
                 <div className="profile_img_div">
-                    {/* <input
-                        type="file"
-                        id="profileImageInput"
-                        className="profile-image-input"
-                        onChange={saveProfileImage}
-                        ref={profileImageInputRef}
-                        style={{ display: editImageMode ? 'block' : 'none' }}
-                    /> */}
-                    
                     <img
                         src={partner?.profileImage ? `${config.backendUrl}/${partner.profileImage.replace(/\\/g, '/')}` : profileImg}
                         alt="Business Profile"
                         className="account_profile_img"
                         ref={profileImageRef}
                     />
-
                 </div>
-                
                 <div className='image_button'>
                     <button
                         className="editButton profilePicBtn"
@@ -128,9 +139,7 @@ const Profile = ({ partner: propPartner, onSave }) => {
             {/* Essential Details Section */}
             <div className="essential_details" id="essentialDetailsSection">
                 <div className="essential_grid">
-
                     <div className="essential_grid_content">
-                        {/* <label className="content_label" htmlFor="businessName">Business Name:</label> */}
                         <input
                             type="text"
                             name="businessName"
@@ -143,7 +152,6 @@ const Profile = ({ partner: propPartner, onSave }) => {
                     </div>
 
                     <div className="essential_grid_content">
-                        {/* <label className="content_label" htmlFor="contactNumber">Main Contact:</label> */}
                         <input
                             type="text"
                             name="contactNumber"
@@ -156,7 +164,6 @@ const Profile = ({ partner: propPartner, onSave }) => {
                     </div>
 
                     <div className="essential_grid_content">
-                        {/* <label className="content_label" htmlFor="location">Main Location:</label> */}
                         <input
                             type="text"
                             name="location"
@@ -169,7 +176,6 @@ const Profile = ({ partner: propPartner, onSave }) => {
                     </div>
                     
                     <div className="essential_grid_content">
-                        {/* <label className="content_label" htmlFor="businessType">Main Service:</label> */}
                         <input
                             type="text"
                             name="businessType"
@@ -190,7 +196,6 @@ const Profile = ({ partner: propPartner, onSave }) => {
                 </button>
 
                 {editSectionMode && (
-
                     <button
                         className="saveButton editprofileButton"
                         onClick={saveSection}
@@ -198,7 +203,6 @@ const Profile = ({ partner: propPartner, onSave }) => {
                         Save
                     </button>
                 )}
-                
             </div>
         </div>
     );
