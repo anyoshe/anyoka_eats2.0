@@ -1,8 +1,6 @@
 import React, { useState, useRef, useEffect, useContext } from 'react';
 import { PartnerContext } from '../../contexts/PartnerContext';
-import { useNavigate } from 'react-router-dom';
 import './UserProfileDashBoard.css';
-import axios from 'axios';
 import Profile from './Profile';
 import './Profile.css';
 import OtherContactsSection from './OtherContactSection';
@@ -10,81 +8,37 @@ import OtherServicesSection from './OtherServiceSection';
 import HotelRestaurantSection from './HotelRestaurantSection';
 import OutsideCatering from '../User/OutsideCatering';
 import ConferenceForm from '../User/ConferenceForm';
+// import AddFood from "../FreshFood/AddFood";
 import config from '../../config';
 import FreshFoodsManagement from './FreshFoodsManagement';
 import UndeliveredOrders from './UndeliveredOrders';
 import DeliveredOrders from './DeliveredOrders';
 import UndeliveredFoodOrders from './UndeliveredFoodOrders';
 import DeliveredFoodOrders from './DeliveredFoodOrders';
-import SpecialOrders from './SpecialOrdersList';
-import Logout from '../Landing/LogOut';
 
-// const Orders = () => <div>Orders Content Here</div>;
-// const Sales = () => <div>Sales Content Here</div>;
-// const Logout = () => <div>Log Out Content Here</div>;
+const Orders = () => <div>Orders Content Here</div>;
+const Sales = () => <div>Sales Content Here</div>;
+const Logout = () => <div>Log Out Content Here</div>;
 
 const UserProfileDashBoard = () => {
-  const { partner, setPartner } = useContext(PartnerContext);
+  const { partner } = useContext(PartnerContext);
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [activeSection, setActiveSection] = useState('profile');
   const [services, setServices] = useState([]); 
-  const [orderSubsection, setOrderSubsection] = useState('undeliveredOrders');
   const dropdownRef = useRef(null);
-  const navigate = useNavigate();
 
   useEffect(() => {
-     // Fetch partner data on mount
-     fetchPartnerData();
-
     document.addEventListener('mousedown', handleClickOutside);
-    // fetchServices(); // Fetch services on component mount
+    fetchServices(); // Fetch services on component mount
 
     return () => {
       document.removeEventListener('mousedown', handleClickOutside);
     };
   }, []);
 
-  useEffect(() => {
-    if (partner?._id) {
-      fetchServices(); // Fetch services only if partner ID is available
-    }
-  }, [partner]);
-
-  const fetchPartnerData = async () => {
-    const token = localStorage.getItem('authToken');
-    if (!token) {
-      navigate('/sign-up-sign-in');
-      return;
-    }
-
-    try {
-      const response = await axios.get(`${config.backendUrl}/api/partner`, {
-        headers: { 'Authorization': `Bearer ${token}` }
-      });
-      const fetchedData = response.data;
-
-      if (JSON.stringify(partner) !== JSON.stringify(fetchedData)) {
-        setPartner(fetchedData);
-      }
-    } catch (error) {
-      console.error('Error fetching partner data:', error);
-      if (error.response && error.response.status === 401) {
-        handleLogout();
-      }
-    }
-  };
-
-
   const fetchServices = async () => {
-    if (!partner?._id) return; // Exit if partner ID is not available
-
     try {
-      const token = localStorage.getItem('authToken');
-      if (!token) return;
-
-      const response = await fetch(`${config.backendUrl}/api/other-services/${partner._id}`, {
-        headers: { 'Authorization': `Bearer ${token}` }
-      });
+      const response = await fetch(`${config.backendUrl}/api/other-services/${partner?._id}`);
       if (!response.ok) {
         throw new Error('Failed to fetch services');
       }
@@ -94,12 +48,6 @@ const UserProfileDashBoard = () => {
       console.error('Error fetching services:', error);
       setServices([]); // Ensure services is empty if there's an error
     }
-  };
-
-  const handleLogout = () => {
-    localStorage.removeItem('authToken');
-    setPartner(null);
-    navigate('/sign-up-sign-in');
   };
 
   const toggleDropdown = () => {
@@ -112,9 +60,6 @@ const UserProfileDashBoard = () => {
     setDropdownOpen(false);
   };
   
-  const handleOrderSubsectionChange = (subsection) => {
-    setOrderSubsection(subsection);
-  };
 
   const handleClickOutside = (event) => {
     if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
@@ -149,35 +94,20 @@ const UserProfileDashBoard = () => {
         return <FreshFoodsManagement partner={partner} />;
       case 'orders':
         return (
-          <div>
-            <button onClick={() => handleOrderSubsectionChange('undeliveredOrders')}>Undelivered Orders</button>
-            <button onClick={() => handleOrderSubsectionChange('undeliveredFoodOrders')}>Undelivered Food Orders</button>
-            <button onClick={() => handleOrderSubsectionChange('specialOrders')}>Special Orders</button>
-            <div>
-              {orderSubsection === 'undeliveredOrders' && <UndeliveredOrders partner={partner} />}
-              {orderSubsection === 'undeliveredFoodOrders' && <UndeliveredFoodOrders partner={partner} />}
-              {orderSubsection === 'specialOrders' && <SpecialOrders partner={partner} />}
-            </div>
-          </div>
+          <>
+            <UndeliveredOrders partner={partner} />
+            <UndeliveredFoodOrders partner={partner} />
+          </>
         );
       case 'sales':
-       
-      return (
-        <div>
-          <div className="button-group">
-            <button onClick={() => handleOrderSubsectionChange('deliveredOrders')}>Dish Sales</button>
-            <button onClick={() => handleOrderSubsectionChange('deliveredFoodOrders')}>Fresh Food Sales</button>
-          </div>
-          <div className="content">
-            {orderSubsection === 'deliveredOrders' && <DeliveredOrders partner={partner} />}
-            {orderSubsection === 'deliveredFoodOrders' && <DeliveredFoodOrders partner={partner} />}
-          </div>
-        </div>
-      );
+        return (
+          <>
+            <DeliveredOrders partner={partner} />
+            <DeliveredFoodOrders partner={partner} />
+          </>
+        );
       case 'logout':
-        handleLogout();
-        navigate('/');
-        return null;
+        return <Logout />;
       default:
         
         return (

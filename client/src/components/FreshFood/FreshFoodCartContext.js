@@ -5,9 +5,7 @@ const initialState = {
   items: [],
   totalPrice: 0,
   cartCount: 0,
-  firstFoodVendor: '',
-  vendorLocation: '', // Add vendorLocation to state
-  isVisible: false
+  firstFoodVendor: ''
 };
 
 // Action types
@@ -20,12 +18,14 @@ const REMOVE_FROM_CART = 'REMOVE_FROM_CART';
 // Reducer function to handle cart actions
 const cartReducer = (state, action) => {
   switch (action.type) {
+  
     case ADD_TO_CART: {
       const { foodDetails } = action.payload;
-      const { foodCode, foodName, foodPrice, foodCategory, vendor, discountedPrice, vendorLocation } = foodDetails;
+      const { foodCode, foodName, foodPrice, foodCategory, vendor, discountedPrice } = foodDetails;
       
+      // Use discount price if available, otherwise use the original price with a 20% markup
       const price = discountedPrice ? discountedPrice : foodPrice * 1.2;
-      const quantity = 1;
+      const quantity = 1; // Always 1 for now
 
       const existingItem = state.items.find(item => item.foodCode === foodCode);
 
@@ -53,17 +53,13 @@ const cartReducer = (state, action) => {
         }
       }
 
-      // Set the vendorLocation in the state
-      const newVendorLocation = vendorLocation;
-
-      // Update localStorage
       const storedCart = JSON.parse(localStorage.getItem('cart')) || [];
       const existingStoredItem = storedCart.find(item => item.foodCode === foodCode);
 
       if (existingStoredItem) {
         existingStoredItem.quantity++;
       } else {
-        storedCart.push({ foodCode, foodName, foodPrice, foodCategory, vendor, quantity, price, vendorLocation });
+        storedCart.push({ foodCode, foodName, foodPrice, foodCategory, vendor, quantity, price });
       }
 
       localStorage.setItem('cart', JSON.stringify(storedCart));
@@ -73,8 +69,7 @@ const cartReducer = (state, action) => {
         items: updatedItems,
         totalPrice: newTotalPrice,
         cartCount: newCartCount,
-        firstFoodVendor,
-        vendorLocation: newVendorLocation // Update the state with new vendorLocation
+        firstFoodVendor
       };
     }
     case INCREASE_QUANTITY: {
@@ -85,7 +80,6 @@ const cartReducer = (state, action) => {
       const newTotalPrice = updatedItems.reduce((sum, item) => sum + item.price * item.quantity, 0);
       const newCartCount = updatedItems.reduce((sum, item) => sum + item.quantity, 0);
 
-      // Update localStorage
       const storedCart = JSON.parse(localStorage.getItem('cart')) || [];
       const existingStoredItem = storedCart.find(item => item.foodCode === foodCode);
 
@@ -112,7 +106,6 @@ const cartReducer = (state, action) => {
       const newTotalPrice = updatedItems.reduce((sum, item) => sum + item.price * item.quantity, 0);
       const newCartCount = updatedItems.reduce((sum, item) => sum + item.quantity, 0);
 
-      // Update localStorage
       const storedCart = JSON.parse(localStorage.getItem('cart')) || [];
       const existingStoredItem = storedCart.find(item => item.foodCode === foodCode);
 
@@ -140,7 +133,6 @@ const cartReducer = (state, action) => {
       const newTotalPrice = updatedItems.reduce((sum, item) => sum + item.price * item.quantity, 0);
       const newCartCount = updatedItems.reduce((sum, item) => sum + item.quantity, 0);
 
-      // Update localStorage
       const storedCart = JSON.parse(localStorage.getItem('cart')) || [];
       const updatedStoredCart = storedCart.filter(item => item.foodCode !== foodCode);
 
@@ -165,6 +157,7 @@ const cartReducer = (state, action) => {
 };
 
 const FreshFoodCartContext = createContext();
+
 
 export const FreshFoodCartProvider = ({ children }) => {
   const [state, dispatch] = useReducer(cartReducer, initialState);

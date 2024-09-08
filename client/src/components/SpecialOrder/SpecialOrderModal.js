@@ -1,8 +1,7 @@
 /* global google */
 import React, { useState, useEffect } from 'react';
-import './SpecialOrderModal.css';
+import './SpecialOrderModal';
 import config from '../../config';
-
 
 const googleApiKey = process.env.REACT_APP_GOOGLE_API_KEY;
 const SpecialOrderModal = ({ closeModal }) => {
@@ -180,75 +179,60 @@ const SpecialOrderModal = ({ closeModal }) => {
 
   return (
     <div className="modal fade show" id="specialOrderModal" tabIndex="-1" role="dialog" aria-labelledby="specialOrderModalLabel" aria-hidden="true" style={{ display: 'block' }}>
-
-      <div className="special-modal-dialog" role="document">
-
-        <div className="modalContent">
-
-          <div className="modalHeader">
-
-            <h5 className="modalTitle" id="specialOrderModalLabel">Place Special Order</h5>
-
-            <button type="button" className="specialClose" data-dismiss="modal" aria-label="Close" onClick={closeModal}>
-              <span aria-hidden="true" className='specialCloseIcon'>&times;</span>
+      <div className="modal-dialog" role="document">
+        <div className="modal-content">
+          <div className="modal-header">
+            <h5 className="modal-title" id="specialOrderModalLabel">Place Special Order</h5>
+            <button type="button" className="close" data-dismiss="modal" aria-label="Close" onClick={closeModal}>
+              <span aria-hidden="true">&times;</span>
             </button>
-
           </div>
-
-          <div className="modalBody">
-
+          <div className="modal-body">
             <form id="specialOrderForm" onSubmit={handleSubmit}>
-
-              <div className='specialTriple'>
-
-                <div className="formGroup">
-                  {/* <label htmlFor="customerName"> Name</label> */}
-                  <input
-                    type="text"
-                    className="formControl specialTripleInputs"
-                    id="customerName"
-                    name="customerName"
-                    placeholder="Name"
-                    value={formData.customerName}
-                    onChange={handleChange}
-                    required
-                  />
-                </div>
-
-                <div className="formGroup">
-                  {/* <label htmlFor="customerEmail">Email</label> */}
-                  <input
-                    type="email"
-                    className="formControl specialTripleInputs"
-                    id="customerEmail"
-                    name="customerEmail"
-                    placeholder="Email"
-                    value={formData.customerEmail}
-                    onChange={handleChange}
-                    required
-                  />
-                </div>
-
-                <div className="formGroup">
-                  {/* <label htmlFor="customerPhone">Number</label> */}
-                  <input
-                    type="tel"
-                    className="formControl specialTripleInputs"
-                    id="customerPhone"
-                    name="customerPhone"
-                    placeholder="Contact"
-                    value={formData.customerPhone}
-                    onChange={handleChange}
-                    required
-                  />
-                </div>
-              </div>  
-
-              <div className="formGroup deliveryDiv">
-                {/* <label htmlFor="deliveryLocation" className='specilLocation'>Delivery Location</label> */}
+              <div className="form-group">
+                <label htmlFor="customerName">Customer Name</label>
                 <input
                   type="text"
-                  className="formControl"
+                  className="form-control"
+                  id="customerName"
+                  name="customerName"
+                  placeholder="Enter your name"
+                  value={formData.customerName}
+                  onChange={handleChange}
+                  required
+                />
+              </div>
+              <div className="form-group">
+                <label htmlFor="customerEmail">Customer Email</label>
+                <input
+                  type="email"
+                  className="form-control"
+                  id="customerEmail"
+                  name="customerEmail"
+                  placeholder="Enter your email"
+                  value={formData.customerEmail}
+                  onChange={handleChange}
+                  required
+                />
+              </div>
+              <div className="form-group">
+                <label htmlFor="customerPhone">Phone Number</label>
+                <input
+                  type="tel"
+                  className="form-control"
+                  id="customerPhone"
+                  name="customerPhone"
+                  placeholder="Enter your phone number"
+                  value={formData.customerPhone}
+                  onChange={handleChange}
+                  required
+                />
+              </div>
+              <div className="form-group">
+                <label htmlFor="deliveryLocation">Delivery Location</label>
+                <input
+                  type="text"
+                  className="form-control"
                   id="deliveryLocation"
                   name="deliveryLocation"
                   placeholder="Enter delivery location"
@@ -256,49 +240,38 @@ const SpecialOrderModal = ({ closeModal }) => {
                   onChange={handleChange}
                   required
                 />
-
-               <div className='locationBtns'>
-                  <button type="button" className="specialPin" onClick={showMap}>Pin Location on Map</button>
-
-                  <button type="button" className="specialPin" onClick={handleUseCurrentLocation}>Use My Current Location</button>
-               </div>
-
-                <div id="map" className="mt-3"></div>
-                
+                <button type="button" className="btn btn-secondary mt-2" onClick={showMap}>Pin Location on Map</button>
+                <button type="button" className="btn btn-secondary mt-2" onClick={handleUseCurrentLocation}>Use My Current Location</button>
+                <div id="map" className="mt-3" style={{ height: '300px', display: 'none' }}></div>
               </div>
-
-              <div className='specialdouble'>
-                <div className="formGroup">
-                  <label htmlFor="deliveryDate" className='specialLabels'>Preferred Delivery Date</label>
-                  <input
-                    type="date"
-                    className="formControl special_times"
-                    id="deliveryDate"
-                    name="deliveryDate"
-                    value={formData.deliveryDate}
-                    onChange={handleChange}
-                    required
-                  />
-                </div>
-
-                <div className="formGroup">
-                  <label htmlFor="deliveryTime" className='specialLabels'>Preferred Delivery Time</label>
-                  <input
-                    type="time"
-                    className="formControl special_times"
-                    id="deliveryTime"
-                    name="deliveryTime"
-                    value={formData.deliveryTime}
-                    onChange={handleChange}
-                    required
-                  />
-                </div>
+              <div className="form-group">
+                <label htmlFor="deliveryDate">Preferred Delivery Date</label>
+                <input
+                  type="date"
+                  className="form-control"
+                  id="deliveryDate"
+                  name="deliveryDate"
+                  value={formData.deliveryDate}
+                  onChange={handleChange}
+                  required
+                />
               </div>
-          
-              <div className="formGroup">
-                {/* <label htmlFor="orderDetails" className='specialLabels'>Order Details</label> */}
+              <div className="form-group">
+                <label htmlFor="deliveryTime">Preferred Delivery Time</label>
+                <input
+                  type="time"
+                  className="form-control"
+                  id="deliveryTime"
+                  name="deliveryTime"
+                  value={formData.deliveryTime}
+                  onChange={handleChange}
+                  required
+                />
+              </div>
+              <div className="form-group">
+                <label htmlFor="orderDetails">Order Details</label>
                 <textarea
-                  className="formControl"
+                  className="form-control"
                   id="orderDetails"
                   name="orderDetails"
                   rows="3"
@@ -308,8 +281,7 @@ const SpecialOrderModal = ({ closeModal }) => {
                   required
                 ></textarea>
               </div>
-
-              {/* <div className="form-group">
+              <div className="form-group">
                 <label htmlFor="specialInstructions">Special Instructions</label>
                 <textarea
                   className="form-control"
@@ -320,10 +292,8 @@ const SpecialOrderModal = ({ closeModal }) => {
                   value={formData.specialInstructions}
                   onChange={handleChange}
                 ></textarea>
-              </div> */}
-
-              <button type="submit"  id='btnPrimary'>Submit</button>
-
+              </div>
+              <button type="submit" className="btn btn-primary">Submit Special Order</button>
             </form>
           </div>
         </div>

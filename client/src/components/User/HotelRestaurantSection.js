@@ -95,7 +95,7 @@ const HotelRestaurantSection = ({ partner }) => {
 
   const handleFormSubmit = async (e) => {
     e.preventDefault();
-  
+
     // Construct form data
     const formDataToSend = new FormData();
     formDataToSend.append('dishCode', formData.dishCode);
@@ -110,23 +110,18 @@ const HotelRestaurantSection = ({ partner }) => {
     if (formData.image) {
       formDataToSend.append('image', formData.image);
     }
-  
+
     try {
       const response = await fetch(`${config.backendUrl}/api/dishes`, {
         method: 'POST',
         body: formDataToSend,
       });
-  
+
       if (response.ok) {
         const result = await response.json();
         console.log('Dish added successfully:', result);
-  
-        // Update the dishes state with the newly added dish
-        setDishes(prevDishes => [...prevDishes, result.dish]);
-  
-        alert('Dish added successfully!');
-        
-        // Clear the form
+        alert('Dish added successfully!'); // Notify the user
+        // Optionally, clear the form or update UI as needed
         setFormData({
           dishCode: '',
           dishName: '',
@@ -134,10 +129,11 @@ const HotelRestaurantSection = ({ partner }) => {
           dishCategory: '',
           quantity: '',
           image: null,
-          discount: '',
+          discount: '', // Assuming you want to reset the discount field as well
         });
-  
-        setIsEditing(false);
+        setIsEditing(false); // If editing, reset the editing state
+      
+        // Clear the form or update UI as needed
       } else {
         console.error('Failed to add dish');
         alert('Failed to add dish. Please check the details.');
@@ -146,7 +142,6 @@ const HotelRestaurantSection = ({ partner }) => {
       console.error('Error submitting the form:', error);
     }
   };
-  
 
   const handleTitleToggle = () => {
     setEditTitle(prevEditTitle => !prevEditTitle);
@@ -192,10 +187,9 @@ const HotelRestaurantSection = ({ partner }) => {
     setEditingDishCode(dish.dishCode);
   };
 
-  
   const handleSubmit = async (e) => {
     e.preventDefault();
-  
+
     // Construct form data
     const formDataToSend = new FormData();
     formDataToSend.append('dishCode', formData.dishCode);
@@ -210,27 +204,19 @@ const HotelRestaurantSection = ({ partner }) => {
     if (formData.image) {
       formDataToSend.append('image', formData.image);
     }
-  
+
     try {
       const response = await fetch(`${config.backendUrl}/api/dishes/${formData.dishCode}`, {
         method: 'PUT',
         body: formDataToSend,
       });
-  
+
       if (response.ok) {
-        const updatedDish = await response.json();
-        console.log('Dish updated successfully:', updatedDish);
-  
-        // Update the dishes array with the updated dish
-        setDishes(prevDishes =>
-          prevDishes.map(dish =>
-            dish._id === updatedDish.dish._id ? updatedDish.dish : dish
-          )
-        );
-  
+        const result = await response.json();
+        console.log('Dish updated successfully:', result);
         alert('Dish updated successfully!');
-  
-        // Clear the form and reset editing state
+        // Reset editing state and clear the form
+        setIsEditing(false);
         setFormData({
           dishCode: '',
           dishName: '',
@@ -238,20 +224,17 @@ const HotelRestaurantSection = ({ partner }) => {
           dishCategory: '',
           quantity: '',
           image: null,
-          discount: '',
+          discount: '', // Reset discount
         });
-  
-        setIsEditing(false);
-        setEditingDishCode(''); // Clear the editing state
       } else {
         console.error('Failed to update dish');
-        alert('Failed to update dish. Please check the details.');
       }
     } catch (error) {
       console.error('Error submitting the form:', error);
       alert('Failed to update dish. Please check the details.');
     }
   };
+
 
   const handleDelete = async (dishId) => {
     try {
@@ -262,8 +245,7 @@ const HotelRestaurantSection = ({ partner }) => {
       });
   
       if (response.ok) {
-        // Filter out the deleted dish by its _id
-        setDishes(prevDishes => prevDishes.filter(dish => dish._id !== dishId));
+        setDishes(prevDishes => prevDishes.filter(dish => dish.dishCode !== dishId)); // Filter by dishCode
         console.log('Dish deleted successfully');
         alert('Dish deleted successfully!'); // Notify the user
       } else {
@@ -275,7 +257,6 @@ const HotelRestaurantSection = ({ partner }) => {
       alert('An error occurred while trying to delete the dish.'); // Notify the user
     }
   };
-  
   
   return (
     <div className="menu_table" id="hotelRestaurantSection">
@@ -344,6 +325,10 @@ const HotelRestaurantSection = ({ partner }) => {
           </div>
         </header>
 
+        {/* PLUS ICON TO ADD TABLE ROWS INTO THE TABLE */}
+        {/* <div className="addRowBtn">
+          <i className="fa fa-plus addingPlus"></i>
+        </div> */}
 
         {/* FORM HOLDING INPUT FIELDS TO FILL THE TABLE */}
         <form id="chart_datas" onSubmit={handleFormSubmit}>
@@ -476,7 +461,7 @@ const HotelRestaurantSection = ({ partner }) => {
 
         {/* Display fetched dishes here */}
         {dishes.map(dish => (
-        <div className="tableRows" key={dish.dishCode}>
+        <div className="tableRows" key={dish._id}>
 
           <div className="dishDiv">
           {/* <img src={dish.imageUrl} alt={dish.dishName} className="dishImage" /> */}
@@ -491,14 +476,40 @@ const HotelRestaurantSection = ({ partner }) => {
           <div className="dishDiv headerspecial">{dish.quantity}</div>
 
           <div className="dishDiv dishdiv_button">
-            <button className="editButton" onClick={() => handleEdit(dish)} style={{ display: dish.dishCode === editingDishCode ? 'none' : 'block' }}><i className="fas fa-edit"></i>
+            <button className="editButton" onClick={() => handleEdit(dish)} style={{ display: dish.dishCode === editingDishCode ? 'none' : 'block' }}><i class="fas fa-edit"></i>
             </button>
 
             <button className="saveButton" onClick={handleSubmit} style={{ display: dish.dishCode === editingDishCode ? 'block' : 'none' }}>Save</button>
 
-            <button className="deleteButton" onClick={() => handleDelete(dish._id)}><i className="fas fa-trash"></i>
+            <button className="deleteButton" onClick={() => handleDelete(dish._id)}><i class="fas fa-trash"></i>
             </button>
-             
+              {/* <div className="dishDiv">
+  <button
+    className="editButton"
+    onClick={() => handleEdit(dish)}
+    style={{ display: dish.dishCode !== editingDishCode ? 'block' : 'none' }}
+    aria-label={`Edit ${dish.dishName}`}
+  >
+    Edit
+  </button>
+  <button
+    className="saveButton"
+    onClick={handleSubmit}
+    style={{ display: dish.dishCode === editingDishCode ? 'block' : 'none' }}
+    aria-label={`Save changes for ${dish.dishName}`}
+  >
+    Save
+  </button>
+  <button
+    className="deleteButton"
+    onClick={() => handleDelete(dish._id)}
+    aria-label={`Delete ${dish.dishName}`}
+  >
+    Delete
+  </button>
+</div> */}
+
+            
             </div>
           </div>
         ))}
