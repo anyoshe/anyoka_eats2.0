@@ -138,13 +138,13 @@ const DeliveredFoodOrders = ({ partner }) => {
 
       <div id="salesTotals">
         <div id="salesTotal">
-          <p>Total Sales : <span id="totalSales"  className="sameTotal">{totalSales.toFixed(2)}</span> <i className="fas fa-list-alt"></i>
+          <p>Total Sales : <span id="totalSales"  className="sameTotal">{totalSales.toFixed(2)}</span> <i class="fas fa-list-alt"></i>
           </p>
 
-          <p>Commission : <span id="commissionDue"  className="sameTotal">{commissionDue.toFixed(2)}</span> <i className="fas fa-dollar-sign"></i>
+          <p>Commission : <span id="commissionDue"  className="sameTotal">{commissionDue.toFixed(2)}</span> <i class="fas fa-dollar-sign"></i>
           </p>
 
-          <p>Total Deliveries : <span id="totalDeliveries"  className="sameTotal">{totalDeliveries}</ span><i className="fas fa-truck"></i>
+          <p>Total Deliveries : <span id="totalDeliveries"  className="sameTotal">{totalDeliveries}</ span><i class="fas fa-truck"></i>
           </p>
           
         </div>

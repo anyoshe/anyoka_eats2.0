@@ -5,10 +5,11 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap/dist/js/bootstrap.bundle.min';
 
 
+// Accessing in React
 const googleApiKey = process.env.REACT_APP_GOOGLE_API_KEY;
 // Function to calculate distance
 const calculateDistance = (lat1, lon1, lat2, lon2) => { 
-  const R = 6371; // Radius of the Earth in km
+  const R = 6371; 
   const dLat = (lat2 - lat1) * Math.PI / 180;
   const dLon = (lon2 - lon1) * Math.PI / 180;
   const a =
@@ -55,9 +56,9 @@ const OrderSummaryModal = ({ show, handleClose, vendorName, orderedFoods = [], v
 
   let deliveryCharges = 0;
   if (distance <= 2) {
-    deliveryCharges = 50; // Base charge for distances up to 2 km
+    deliveryCharges = 50; 
   } else {
-    deliveryCharges = 50 + (Math.ceil(distance - 2) * 30); // Base charge plus KES 30 for every km beyond 2 km
+    deliveryCharges = 50 + (Math.ceil(distance - 2) * 30);
   }
 
   const totalFoodsPrice = orderedFoods.reduce((total, food) => total + food.price * food.quantity, 0);
@@ -68,7 +69,6 @@ const OrderSummaryModal = ({ show, handleClose, vendorName, orderedFoods = [], v
   };
 
   const handleWhatsAppSignIn = () => {
-    // Replace with actual WhatsApp sign-in logic or link
     window.open(`https://wa.me/${contactNumber}`, '_blank');
   };
   const handleTimeChange = (e) => {
@@ -80,11 +80,11 @@ const OrderSummaryModal = ({ show, handleClose, vendorName, orderedFoods = [], v
       // Check if contact number is provided or the user has signed in with WhatsApp
       if (!contactNumber) {
         alert('Please enter your contact number or sign in with WhatsApp.');
-        return; // Prevent further execution
+        return; 
       }
       if (!selectedTime) {
         alert('Please enter the time you expect your order.');
-        return; // Prevent further execution
+        return; 
       }
     setShowPaymentModal(true);
   };

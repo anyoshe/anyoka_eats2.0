@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import config from '../../config';
@@ -9,7 +10,7 @@ import { Link } from 'react-router-dom';
 import './LandingPage.css';
 import OrderTrackingModal from '../Tracking/OrderTrackingModal';
 import SearchBar from './SearchBar';
-import SpecialOrderModal from '../SpecialOrder/SpecialOrderModal';
+import SpecialOrderModal from '../SpecialOrderModal';
 // import FoodCard from '../FreshFood/FoodCard';
 import NavBar from '../Header/navbar';
 import Testimonials from '../Landing/LandingTestimonial';

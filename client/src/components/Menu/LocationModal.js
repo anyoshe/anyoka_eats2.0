@@ -12,7 +12,7 @@ const fallbackLocations = {
   "KIENYEJI CLUB": { lat: -3.215983807798293, lng: 40.11173015525964 },
   "BILLIONAIRE CLUB": { lat: -3.2150307505922235, lng: 40.11619069638544},
   "STARS AND GARTERS": { lat: -3.2101632447638084, lng: 40.11700276546466},
-  "Milcah'sRestaurant": { lat: -3.215983807798293, lng: 40.11173015525964 },
+ 
 };
 
 const LocationModal = ({ show, handleClose, restaurantName, orderedDishes = [] }) => {

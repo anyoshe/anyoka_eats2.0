@@ -278,6 +278,18 @@ appRouter.get('/partner_foods', async (req, res) => {
   }
 });
 
+// Example of a backend route
+appRouter.get('/partners/:id/vendors', async (req, res) => {
+  try {
+    const partnerId = req.params.id;
+    const vendors = await Vendor.find({ partnerId: partnerId });
+    res.json(vendors);
+  } catch (error) {
+    res.status(500).json({ message: 'Server error' });
+  }
+});
+
+
 // //RATING SCHEMA AND ITS ROUTES
 
 const foodRatingSchema = new Schema({
@@ -469,7 +481,7 @@ appRouter.get('/orders/:orderId', async (req, res) => {
   }
 });
 // Update order status
-appRouter.patch('/updateOrderStatus/:orderId', async (req, res) => {
+appRouter.patch('/updateFoodOrderStatus/:orderId', async (req, res) => {
   try {
     const { orderId } = req.params;
     const { status } = req.body;
@@ -499,6 +511,17 @@ appRouter.get('/orders/undelivered', async (req, res) => {
     res.status(500).send('Server Error');
   }
 });
+
+// Example route for fetching food orders
+appRouter.get('/foodOrders', async (req, res) => {
+  try {
+    const foodOrders = await FoodOrder.find(); // Adjust this according to your database schema
+    res.json(foodOrders);
+  } catch (error) {
+    res.status(500).json({ message: 'Error fetching food orders' });
+  }
+});
+
 
 
 
