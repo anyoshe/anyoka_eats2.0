@@ -60,7 +60,7 @@ const DishCategories = () => {
   }, [view]);
 
   const getTopRatedDishes = () => {
-    return [...dishes].sort((a, b) => b.averageRating - a.averageRating).slice(0, 4);
+    return [...dishes].sort((a, b) => b.averageRating - a.averageRating).slice(0, 12);
   };
 
   const getPopularDishes = () => {
@@ -79,6 +79,7 @@ const DishCategories = () => {
         <button onClick={() => setView('all')}>All Dishes</button>
         <button onClick={() => setView('popular')}>Popular Dishes</button>
         <button onClick={() => setView('discounted')}>Discounted and Offers</button>
+        <button onClick={() => setView('topRated')}>Featured Dishes</button>
       </div>
      <div className="dishes-to-display">
       {/* Conditionally render sections based on selected view */}
@@ -109,6 +110,16 @@ const DishCategories = () => {
           <h5 className='menuHeader'>Discounted and Offers</h5>
           <ul id="discounted-dishes" className="dish-list">
             {discountedDishes.map(dish => (
+              <DishCard key={dish.dishCode} dish={dish} addToCart={() => {}} />
+            ))}
+          </ul>
+        </div>
+      )}
+       {view === 'topRated' && (
+        <div className='discountedDishDiv menuDivs'>
+          <h5 className='menuHeader'>Featured Dishes</h5>
+          <ul id="topRated-dishes" className="dish-list">
+            {getTopRatedDishes().map(dish => (
               <DishCard key={dish.dishCode} dish={dish} addToCart={() => {}} />
             ))}
           </ul>

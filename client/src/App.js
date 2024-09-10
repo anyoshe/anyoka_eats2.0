@@ -73,6 +73,7 @@ function App() {
                         </CartProvider>
                     } />
                     <Route path="/offers" element={<MenuPage />} />
+                    <Route path="/featured" element={<MenuPage />} />
                     <Route path='/outside-catering' element={<OutsideCateringLandingPage />} />
                     <Route path="/user" element={<UserProfileDashBoard />} />
                     <Route path="/conferences" element={<ConferenceLandingPage />} />

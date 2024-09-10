@@ -257,6 +257,7 @@ const FreshFoodsManagement = ({ partner }) => {
           discount: '',
           foodDescription: ''
         });
+        setEditingFoodCode(null);
       } else {
         console.error('Failed to update food');
         alert('Failed to update food. Please check the details.');
@@ -266,57 +267,29 @@ const FreshFoodsManagement = ({ partner }) => {
       alert('Failed to update food. Please check the details.');
     }
   };
-  
 
-  // const handleDelete = async (foodId) => {
-  //   try {
-  //     const response = await fetch(`${config.backendUrl}/api/foods/${foodId}`, {
-  //       method: 'DELETE'
-  //     });
-
-  //     if (response.ok) {
-  //       setFoods(prevFoods => prevFoods.filter(food => food.foodCode !== foodId));
-  //       alert('Food deleted successfully!');
-  //     } else {
-  //       alert('Failed to delete food. Please try again later.');
-  //     }
-  //   } catch (error) {
-  //     alert('An error occurred while trying to delete the food.');
-  //   }
-  // };
   const handleDelete = async (foodId) => {
     try {
-      console.log('Deleting food with ID:', foodId); // Log the identifier being passed
-  
       const response = await fetch(`${config.backendUrl}/api/foods/${foodId}`, {
-        method: 'DELETE'
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json',
+        },
       });
   
       if (response.ok) {
-        // Log success and filter out the deleted food
-        console.log('Food deleted successfully');
-  
-        // Update the foods state to reflect the deletion
-        setFoods(prevFoods => {
-          const updatedFoods = prevFoods.filter(food => food.foodCode !== foodId);
-          console.log('Updated foods list:', updatedFoods);
-          return updatedFoods;
-        });
-  
-        alert('Food deleted successfully!'); // Notify the user
+        // If the deletion was successful, remove the item from the frontend list
+        setFoods(prevFoods => prevFoods.filter(food => food._id !== foodId));
+        alert('Food item successfully deleted.');
       } else {
-        console.error('Failed to delete food');
-        alert('Failed to delete food. Please try again later.'); // Notify the user
+        const errorData = await response.json();
+        alert(`Failed to delete food item: ${errorData.message}`);
       }
     } catch (error) {
-      console.error('Error deleting food:', error);
-      alert('An error occurred while trying to delete the food.'); // Notify the user
+      alert(`An error occurred: ${error.message}`);
     }
   };
   
-  
-  
-
   return (
     <div className="menu_table" id="hotelRestaurantSection">
       <div className="column small-12 left_panel">
@@ -332,16 +305,20 @@ const FreshFoodsManagement = ({ partner }) => {
             ) : (
               <h2 className='h2TableTitle'>
                 {tableTitle}
-                <button className="hideshow" onClick={handleTitleToggle}>
+                
+            <h4 className="vendorLocation">
+              {vendorLocation}
+            </h4>
+                {/* <button className="hideshow" onClick={handleTitleToggle}>
                   <i className="fa fa-pencil" aria-hidden="true"></i>
-                </button>
+                </button> */}
               </h2>
             )}
             {/* </div> */}
 
-            <h4 className="vendorLocation">
+            {/* <h4 className="vendorLocation">
               {vendorLocation}
-            </h4>
+            </h4> */}
 
             {/* Always show the Add Restaurant button */}
             <button className="addRestaurantButton" onClick={handleAddVendor}>Add Grocer Name</button>

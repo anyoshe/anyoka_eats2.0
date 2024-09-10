@@ -195,20 +195,31 @@ appRouter.get('/discounts', async (req, res) => {
   }
 });
 
-// Delete a food item by foodCode
-appRouter.delete('/foods/:id', async (req, res) => {
-  try {
-    const { id } = req.params;
-    const result = await Food.findByIdAndDelete(id);
+// Delete a food item
+appRouter.delete('/foods/:identifier', async (req, res) => {
+  const { identifier } = req.params;
+ 
 
-    if (!result) {
-      return res.status(404).json({ message: 'Food not found' });
+  try {
+    if (!identifier) {
+      return res.status(400).json({ error: 'Identifier not provided' });
     }
 
-    res.status(200).json({ message: 'Food deleted successfully' });
+    const deletedFood = await Food.findOneAndDelete({
+      $or: [
+        { foodCode: new RegExp(`^${identifier}$`, 'i') },
+        { _id: identifier }
+      ]
+    });
+
+    if (!deletedFood) {
+      return res.status(404).json({ error: 'Food not found' });
+    }
+
+    res.json({ message: 'Food deleted successfully', deletedFood });
   } catch (error) {
     console.error('Error deleting food:', error);
-    res.status(500).json({ message: 'Server error' });
+    res.status(500).json({ error: 'Failed to delete food', message: error.message });
   }
 });
 

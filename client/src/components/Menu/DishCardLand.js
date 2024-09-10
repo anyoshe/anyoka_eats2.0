@@ -4,7 +4,7 @@ import config from '../../config';
 import './DishCard.css';
 import { useNavigate } from 'react-router-dom';
 
-const DishCardLand = ({ dish }) => {
+const DishCardLand = ({ dish, source }) => {
   const imageUrl = `${config.backendUrl}${dish.imageUrl}`;
   const [averageRating, setAverageRating] = useState(dish.averageRating);
   const [ratingCount, setRatingCount] = useState(dish.ratingCount);
@@ -20,7 +20,15 @@ const DishCardLand = ({ dish }) => {
         dishDetails: dish
       }
     });
-    navigate('/offers', { state: { view: 'discounted' } });
+
+    // Navigate based on the source prop
+    if (source === 'featured') {
+      navigate('/featured', { state: { view: 'topRated' } });
+    } else if (source === 'offers') {
+      navigate('/offers', { state: { view: 'discounted' } });
+    } else {
+      navigate('/menu'); // Fallback to the main menu
+    }
   };
   
   const submitRating = async (itemId, itemType, rating) => {
@@ -83,12 +91,9 @@ const DishCardLand = ({ dish }) => {
       <h6 className='dishName'>{dish.dishName}</h6>
   
       {dish.discount > 0 ? (
-
         <span className="original-price-offer">
           Was <span className='diagonal-strikethrough linePrice'>Ksh {(dish.dishPrice * 1.2).toFixed(2)}</span>
         </span>
-
-
       ) : (
         <p className='dishPrice dishContent'>
           Ksh {(dish.dishPrice * 1.2).toFixed(2)}
@@ -124,4 +129,3 @@ const DishCardLand = ({ dish }) => {
 };
 
 export default DishCardLand;
-

@@ -286,7 +286,7 @@ const LandingPage = () => {
                             
                             <div className="offerDisplay">
                                 {dishes.map(dish => (
-                                    <DishCardLand key={dish.dishCode} dish={dish} />
+                                    <DishCardLand key={dish.dishCode} dish={dish} source="offers" />
                                 ))}
                             </div>
                         </div> 
@@ -330,7 +330,7 @@ const LandingPage = () => {
                     {/* Food features */}
                     <div className="featuredFood featured">
                         {getTopRatedDishes().map(dish => (
-                            <DishCard key={dish.dishCode} dish={dish} />
+                            <DishCardLand key={dish.dishCode} dish={dish} source="featured" />
                         ))}
                     </div>
                 </div>
