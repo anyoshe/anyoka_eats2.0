@@ -60,7 +60,6 @@ function Testimonials() {
           <h4 className="job">User</h4>
         </div>
 
-     
         <div className="slide-box">
           
             <p className="comment">
@@ -81,7 +80,7 @@ function Testimonials() {
 
       
         <div className="slide-box">
-       
+
           <p className="comment">
           Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do
           eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut
@@ -98,9 +97,8 @@ function Testimonials() {
           <h4 className="job">Driver</h4>
         </div>
 
-     
         <div className="slide-box">
-         
+
           <p className="comment">
           Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do
           eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut
@@ -117,7 +115,6 @@ function Testimonials() {
           <h4 className="job">User</h4>
         </div>
 
-       
         <div className="slide-box">
           
             <p className="comment">

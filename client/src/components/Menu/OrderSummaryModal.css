@@ -6,7 +6,7 @@
 }
 
 #orderSummaryModalLabel{
-    font-size: 20px;
+    font-size: 1.3rem;
     font-weight: 800;
     font-style: normal;
     color: var(--green);
@@ -14,24 +14,36 @@
 }
 
 .form-group{
-    padding-bottom: 20px;
+    /* padding-bottom: 20px; */
 }
 
 .summary{
     font-weight: 500;
     font-style: normal;
-    margin-bottom: 5px;
+    margin-bottom: 0.5rem;
+    font-size: 1.1rem;
 }
 
 .closeOrder{
     background-color: var(--green);
     color: white;
+    border: none;
+    padding: 0.5rem 1rem;
+    transition: ease-in .2s;
 }
 
 .closeOrder:hover{
     background-color: white;
     color: var(--orange);
     outline: 1px solid var( --orange);
+}
+
+.text-muted{
+    font-size: 1rem;
+}
+
+.summary_total_details{
+    font-size: 0.9rem;
 }
 
 .price{

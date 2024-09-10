@@ -396,8 +396,28 @@
 
 /* Very small devices (small mobile phones) */
 @media only screen and (max-width: 480px) {
+  .footer-section{
+    border: 2px solid red;
+  }
+
+  .top_header_div{
+
+  }
+
+  .top_header_divs{
+
+  }
+
+  .top_header_icons{
+
+  }
+
+  .top_header_divs_headers{
+    
+  }
+  
   .footer_logo_head {
-    font-size: 2.5em; /* Reduce heading size further */
+    font-size: 2.5em; 
   }
 
   .footer-logo-text {
@@ -410,10 +430,10 @@
 
   .car, .bike {
     width: 12%;
-    height: 12%; /* Further reduce size of animations */
+    height: 12%; 
   }
 
   .contact_form_btn {
-    padding: 7px; /* Adjust button padding for very small screens */
+    padding: 7px;
   }
 }

@@ -199,12 +199,12 @@ const updateCustomerLocation = newPosition => {
               <div id="mapContainer"></div>
 
               <div className='useMylocation'>
-                <button type="button" className="btn btn-primary  InputBtn" onClick={getLocation}>Use My Location</button> 
+                <button type="button" className=" btn-primary  InputBtn" onClick={getLocation}>Use My Location</button> 
 
                 <input
                   type="text"
                   id="customerLocation"
-                  className="form-control mt-3"
+                  className="form-control "
                   placeholder="Enter Delivery Location"
                   onChange={(e) => setManualInput(e.target.value)}
                 />
@@ -212,9 +212,9 @@ const updateCustomerLocation = newPosition => {
 
             </div>
             <div className="modal-footer">
-              <button type="button" className="btn cancel_Ok_btn" onClick={handleOkClick}>OK</button>
+              <button type="button" className="cancel_Ok_btn" onClick={handleOkClick}>OK</button>
 
-              <button type="button" className="btn  cancel_Ok_btn" data-bs-dismiss="modal" onClick={handleClose}>Cancel</button>
+              <button type="button" className="cancel_Ok_btn" data-bs-dismiss="modal" onClick={handleClose}>Cancel</button>
 
             </div>
           </div>

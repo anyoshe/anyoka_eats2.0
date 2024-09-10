@@ -194,9 +194,11 @@ img {
 
 /* Testimonials section styles */
 .testimonials {
-    padding: 60px 0;
+    /* padding: 60px 0; */
     background-color: #f9f9f9;
     text-align: center;
+    padding: 0;
+    padding-top: 1rem;
 }
 
 .testimonials h2 {

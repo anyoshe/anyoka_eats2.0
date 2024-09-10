@@ -1,9 +1,29 @@
+
+#exampleModalLabel{
+    font-weight: 800;
+    text-decoration: underline;
+    color: var(--green);
+}
+
 .by_reataurant_select{
     height: 100%;
     /* width: 100%; */
     transition: ease-in .2s;
+    border: none;
+    transition: ease-in .2s;
 }
 
-.by_reataurant_select:hover{
+.by_reataurant_select:hover,.by_reataurant_select:focus{
     cursor: pointer;
+    outline: 1px solid var(--green);
+    border: none;
+}
+
+#dishesModalContent {
+    /* border: 5px solid green; */
+
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    column-gap: 5px;
+    row-gap: 10px;
 }

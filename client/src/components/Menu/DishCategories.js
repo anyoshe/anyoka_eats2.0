@@ -74,58 +74,61 @@ const DishCategories = () => {
   return (
     <div id="dish-categories">
       <section className='dishesSection'>
-      {/* Buttons for category selection */}
-      <div className="category-buttons">
-        <button onClick={() => setView('all')}>All Dishes</button>
-        <button onClick={() => setView('popular')}>Popular Dishes</button>
-        <button onClick={() => setView('discounted')}>Discounted and Offers</button>
-      </div>
-     <div className="dishes-to-display">
-      {/* Conditionally render sections based on selected view */}
-      {view === 'popular' && (
-        <div className='popularDishDiv menuDivs'>
-          <h5 className='menuHeader'>Popular Dishes</h5>
-          <ul id="popular-dishes" className="dish-list">
-            {getPopularDishes().map(dish => (
-              <DishCard key={dish.dishCode} dish={dish} addToCart={() => {}} />
-            ))}
-          </ul>
-        </div>
-      )}
 
-      {view === 'all' && (
-        <div className='allDishDiv menuDivs'>
-          <h5 className='menuHeader'>All Dishes</h5>
-          <ul id="all-dishes" className="dish-list">
-            {dishes.map(dish => (
-              <DishCard key={dish.dishCode} dish={dish} addToCart={() => {}} />
-            ))}
-          </ul>
+        <div className="category-buttons-div">
+          <button onClick={() => setView('all')} className='menu-category-buttons'>All</button>
+          <button onClick={() => setView('popular')} className='menu-category-buttons'>Popular</button>
+          <button onClick={() => setView('discounted')} className='menu-category-buttons'>Offers</button>
         </div>
-      )}
+        
+        <div className="dishes-to-display">
+          {view === 'popular' && (
+            <div className='popularDishDiv menuDivs'>
+              <h5 className='menuHeader'>Popular Dishes</h5>
+              <ul id="popular-dishes" className="dish-list">
+                {getPopularDishes().map(dish => (
+                  <DishCard key={dish.dishCode} dish={dish} addToCart={() => {}} />
+                ))}
+              </ul>
+            </div>
+          )}
 
-      {view === 'discounted' && (
-        <div className='discountedDishDiv menuDivs'>
-          <h5 className='menuHeader'>Discounted and Offers</h5>
-          <ul id="discounted-dishes" className="dish-list">
-            {discountedDishes.map(dish => (
-              <DishCard key={dish.dishCode} dish={dish} addToCart={() => {}} />
-            ))}
-          </ul>
+          {view === 'all' && (
+            <div className='allDishDiv menuDivs'>
+              <h5 className='menuHeader'>All Dishes</h5>
+              <ul id="all-dishes" className="dish-list">
+                {dishes.map(dish => (
+                  <DishCard key={dish.dishCode} dish={dish} addToCart={() => {}} />
+                ))}
+              </ul>
+            </div>
+          )}
+
+          {view === 'discounted' && (
+            <div className='discountedDishDiv menuDivs'>
+              <h5 className='menuHeader'>On Offers Dishes</h5>
+              <ul id="discounted-dishes" className="dish-list">
+                {discountedDishes.map(dish => (
+                  <DishCard key={dish.dishCode} dish={dish} addToCart={() => {}} />
+                ))}
+              </ul>
+            </div>
+          )}
+
         </div>
-      )}
-     </div>
-     </section>
-     <section className="restaurantSection">
-      <div className='popularHotelDiv menuDivs'>
-        <h5 className='restaurantHeader'>Popular Restaurants</h5>
-        <ul id="popular-restaurants" className="restaurant-list">
-          {getPopularRestaurants().map(restaurant => (
-            <RestaurantCard key={restaurant._id} restaurant={restaurant} />
-          ))}
-        </ul>
-      </div>
       </section>
+
+      <section className="restaurantSection">
+        <div className='popularHotelDiv menuDivs'>
+          <h5 className='restaurantHeader'>Popular Restaurants</h5>
+          <ul id="popular-restaurants" className="restaurant-list">
+            {getPopularRestaurants().map(restaurant => (
+              <RestaurantCard key={restaurant._id} restaurant={restaurant} />
+            ))}
+          </ul>
+        </div>
+      </section>
+
     </div>
   );
 };

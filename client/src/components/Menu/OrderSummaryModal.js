@@ -172,7 +172,6 @@ const OrderSummaryModal = ({ show, handleClose, restaurantName, orderedDishes = 
       } else {
         alert('Order has been canceled.');
         setShowPaymentModal(false);
-       
       }
     } setTimeout(() => {
           window.location.href = '/';
@@ -303,12 +302,13 @@ const OrderSummaryModal = ({ show, handleClose, restaurantName, orderedDishes = 
               <ul className="list-group mb-3 form-group">
                 <p className='summary'>Dishes Ordered</p>
                 {orderedDishes.map((dish, index) => (
-                  <li key={index} className="list-group-item d-flex justify-content-between lh-sm">
+                  <li key={index} className="list-group-item d-flex justify-content-between ">
+
                     <div>
 
                       <h6 className="my-0">{dish.dishName}</h6>
                       
-                      <small className="text-muted">{dish.dishDescription}</small>
+                      {/* <small className="text-muted">{dish.dishDescription}</small> */}
                     </div>
                     <span className="text-muted">{dish.quantity} x KSH {dish.price.toFixed(2)}</span>
                   </li>
@@ -316,19 +316,19 @@ const OrderSummaryModal = ({ show, handleClose, restaurantName, orderedDishes = 
               </ul>
 
               <div className="d-flex justify-content-between">
-                <span>Delivery Charges (KSH)</span>
+                <span className='summary_total_details'>Delivery Charges (KSH)</span>
                 <span className='price'>{deliveryCharges.toFixed(2)}</span>
               </div>
 
               <div className="d-flex justify-content-between">
-                <span>Total (KSH)</span>
+                <span className='summary_total_details'>Total (KSH)</span>
                 <span className='price'>{grandTotal.toFixed(2)}</span>
               </div>
             </div>
 
             <div className="modal-footer">
-              <button type="button" className="btn closeOrder" onClick={handleConfirmOrder}>Confirm</button>
-              <button type="button" className="btn closeOrder" onClick={handleClose}>Close</button>
+              <button type="button" className="closeOrder" onClick={handleConfirmOrder}>Confirm</button>
+              <button type="button" className="closeOrder" onClick={handleClose}>Close</button>
             </div>
 
           </div>
