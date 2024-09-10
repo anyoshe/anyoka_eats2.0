@@ -158,3 +158,54 @@
   color: #888;
   font-size: 0.9em;
 }
+
+@media (max-width: 480px) {
+  .dish-card{
+    width: 12.8rem;
+  }
+
+  .food-image{
+    height: 9rem;
+    border-radius: 0;
+  }
+
+  .discounted-price-circle{
+    padding: 0.1rem 0.1rem;
+    font-size: 0.6rem;
+    top: -9%;
+    right: 1%;
+  }
+
+  .dishName{
+    font-size: 0.7rem;
+    margin-bottom: 0rem;
+    padding: 0.4rem 0rem;
+  }
+
+  .fresh_original{
+    margin-bottom: 0;
+    padding: 0.1rem;
+    font-size: 0.9rem;
+  }
+
+  .fresh-original-strikethrough{
+    font-size: 0.9rem;
+  }
+
+  .dishRestaurant{
+    margin-bottom: 0.3rem;
+    font-size: 0.7rem;
+  }
+
+  .dishAddToCart{
+    border-radius: 0;
+    padding: 0.3rem 0.9rem;
+    width: 80%;
+    margin-bottom: 0rem;
+    font-size: 0.9rem;
+  }
+
+  .average{
+    font-size: 0.8rem;
+  }
+}

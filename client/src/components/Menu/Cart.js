@@ -47,7 +47,7 @@ const Cart = () => {
           <div className="modal-content">
             <div className="modal-header">
               <h5 className="modal-title" id="cartModalLabel">My Order</h5>
-              <button type="button" className="btn-close" data-bs-dismiss="modal" aria-label="Close" onClick={closeCartModal}></button>
+              {/* <button type="button" className="btn-close" data-bs-dismiss="modal" aria-label="Close" onClick={closeCartModal}></button> */}
             </div>
 
             <div className="modal-body">
@@ -58,32 +58,37 @@ const Cart = () => {
               <ul id="cartItems">
                 {state.items.map((item, index) => (
                   <li key={index} className="d-flex justify-content-between align-items-center">
-                    <span className='itemDishName'><span>{item.dishName}</span> <span>Ksh.{(item.price * item.quantity)}</span></span>
+                    <span className='itemDishName'>
+                      <span className='DishDetailSpan'>{item.dishName}</span> 
+                      <span className='DishDetailSpan'>Ksh.{(item.price * item.quantity)}</span>
+                    </span>
 
                     <div className="d-flex align-items-center">
-                      <button className="btn btn-outline-secondary btn-sm me-2 minus" onClick={() => handleDecreaseQuantity(item.dishCode)}>-</button>
+                      {/* <button className="btn btn-outline-secondary btn-sm me-2 minus-plus" onClick={() => handleDecreaseQuantity(item.dishCode)}>-</button> */}
+                      <button className="btn-outline-secondary btn-sm me-2 minus-plus minus" onClick={() => handleDecreaseQuantity(item.dishCode)}>-</button>
 
-                      <span>{item.quantity}</span>
+                      <span className='menuDishQuantity'>{item.quantity}</span>
 
-                      <button className="btn btn-outline-secondary btn-sm ms-2 plus" onClick={() => handleIncreaseQuantity(item.dishCode)}>+</button>
+                      {/* <button className="btn btn-outline-secondary btn-sm ms-2 plus" onClick={() => handleIncreaseQuantity(item.dishCode)}>+</button> */}
+                      <button className="btn-outline-secondary btn-sm ms-2 minus-plus plus" onClick={() => handleIncreaseQuantity(item.dishCode)}>+</button>
 
-                      <button className="btn btn-danger btn-sm ms-2" onClick={() => handleRemoveFromCart(item.dishCode)}>Delete</button>
+                      <button className="btn-danger btn-sm ms-2 menuDelete" onClick={() => handleRemoveFromCart(item.dishCode)}>Delete</button>
                     </div>
                   </li>
                 ))}
               </ul>
 
               <div>
-                <span className='itemTotal'>Total Price:</span> Ksh. <span id="totalPrice">{state.totalPrice.toFixed(2)}</span>
+                <span className='itemTotal'>Total Price :</span> Ksh <span id="totalPrice">{state.totalPrice.toFixed(2)}</span>
                 </div>
-            </div>
+              </div>
 
             <div className="modal-footer">
-              <button type="button" className="btn bottomBtn" onClick={handlePlaceOrder}>
-                Place Order
+              <button type="button" className="bottomBtn" onClick={handlePlaceOrder}>
+                Continue
               </button>
               
-              <button type="button" className="btn bottomBtn" data-bs-dismiss="modal" aria-label="Close" onClick={closeCartModal}>
+              <button type="button" className="bottomBtn" data-bs-dismiss="modal" aria-label="Close" onClick={closeCartModal}>
                 Close
               </button>
             </div>

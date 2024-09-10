@@ -60,7 +60,6 @@ const LandingPage = () => {
                 const response = await axios.get(`${config.backendUrl}/api/discounted-dishes`);
                 const fetchedDishes = response.data.dishes || [];
 
-               
                 const discountedDishes = fetchedDishes.filter(dish => dish.discount && dish.discount > 0).slice(0, 5);
 
                 setDishes(discountedDishes);
@@ -135,21 +134,30 @@ const LandingPage = () => {
     };
 
     return (
-        
         <div className="containerDiv">
             {/* <NavBar/> */}
             {/* header section - logo, searchBar, signIn & logIn, slogan, services */}
-            <section className="headerSection">
-                {/* logo */}
-                <div className="logo-CTA">
+            <div className="logo-CTA">
                     <div className="logoDiv">
-                        <h2 className="logo">Anyoka Eats</h2>
+                        <h2 className="land_logo">Anyoka Eats</h2>
                     </div>
-                  
+
                     <div className="signCta_div">
                         <Link to="/sign-up-sign-in" className="landing_sign">Log In</Link>
                     </div>
                 </div>
+            <section className="headerSection">
+                {/* logo */}
+                {/* <div className="logo-CTA">
+                    <div className="logoDiv">
+                        <h2 className="land_logo">Anyoka Eats</h2>
+                    </div>
+
+                    <div className="signCta_div">
+                        <Link to="/sign-up-sign-in" className="landing_sign">Log In</Link>
+                    </div>
+                </div> */}
+
                 {/* searchBar & services */}
                 <div className="services-serchBar">
                     <SearchBar />
@@ -233,9 +241,11 @@ const LandingPage = () => {
                     <div className="offerNavContainer">
                         <div className="offerNav">
                             <button className="categories allBtn">All</button>
+
                             <button className="categories categoryBtn" onMouseOver={handleMouseOver} onMouseOut={handleMouseOut}>
                                 Categories
                             </button>
+                            
                             {dropdownOpen && (
                                 <div className="dropdown-content" onMouseOver={handleMouseOver} onMouseOut={handleMouseOut}>
                                     <a href="#Food" onClick={selectOption}>Food</a>
@@ -294,16 +304,15 @@ const LandingPage = () => {
 
                         
                        {/* Discounted Foods */}
-                    {discountedFoods.length > 0 && (
-                            <div>
-                               
-                                <div className="offerDisplay">
-                                    {discountedFoods.map(food => (
-                                        <FoodCardLand key={food.foodCode} food={food} />
-                                    ))}
+                        {discountedFoods.length > 0 && (
+                                <div>
+                                    <div className="offerDisplay">
+                                        {discountedFoods.map(food => (
+                                            <FoodCardLand key={food.foodCode} food={food} />
+                                        ))}
+                                    </div>
                                 </div>
-                            </div>
-                        )}
+                            )}
                     </div>
                 </div>
             </section>
@@ -342,7 +351,7 @@ const LandingPage = () => {
                     {/* <!-- PARAGRAPH  DIV --> */}
                     <div className="paragraph_div">
                         <h3 className="join_team_heading">
-                           Join our ever evolving and  growing community as :
+                            Join our ever evolving and  growing community as :
                         </h3>
                     </div>
 
@@ -362,19 +371,17 @@ const LandingPage = () => {
                             <button className="signup">Sign Up</button>
                         </div>
 
-                        <div className="join_team_choices">
+                        {/* <div className="join_team_choices">
                             <h3 className="join_title">User</h3>
 
                             <p className="join_explanation">Sign up and order food together with other services of your choice</p>
 
-                            {/* <!-- IMAGE DIV AND IMAGE --> */}
                             <div className="join_team_image_div">
                                 <img src={userPersonImg} alt="User Person" className="join_img" />
                             </div>
 
-                            {/* <!-- SIGN UP BUTTON --> */}
                             <button className="signup">Sign Up</button>
-                        </div>
+                        </div> */}
 
                         <div className="join_team_choices">
                             <h3 className="join_title">Deliver Person</h3>
