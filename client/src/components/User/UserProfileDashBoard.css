@@ -184,3 +184,8 @@
 .grid_profile_two{
     /* border: 5px solid purple; */
 }
+
+.homeLinkUser{
+    display: flex;
+    align-items: center;
+}

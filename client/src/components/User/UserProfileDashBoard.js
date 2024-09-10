@@ -18,6 +18,8 @@ import UndeliveredFoodOrders from './UndeliveredFoodOrders';
 import DeliveredFoodOrders from './DeliveredFoodOrders';
 import SpecialOrders from './SpecialOrdersList';
 import Logout from '../Landing/LogOut';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faHome } from '@fortawesome/free-solid-svg-icons'
 
 // const Orders = () => <div>Orders Content Here</div>;
 // const Sales = () => <div>Sales Content Here</div>;
@@ -203,7 +205,9 @@ const UserProfileDashBoard = () => {
     {/* logo */}
     <div className="profile_profile_bar">
       <div className='profile_bar'>
+      <a href="/" className='homeLinkUser'><FontAwesomeIcon icon={faHome}  className='homeIcon'/></a> 
         <div className="logoDiv">
+          
           <h3 className='welcome-greet'>Welcome ,<span className='partner_welcome'>  {partner?.businessName}</span></h3>
         </div>
       

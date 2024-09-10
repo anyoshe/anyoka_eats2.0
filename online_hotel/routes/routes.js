@@ -843,6 +843,7 @@ const restaurantSchema = new mongoose.Schema({
   restaurantImgUrl: {type: String, required: false },
   restaurant: { type: String, required: true },
   dishCategory: { type: String, required: true },
+  location: { type: String, required: false },
   averageRating: { type: Number, default: 0 },
   ratingCount: { type: Number, default: 0 }
 });
@@ -850,7 +851,7 @@ const restaurantSchema = new mongoose.Schema({
 const Restaurant = mongoose.model("Restaurant", restaurantSchema);
 
 
-// Example route to get dishes by restaurant name
+// route to get dishes by restaurant name
 router.get('/partner_dishes', async (req, res) => {
   const { restaurantName } = req.query;
 
@@ -903,10 +904,11 @@ router.get('/partners/:_id/restaurants', async (req, res) => {
 // Add a new restaurant
 router.post('/restaurants', async (req, res) => {
   try {
-    const { partnerId, restaurant, dishCategory, restaurantImgUrl } = req.body;
+    const { partnerId, restaurant, dishCategory, location, restaurantImgUrl } = req.body;
     const newRestaurant = new Restaurant({
       partnerId,
       restaurant,
+      location,
       dishCategory,
       restaurantImgUrl,
     });
@@ -916,6 +918,52 @@ router.post('/restaurants', async (req, res) => {
     res.status(500).json({ message: 'Server error', error });
   }
 });
+
+
+router.put('/restaurants/:id', async (req, res) => {
+  const { id } = req.params;
+  const updateData = req.body;
+
+  try {
+    const restaurant = await Restaurant.findById(id);
+    if (!restaurant) {
+      return res.status(404).json({ message: 'Restaurant not found' });
+    }
+
+    const oldRestaurantName = restaurant.restaurant; // Save the original restaurant name
+
+    // Explicitly handle the `restaurant` name (since it's a required field)
+    if (updateData.restaurant) {
+      restaurant.restaurant = updateData.restaurant; // update restaurant name
+    }
+
+    // Dynamically update or add any other fields that are present in the request body
+    Object.keys(updateData).forEach((key) => {
+      if (key !== 'restaurant') { // Avoid re-updating the restaurant name here
+        restaurant[key] = updateData[key]; // assign other fields dynamically
+      }
+    });
+
+    // Save the updated restaurant document
+    await restaurant.save();
+
+    // Check if the restaurant name was changed and update dishes if necessary
+    if (updateData.restaurant && updateData.restaurant !== oldRestaurantName) {
+      // Update all dishes with the old restaurant name to the new restaurant name
+      await Dish.updateMany(
+        { restaurant: oldRestaurantName }, // Match dishes with the old name
+        { $set: { restaurant: updateData.restaurant } } // Update to the new name
+      );
+    }
+
+    res.status(200).json({ message: 'Restaurant and associated dishes updated successfully', restaurant });
+  } catch (error) {
+    console.error('Error updating restaurant or dishes:', error);
+    res.status(500).json({ message: 'Error updating restaurant or dishes', error });
+  }
+});
+
+
 // fetch restaurants for menu
 router.get('/restaurants', async (req, res) => {
   try {
@@ -926,6 +974,22 @@ router.get('/restaurants', async (req, res) => {
   }
 });
 
+router.get('/restaurants/:id', async (req, res) => {
+  console.log('Attempting to fetch restaurant details for ID:', req.params.id);
+  const { id } = req.params;
+  console.log('Restaurants retrieved', id);
+
+  try {
+    const restaurant = await Restaurant.findById(id);
+    if (!restaurant) {
+      return res.status(404).json({ message: 'Restaurant not found', id: id });
+    }
+    res.status(200).json(restaurant);
+  } catch (error) {
+    console.error('Error in /restaurants/:id route:', error);
+    res.status(500).json({ message: 'Server error', error: error.message });
+  }
+});
 
 router.post('/restaurants', async (req, res) => {
   const { restaurant, dishCategory } = req.body;
@@ -948,6 +1012,30 @@ router.post('/restaurants', async (req, res) => {
   }
 });
 
+router.delete('/restaurants/:id', async (req, res) => {
+  const { id } = req.params;
+  try {
+    // Find the restaurant by ID
+    const restaurant = await Restaurant.findById(id);
+    if (!restaurant) {
+      return res.status(404).json({ message: 'Restaurant not found' });
+    }
+
+    // Get the restaurant name to identify associated dishes
+    const restaurantName = restaurant.restaurant;
+
+    // Delete all dishes associated with this restaurant
+    await Dish.deleteMany({ restaurant: restaurantName });
+
+    // Delete the restaurant
+    await Restaurant.findByIdAndDelete(id);
+
+    res.status(200).json({ message: 'Restaurant and associated dishes deleted successfully' });
+  } catch (error) {
+    console.error('Error deleting restaurant:', error);
+    res.status(500).json({ message: 'Error deleting restaurant', error });
+  }
+});
 
 //fetching restaurants
 router.get('/restaurants/:cuisineType', async (req, res) => {

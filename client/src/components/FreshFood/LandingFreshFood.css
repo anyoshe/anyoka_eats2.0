@@ -233,10 +233,14 @@
 }
 
 .category-grid {
-    display: flex;
-    flex-direction: column;
+    /* display: flex;
+    flex-direction: column; 
     justify-content: center;
-    gap: 15px;
+    gap: 15px; */
+    display: grid;
+    grid-template-columns: repeat(5,1fr);
+    column-gap: 10px;
+    row-gap: 20px;
     background-color: white;
     color: #333;
 }
