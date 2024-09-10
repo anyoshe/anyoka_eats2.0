@@ -13,7 +13,7 @@
 }
 
 #cartModalLabel{
-    font-size: 20px;
+    font-size: 1.5rem;
     font-weight: 800;
     font-style: normal;
     color: var(--green);
@@ -38,8 +38,15 @@
 }
 
 .itemDishName{
+    /* border: 1px solid red; */
+
     display: grid;
-    grid-template-columns:100% 40%;
+    grid-template-columns: 50% 50%;
+    width: 50%;
+}
+
+.DishDetailSpan{
+    font-size: 0.9rem;
 }
 
 .d-flex{
@@ -48,27 +55,76 @@
     padding: 5px ;
 }
 
+.minus-plus{
+    color: white;
+    border: none; 
+    padding: 0.5rem 1.2rem;
+    border: none;
+    color: white;
+}
+
 .minus{
     background: var(--orange);
-    color: white;
-    border: none;
+    transition: ease-in .2s;
+}
+
+.minus:hover{
+    background: white;
+    color: var(--orange);
+    outline: 1px solid var(--orange);
+}
+
+.menuDishQuantity{
+    /* border: 1px solid red; */
+
+    width: 1rem;
+    text-align: center;
+    font-size: 1rem;
 }
 
 .plus{
     background: var(--green);
+    transition: ease-in .2s;
+    margin-right: 1rem;
+}
+
+.plus:hover{
+    background: white;
+    color: var(--green);
+    outline: 1px solid var(--green);
+}
+
+.menuDelete{
+    background: red;
     color: white;
+    padding: 0.5rem 1.2rem;
     border: none;
+    transition: ease-in .2s;
+}
+
+.menuDelete:hover{
+    background: white;
+    color: red;
+    outline: 1px solid red;
 }
 
 .itemTotal{
+    font-weight: 400;
+    font-size: 1.1rem;   
+}
+
+#totalPrice{
+    font-size: 1.2rem; 
+    color: var(--orange);
     font-weight: 600;
-    font-size: 18px;   
 }
 
 .bottomBtn{
     color: white;
     background: var(--green);
     border: none;
+    padding: 0.5rem 1rem;
+    transition: ease-in .2s;
 }
 
 .bottomBtn:hover{
@@ -81,11 +137,12 @@
 .fa-shopping-cart{
     font-size: 20px;
     color: var(--green);
+    transition: ease-in .2s;
 }
 
 .fa-shopping-cart:hover{
-    color: var(--orange);
-cursor: pointer;
+    color: white;
+    cursor: pointer;
 }
 
 .cart-icon-wrapper {

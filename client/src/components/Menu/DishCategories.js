@@ -94,16 +94,16 @@ const DishCategories = () => {
         </div>
       )}
 
-      {view === 'all' && (
-        <div className='allDishDiv menuDivs'>
-          <h5 className='menuHeader'>All Dishes</h5>
-          <ul id="all-dishes" className="dish-list">
-            {dishes.map(dish => (
-              <DishCard key={dish.dishCode} dish={dish} addToCart={() => {}} />
-            ))}
-          </ul>
-        </div>
-      )}
+          {view === 'all' && (
+            <div className='allDishDiv menuDivs'>
+              <h5 className='menuHeader'>All Dishes</h5>
+              <ul id="all-dishes" className="dish-list">
+                {dishes.map(dish => (
+                  <DishCard key={dish.dishCode} dish={dish} addToCart={() => {}} />
+                ))}
+              </ul>
+            </div>
+          )}
 
       {view === 'discounted' && (
         <div className='discountedDishDiv menuDivs'>
@@ -137,6 +137,7 @@ const DishCategories = () => {
         </ul>
       </div>
       </section>
+
     </div>
   );
 };

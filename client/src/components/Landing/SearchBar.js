@@ -127,7 +127,7 @@ const SearchBar = () => {
                         onClick={() => handleSuggestionClick(item.dishCode)}
                     >
                         {/* {item.dishName} - {item.dishCategory} - {item.restaurant} */}
-                        <span>{item.dishName}</span>  <span>{item.dishCategory}</span>  <span>{item.restaurant}</span>
+                        <span className='landDishSearch'>{item.dishName}</span>  <span className='landDishSearch'>{item.dishCategory}</span>  <span className='landDishSearch'>{item.restaurant}</span>
                     </div>
                 ))}
             </div>
@@ -142,11 +142,15 @@ const SearchBar = () => {
 
                         <div className='result_display result-result_display'>
                             <h5 className='search_h5'>{details.dishName}</h5>
+
                             <p>{details.dishDescription}</p>
+
                             {/* <p>Category: {details.dishCategory}</p> */}
                             <p>{details.dishCategory}</p>
+
                             {/* <p>Restaurant: {details.restaurant}</p> */}
                             <p>{details.restaurant}</p>
+
                             <p className="restaurant">Price: {details.dishPrice * 1.2}</p>
                         </div>
                     </div>
@@ -156,7 +160,5 @@ const SearchBar = () => {
         </div>
     );
 };
- 
+
 export default SearchBar;
- 
- 
