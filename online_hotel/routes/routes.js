@@ -21,6 +21,23 @@ const { type } = require("os");
 require('dotenv').config();
 const nodemailer = require('nodemailer');
 
+function authenticateToken(req, res, next) {
+  console.log('Authenticating token...');
+  const token = req.header('Authorization')?.split(' ')[1];
+  if (!token) return res.status(401).send('Access Denied');
+  
+  try {
+      const verified = jwt.verify(token, process.env.JWT_SECRET);
+      req.user = verified;
+      console.log('Token verified:', verified);
+      next();  // Make sure this line is executed
+  } catch (err) {
+      console.log('Token verification failed:', err.message);
+      res.status(400).send('Invalid Token');
+  }
+}
+
+
 
 //USER SCHEMA AND ROUTES
 const userSchema = new mongoose.Schema({
@@ -113,7 +130,16 @@ const partnerSchema = new mongoose.Schema({
 
 const Partner = mongoose.model('Partner', partnerSchema);
 
-
+router.get('/partner', authenticateToken, async (req, res) => {
+  try {
+    console.log('User ID:', req.user._id);
+    const partner = await Partner.findById(req.user._id);
+    if (!partner) return res.status(404).send('Partner not found.');
+    res.json(partner);
+  } catch (error) {
+    res.status(500).send(error.message);
+  }
+});
 // Define the sign-up route
 router.post('/signup', async (req, res) => {
   const { businessName, businessType, contactNumber, email, location, password } = req.body;
@@ -158,6 +184,22 @@ router.post('/signup', async (req, res) => {
 
 
 // Login route
+// router.post('/login', async (req, res) => {
+//   try {
+//     const { contactNumber, password } = req.body;
+//     const partner = await Partner.findOne({ contactNumber });
+
+//     if (!partner) return res.status(400).send('Invalid Credentials.');
+
+//     const validPassword = await bcrypt.compare(password, partner.password);
+//     if (!validPassword) return res.status(400).send('Invalid Credentials.');
+
+//     res.send(partner);
+//   } catch (err) {
+//     res.status(500).send(err.message);
+//   }
+// });
+
 router.post('/login', async (req, res) => {
   try {
     const { contactNumber, password } = req.body;
@@ -168,7 +210,11 @@ router.post('/login', async (req, res) => {
     const validPassword = await bcrypt.compare(password, partner.password);
     if (!validPassword) return res.status(400).send('Invalid Credentials.');
 
-    res.send(partner);
+    // Generate a JWT token
+    const token = jwt.sign({ _id: partner._id }, process.env.JWT_SECRET, { expiresIn: '1h' });
+
+    // Send the token and partner details to the client
+    res.json({ token, partner });
   } catch (err) {
     res.status(500).send(err.message);
   }
@@ -432,13 +478,13 @@ const dishSchema = new Schema({
   discount: { type: Number, default: 0 }, 
   dishCategory: { type: String, required: true },
   restaurant: { type: String, required: true },
-  subTotal: { type: Number, required: false, default: 0 },
-  dishDescription: { type: String, required: false },
+  subTotal: { type: Number, required: false, default: 0 },   
+  dishDescription: { type: String, required: false }, 
   createdAt: { type: Date, default: Date.now },
-  averageRating: { type: Number, default: 0 },
+  averageRating: { type: Number, default: 0 },  
   ratingCount: { type: Number, default: 0 },
-  discountedPrice: { type: Number, required: false, default: 0 },
-});
+  discountedPrice: { type: Number, required: false, default: 0 },      
+});  
 // Pre-save middleware to calculate the discounted price
 
  dishSchema.pre('save', function (next) {
