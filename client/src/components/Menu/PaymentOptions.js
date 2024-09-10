@@ -58,7 +58,9 @@ const PaymentOptions = ({ orderDetails, onPaymentSuccess, onPaymentFailure }) =>
         <select id="paymentMethod" value={paymentMethod} onChange={handlePaymentMethodChange}>
           <option value="mpesa" className='mpesa'>M-Pesa</option>
           <option value="visa">Visa</option>
-        
+          {/* <option value="visa">Airtel Money</option>
+          <option value="visa">Equity</option>
+          <option value="visa">KCB</option> */}
         </select>
       </div>
 

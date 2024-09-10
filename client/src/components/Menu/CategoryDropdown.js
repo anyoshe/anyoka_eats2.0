@@ -78,29 +78,41 @@ const CategoryDropdown = ({ addToCart, searchQuery }) => {
 
       {modalVisible && (
         <div className="modal fade show" id="dishModal" tabIndex="-1" aria-labelledby="dishModalLabel" aria-hidden="true" style={{ display: 'block' }}>
+
           <div className="modal-dialog modal-lg">
+
             <div className="modal-content">
+
               <div className="modal-header">
-                <h5 className="modal-title" id="dishModalLabel">Dishes</h5>
+                <h5 className="modal-title" id="dishModalLabel">By Cuisine</h5>
+
                 <button type="button" className="btn-close" data-bs-dismiss="modal" aria-label="Close" onClick={handleCloseModal}></button>
+
               </div>
+
               <div className="modal-body">
                 {Object.keys(dishesByRestaurant).length > 0 ? (
                   Object.keys(dishesByRestaurant).map((restaurant) => (
+
                     <div key={restaurant} className="restaurant-section">
+
                       <h2 className="restaurant-heading">{restaurant}</h2>
+
                       <div className="dishes-container">
                         {dishesByRestaurant[restaurant].map((dish) => (
-                          <DishCard key={dish.dishCode} dish={dish} addToCart={addToCart} />
+                          <DishCard key={dish.dishCode} dish={dish} addToCart={addToCart} className="drop_dishes" />
                         ))}
                       </div>
                     </div>
+
                   ))
                 ) : (
                   <p>No dishes available for this category.</p>
                 )}
               </div>
+
             </div>
+
           </div>
         </div>
       )}

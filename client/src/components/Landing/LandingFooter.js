@@ -94,9 +94,8 @@ import config from '../../config';
 const Footer = () => {
   const [email, setEmail] = useState('');
   const [message, setMessage] = useState('');
- 
 
- const handleSubmit = async (event) => {
+const handleSubmit = async (event) => {
   event.preventDefault();
 
   const formData = {
@@ -132,19 +131,25 @@ const Footer = () => {
       <div className="top_header_div">
         <div className="top_header_divs">
           <i className="fas fa-map-marker-alt" id="top_header_icons"></i>
+
           <h3 className="top_header_divs_headers">Location</h3>
+
           <p className="top_header_divs_para">1450 - 2000 Malindi, Maweni</p>
         </div>
 
         <div className="top_header_divs">
           <i className="fas fa-phone" id="top_header_icons"></i>
+
           <h3 className="top_header_divs_headers">Phone</h3>
+
           <p className="top_header_divs_para">0798765432</p>
         </div>
 
         <div className="top_header_divs">
           <i className="far fa-envelope-open" id="top_header_icons"></i>
+
           <h3 className="top_header_divs_headers">Email</h3>
+          
           <p className="top_header_divs_para">AnyokaEats@gmail.com</p>
         </div>
       </div>

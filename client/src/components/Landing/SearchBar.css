@@ -23,14 +23,18 @@
 }
 
 #searchResults {
+  /* border: 1px solid red; */
+
   box-shadow: rgba(0, 0, 0, 0.35) 0px 5px 15px;
   background: white;
   color: black;
   position: absolute;
   z-index: 80;
-  top: 30%;
-  left: 23%;
-  width: 50%;
+  top: 32%;
+  /* left: 23%; */
+  left: 26%;
+  /* width: 50%; */
+  width: 45%;
 }
 
 .suggestion-item {
@@ -45,7 +49,7 @@
   transition: ease-in .2s;
 }
 
-.suggestion-item span{
+.landDishSearch{
   cursor: pointer;
   color: white;
   font-size: 15px;
@@ -136,9 +140,9 @@
 /* Large desktops and laptops */
 @media (min-width: 1200px) {
   #searchResults {
-    top: 25%;
-    left: 30%;
-    width: 40%;
+    /* top: 25%; */
+    /* left: 30%; */
+    /* width: 40%; */
   }
 
   .suggestion-item {
@@ -188,7 +192,7 @@
 }
 
 /* Mobile phones */
-@media (max-width: 767px) {
+/* @media (max-width: 767px) {
   .searchBar {
     margin-top: 12%;
   }
@@ -203,6 +207,75 @@
     grid-template-columns: 1fr;
     gap: 20px;
     padding: 8px 15px;
+  }
+
+  .detail-container {
+    grid-template-columns: 1fr;
+  }
+
+  .mic-icon {
+    font-size: 18px;
+    margin-right: 8px;
+  }
+
+  .mic-icon:hover {
+    font-size: 25px;
+  }
+} */
+
+
+
+@media (max-width: 480px) {
+  .searchBar {
+    /* border: 1px solid blue; */
+
+    margin-top: 5%;
+    width: 100%;
+  }
+
+  #searchResults {
+    top: 15%;
+    left: 2%;
+    width: 86%;
+  }
+
+  .suggestion-item {
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 5px;
+    align-items: center;
+    justify-content: center;
+    padding: 0.1rem 0.2rem;
+  }
+
+  .search__container{
+    /* border: 1px solid blue; */
+
+    padding-top: 0.7rem;
+    width: 95%;
+    height: 4rem;
+    margin-bottom: 0.5rem;
+  }
+
+  .search__input{
+    padding: 0.5rem 1rem;
+    text-align: center;
+  }
+
+.search__input:hover,
+.search__input:focus {
+    padding: 0.7rem 0.9rem;
+    /* outline: 0;
+    border: 1px solid transparent;
+    border-bottom: 1px solid var(--green);
+    border-radius: 0;
+    background-position: 97% center; */
+}
+
+
+  .landDishSearch{
+    /* border: 1px solid blue; */
+
+    font-size: 0.6rem;
   }
 
   .detail-container {

@@ -9,7 +9,7 @@ const RestaurantCard = ({ restaurant }) => {
     useEffect(() => {
         // Set the initial rating to the average rating from props
         setRating(restaurant.averageRating);
-      }, [restaurant.averageRating]);
+    }, [restaurant.averageRating]);
 
     const handleStarClick = async (star) => {
         try {
