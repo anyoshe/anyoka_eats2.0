@@ -1,79 +1,229 @@
-/* Center the modal vertically and horizontally */
-.modal-dialog {
+@import url('https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap');
+
+:root{
+  --green:rgb(30, 165, 9);
+  --orange: rgb(255,165,0);
+}
+
+#specialOrderModal {
+  background-color: rgb(0, 0, 0, 0.7);
+  width: 100%;
+  /* margin-left: 0px; */
+  margin-top: 5%;
+  height: 95vh;
   display: flex;
   align-items: center;
   justify-content: center;
-  min-height: 100vh;
 }
-.modal {
-  background-color: rgb(0, 0, 0, 0.7);
-  width: 80%;
-  margin-left: 20%;
+
+/* Center the modal vertically and horizontally */
+.special-modal-dialog{
+  /* border: 5px solid green; */
+
+  width: 50%;
+  margin-top: 2%;
+  margin-left: 25%;
 }
+
+.modalContent{
+  /* border: 5px solid red; */
+
+  width: 100%;
+  background: white;
+  padding: 10px 5px;
+  /* margin-top: 5%; */
+}
+
+/* MODAL HEADER  */
+.modalHeader{
+  /* border: 1px solid green; */
+  
+  /* background-color: var(--green); */
+  border-bottom: 1px solid #dee2e6;
+  display: flex;
+  justify-content: space-between;
+  color: var(--green);
+  width: 100%;
+  padding: 10px 5px;
+  margin-bottom: 1%;
+}
+
+.modalTitle{
+  font-size: 20px;
+  font-weight: 800;
+  text-decoration: underline;
+}
+
+/* Styling for the close button */
+.specialClose {
+  padding: 5px 10px;
+  border: none;
+  color: white;
+  background: var(--green);
+
+}
+
+.specialClose:hover {
+  color: var(--orange);
+  background: white;
+  outline: 1px solid var(--orange);
+  transition: ease-in 0.2s;
+  text-decoration: none;
+}
+
+.specialCloseIcon{
+  font-size: 18px;
+}
+
+/* MODAL BODY */
+.modalBody{
+  /* border: 1px solid red; */
+  width: 100%;
+  padding: 0px;
+}
+
+#specialOrderForm{
+  /* border: 1px solid red; */
+
+  width: 100%;
+  padding-top: 5px;
+}
+
+.specialTriple{
+  display: grid;
+  grid-template-columns: repeat(3,1fr);
+  gap: 10px;
+  justify-content: space-around;
+  width: 100%;
+}
+
+.specialdouble{
+  display: grid;
+  grid-template-columns: repeat(2,1fr);
+  gap: 10px;
+  justify-content: space-around;
+  width: 100%;
+}
+
+.special_times{
+  padding: 5px;
+}
+
 /* Styling for the form elements */
-.form-group {
+.formGroup {
+  /* border: 1px solid green; */
+
   margin-bottom: 15px;
+  padding-bottom: 0px;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
 }
 
-.form-control {
-  border-radius: 4px;
-  padding: 10px;
+.deliveryDiv{
+  margin-bottom: 5%;
+}
+
+.specialLabels{
+  /* border: 1px dotted red; */
+  text-align: left;
+  margin-bottom: 2px;
+  font-size: 17px;
+}
+
+.specialPin{
+  background: var(--green);
+  color: white;
+  font-size: 15px;
+  padding: 5px;
+  border: none;
+  margin-bottom: 2px;
+}
+
+.specialPin:hover{
+  background: white;
+  color: var(--orange);
+  outline: 1px solid var(--orange);
+}
+
+.locationBtns{
+  /* border: 1px dotted red; */
+
+  width: 100%;
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 5px;
+}
+
+.formControl {
+  /* border: 1px solid salmon; */
+
   font-size: 16px;
+  border-radius: 0px;
+  border: none;
+  outline: 1px solid rgba(128, 128, 128, 0.203);
 }
 
-.btn-primary {
-  background-color: #007bff;
-  border-color: #007bff;
-  padding: 10px 20px;
+.formControl:hover, .formControl:focus{
+  color: var(--orange);
+  outline: 1px solid var(--orange);
+  cursor: pointer;
+}
+
+.specialTripleInputs{
+  padding: 5px;
+}
+
+/* #specialDetails{
+  border: 1px solid red;
+  width: 100%;
+  border-radius: 0px;
+} */
+
+/* .specialCloseBtn{
+  text-align: right;
+} */
+
+#btnPrimary {
+  background: var(--green);
+  border: none;
+  padding: 5px 20px;
   font-size: 16px;
+  color: white;
+  transition: ease-in .2s;
 }
 
-.btn-primary:hover {
-  background-color: #0056b3;
-  border-color: #004085;
+#btnPrimary:hover {
+  background: white;
+  color: var(--orange);
+  outline: 1px solid var(--orange);
+}
+
+.specilLocation{
+  padding: 5px;
+}
+
+#deliveryLocation{
+  padding: 5px;
+  margin-bottom: 10px;
 }
 
 /* Hide the map initially */
 #map {
-  height: 300px;
+  height: 150px;
   width: 100%;
   margin-top: 10px;
   display: none;
 }
 
-/* Additional styling for the modal header and body */
-.modal-header {
-  background-color: #f2490c;
-  border-bottom: 1px solid #dee2e6;
+/* .specialOrderDouble{
   display: flex;
-  justify-content: space-between;
-  color: #ffff;
-}
+  justify-content: space-around;
+} */
 
-.modal-title {
-  font-size: 20px;
-  font-weight: 600;
-}
-
-.modal-body {
-  padding: 20px;
-}
-
-/* Styling for the close button */
-.close {
-  font-size: 24px;
-  color: #000;
-  float: right;
-  border-radius: 10px;
-}
-
-.close:hover {
-  color: #0056b3;
-  text-decoration: none;
-}
 /* Styling for screens below 700px */
 @media (max-width: 700px) {
-  .modal {
+  .specialOrderModal {
     width: 100%;
     margin-left: 0;
     font-size: 12px;
@@ -82,46 +232,4 @@
     height: 300px;
     background-size: contain;
   } 
-}
-
-.special-order-section {
-  margin-bottom: 50px; 
-  height: auto;
-  background-color: #dee2e6;
-  padding: 30px;
-  color: #ffff;
-}
-/* #special-order {
-    height: 100vh;
-} */
-
-.hero-background {
-  /* background-image: url("../assets/heroimage.jpg"); 
-  background-size: contain;
-  background-position: center;
-  height: 100%; */
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  opacity: 0.9; /* Adjust for overlay effect */
-}
-
-.hero-content {
-  background: rgba(0, 0, 0, 0.5); /* Dark overlay for readability */
-  padding: 20px;
-  border-radius: 8px;
-  margin-top: 20%;
-}
-
-.cta-button {
-  padding: 10px 20px;
-  background-color: #ff5733; /* Customize button color */
-  border: none;
-  border-radius: 5px;
-  color: white;
-  cursor: pointer;
-}
-
-.cta-button:hover {
-  background-color: #ff451a; /* Darker shade on hover */
 }

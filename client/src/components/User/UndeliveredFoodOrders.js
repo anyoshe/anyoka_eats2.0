@@ -111,6 +111,7 @@ const UndeliveredFoodOrders = ({ partner }) => {
           <li key={food.foodName}>{food.foodName} - Quantity: {food.quantity}</li>
         ))}
       </ul>
+      <p>Delivery Charges: Kes.{foodOrder.deliveryCharges}.00</p>
       <p>Total Price: Kes.{foodOrder.totalPrice}.00</p>
       <p>Created At: {new Date(foodOrder.createdAt).toLocaleString()}</p>
       <p>Status: <span className="order-status">{foodOrder.status || 'undefined'}</span></p>
