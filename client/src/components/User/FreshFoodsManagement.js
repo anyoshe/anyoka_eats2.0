@@ -1,10 +1,30 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import './Profile.css';
 import config from '../../config';
 
+const googleApiKey = process.env.REACT_APP_GOOGLE_API_KEY;
+
+// Helper function to load Google Maps script asynchronously
+const loadGoogleMapsScript = (callback) => {
+  const existingScript = document.getElementById('googleMaps');
+  if (!existingScript) {
+    const script = document.createElement('script');
+    script.src = `https://maps.googleapis.com/maps/api/js?key=${googleApiKey}&libraries=places`;
+    script.id = 'googleMaps';
+    script.async = true;
+    script.onload = () => {
+      if (callback) callback();
+    };
+    document.head.appendChild(script);
+  } else {
+    if (callback) callback();
+  }
+};
+
+
 const FreshFoodsManagement = ({ partner }) => {
   const [editTitle, setEditTitle] = useState(false);
-  const [tableTitle, setTableTitle] = useState('TABLE TITLE');
+  // const [tableTitle, setTableTitle] = useState('TABLE TITLE');
   const [formData, setFormData] = useState({
     foodCode: '',
     foodName: '',
@@ -21,7 +41,124 @@ const FreshFoodsManagement = ({ partner }) => {
   const [foods, setFoods] = useState([]);
   const [isEditing, setIsEditing] = useState(false);
   const [editingFoodCode, setEditingFoodCode] = useState(null);
-  const [vendorLocation, setVendorLocation] = useState('');
+  // const [vendorLocation, setVendorLocation] = useState('');
+
+
+  const [isEditingTitle, setIsEditingTitle] = useState(false);
+
+  const [tableTitle, setTableTitle] = useState(selectedVendor?.vendorName || "");
+  const [vendorLocation, setVendorLocation] = useState(selectedVendor?.location || "");
+  const [foodCategory, setFoodCategory] = useState(selectedVendor?.foodCategory || "");
+  const [vendorImageUrl, setVendoImageUrl] = useState(selectedVendor?.vendorImgUrl || "");
+
+  const mapRef = useRef(null);
+  const [map, setMap] = useState(null);
+  const [marker, setMarker] = useState(null);
+  const [address, setAddress] = useState('');
+  const [scriptLoaded, setScriptLoaded] = useState(false);
+
+  // Load Google Maps script only once
+  useEffect(() => {
+    loadGoogleMapsScript(() => {
+      setScriptLoaded(true);
+    });
+  }, []);
+
+  // Initialize the map once script is loaded
+  useEffect(() => {
+    if (scriptLoaded && isEditingTitle) {
+      initializeMap();
+    }
+  }, [scriptLoaded, isEditingTitle]);
+
+  const initializeMap = () => {
+    if (!window.google) {
+      console.error("Google Maps API is not loaded.");
+      return;
+    }
+
+    const mapInstance = new window.google.maps.Map(mapRef.current, {
+      center: { lat: -3.2222, lng: 40.1167 }, // Default location
+      zoom: 15,
+    });
+
+    setMap(mapInstance);
+
+    mapInstance.addListener('click', (event) => {
+      const clickedLocation = event.latLng;
+      if (marker) {
+        marker.setMap(null); // Remove existing marker
+      }
+
+      const newMarker = new window.google.maps.Marker({
+        position: clickedLocation,
+        map: mapInstance,
+        draggable: true,
+      });
+
+      newMarker.addListener('dragend', () => {
+        const position = newMarker.getPosition();
+        reverseGeocode(position);
+      });
+
+      setMarker(newMarker);
+      reverseGeocode(clickedLocation);
+    });
+  };
+
+  const reverseGeocode = (location) => {
+    const geocoder = new window.google.maps.Geocoder();
+    geocoder.geocode({ location }, (results, status) => {
+      if (status === 'OK' && results[0]) {
+        setAddress(results[0].formatted_address);
+      } else {
+        console.error('Geocoder failed due to: ' + status);
+        setAddress('Address not found');
+      }
+    });
+  };
+
+  const handleUseMyLocation = async () => {
+    if (navigator.geolocation) {
+      try {
+        const position = await new Promise((resolve, reject) => {
+          navigator.geolocation.getCurrentPosition(resolve, reject);
+        });
+
+        const userLocation = {
+          lat: position.coords.latitude,
+          lng: position.coords.longitude,
+        };
+
+        if (map) {
+          map.setCenter(userLocation);
+          map.setZoom(15);
+
+          if (marker) {
+            marker.setMap(null);
+          }
+
+          const newMarker = new window.google.maps.Marker({
+            position: userLocation,
+            map: map,
+            draggable: true,
+          });
+
+          newMarker.addListener('dragend', () => {
+            const position = newMarker.getPosition();
+            reverseGeocode(position);
+          });
+
+          setMarker(newMarker);
+          reverseGeocode(userLocation);
+        }
+      } catch (error) {
+        console.error('Error fetching current location', error);
+      }
+    } else {
+      alert('Geolocation is not supported by this browser.');
+    }
+  };
 
   useEffect(() => {
     fetchVendors();
@@ -95,7 +232,7 @@ const FreshFoodsManagement = ({ partner }) => {
 
   const handleFormSubmit = async (e) => {
     e.preventDefault();
-  
+
     // Construct form data
     const formDataToSend = new FormData();
     formDataToSend.append('foodCode', formData.foodCode);
@@ -111,22 +248,22 @@ const FreshFoodsManagement = ({ partner }) => {
     if (formData.image) {
       formDataToSend.append('image', formData.image);
     }
-  
+
     try {
       const response = await fetch(`${config.backendUrl}/api/foods`, {
         method: 'POST',
         body: formDataToSend,
       });
-  
+
       if (response.ok) {
         const result = await response.json();
         console.log('Food added successfully:', result);
-  
+
         // Update the foods state with the newly added food item
         setFoods(prevFoods => [...prevFoods, result.food]);
-  
+
         alert('Food added successfully!');
-  
+
         // Clear the form
         setFormData({
           foodCode: '',
@@ -138,7 +275,7 @@ const FreshFoodsManagement = ({ partner }) => {
           discount: '',
           foodDescription: ''
         });
-  
+
         setIsEditing(false);
       } else {
         console.error('Failed to add food');
@@ -148,11 +285,62 @@ const FreshFoodsManagement = ({ partner }) => {
       console.error('Error submitting the form:', error);
     }
   };
-  
 
-  const handleTitleToggle = () => {
-    setEditTitle(prevEditTitle => !prevEditTitle);
+  const handleTitleToggle = async () => {
+    if (!isEditingTitle) {
+      // Prefill the form fields with current values from selectedVendor before editing
+      if (selectedVendor) {
+        setTableTitle(selectedVendor.vendor || '');
+        setAddress(selectedVendor.vendorLocation || '');
+        setFoodCategory(selectedVendor.foodCategory || '');
+      }
+    }
+
+    // If user was editing and is now saving
+    if (isEditingTitle) {
+      // Create an object with only changed fields
+      const updatedData = {};
+
+      // Only add fields that have been modified (and are not empty)
+      if (tableTitle && tableTitle !== selectedVendor?.vendor) {
+        updatedData.vendor = tableTitle;
+      }
+      if (address && address !== selectedVendor?.vendorLocation) {
+        updatedData.vendorLocation = address;
+      }
+      if (foodCategory && foodCategory !== selectedVendor?.foodCategory) {
+        updatedData.foodCategory = foodCategory;
+      }
+
+      // Only proceed if there are changes to send
+      if (Object.keys(updatedData).length > 0) {
+        try {
+          const response = await fetch(`${config.backendUrl}/api/vendors/${selectedVendor?._id}`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(updatedData), // Send only updated fields
+          });
+
+          if (response.ok) {
+            const result = await response.json();
+            console.log('Vendor updated successfully:', result);
+            alert('Vendor updated successfully!');
+          } else {
+            console.error('Failed to update vendor');
+            alert('Failed to update vendor. Please try again.');
+          }
+        } catch (error) {
+          console.error('Error updating vendor:', error);
+          alert('Error updating vendor. Please try again.');
+        }
+      } else {
+        alert('No changes made');
+      }
+    }
+
+    setIsEditingTitle(!isEditingTitle); // Toggle edit mode
   };
+
 
   const handleTitleChange = (e) => {
     setTableTitle(e.target.value);
@@ -210,7 +398,7 @@ const FreshFoodsManagement = ({ partner }) => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-  
+
     // Construct form data
     const formDataToSend = new FormData();
     formDataToSend.append('foodCode', formData.foodCode);
@@ -226,24 +414,24 @@ const FreshFoodsManagement = ({ partner }) => {
     if (formData.image) {
       formDataToSend.append('image', formData.image);
     }
-  
+
     try {
       const response = await fetch(`${config.backendUrl}/api/foods/${formData.foodCode}`, {
         method: 'PUT',
         body: formDataToSend,
       });
-  
+
       if (response.ok) {
         const result = await response.json();
         console.log('Food updated successfully:', result);
-  
+
         // Update the food item in the state
         setFoods(prevFoods =>
           prevFoods.map(food =>
             food.foodCode === result.food.foodCode ? result.food : food
           )
         );
-  
+
         alert('Food updated successfully!');
         // Reset editing state and clear the form
         setIsEditing(false);
@@ -276,7 +464,7 @@ const FreshFoodsManagement = ({ partner }) => {
           'Content-Type': 'application/json',
         },
       });
-  
+
       if (response.ok) {
         // If the deletion was successful, remove the item from the frontend list
         setFoods(prevFoods => prevFoods.filter(food => food._id !== foodId));
@@ -289,39 +477,114 @@ const FreshFoodsManagement = ({ partner }) => {
       alert(`An error occurred: ${error.message}`);
     }
   };
-  
+
+  const handleDeleteVendor = async () => {
+    const confirmDelete = window.confirm(
+      "Are you sure you want to delete this vendor and all its foods? This action cannot be undone."
+    );
+    if (confirmDelete) {
+      try {
+        const response = await fetch(`${config.backendUrl}/api/vendors/${selectedVendor._id}`, {
+          method: 'DELETE',
+        });
+        if (response.ok) {
+          alert('Vendor and its foods have been deleted successfully.');
+          // Update the local state to remove the deleted restaurant
+          setVendors(vendors.filter(vendor => vendor._id !== selectedVendor._id));
+          setSelectedVendor(null);
+          setTableTitle('TABLE TITLE');
+          setFoods([]);
+        } else {
+          console.error('Failed to delete vendor');
+          alert('Failed to delete vendor. Please try again.');
+        }
+      } catch (error) {
+        console.error('Error deleting vendor:', error);
+        alert('Error deleting vendor. Please try again.');
+      }
+    }
+  };
+
+
   return (
     <div className="menu_table" id="hotelRestaurantSection">
       <div className="column small-12 left_panel">
         <header data-equalizer-watch className="iconHeader">
           <div className="tableTitileChart">
-            {editTitle ? (
+
+            {isEditingTitle ? (
               <input
                 type="text"
                 value={tableTitle}
                 onChange={handleTitleChange}
                 className="inputHide"
               />
+
             ) : (
               <h2 className='h2TableTitle'>
                 {tableTitle}
-                
-            <h4 className="vendorLocation">
-              {vendorLocation}
-            </h4>
-                {/* <button className="hideshow" onClick={handleTitleToggle}>
-                  <i className="fa fa-pencil" aria-hidden="true"></i>
-                </button> */}
+                <h4 className="vendorLocation">
+                  {vendorLocation}
+                </h4>
               </h2>
             )}
-            {/* </div> */}
+            <button className="hideshow" onClick={handleTitleToggle}>
+              {isEditingTitle ? 'Save' : ''}
+              <i className={`fa ${isEditingTitle ? 'fa-save' : 'fa-pencil'}`} aria-hidden="true"></i>
+            </button>
 
-            {/* <h4 className="vendorLocation">
-              {vendorLocation}
-            </h4> */}
+            {/* Close Button when in editing mode */}
+            {isEditingTitle && (
+              <button className="closeButton" onClick={() => setIsEditingTitle(false)}>
+                Close <i className="fa fa-times" aria-hidden="true"></i>
+              </button>
+            )}
+
+            <button className="deleteButton" onClick={handleDeleteVendor}><i className="fas fa-trash"></i></button>
+
+            {isEditingTitle ? (
+              <div>
+                <label>
+                  Vendor Name:
+                  <input
+                    type="text"
+                    value={tableTitle}
+                    onChange={(e) => setTableTitle(e.target.value)}
+                  />
+                </label>
+                <div className="location-section">
+                  <label>
+                    Vendor Location:
+                  </label>
+                  <div id="map99" ref={mapRef} style={{ width: '100%', height: '400px' }}></div>
+                  <input
+                    type="text"
+                    placeholder="Enter a location"
+                    // ref={inputRef}
+                    className="headerInputs"
+                  />
+                  <button onClick={handleUseMyLocation}>Use My Location</button>
+                  <p>Selected Address: {address}</p>
+
+                </div>
+                <label>
+                  Food Category:
+                  <input
+                    type="text"
+                    value={foodCategory}
+                    onChange={(e) => setFoodCategory(e.target.value)}
+                  />
+                </label>
+
+
+              </div>
+            ) : (
+              <button onClick={handleTitleToggle}></button>
+            )}
 
             {/* Always show the Add Restaurant button */}
-            <button className="addRestaurantButton" onClick={handleAddVendor}>Add Grocer Name</button>
+            <button className="addRestaurantButton" onClick={handleAddVendor}><i className="fa fa-plus" id='addingPlus'></i></button>
+
 
             {/* Show dropdown if there are 2 or more restaurants */}
             {vendors.length > 1 && (
@@ -415,19 +678,26 @@ const FreshFoodsManagement = ({ partner }) => {
               </label>
             </div>
 
-
             <div className="small-4 cell column">
               <label>
-                <input
-                  type="text"
-                  placeholder="Food Category"
+                <select
                   className="headerInputs"
                   name="foodCategory"
                   value={formData.foodCategory}
                   onChange={handleInputChange}
-                />
+                >
+                  <option value="" disabled>Select Food Category</option>
+                  <option value="Fruits and Vegetables">Fruits & Vegetables</option>
+                  <option value="Grains and Cereals">Grains & Cereals</option>
+                  <option value="Spices">Spices</option>
+                  <option value="Tubers and Roots">Tubers & Roots</option>
+                  <option value="Meat and Poultry">Meat & Poultry</option>
+                  <option value="Dairy and Eggs">Dairy & Eggs</option>
+                  <option value="Sea Foods and Fish">Sea Foods & Fish</option>
+                </select>
               </label>
             </div>
+
 
             <div className="small-5 cell column">
               <label>
