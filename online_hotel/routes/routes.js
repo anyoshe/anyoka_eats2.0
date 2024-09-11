@@ -183,23 +183,6 @@ router.post('/signup', async (req, res) => {
 });
 
 
-// Login route
-// router.post('/login', async (req, res) => {
-//   try {
-//     const { contactNumber, password } = req.body;
-//     const partner = await Partner.findOne({ contactNumber });
-
-//     if (!partner) return res.status(400).send('Invalid Credentials.');
-
-//     const validPassword = await bcrypt.compare(password, partner.password);
-//     if (!validPassword) return res.status(400).send('Invalid Credentials.');
-
-//     res.send(partner);
-//   } catch (err) {
-//     res.status(500).send(err.message);
-//   }
-// });
-
 router.post('/login', async (req, res) => {
   try {
     const { contactNumber, password } = req.body;
@@ -923,6 +906,7 @@ router.post('/restaurants', async (req, res) => {
 router.put('/restaurants/:id', async (req, res) => {
   const { id } = req.params;
   const updateData = req.body;
+  console.log(updateData);
 
   try {
     const restaurant = await Restaurant.findById(id);
@@ -932,16 +916,9 @@ router.put('/restaurants/:id', async (req, res) => {
 
     const oldRestaurantName = restaurant.restaurant; // Save the original restaurant name
 
-    // Explicitly handle the `restaurant` name (since it's a required field)
-    if (updateData.restaurant) {
-      restaurant.restaurant = updateData.restaurant; // update restaurant name
-    }
-
-    // Dynamically update or add any other fields that are present in the request body
+    // Update only the fields present in the request body
     Object.keys(updateData).forEach((key) => {
-      if (key !== 'restaurant') { // Avoid re-updating the restaurant name here
-        restaurant[key] = updateData[key]; // assign other fields dynamically
-      }
+      restaurant[key] = updateData[key]; // Dynamically update the fields
     });
 
     // Save the updated restaurant document

@@ -264,6 +264,93 @@ appRouter.post('/vendors', async (req, res) => {
   }
 });
 
+
+// appRouter.put('/vendors/:id', async (req, res) => {
+//   const { id } = req.params;
+//   const updateData = req.body;
+//   console.log(updateData);
+
+//   try {
+//     const vendor = await Vendor.findById(id);
+//     if (!vendor) {
+//       return res.status(404).json({ message: 'Vendor not found' });
+//     }
+
+//     const oldVendorName = vendor.vendor; // Save the original restaurant name
+
+//     // Explicitly handle the `restaurant` name (since it's a required field)
+//     if (updateData.vendor) {
+//       vendor.vendor = updateData.vendor; // update restaurant name
+//     }
+
+//     // Dynamically update or add any other fields that are present in the request body
+//     Object.keys(updateData).forEach((key) => {
+//       if (key !== 'vendor') { // Avoid re-updating the restaurant name here
+//         vendor[key] = updateData[key]; // assign other fields dynamically
+//       }
+//     });
+
+//     // Save the updated restaurant document
+//     await vendor.save();
+
+//     // Check if the restaurant name was changed and update dishes if necessary
+//     if (updateData.vendor && updateData.vendor !== oldVendorName) {
+//       // Update all foods with the oldvendor name to the new vendor name
+//       await Food.updateMany(
+//         { vendor: oldVendorName }, // Match foods with the old name
+//         { $set: { vendor: updateData.vendor } } // Update to the new name
+//       );
+//     }
+
+//     res.status(200).json({ message: 'Vendor and associated foods updated successfully', vendor });
+//   } catch (error) {
+//     console.error('Error updating vendor or foods:', error);
+//     res.status(500).json({ message: 'Error updating vendor or foods', error });
+//   }
+// });
+
+
+appRouter.put('/vendors/:id', async (req, res) => {
+  const { id } = req.params;
+  const updateData = req.body;
+  console.log(updateData);
+
+  try {
+    // Fetch the existing vendor from the database
+    const vendor = await Vendor.findById(id);
+    if (!vendor) {
+      return res.status(404).json({ message: 'Vendor not found' });
+    }
+
+    const oldVendorName = vendor.vendor; // Save the original vendor name
+
+    // Update only the provided fields, keeping original values for others
+    Object.keys(updateData).forEach((key) => {
+      if (updateData[key] !== undefined && updateData[key] !== null && updateData[key] !== '') {
+        vendor[key] = updateData[key]; // Update field only if value is not undefined or null or empty
+      }
+    });
+
+    // Save the updated vendor document
+    const updatedVendor = await vendor.save();
+
+    // If the vendor name has changed, update all related foods
+    if (updateData.vendor && updateData.vendor !== oldVendorName) {
+      const result = await Food.updateMany(
+        { vendor: oldVendorName }, // Match foods with the old vendor name
+        { $set: { vendor: updateData.vendor } } // Update to the new vendor name
+      );
+      console.log(`Updated ${result.nModified} foods with new vendor name.`);
+    }
+
+    res.status(200).json({ message: 'Vendor and associated foods updated successfully', vendor: updatedVendor });
+  } catch (error) {
+    console.error('Error updating vendor or foods:', error);
+    res.status(500).json({ message: 'Error updating vendor or foods', error });
+  }
+});
+
+
 // Check if the partner has any restaurants
 appRouter.get('/vendors/:partnerId', async (req, res) => {
   try {
@@ -278,6 +365,30 @@ appRouter.get('/vendors/:partnerId', async (req, res) => {
   }
 });
 
+appRouter.delete('/vendors/:id', async (req, res) => {
+  const { id } = req.params;
+  try {
+    // Find the vendor by ID
+    const vendor = await Vendor.findById(id);
+    if (!vendor) {
+      return res.status(404).json({ message: 'Vendor not found' });
+    }
+
+    // Get the vendor name to identify associated foods
+    const vendorName = vendor.vendor;
+
+    // Delete all foods associated with this vendor
+    await Food.deleteMany({ vendor: vendorName });
+
+    // Delete the restaurant
+    await Vendor.findByIdAndDelete(id);
+
+    res.status(200).json({ message: 'Vendor and associated foods deleted successfully' });
+  } catch (error) {
+    console.error('Error deleting vendor:', error);
+    res.status(500).json({ message: 'Error deleting vendor', error });
+  }
+});
 appRouter.get('/partner_foods', async (req, res) => {
   const { vendorName } = req.query;
 

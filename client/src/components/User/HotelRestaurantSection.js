@@ -3,83 +3,23 @@ import './Profile.css';
 import config from '../../config';
 
 const googleApiKey = process.env.REACT_APP_GOOGLE_API_KEY;
-// const script = document.createElement('script');
-//       script.src = `https://maps.googleapis.com/maps/api/js?key=${googleApiKey}&callback=initMap&libraries=places`;
-//       script.async = true;
-//       document.head.appendChild(script);
 
-
-// const HotelRestaurantSection = ({ partner }) => {
-//   const [editTitle, setEditTitle] = useState(false);
-//   // const [tableTitle, setTableTitle] = useState('TABLE TITLE');
-//   const [formData, setFormData] = useState({
-//     dishCode: '',
-//     dishName: '',
-//     dishPrice: '',
-//     dishCategory: '',
-//     quantity: '',
-//     image: null
-//   });
-//   const [restaurants, setRestaurants] = useState([]);
-//   const [selectedRestaurant, setSelectedRestaurant] = useState(null);
-//   const [showAddRestaurantPrompt, setShowAddRestaurantPrompt] = useState(false);
-//   const [dishes, setDishes] = useState([]);
-//   const [isEditing, setIsEditing] = useState(false);
-//   const [editingDishCode, setEditingDishCode] = useState(null);
-//   const [isEditingTitle, setIsEditingTitle] = useState(false);
-
-//   // Assuming you have input fields for these restaurant fields
-//   const [tableTitle, setTableTitle] = useState(selectedRestaurant?.restaurantName || "");
-//   const [restaurantLocation, setRestaurantLocation] = useState(selectedRestaurant?.location || "");
-//   const [dishCategory, setDishCategory] = useState(selectedRestaurant?.dishCategory || "");
-//   const [restaurantImageUrl, setRestaurantImageUrl] = useState(selectedRestaurant?.restaurantImgUrl || "");
-
-
-//   const [location, setLocation] = useState('');
-//   const [map, setMap] = useState(null);
-//   const [autocomplete, setAutocomplete] = useState(null);
-//   const mapRef = useRef(null);
-//   const inputRef = useRef(null);
-
-//   useEffect(() => {
-//     if (window.google) {
-//       // Initialize map and autocomplete
-//       const mapOptions = {
-//         center: { lat: -3.2222, lng: 40.1167 }, // Default location
-//         zoom: 15,
-//       };
-//       const mapInstance = new window.google.maps.Map(mapRef.current, mapOptions);
-//       setMap(mapInstance);
-
-//       const autoCompleteInstance = new window.google.maps.places.Autocomplete(inputRef.current);
-//       autoCompleteInstance.bindTo('bounds', mapInstance);
-//       setAutocomplete(autoCompleteInstance);
-
-//       autoCompleteInstance.addListener('place_changed', () => {
-//         const place = autoCompleteInstance.getPlace();
-//         if (place.geometry) {
-//           setLocation(place.formatted_address);
-//           mapInstance.setCenter(place.geometry.location);
-//           mapInstance.setZoom(15);
-//         }
-//       });
-//     }
-//   }, []);
-
-//   const handleUseMyLocation = () => {
-//     if (navigator.geolocation) {
-//       navigator.geolocation.getCurrentPosition((position) => {
-//         const { latitude, longitude } = position.coords;
-//         const myLocation = new window.google.maps.LatLng(latitude, longitude);
-//         map.setCenter(myLocation);
-//         map.setZoom(15);
-//         setLocation('Your current location');
-//       });
-//     } else {
-//       alert('Geolocation is not supported by this browser.');
-//     }
-//   };
-// import React, { useState, useEffect, useRef } from 'react';
+// Helper function to load Google Maps script asynchronously
+const loadGoogleMapsScript = (callback) => {
+  const existingScript = document.getElementById('googleMaps');
+  if (!existingScript) {
+    const script = document.createElement('script');
+    script.src = `https://maps.googleapis.com/maps/api/js?key=${googleApiKey}&libraries=places`;
+    script.id = 'googleMaps';
+    script.async = true;
+    script.onload = () => {
+      if (callback) callback();
+    };
+    document.head.appendChild(script);
+  } else {
+    if (callback) callback();
+  }
+};
 
 const HotelRestaurantSection = ({ partner }) => {
   const [editTitle, setEditTitle] = useState(false);
@@ -98,81 +38,121 @@ const HotelRestaurantSection = ({ partner }) => {
   const [isEditing, setIsEditing] = useState(false);
   const [editingDishCode, setEditingDishCode] = useState(null);
   const [isEditingTitle, setIsEditingTitle] = useState(false);
-  
+
   const [tableTitle, setTableTitle] = useState(selectedRestaurant?.restaurantName || "");
   const [restaurantLocation, setRestaurantLocation] = useState(selectedRestaurant?.location || "");
   const [dishCategory, setDishCategory] = useState(selectedRestaurant?.dishCategory || "");
   const [restaurantImageUrl, setRestaurantImageUrl] = useState(selectedRestaurant?.restaurantImgUrl || "");
 
-  const [location, setLocation] = useState('');
-  const [map, setMap] = useState(null);
-  const [autocomplete, setAutocomplete] = useState(null);
   const mapRef = useRef(null);
-  const inputRef = useRef(null);
+  const [map, setMap] = useState(null);
+  const [marker, setMarker] = useState(null);
+  const [address, setAddress] = useState('');
+  const [scriptLoaded, setScriptLoaded] = useState(false);
 
+  // Load Google Maps script only once
   useEffect(() => {
-    // Function to initialize Google Maps
-    const initializeMap = () => {
-      if (mapRef.current && window.google) {
-        const mapOptions = {
-          center: { lat: -3.2222, lng: 40.1167 }, // Default location
-          zoom: 15,
-        };
-        const mapInstance = new window.google.maps.Map(mapRef.current, mapOptions);
-        setMap(mapInstance);
-
-        const autoCompleteInstance = new window.google.maps.places.Autocomplete(inputRef.current);
-        autoCompleteInstance.bindTo('bounds', mapInstance);
-        setAutocomplete(autoCompleteInstance);
-
-        autoCompleteInstance.addListener('place_changed', () => {
-          const place = autoCompleteInstance.getPlace();
-          if (place.geometry) {
-            setLocation(place.formatted_address);
-            mapInstance.setCenter(place.geometry.location);
-            mapInstance.setZoom(15);
-          }
-        });
-      }
-    };
-
-    // Load Google Maps script
-    const loadGoogleMapsScript = () => {
-      const googleApiKey = process.env.REACT_APP_GOOGLE_API_KEY;
-      if (!googleApiKey) {
-        console.error('Google API Key is missing.');
-        return;
-      }
-
-      const existingScript = document.getElementById('google-maps-script');
-      if (!existingScript) {
-        const script = document.createElement('script');
-        script.src = `https://maps.googleapis.com/maps/api/js?key=${googleApiKey}&libraries=places`;
-        script.id = 'google-maps-script';
-        script.async = true;
-        script.onload = initializeMap;
-        document.head.appendChild(script);
-      } else {
-        initializeMap();
-      }
-    };
-
-    loadGoogleMapsScript();
+    loadGoogleMapsScript(() => {
+      setScriptLoaded(true);
+    });
   }, []);
 
-  const handleUseMyLocation = () => {
-    if (navigator.geolocation && map) {
-      navigator.geolocation.getCurrentPosition((position) => {
-        const { latitude, longitude } = position.coords;
-        const myLocation = new window.google.maps.LatLng(latitude, longitude);
-        map.setCenter(myLocation);
-        map.setZoom(15);
-        setLocation('Your current location');
+  // Initialize the map once script is loaded
+  useEffect(() => {
+    if (scriptLoaded && isEditingTitle) {
+      initializeMap();
+    }
+  }, [scriptLoaded, isEditingTitle]);
+
+  const initializeMap = () => {
+    if (!window.google) {
+      console.error("Google Maps API is not loaded.");
+      return;
+    }
+
+    const mapInstance = new window.google.maps.Map(mapRef.current, {
+      center: { lat: -3.2222, lng: 40.1167 }, // Default location
+      zoom: 15,
+    });
+
+    setMap(mapInstance);
+
+    mapInstance.addListener('click', (event) => {
+      const clickedLocation = event.latLng;
+      if (marker) {
+        marker.setMap(null); // Remove existing marker
+      }
+
+      const newMarker = new window.google.maps.Marker({
+        position: clickedLocation,
+        map: mapInstance,
+        draggable: true,
       });
+
+      newMarker.addListener('dragend', () => {
+        const position = newMarker.getPosition();
+        reverseGeocode(position);
+      });
+
+      setMarker(newMarker);
+      reverseGeocode(clickedLocation);
+    });
+  };
+
+  const reverseGeocode = (location) => {
+    const geocoder = new window.google.maps.Geocoder();
+    geocoder.geocode({ location }, (results, status) => {
+      if (status === 'OK' && results[0]) {
+        setAddress(results[0].formatted_address);
+      } else {
+        console.error('Geocoder failed due to: ' + status);
+        setAddress('Address not found');
+      }
+    });
+  };
+
+  const handleUseMyLocation = async () => {
+    if (navigator.geolocation) {
+      try {
+        const position = await new Promise((resolve, reject) => {
+          navigator.geolocation.getCurrentPosition(resolve, reject);
+        });
+
+        const userLocation = {
+          lat: position.coords.latitude,
+          lng: position.coords.longitude,
+        };
+
+        if (map) {
+          map.setCenter(userLocation);
+          map.setZoom(15);
+
+          if (marker) {
+            marker.setMap(null);
+          }
+
+          const newMarker = new window.google.maps.Marker({
+            position: userLocation,
+            map: map,
+            draggable: true,
+          });
+
+          newMarker.addListener('dragend', () => {
+            const position = newMarker.getPosition();
+            reverseGeocode(position);
+          });
+
+          setMarker(newMarker);
+          reverseGeocode(userLocation);
+        }
+      } catch (error) {
+        console.error('Error fetching current location', error);
+      }
     } else {
-      alert('Geolocation is not supported by this browser or map not initialized.');
+      alert('Geolocation is not supported by this browser.');
     }
   };
+
 
   useEffect(() => {
     fetchRestaurants();
@@ -302,42 +282,74 @@ const HotelRestaurantSection = ({ partner }) => {
     }
   };
 
- 
+  useEffect(() => {
+    if (selectedRestaurant) {
+      setTableTitle(selectedRestaurant.restaurant || '');
+      setAddress(selectedRestaurant.location || '');
+      setDishCategory(selectedRestaurant.dishCategory || '');
+      setRestaurantImageUrl(selectedRestaurant.restaurantImgUrl || '');
+    }
+  }, [selectedRestaurant]);
+
+
   const handleTitleToggle = async () => {
+    if (!isEditingTitle) {
+      setTableTitle(selectedRestaurant?.restaurant || '');
+      setAddress(selectedRestaurant?.location || '');
+      setDishCategory(selectedRestaurant?.dishCategory || '');
+      setRestaurantImageUrl(selectedRestaurant?.restaurantImgUrl || '');
+    }
+
     if (isEditingTitle) {
       // Save the changes to the server
       try {
-        const response = await fetch(`${config.backendUrl}/api/restaurants/${selectedRestaurant?._id}`, {
-          method: 'PUT',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            restaurant: tableTitle,
-            location: restaurantLocation,
-            dishCategory: dishCategory,
-            restaurantImgUrl: restaurantImageUrl
-          }),
-        });
+        const updatedData = {};
 
-        if (response.ok) {
-          const result = await response.json();
-          console.log('Restaurant updated successfully:', result);
-          alert('Restaurant updated successfully!');
-          // Optionally update the restaurant list or state here with updated fields
+        // Add only fields that have changed
+        if (tableTitle && tableTitle !== selectedRestaurant?.restaurant) {
+          updatedData.restaurant = tableTitle;
+        }
+        if (address && address !== selectedRestaurant?.location) {
+          updatedData.location = address;
+        }
+        if (dishCategory && dishCategory !== selectedRestaurant?.dishCategory) {
+          updatedData.dishCategory = dishCategory;
+        }
+        if (restaurantImageUrl && restaurantImageUrl !== selectedRestaurant?.restaurantImgUrl) {
+          updatedData.restaurantImgUrl = restaurantImageUrl;
+        }
+
+        if (Object.keys(updatedData).length > 0) {
+          const response = await fetch(`${config.backendUrl}/api/restaurants/${selectedRestaurant?._id}`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(updatedData),
+          });
+
+          if (response.ok) {
+            const result = await response.json();
+            console.log('Restaurant updated successfully:', result);
+            alert('Restaurant updated successfully!');
+          } else {
+            console.error('Failed to update restaurant');
+            alert('Failed to update restaurant. Please try again.');
+          }
         } else {
-          console.error('Failed to update restaurant');
-          alert('Failed to update restaurant. Please try again.');
+          alert('No changes detected.');
         }
       } catch (error) {
         console.error('Error updating restaurant:', error);
         alert('Error updating restaurant. Please try again.');
       }
     }
+
     setIsEditingTitle(!isEditingTitle); // Toggle edit mode
   };
 
 
   const handleTitleChange = (e) => {
     setTableTitle(e.target.value);
+    setRestaurantLocation(e.target.value);
   };
 
   const handleAddRestaurant = async () => {
@@ -509,13 +521,23 @@ const HotelRestaurantSection = ({ partner }) => {
             ) : (
               <h2 className='h2TableTitle'>
                 {tableTitle}
+                <h4 className="vendorLocation">
+                  {address}
+                </h4>
               </h2>
             )}
+
             <button className="hideshow" onClick={handleTitleToggle}>
               {isEditingTitle ? 'Save' : ''}
               <i className={`fa ${isEditingTitle ? 'fa-save' : 'fa-pencil'}`} aria-hidden="true"></i>
             </button>
-         
+            {/* Close Button when in editing mode */}
+            {isEditingTitle && (
+              <button className="closeButton" onClick={() => setIsEditingTitle(false)}>
+                Close <i className="fa fa-times" aria-hidden="true"></i>
+              </button>
+            )}
+
             <button className="deleteButton" onClick={handleDeleteRestaurant}><i className="fas fa-trash"></i></button>
 
             {/* <h3 className="businessName">{partner?.restaurant}</h3> */}
@@ -530,19 +552,20 @@ const HotelRestaurantSection = ({ partner }) => {
                   />
                 </label>
                 <div className="location-section">
-        <label>
-          Restaurant Location:
-          <input
-            type="text"
-            placeholder="Enter a location"
-            ref={inputRef}
-            className="headerInputs"
-          />
-        </label>
-        <button onClick={handleUseMyLocation}>Use My Location</button>
-        <div ref={mapRef} style={{ height: '400px', width: '100%' }}></div>
-        <p>Selected Location: {location}</p>
-      </div>
+                  <label>
+                    Restaurant Location:
+                  </label>
+                  <div id="map99" ref={mapRef} style={{ width: '100%', height: '400px' }}></div>
+                  <input
+                    type="text"
+                    placeholder="Enter a location"
+                    // ref={inputRef}
+                    className="headerInputs"
+                  />
+                  <button onClick={handleUseMyLocation}>Use My Location</button>
+                  <p>Selected Address: {address}</p>
+
+                </div>
                 <label>
                   Dish Category:
                   <input
@@ -551,16 +574,6 @@ const HotelRestaurantSection = ({ partner }) => {
                     onChange={(e) => setDishCategory(e.target.value)}
                   />
                 </label>
-                {/* <label>
-      Restaurant Image URL:
-      <input 
-        type="text" 
-        value={restaurantImageUrl} 
-        onChange={(e) => setRestaurantImageUrl(e.target.value)} 
-      />
-    </label> */}
-
-                {/* <button onClick={handleTitleToggle}>Save</button> */}
               </div>
             ) : (
               <button onClick={handleTitleToggle}></button>
@@ -685,7 +698,7 @@ const HotelRestaurantSection = ({ partner }) => {
               </label>
             </div>
 
-            <div className="small-4 cell column">
+            {/* <div className="small-4 cell column">
               <label>
 
                 <input
@@ -697,6 +710,28 @@ const HotelRestaurantSection = ({ partner }) => {
                   onChange={handleInputChange}
                 />
 
+              </label>
+            </div> */}
+
+            <div className="small-4 cell column">
+              <label>
+                <select
+                  placeholder="Dish Category"
+                  className="headerInputs"
+                  name="dishCategory"
+                  value={formData.dishCategory}
+                  onChange={handleInputChange}
+                >
+                  <option value="">Select a category</option>
+                  <option value="Chinese Foods">Chinese Foods</option>
+                  <option value="Swahili Dishes">Swahili Dishes</option>
+                  <option value="African Dishes">African Dishes</option>
+                  <option value="Kenyan Food">Kenyan Food</option>
+                  <option value="Indian Foods">Indian Foods</option>
+                  <option value="Italian Foods">Italian Foods</option>
+                  <option value="Others">Others</option>
+                  {/* Add more categories if needed */}
+                </select>
               </label>
             </div>
 
