@@ -137,14 +137,14 @@ const LandingPage = () => {
             {/* <NavBar/> */}
             {/* header section - logo, searchBar, signIn & logIn, slogan, services */}
             <div className="logo-CTA">
-                    <div className="logoDiv">
-                        <h2 className="land_logo">Anyoka Eats</h2>
-                    </div>
-
-                    <div className="signCta_div">
-                        <Link to="/sign-up-sign-in" className="landing_sign">Log In</Link>
-                    </div>
+                <div className="logoDiv">
+                    <h2 className="land_logo">Anyoka Eats</h2>
                 </div>
+
+                <div className="signCta_div">
+                    <Link to="/sign-up-sign-in" className="landing_sign">Log In</Link>
+                </div>
+            </div>
             <section className="headerSection">
                 {/* logo */}
                 {/* <div className="logo-CTA">

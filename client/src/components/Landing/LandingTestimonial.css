@@ -17,6 +17,7 @@
   padding: 20px ;
   height: 40%;
   width: 100%;
+  overflow-x: hidden;
   display: flex;
   justify-content: center;
   flex-direction: column;
