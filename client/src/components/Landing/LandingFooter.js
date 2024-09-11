@@ -155,8 +155,8 @@ const handleSubmit = async (event) => {
       </div>
 
       <div className="footer-content">
-        <span className="bike"></span>
-        <span className="car"></span>
+        {/* <span className="bike"></span>
+        <span className="car"></span> */}
 
         <div className="row row_two">
           <div className="column_logo column_footer">
@@ -183,14 +183,18 @@ const handleSubmit = async (event) => {
             <p className="social_header">Socials</p>
             <div className="social_icon">
               <a href="#" className="social_link">
+                <i className="fab fa-tiktok tiktok-bg" id="social_list"></i>
+              </a>
+              <a href="#" className="social_link">
                 <i className="fab fa-facebook-f facebook-bg" id="social_list"></i>
               </a>
               <a href="#" className="social_link">
                 <i className="fab fa-twitter twitter-bg" id="social_list"></i>
               </a>
               <a href="#" className="social_link">
-                <i className="fab fa-google-plus-g google-bg" id="social_list"></i>
+                <i className="fab fa-instagram instagram-bg" id="social_list"></i>
               </a>
+
               <a href="#" className="social_link">
                 <i className="fab fa-whatsapp whatsapp-bg" id="social_list"></i>
               </a>
@@ -203,25 +207,28 @@ const handleSubmit = async (event) => {
               <input 
               type="email" 
               name='email'
-               className="your_email"
+                className="your_email"
                 placeholder="Your Email"
-                 required 
-                 value={email}
-                 onChange={(e) => setEmail(e.target.value)}
-                 />
+                required 
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                />
               <textarea
-               name="message" 
-               placeholder="Your Message" 
-               className="contact_text_email"
-               required
-               value={message}
-               onChange={(e) => setMessage(e.target.value)}
-               ></textarea>
-              <button type="submit" className="contact_form_btn">Let's Talk</button>
+              name="message" 
+              placeholder="Your Message" 
+              className="contact_text_email"
+              required
+              value={message}
+              onChange={(e) => setMessage(e.target.value)}
+              ></textarea>
+            <button type="submit" className="contact_form_btn">Let's Talk</button>
             </form>
           </div>
         </div>
       </div>
+
+      <span className="bike"></span>
+      <span className="car"></span>
 
       <div className="copyright_div">
         <p className="copyright_text">Anyoka Eats &copy; Copyright 2024, All Right Reserved</p>
