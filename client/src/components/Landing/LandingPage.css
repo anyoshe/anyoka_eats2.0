@@ -1098,12 +1098,21 @@ animation: hoverShake 0.15s linear 3;
     }
 
     .featuredFood{
-        padding: 0.2rem;
+        /* border: 2px solid green; */
+
+        padding: 0rem;
+        min-width: 100%;
+    }
+
+    .featured{
+        gap: 5px;
+        align-items: center;
+        justify-content: center;
     }
 
     .join_team_section {
         margin-top: 1rem;
-        padding:0.6rem;
+        padding: 0.6rem;
         width: 100%;
         height: fit-content;
     }
@@ -1160,12 +1169,7 @@ animation: hoverShake 0.15s linear 3;
         font-size: 0.7rem;
         width: 5rem;
     }
-
-
-
-
-
-
+    
     .about_us_section {
         padding: 0.5rem 0.5rem;
         width: 100%;
