@@ -27,3 +27,11 @@
     column-gap: 5px;
     row-gap: 10px;
 }
+
+@media (max-width: 480px){
+    .by_reataurant_select{
+        border: 1px solid green;
+        padding: 0.1rem;
+        font-size: 0.8rem;
+    }
+}
