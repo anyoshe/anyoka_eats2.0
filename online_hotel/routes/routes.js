@@ -825,8 +825,8 @@ const restaurantSchema = new mongoose.Schema({
   partnerId: { type: mongoose.Schema.Types.ObjectId, ref: 'Partner', required: true },
   restaurantImgUrl: {type: String, required: false },
   restaurant: { type: String, required: true },
-  dishCategory: { type: String, required: true },
-  location: { type: String, required: false },
+  dishCategory: { type: String, required: false },
+  location: { type: String, required: true },
   averageRating: { type: Number, default: 0 },
   ratingCount: { type: Number, default: 0 }
 });
@@ -950,6 +950,31 @@ router.get('/restaurants', async (req, res) => {
     res.status(500).json({ error: 'Failed to fetch restaurants' });
   }
 });
+
+//Endpoint to get restaurant details by name// GET route to fetch restaurant location by name
+// Your router
+router.get('/restaurants/location/:restaurantName', async (req, res) => {
+  console.log('Received request for restaurant:', req.params.restaurantName);
+  const { restaurantName } = req.params;
+
+  try {
+    console.log('Searching for restaurant:', restaurantName);
+    const restaurant = await Restaurant.findOne({
+      restaurant: { $regex: new RegExp(`^${restaurantName}$`, 'i') }
+    });
+    console.log('Found restaurant:', restaurant);
+    if (!restaurant) {
+      console.log('Restaurant not found');
+      return res.status(404).json({ error: 'Restaurant not found' });
+    }
+    console.log('Returning location:', restaurant.location);
+    res.status(200).json({ location: restaurant.location });
+  } catch (error) {
+    console.error('Error fetching restaurant location:', error);
+    res.status(500).json({ error: 'Server error' });
+  }
+});
+
 
 router.get('/restaurants/:id', async (req, res) => {
   console.log('Attempting to fetch restaurant details for ID:', req.params.id);
