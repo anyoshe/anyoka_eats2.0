@@ -109,6 +109,7 @@ const MainSearchBar = ({ addToCart }) => {
                 <button onClick={handleRestaurantToggle} className="btn_restaurant  by_btn">
                     By Restaurants
                 </button>
+                
                 {showCategoryDropdown && (
                     <CategoryDropdown addToCart={addToCart} searchQuery={searchQuery} />
                 )}
