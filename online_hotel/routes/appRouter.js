@@ -265,50 +265,6 @@ appRouter.post('/vendors', async (req, res) => {
 });
 
 
-// appRouter.put('/vendors/:id', async (req, res) => {
-//   const { id } = req.params;
-//   const updateData = req.body;
-//   console.log(updateData);
-
-//   try {
-//     const vendor = await Vendor.findById(id);
-//     if (!vendor) {
-//       return res.status(404).json({ message: 'Vendor not found' });
-//     }
-
-//     const oldVendorName = vendor.vendor; // Save the original restaurant name
-
-//     // Explicitly handle the `restaurant` name (since it's a required field)
-//     if (updateData.vendor) {
-//       vendor.vendor = updateData.vendor; // update restaurant name
-//     }
-
-//     // Dynamically update or add any other fields that are present in the request body
-//     Object.keys(updateData).forEach((key) => {
-//       if (key !== 'vendor') { // Avoid re-updating the restaurant name here
-//         vendor[key] = updateData[key]; // assign other fields dynamically
-//       }
-//     });
-
-//     // Save the updated restaurant document
-//     await vendor.save();
-
-//     // Check if the restaurant name was changed and update dishes if necessary
-//     if (updateData.vendor && updateData.vendor !== oldVendorName) {
-//       // Update all foods with the oldvendor name to the new vendor name
-//       await Food.updateMany(
-//         { vendor: oldVendorName }, // Match foods with the old name
-//         { $set: { vendor: updateData.vendor } } // Update to the new name
-//       );
-//     }
-
-//     res.status(200).json({ message: 'Vendor and associated foods updated successfully', vendor });
-//   } catch (error) {
-//     console.error('Error updating vendor or foods:', error);
-//     res.status(500).json({ message: 'Error updating vendor or foods', error });
-//   }
-// });
-
 
 appRouter.put('/vendors/:id', async (req, res) => {
   const { id } = req.params;

@@ -68,7 +68,7 @@ const DishCategories = () => {
   };
 
   const getPopularRestaurants = () => {
-    return [...restaurants].sort((a, b) => b.averageRating - a.averageRating).slice(0, 3);
+    return [...restaurants].sort((a, b) => b.averageRating - a.averageRating).slice(0, 4);
   };
 
   return (

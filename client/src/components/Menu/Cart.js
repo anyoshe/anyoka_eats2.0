@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useCart } from './CartContext';
 import LocationModal from './LocationModal';
 import './Cart.css';
@@ -9,7 +9,14 @@ const Cart = () => {
   const { state, dispatch } = useCart();
   const [showLocationModal, setShowLocationModal] = useState(false);
   const [showCartModal, setShowCartModal] = useState(false);
-  
+  const [restaurantLocation, setRestaurantLocation] = useState('');
+
+  // Get the selected restaurant location from the state
+  useEffect(() => {
+    if (state.restaurantLocation) {
+      setRestaurantLocation(state.restaurantLocation);
+    }
+  }, [state.restaurantLocation]);
 
   const handleCartClick = () => {
     setShowCartModal(true);
@@ -64,14 +71,9 @@ const Cart = () => {
                     </span>
 
                     <div className="d-flex align-items-center">
-                      {/* <button className="btn btn-outline-secondary btn-sm me-2 minus-plus" onClick={() => handleDecreaseQuantity(item.dishCode)}>-</button> */}
                       <button className="btn-outline-secondary btn-sm me-2 minus-plus minus" onClick={() => handleDecreaseQuantity(item.dishCode)}>-</button>
-
                       <span className='menuDishQuantity'>{item.quantity}</span>
-
-                      {/* <button className="btn btn-outline-secondary btn-sm ms-2 plus" onClick={() => handleIncreaseQuantity(item.dishCode)}>+</button> */}
                       <button className="btn-outline-secondary btn-sm ms-2 minus-plus plus" onClick={() => handleIncreaseQuantity(item.dishCode)}>+</button>
-
                       <button className="btn-danger btn-sm ms-2 menuDelete" onClick={() => handleRemoveFromCart(item.dishCode)}>Delete</button>
                     </div>
                   </li>
@@ -80,8 +82,8 @@ const Cart = () => {
 
               <div>
                 <span className='itemTotal'>Total Price :</span> Ksh <span id="totalPrice">{state.totalPrice.toFixed(2)}</span>
-                </div>
               </div>
+            </div>
 
             <div className="modal-footer">
               <button type="button" className="bottomBtn" onClick={handlePlaceOrder}>
@@ -97,18 +99,19 @@ const Cart = () => {
       </div>
 
       {/* Location Modal */}
-      <LocationModal show={showLocationModal}
-      handleClose={closeLocationModal} 
-      restaurantName={state.firstDishRestaurant}
-      orderedDishes={state.items}
-        />
+      <LocationModal 
+        show={showLocationModal}
+        handleClose={closeLocationModal} 
+        restaurantName={state.firstDishRestaurant}
+        orderedDishes={state.items}
+        restaurantLocation={restaurantLocation} // Pass the restaurant location here
+      />
 
-      
       {/* Cart Trigger */}
       <a href="#" id="cart2" onClick={handleCartClick}>
         <i className="fas fa-shopping-cart"></i><span id="cartCount">{state.cartCount}</span>
       </a>
-  </>
+    </>
   );
 };
 
