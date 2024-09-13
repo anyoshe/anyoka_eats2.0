@@ -15,10 +15,10 @@
 .input-group {
   /* border: 1px solid red; */
 
-  display: flex;
-  flex-direction: row;
+  /* display: flex; */
+  /* flex-direction: row; */
   width: 110%;
-  flex-wrap: nowrap;
+  /* flex-wrap: nowrap; */
 }
 
 .by_btn{
@@ -77,4 +77,28 @@
   color: black;
   background-color: #f9f9f9;
   font-size: 30px;
+}
+
+@media (max-width : 480px){
+  .search-bar-container{
+    margin: 0rem 0.1rem;
+  }
+
+  .input-group {
+    width: 90%;
+  }
+
+  .by_btn{
+    font-size: 0.8rem;
+    margin-right: 0.5rem;
+    padding: 0.3rem;
+    margin-bottom: 0.1rem;
+  }
+
+  .by_btn:hover{
+    border: none;
+    cursor: pointer;
+    padding: 0.3rem;
+    margin-right: 0.5rem;
+  }
 }

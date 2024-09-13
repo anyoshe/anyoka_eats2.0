@@ -13,8 +13,7 @@
 }
 
 #dish-categories{
-    /* border: 5px solid green;
-     */
+    /* border: 5px solid pink; */
     display: grid;
     grid-template-columns: 75% 25%;
     /* height: 100vh; */
@@ -25,7 +24,7 @@
 }
 
 .dishesSection{
-    /* border: 5px solid red; */
+    /* border: 5px solid green; */
 
     margin-top: 0.4%;
     width: 100%;
@@ -34,8 +33,33 @@
 
 .dishes-to-display{
     /* border: 5px solid blue; */
+}
 
-    margin-top: 4rem;
+.category-buttons{
+    /* border: 5px solid red; */
+    
+    margin-left: 2rem;
+    display: flex;
+    justify-content: space-between;
+    width: 50%;
+    padding: 0.2rem;
+}
+
+.switchButtons{
+    background: var(--green);
+    border: none;
+    padding: 0.2rem 1.2rem;
+    border-radius: 5%;
+    color: white;
+    transition: ease-in .2s;
+}
+
+.switchButtons:hover,.switchButtons:focus{
+    background: white;
+    border: 0.1px solid var(--orange);
+    text-decoration: underline;
+    color: var(--orange);
+    cursor: pointer;
 }
 
 .category-buttons-div{
@@ -111,4 +135,56 @@
     display: flex;
     flex-direction: column;
     padding-left: 0px;
+}
+
+@media (max-width:480px){
+    .restaurantSection{
+        display: none;
+    }
+
+    .dishesSection{
+        /* border: 5px solid green; */
+    
+        margin-top: 1.5%;
+        width: 100%;
+        position: relative;
+    }
+
+    #dish-categories{
+        /* border: 5px solid yellow; */
+        grid-template-columns: 100%;
+    }
+
+    .category-buttons{
+        /* border: 5px solid red; */
+        
+        display: flex;
+        justify-content: space-between;
+        width: 100%;
+        padding: 0.2rem;
+        margin-left: 0rem;
+    }
+
+    .switchButtons {
+        padding: 0.1rem 1.2rem;
+        font-size: 0.8rem;
+    }
+
+    .menuHeader{
+        /* border: 1px solid blue; */
+
+        width: 98%;
+        margin-top: 2%;
+        margin-left: 1%;
+        padding: 0.2rem 0.1rem;
+        font-weight: 600;
+        font-size: 1rem;
+    }
+
+    .dish-list {
+        grid-template-columns: repeat(2,1fr);
+        column-gap: 5px;
+        row-gap: 10px;
+        padding-left: 0.4rem;
+    }
 }
