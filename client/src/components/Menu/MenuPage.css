@@ -14,8 +14,6 @@
 }
 
 #navline{
-  /* border: 5px solid red; */
-
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -47,3 +45,26 @@
   margin-top: 4%; 
 }
 
+
+/* Media screens */
+@media (max-width: 480px) {
+  .NavBarContainer{
+    /* border: 5px solid red; */
+
+    width: 100%;
+  } 
+  
+  #navline{
+    /* border: 5px solid green; */
+    width: 100%;
+  }
+
+  .homeLink{
+    display: none;
+  }
+
+  .menu-container{
+    margin-top: 12%;
+  }
+
+}

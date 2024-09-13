@@ -148,7 +148,7 @@
 .cart-icon-wrapper {
     position: relative;
 }
-  
+
 #cartCount {
     position: absolute;
     top: 13%; 
@@ -156,4 +156,19 @@
     font-weight: 600;
     font-size: 18px;
     color: red;
+}
+
+@media(max-width : 480px){
+    .fa-shopping-cart{
+        font-size: 1rem;
+        position: absolute;
+        right: 5%;
+        top: 33%;
+    }
+
+    #cartCount{
+        font-size: 1rem; 
+        right: 3%;
+        top: 11%; 
+    }
 }
