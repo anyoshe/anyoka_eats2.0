@@ -228,7 +228,9 @@ const LandingFreshFood = () => {
 
       <section className="main-category">
         <div className="fresh-list">
+
           <h2 className='fresh_page_heading'>Product Categories</h2>
+
           <ul className="fresh_category">
             <li className={`fresh_link ${activeCategory === 'All' ? 'active' : ''}`} onClick={() => handleCategoryClick('All')}>All</li>
             <li className={`fresh_link ${activeCategory === 'Fruits and Vegetables' ? 'active' : ''}`} onClick={() => handleCategoryClick('Fruits and Vegetables')}>Fruits & Vegetables</li>
@@ -240,7 +242,7 @@ const LandingFreshFood = () => {
             <li className={`fresh_link ${activeCategory === 'Sea Foods and Fish' ? 'active' : ''}`} onClick={() => handleCategoryClick('Sea Foods and Fish')}>Sea Foods & Fish</li>
           </ul>
         </div>
-         <h2>Discover Our Selection</h2>
+        <h2 className='discoverTitle'>Discover Our Selection</h2>
         <div className="category-grid">
           {filteredFoods.length > 0 ? (
             filteredFoods.map((food) => (
