@@ -104,7 +104,7 @@ const Cart = () => {
         handleClose={closeLocationModal} 
         restaurantName={state.firstDishRestaurant}
         orderedDishes={state.items}
-        restaurantLocation={restaurantLocation} // Pass the restaurant location here
+        restaurantLocation={restaurantLocation}
       />
 
       {/* Cart Trigger */}

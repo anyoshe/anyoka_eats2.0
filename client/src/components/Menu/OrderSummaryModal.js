@@ -54,10 +54,10 @@ const OrderSummaryModal = ({ show, handleClose, restaurantName, orderedDishes = 
   const distance = calculateDistance(restaurantLocation.lat, restaurantLocation.lng, pinnedLocation.lat, pinnedLocation.lng);
 
   let deliveryCharges = 0;
-  if (distance <= 2) {
+  if (distance <= 1) {
     deliveryCharges = 50; // Base charge for distances up to 2 km
   } else {
-    deliveryCharges = 50 + (Math.ceil(distance - 2) * 30); // Base charge plus KES 30 for every km beyond 2 km
+    deliveryCharges = 50 + (Math.ceil(distance - 1) * 30); // Base charge plus KES 30 for every km beyond 2 km
   }
 
   const totalDishesPrice = orderedDishes.reduce((total, dish) => total + dish.price * dish.quantity, 0);

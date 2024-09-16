@@ -30,7 +30,6 @@ const foodSchema = new Schema({
   discount: { type: Number, default: 0 },
   foodCategory: { type: String, required: true },
   vendor: { type: String, required: true },
-  vendorLocation: { type: String, required: true},
   subTotal: { type: Number, required: false, default: 0 },
   foodDescription: { type: String, required: false },
   createdAt: { type: Date, default: Date.now },
@@ -62,7 +61,7 @@ appRouter.post('/foods', (req, res) => {
     }
 
     try {
-      const { foodCode, foodName, quantity, foodPrice, foodCategory, vendor, vendorLocation, foodDescription, partnerId } = req.body;
+      const { foodCode, foodName, quantity, foodPrice, foodCategory, vendor, foodDescription, partnerId } = req.body;
       const imageUrl = req.file ? `/uploads/images/${req.file.filename}` : '';
 
       // Check if the vendor already exists
@@ -85,7 +84,6 @@ appRouter.post('/foods', (req, res) => {
         foodPrice,
         foodCategory,
         vendor,
-        vendorLocation,
         foodDescription,
         partnerId,
         imageUrl
@@ -125,7 +123,7 @@ appRouter.put('/foods/:foodCode', (req, res) => {
       return res.status(500).json({ success: false, message: 'Error uploading image', error: err });
     }
     try {
-      const { foodName, foodPrice, quantity, foodCategory, vendor, vendorLocation, foodDescription, discount } = req.body;
+      const { foodName, foodPrice, quantity, foodCategory, vendor, foodDescription, discount } = req.body;
       let imageUrl;
       if (req.file) {
         imageUrl = '/uploads/images/' + req.file.filename; // Path to the uploaded file
@@ -136,7 +134,6 @@ appRouter.put('/foods/:foodCode', (req, res) => {
       if (quantity) updatedFields.quantity = quantity;
       if (foodCategory) updatedFields.foodCategory = foodCategory;
       if (vendor) updatedFields.vendor = vendor;
-      if (vendorLocation) updatedFields.vendorLocation = vendorLocation;
       if (foodDescription) updatedFields.foodDescription = foodDescription;
       if (imageUrl) updatedFields.imageUrl = imageUrl;
 
@@ -320,6 +317,53 @@ appRouter.get('/vendors/:partnerId', async (req, res) => {
     res.status(500).json({ message: 'Server error', error });
   }
 });
+// Route to get vendor location
+appRouter.get('/vendors/vendor/:vendorName', async (req, res) => {
+  try {
+    const vendorName = req.params.vendorName;
+    console.log('Received request for vendor location:', vendorName);
+
+    // Fetch vendor details from the database using vendor name
+    const vendor = await Vendor.findOne({ vendor: vendorName }); // Adjust if field name is 'vendor'
+ console.log(vendor); 
+    if (!vendor) {
+      return res.status(404).json({ message: 'Vendor not found' });
+    }
+
+    // Return vendor location
+    return res.status(200).json({
+      vendorLocation: vendor.vendorLocation
+     
+    });
+  
+  } catch (error) {
+    console.error('Error fetching vendor location:', error);
+    res.status(500).json({ message: 'Server error' });
+  }
+});
+
+appRouter.get('/vendors/:vendorId', async (req, res) => {
+  const { vendorId } = req.params;
+
+  try {
+    // Fetch the vendor details from the database
+    const vendor = await Vendor.findById(vendorId).select('vendor vendorLocation');
+    
+    if (!vendor) {
+      return res.status(404).json({ message: 'Vendor not found' });
+    }
+
+    // Respond with the vendor details
+    res.json({
+      vendorName: vendor.vendor,
+      vendorLocation: vendor.vendorLocation
+    });
+  } catch (error) {
+    console.error('Error fetching vendor details:', error);
+    res.status(500).json({ message: 'Internal server error' });
+  }
+});
+
 
 appRouter.delete('/vendors/:id', async (req, res) => {
   const { id } = req.params;

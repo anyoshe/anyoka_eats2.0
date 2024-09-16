@@ -2,6 +2,8 @@ import React, { useState } from 'react';
 import { useFreshFoodCart } from './FreshFoodCartContext';
 import FoodLocationModal from './FoodLocationModal';
 import './FoodCart.css';
+import 'bootstrap/dist/css/bootstrap.min.css';
+import 'bootstrap/dist/js/bootstrap.bundle.min'; 
 
 const FoodCart = () => {
   const { state, dispatch } = useFreshFoodCart();
@@ -47,34 +49,51 @@ const FoodCart = () => {
           <div className="modal-content">
             <div className="modal-header">
               <h5 className="modal-title" id="cartModalLabel">My Order</h5>
-              <button type="button" className="btn-close" data-bs-dismiss="modal" aria-label="Close" onClick={closeCartModal}></button>
+              {/* <button type="button" className="btn-close" data-bs-dismiss="modal" aria-label="Close" onClick={closeCartModal}></button> */}
             </div>
             <div className="modal-body">
-              <div><strong>Vendor Name:</strong> {state.firstFoodVendor}</div>
+            <div className='restaurantNameDiv'>
+              <span className='restaurantName'>Vendor Name: </span>{state.firstFoodVendor}</div>
               <ul id="cartItems">
                 {state.items.map((item, index) => (
                   <li key={index} className="d-flex justify-content-between align-items-center">
-                    <span>{item.foodName} - Kes.{(item.price * item.quantity).toFixed(2)}</span>
+                    <span className='itemDishName'> <span className='DishDetailSpan'>{item.foodName}</span>
+                    <span className='DishDetailSpan'>Kes.{(item.price * item.quantity)}</span>
+                    </span>
                     <div className="d-flex align-items-center">
-                      <button className="btn btn-outline-secondary btn-sm me-2" onClick={() => handleDecreaseQuantity(item.foodCode)}>-</button>
-                      <span>{item.quantity}</span>
-                      <button className="btn btn-outline-secondary btn-sm ms-2" onClick={() => handleIncreaseQuantity(item.foodCode)}>+</button>
-                      <button className="btn btn-danger btn-sm ms-2" onClick={() => handleRemoveFromCart(item.foodCode)}>Delete</button>
+                      <button className="btn btn-outline-secondary btn-sm me-2 minus-plus minus" onClick={() => handleDecreaseQuantity(item.foodCode)}>-</button>
+                      <span  className='menuDishQuantity'>{item.quantity}</span>
+                      <button className="btn btn-outline-secondary btn-sm ms-2 minus-plus plus" onClick={() => handleIncreaseQuantity(item.foodCode)}>+</button>
+                      <button className="btn btn-danger btn-sm ms-2 menuDelete" onClick={() => handleRemoveFromCart(item.foodCode)}>Delete</button>
                     </div>
                   </li>
                 ))}
               </ul>
-              <div>Total Price: Kes.<span id="totalPrice">{state.totalPrice.toFixed(2)}</span></div>
+              {/* <div>
+              <span className='itemTotal'>Total Price :</span></span>id="totalPrice">{state.totalPrice.toFixed(2)}</span></div>
               {/* <div>Items in Cart: <span id="cartCount">{state.cartCount}</span></div> */}
+            {/* </div> */}
+            <div>
+                <span className='itemTotal'>Total Price :</span> Ksh <span id="totalPrice">{state.totalPrice.toFixed(2)}</span>
+              </div>
             </div>
-            <div className="modal-footer">
+            {/* <div className="modal-footer">
               <button type="button" className="btn btn-secondary" data-bs-dismiss="modal" aria-label="Close" onClick={closeCartModal}>
                 Close
               </button>
               <button type="button" className="btn btn-primary" onClick={handlePlaceOrder}>
                 Place Order
+              </button> */}
+               <div className="modal-footer">
+              <button type="button" className="bottomBtn" onClick={handlePlaceOrder}>
+                Continue
+              </button>
+              
+              <button type="button" className="bottomBtn" data-bs-dismiss="modal" aria-label="Close" onClick={closeCartModal}>
+                Close
               </button>
             </div>
+          
           </div>
         </div>
       </div>

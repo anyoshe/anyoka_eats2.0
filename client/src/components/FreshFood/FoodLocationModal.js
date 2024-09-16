@@ -50,8 +50,58 @@ const FoodLocationModal = ({ show, handleClose, vendorName, vendorLocation, orde
         setMap(newMap);
 
         const geocodeVendorLocation = () => {
+  
+          const geocoder = new google.maps.Geocoder();
+        
+          // Function to attempt geocoding the vendor name
+          function attemptGeocodeByVendorName() {
+            if (vendorName) {
+              // Try geocoding the vendor name if vendorLocation wasn't provided
+              geocoder.geocode({ address: vendorName }, (results, status) => {
+                if (status === 'OK' && results.length > 0) {
+                  const location = results[0].geometry.location;
+                  const newVendorCoords = { lat: location.lat(), lng: location.lng() };
+                  setVendorCoords(newVendorCoords);
+                  newMap.setCenter(newVendorCoords);
+                  new google.maps.Marker({
+                    map: newMap,
+                    position: newVendorCoords,
+                    label: 'Vendor',
+                  });
+                  console.log('Vendor coordinates set from vendorName:', newVendorCoords);
+                } else {
+                  console.error('Geocoding failed for vendorName. Status:', status);
+                  fallbackToHardcodedLocation();
+                }
+              });
+            } else {
+              // vendorName is not provided
+              fallbackToHardcodedLocation();
+            }
+          }
+        
+          // Function to handle fallback to hardcoded locations
+          function fallbackToHardcodedLocation() {
+            const fallbackLocation = fallbackLocations[vendorName];
+            if (fallbackLocation) {
+              setVendorCoords(fallbackLocation);
+              newMap.setCenter(fallbackLocation);
+              new google.maps.Marker({
+                map: newMap,
+                position: fallbackLocation,
+                label: 'Vendor',
+              });
+              console.log('Fallback coordinates set:', fallbackLocation);
+              alert(`Geocoding failed. Using fallback location for ${vendorName}.`);
+            } else {
+              console.error('No fallback location found for vendorName:', vendorName);
+              alert('Unable to locate vendor. Please use a different vendor.');
+            }
+          }
+        
+          // Check if vendorLocation is provided (in coordinates form)
           if (vendorLocation) {
-            const geocoder = new google.maps.Geocoder();
+            // Try geocoding the provided vendor location address
             geocoder.geocode({ address: vendorLocation }, (results, status) => {
               if (status === 'OK' && results.length > 0) {
                 const location = results[0].geometry.location;
@@ -63,33 +113,23 @@ const FoodLocationModal = ({ show, handleClose, vendorName, vendorLocation, orde
                   position: newVendorCoords,
                   label: 'Vendor',
                 });
-                console.log('Vendor coordinates set:', newVendorCoords);
+                console.log('Vendor coordinates set from vendorLocation:', newVendorCoords);
               } else {
-                console.error('Geocoding failed. Status:', status);
-                // Fallback to coordinates based on vendor name
-                const fallbackLocation = fallbackLocations[vendorLocation];
-                if (fallbackLocation) {
-                  setVendorCoords(fallbackLocation);
-                  newMap.setCenter(fallbackLocation);
-                  new google.maps.Marker({
-                    map: newMap,
-                    position: fallbackLocation,
-                    label: 'Vendor',
-                  });
-                  console.log('Fallback coordinates set:', fallbackLocation);
-                  alert(`Geocoding failed. Using fallback location for ${vendorLocation}.`);
-                } else {
-                  console.error('Unable to geocode vendor location. No fallback available.');
-                  alert('Unable to geocode vendor location. Please use a different vendor.');
-                }
+                console.error('Geocoding failed for vendorLocation. Status:', status);
+                // If vendorLocation geocoding fails, fallback to next step
+                attemptGeocodeByVendorName();
               }
             });
           } else {
-            console.error('Vendor location is not provided.');
+            // vendorLocation not provided, try geocoding by vendorName
+            attemptGeocodeByVendorName();
           }
         };
-
+        
+        // Call geocodeVendorLocation
         geocodeVendorLocation();
+        
+        
       };
 
       return () => {

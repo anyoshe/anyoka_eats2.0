@@ -242,7 +242,6 @@ const FreshFoodsManagement = ({ partner }) => {
     formDataToSend.append('discount', formData.discount);
     formDataToSend.append('foodCategory', formData.foodCategory);
     formDataToSend.append('vendor', selectedVendor?.vendor || '');
-    formDataToSend.append('vendorLocation', vendorLocation || ''); // Directly use vendorLocation
     formDataToSend.append('foodDescription', formData.foodDescription || '');
     formDataToSend.append('partnerId', partner._id);
     if (formData.image) {
@@ -408,7 +407,6 @@ const FreshFoodsManagement = ({ partner }) => {
     formDataToSend.append('discount', formData.discount);
     formDataToSend.append('foodCategory', formData.foodCategory);
     formDataToSend.append('vendor', selectedVendor?.vendor || '');
-    formDataToSend.append('vendorLocation', vendorLocation?.vendorLocation || '');
     formDataToSend.append('vendorDescription', formData.vendorDescription || '');
     formDataToSend.append('partnerId', partner._id);
     if (formData.image) {

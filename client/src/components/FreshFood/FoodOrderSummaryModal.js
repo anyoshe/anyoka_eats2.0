@@ -54,10 +54,10 @@ const OrderSummaryModal = ({ show, handleClose, vendorName, orderedFoods = [], v
   const distance = calculateDistance(vendorLocation.lat, vendorLocation.lng, pinnedLocation.lat, pinnedLocation.lng);
 
   let deliveryCharges = 0;
-  if (distance <= 2) {
+  if (distance <= 1) {
     deliveryCharges = 50; // Base charge for distances up to 2 km
   } else {
-    deliveryCharges = 50 + (Math.ceil(distance - 2) * 30); // Base charge plus KES 30 for every km beyond 2 km
+    deliveryCharges = 50 + (Math.ceil(distance - 1) * 30); // Base charge plus KES 30 for every km beyond 2 km
   }
 
   const totalFoodsPrice = orderedFoods.reduce((total, food) => total + food.price * food.quantity, 0);
@@ -67,10 +67,10 @@ const OrderSummaryModal = ({ show, handleClose, vendorName, orderedFoods = [], v
     setContactNumber(e.target.value);
   };
 
-  const handleWhatsAppSignIn = () => {
-    // Replace with actual WhatsApp sign-in logic or link
-    window.open(`https://wa.me/${contactNumber}`, '_blank');
-  };
+  // const handleWhatsAppSignIn = () => {
+  //   // Replace with actual WhatsApp sign-in logic or link
+  //   window.open(`https://wa.me/${contactNumber}`, '_blank');
+  // };
   const handleTimeChange = (e) => {
     setSelectedTime(e.target.value);
   };
@@ -256,7 +256,7 @@ const OrderSummaryModal = ({ show, handleClose, vendorName, orderedFoods = [], v
 
   
   const saveOrderToDatabase = async (foodOrderDetails) => {
-    const maxRetries = 3; // Maximum number of retry attempts
+    const maxRetries = 5; // Maximum number of retry attempts
     let attempts = 0;
     let orderSaved = false;
   
@@ -332,14 +332,14 @@ const OrderSummaryModal = ({ show, handleClose, vendorName, orderedFoods = [], v
                   placeholder="Enter your contact number"
                   required
                 /><br></br>
-                <p>Or You Can</p>
+                {/* <p>Or You Can</p>
                 <button
                   type="button"
                   className="btn btn-success"
                   onClick={handleWhatsAppSignIn}
                 >
                   Sign in with WhatsApp
-                </button>
+                </button> */}
               </div>
               <div className="form-group my-3">
                 <label htmlFor="deliveryTime">Expected Delivery Time</label>
