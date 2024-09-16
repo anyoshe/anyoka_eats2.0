@@ -55,36 +55,58 @@ const LocationModal = ({ show, handleClose, restaurantName, orderedDishes = [] }
         setMap(newMap);
 
         const initializeLocation = async () => {
-          if (state.restaurantLocation) {
+          // Check if restaurant location (lat/lng) is passed from cart context
+          if (state.restaurantLocation && state.restaurantLocation.lat && state.restaurantLocation.lng) {
+            // Directly set the restaurant location without geocoding since it's already geocoded
             setRestaurantLocation(state.restaurantLocation);
             newMap.setCenter(state.restaurantLocation);
+          } else if (state.restaurantLocation) {
+            try {
+              // If restaurantLocation is a human-readable address, convert it to lat/lng
+              const { lat, lng } = await getCoordinatesForAddress(state.restaurantLocation);
+              const newRestaurantLocation = { lat, lng };
+              setRestaurantLocation(newRestaurantLocation);
+              newMap.setCenter(newRestaurantLocation);
+            } catch (error) {
+              console.error('Error converting restaurant location from cart context:', error);
+              // Proceed to check if restaurant name can be geocoded
+              geocodeRestaurant();
+            }
           } else {
-            const geocodeRestaurant = () => {
-              const geocoder = new google.maps.Geocoder();
-              geocoder.geocode({ address: restaurantName }, (results, status) => {
-                if (status === 'OK' && results.length > 0) {
-                  const location = results[0].geometry.location;
-                  const newRestaurantLocation = { lat: location.lat(), lng: location.lng() };
-                  setRestaurantLocation(newRestaurantLocation);
-                  newMap.setCenter(newRestaurantLocation);
-                } else {
-                  const fallbackLocation = fallbackLocations[restaurantName];
-                  if (fallbackLocation) {
-                    setRestaurantLocation(fallbackLocation);
-                    newMap.setCenter(fallbackLocation);
-                  } else {
-                    console.error('Unable to geocode restaurant location: ' + status);
-                  }
-                }
-              });
-            };
-
+            // No restaurantLocation in cart context, attempt to geocode the restaurant name
             geocodeRestaurant();
           }
         };
-
+        
+        const geocodeRestaurant = () => {
+          const geocoder = new google.maps.Geocoder();
+        
+          // Try geocoding the restaurant name
+          geocoder.geocode({ address: restaurantName }, (results, status) => {
+            if (status === 'OK' && results.length > 0) {
+              const location = results[0].geometry.location;
+              const newRestaurantLocation = { lat: location.lat(), lng: location.lng() };
+              setRestaurantLocation(newRestaurantLocation);
+              newMap.setCenter(newRestaurantLocation);
+            } else {
+              console.error('Geocoding restaurant name failed:', status);
+              // Use fallback coordinates if available
+              const fallbackLocation = fallbackLocations[restaurantName];
+              if (fallbackLocation) {
+                setRestaurantLocation(fallbackLocation);
+                newMap.setCenter(fallbackLocation);
+              } else {
+                // If no fallback is available, show an error message
+                console.error('Unable to geocode restaurant location and no fallback available.');
+                alert('Failed to locate the restaurant position. Please try again later.');
+              }
+            }
+          });
+        };
+        
         initializeLocation();
-      };
+
+      }
 
       return () => {
         document.head.removeChild(script);

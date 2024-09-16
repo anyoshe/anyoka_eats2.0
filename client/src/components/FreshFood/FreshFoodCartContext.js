@@ -1,12 +1,13 @@
-import React, { createContext, useContext, useReducer } from 'react';
+import React, { createContext, useContext, useReducer, useEffect } from 'react';
+import axios from 'axios';
+import config from '../../config';
 
-// Initial state of the cart
 const initialState = {
   items: [],
   totalPrice: 0,
   cartCount: 0,
   firstFoodVendor: '',
-  vendorLocation: '', // Add vendorLocation to state
+  vendorLocation: '', // Expecting a human-readable address
   isVisible: false
 };
 
@@ -16,15 +17,15 @@ const TOGGLE_CART_VISIBILITY = 'TOGGLE_CART_VISIBILITY';
 const INCREASE_QUANTITY = 'INCREASE_QUANTITY';
 const DECREASE_QUANTITY = 'DECREASE_QUANTITY';
 const REMOVE_FROM_CART = 'REMOVE_FROM_CART';
+const SET_VENDOR_LOCATION = 'SET_VENDOR_LOCATION';
 
 // Reducer function to handle cart actions
-const cartReducer = (state, action) => {
+const foodCartReducer = (state, action) => {
   switch (action.type) {
     case ADD_TO_CART: {
       const { foodDetails } = action.payload;
-      const { foodCode, foodName, foodPrice, foodCategory, vendor, discountedPrice, vendorLocation } = foodDetails;
-      
-      const price = discountedPrice ? discountedPrice : foodPrice * 1.2;
+      const { foodCode, foodName, foodPrice, foodCategory, vendor, discount, discountedPrice } = foodDetails;
+      const price = discount > 0 ? discountedPrice : foodPrice * 1.2; 
       const quantity = 1;
 
       const existingItem = state.items.find(item => item.foodCode === foodCode);
@@ -53,9 +54,6 @@ const cartReducer = (state, action) => {
         }
       }
 
-      // Set the vendorLocation in the state
-      const newVendorLocation = vendorLocation;
-
       // Update localStorage
       const storedCart = JSON.parse(localStorage.getItem('cart')) || [];
       const existingStoredItem = storedCart.find(item => item.foodCode === foodCode);
@@ -63,7 +61,7 @@ const cartReducer = (state, action) => {
       if (existingStoredItem) {
         existingStoredItem.quantity++;
       } else {
-        storedCart.push({ foodCode, foodName, foodPrice, foodCategory, vendor, quantity, price, vendorLocation });
+        storedCart.push({ foodCode, foodName, foodPrice, foodCategory, vendor, quantity });
       }
 
       localStorage.setItem('cart', JSON.stringify(storedCart));
@@ -73,10 +71,17 @@ const cartReducer = (state, action) => {
         items: updatedItems,
         totalPrice: newTotalPrice,
         cartCount: newCartCount,
-        firstFoodVendor,
-        vendorLocation: newVendorLocation // Update the state with new vendorLocation
+        firstFoodVendor
       };
     }
+
+    case SET_VENDOR_LOCATION: {
+      return {
+        ...state,
+        vendorLocation: action.payload
+      };
+    }
+
     case INCREASE_QUANTITY: {
       const { foodCode } = action.payload;
       const updatedItems = state.items.map(item =>
@@ -102,6 +107,7 @@ const cartReducer = (state, action) => {
         cartCount: newCartCount
       };
     }
+
     case DECREASE_QUANTITY: {
       const { foodCode } = action.payload;
       const updatedItems = state.items.map(item =>
@@ -134,6 +140,7 @@ const cartReducer = (state, action) => {
         cartCount: newCartCount
       };
     }
+
     case REMOVE_FROM_CART: {
       const { foodCode } = action.payload;
       const updatedItems = state.items.filter(item => item.foodCode !== foodCode);
@@ -153,28 +160,64 @@ const cartReducer = (state, action) => {
         cartCount: newCartCount
       };
     }
+
     case TOGGLE_CART_VISIBILITY: {
       return {
         ...state,
         isVisible: !state.isVisible
       };
     }
+
     default:
       return state;
   }
 };
 
-const FreshFoodCartContext = createContext();
+const FoodCartContext = createContext();
+
+const fetchVendorLocation = async (vendorName) => {
+  console.log('Fetching location for:', vendorName);
+  try {
+    const response = await axios.get(`${config.backendUrl}/api/vendors/vendor/${encodeURIComponent(vendorName)}`);
+    return response.data.vendorLocation; // Directly return the address
+  } catch (error) {
+    console.error('Error fetching vendor location:', error);
+    return null;
+  }
+};
 
 export const FreshFoodCartProvider = ({ children }) => {
-  const [state, dispatch] = useReducer(cartReducer, initialState);
+  const [state, dispatch] = useReducer(foodCartReducer, initialState);
+
+  useEffect(() => {
+    const fetchLocation = async () => {
+      if (state.firstFoodVendor) {
+        const location = await fetchVendorLocation(state.firstFoodVendor);
+        if (location) {
+          dispatch({ type: SET_VENDOR_LOCATION, payload: location });
+        }
+      }
+    };
+
+    fetchLocation();
+  }, [state.firstFoodVendor]);
 
   return (
-    <FreshFoodCartContext.Provider value={{ state, dispatch }}>
+    <FoodCartContext.Provider value={{ state, dispatch }}>
       {children}
-    </FreshFoodCartContext.Provider>
+    </FoodCartContext.Provider>
   );
 };
 
-export const useFreshFoodCart = () => useContext(FreshFoodCartContext);
-export default FreshFoodCartContext;
+export const useFreshFoodCart = () => useContext(FoodCartContext);
+
+// Action to add to cart, which fetches vendorLocation first
+export const addToFoodCartWithVendorLocation = (foodDetails) => async (dispatch) => {
+  const vendorLocation = await fetchVendorLocation(foodDetails.vendor);
+  if (vendorLocation) {
+    dispatch({
+      type: ADD_TO_CART,
+      payload: { foodDetails, vendorLocation }
+    });
+  }
+};

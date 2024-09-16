@@ -2203,8 +2203,8 @@ router.get('/testimonials', (req, res) => {
 const transporter = nodemailer.createTransport({
   service: 'gmail',
   auth: {
-    user: 'anyokaanyoka@gmail.com',
-    pass: 'bpyw vmqq kyab cfaw', 
+    user: 'anyokaeats@gmail.com',
+    pass: 'hsvu kcue lejt cmks', 
   },
 });
 
@@ -2215,7 +2215,7 @@ router.post('/send-email', (req, res) => {
 
   const mailOptions = {
     from: email,
-    to: 'anyokaanyoka@gmail.com', // replace with your email
+    to: 'anyokaeats@gmail.com', // replace with your email
     subject: 'New Contact Form Submission', 
     text: `Message from ${email}: ${message}`,
   };
