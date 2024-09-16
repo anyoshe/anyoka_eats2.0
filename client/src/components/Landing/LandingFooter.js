@@ -93,7 +93,7 @@ const handleSubmit = async (event) => {
           <div className="footer-social-icon column_footer">
             <p className="social_header">Socials</p>
             <div className="social_icon">
-              <a href="#" className="social_link">
+              <a href="https://www.tiktok.com/@anyokaeats" target="_blank" className="social_link">
                 <i className="fab fa-tiktok tiktok-bg" id="social_list"></i>
               </a>
               <a href="https://www.facebook.com/anyokaeats" className="social_link">
@@ -102,7 +102,7 @@ const handleSubmit = async (event) => {
               <a class="twitter-timeline social_link" href="https://twitter.com/AnyokaEats?ref_src=twsrc%5Etfw">
               <i className="fab fa-twitter twitter-bg" id="social_list"></i></a> 
               <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
-              <a href="#" className="social_link">
+              <a href="https://www.instagram.com/anyokaeats254" target="_blank" className="social_link">
                 <i className="fab fa-instagram instagram-bg" id="social_list"></i>
               </a>
 

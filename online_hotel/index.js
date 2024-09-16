@@ -59,6 +59,14 @@ app.use('/api', appRoutes);
 // File Uploads
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
+app.use(express.static(path.join(__dirname, 'public'))); // Serve static files
+
+// Catch-all route to serve index.html for client-side routing
+app.get('*', (req, res) => {
+  res.sendFile(path.resolve(__dirname, 'public', 'index.html'));
+});
+
+
 // Error Handler
 function errorHandler(err, req, res, next) {
   console.error(err.stack); 
