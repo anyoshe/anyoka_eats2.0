@@ -163,7 +163,7 @@ const UserProfileDashBoard = () => {
           </div>
         );
       case 'sales':
-       
+      
       return (
         <div>
           <div className="button-group">

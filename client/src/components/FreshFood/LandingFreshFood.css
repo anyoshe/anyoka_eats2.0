@@ -113,7 +113,7 @@
     outline: 1px solid #ccc;
 }
 
-.main-category ul {
+.fresh_category {
     padding: 20px;
     display: flex;
     align-content: center;
@@ -122,7 +122,7 @@
     width: 100%;
 }
 
-.main-category ul li {
+.fresh_category li {
     list-style: none;
 }
 
@@ -305,4 +305,107 @@
 
 .payment-methods {
     margin: 10px 0;
+}
+
+
+@media(max-width:480px){
+    .landing-fresh-food{
+        /* border: 5px solid green; */
+
+        align-items: start;
+        padding: 0rem 0.3rem;
+        align-items: center;
+    } 
+
+    .fresh_nav_position{
+        /* border: 5px solid green; */
+    }
+
+    .landing-fresh-foods-header{
+        left: 0;
+        top: 0;
+        right: 0;
+        height: 4rem;
+        width: 100%;
+    }
+
+    .fresh_bar{
+        width: 60%;
+    }
+
+    .fresh_glass{
+        width: 16%;
+        padding: 0.3rem;
+    }
+
+    .main-category{
+        margin-top: 19%;
+        padding: 0;
+        width: 100%;
+        align-items: center;
+    }
+
+    .fresh_page_heading{
+        font-size: 1rem;
+        font-weight: 600;
+    }
+
+    .fresh_category {
+        padding: 0.2rem 0.3rem;
+        height: 1%;
+        width: 100vw
+    }
+
+    .fresh_link {
+        padding: 0.1rem 1px;
+        border-bottom: none;
+        font-size: 0.6rem;
+        transition: ease-in 0.2s;
+        margin: 0rem 0.2rem;
+        text-align: center;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .discoverTitle{
+        font-size: 1.1rem;
+    }
+
+    .category-grid {
+        grid-template-columns: repeat(2, 1fr);
+        column-gap: 5px;
+        row-gap: 10px;
+    }
+
+    .fresh-page-offers-section {
+        width: 100%;
+    }
+
+    .fresh-page-offers-title {
+        font-size: 1rem;
+        font-weight: 600;
+        padding: 0.1rem 0.2rem;
+    }
+
+    .offer-page-grid {
+        grid-template-columns: repeat(2, 1fr);
+        column-gap: 0.3rem;
+        row-gap: 0.5rem;
+    }
+
+    .fresh-wholesale-title {
+        color: green;
+    }
+
+    .fresh-wholesale-para {
+        margin-top: 1%;
+        margin-bottom: 4%;
+        font-size: 1rem;
+        text-align: center;
+    }
+
+    .wholesale {
+        width: 100%;
+    }
 }

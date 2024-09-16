@@ -509,8 +509,7 @@ const HotelRestaurantSection = ({ partner }) => {
         <header data-equalizer-watch className="iconHeader">
 
           <div className="tableTitileChart">
-
-            {isEditingTitle ? (
+            {/* {isEditingTitle ? (
               <input
                 type="text"
                 value={tableTitle}
@@ -518,74 +517,146 @@ const HotelRestaurantSection = ({ partner }) => {
                 className="inputHide"
               />
 
-            ) : (
+            ) : ( */}
               <h2 className='h2TableTitle'>
                 {tableTitle}
                 <h4 className="vendorLocation">
                   {address}
                 </h4>
-              </h2>
-            )}
 
-            <button className="hideshow" onClick={handleTitleToggle}>
+                <div className='func_div'>
+                  <button className="hideshow func_icons func_icons_save" onClick={handleTitleToggle}>
+                  {/* {isEditingTitle ? 'Save' : ''} */}
+                
+                    <i className={`fa ${isEditingTitle ? 'fa-save' : 'fa-edit'}`} aria-hidden="true"></i>
+                  </button>
+
+                  <button className="func_icons func_icons_delete" onClick={handleDeleteRestaurant}><i className="fas fa-trash"></i></button>
+                
+                  {isEditingTitle && (
+                    <button className="closeButton func_icons func_icons_close" onClick={() => setIsEditingTitle(false)}>
+                      {/* Close  */}
+                      <i className="fa fa-times" aria-hidden="true"></i>
+                    </button>
+                  )}
+
+                </div>
+
+              </h2>
+            {/* )} */}
+
+            {/* <button className="hideshow" onClick={handleTitleToggle}>
               {isEditingTitle ? 'Save' : ''}
-              <i className={`fa ${isEditingTitle ? 'fa-save' : 'fa-pencil'}`} aria-hidden="true"></i>
+            
+              <i className={`fa ${isEditingTitle ? 'fa-save' : 'fa-edit'}`} aria-hidden="true"></i>
             </button>
-            {/* Close Button when in editing mode */}
+          
             {isEditingTitle && (
               <button className="closeButton" onClick={() => setIsEditingTitle(false)}>
                 Close <i className="fa fa-times" aria-hidden="true"></i>
               </button>
             )}
 
-            <button className="deleteButton" onClick={handleDeleteRestaurant}><i className="fas fa-trash"></i></button>
+            <button className="deleteButton" onClick={handleDeleteRestaurant}><i className="fas fa-trash"></i></button> */}
 
             {/* <h3 className="businessName">{partner?.restaurant}</h3> */}
             {isEditingTitle ? (
               <div>
-                <label>
-                  Restaurant Name:
+                <label className='tableEditLabels'>
+                  {/* Restaurant Name: */}
+                  Name : 
+
+                  <br></br>
+
                   <input
                     type="text"
                     value={tableTitle}
                     onChange={(e) => setTableTitle(e.target.value)}
+                    className='tableEditInput'
                   />
                 </label>
-                <div className="location-section">
-                  <label>
-                    Restaurant Location:
-                  </label>
-                  <div id="map99" ref={mapRef} style={{ width: '100%', height: '400px' }}></div>
+
+                {/* <label className='tableEditLabels'>
+                    Location :  
+
+                    <br></br>
+
+                    <input
+                    type="text"
+                    value={address}
+                    onChange={(e) => setTableTitle(e.target.value)}
+                    className='tableEditInput'
+                  />
+                </label> */}
+
+                <label className='tableEditLabels'>
+                  Best In:  
+
+                  <br></br>
+
                   <input
                     type="text"
-                    placeholder="Enter a location"
-                    // ref={inputRef}
-                    className="headerInputs"
+                    value={dishCategory}
+                    onChange={(e) => setDishCategory(e.target.value)}
+                    className='tableEditInput'
                   />
-                  <button onClick={handleUseMyLocation}>Use My Location</button>
-                  <p>Selected Address: {address}</p>
+                </label>
+
+                <br></br>
+                
+                <label className='tableEditLabels'>
+                    Location :  
+
+                    <br></br>
+
+                    <input
+                    type="text"
+                    value={address}
+                    onChange={(e) => setTableTitle(e.target.value)}
+                    className='tableEditInput locationtableEdit'
+                  />
+                </label>
+
+                <div className="location-section">
+                  {/* <label>
+                    Restaurant Location: 
+                    Location :  
+                    <input
+                    type="text"
+                    value={address}
+                    onChange={(e) => setTableTitle(e.target.value)}
+                  />
+                  </label> */}
+                  <div id="map99" ref={mapRef} style={{ width: '100%', height: '400px' }}></div>
+                  {/* <input
+                    type="text"
+                    placeholder="Enter a location"
+                    className="headerInputs"
+                  /> */}
+                  <button onClick={handleUseMyLocation} className='orUseBtn'> Or Use My Location</button>
+                  {/* <p>Selected Address: {address}</p> */}
 
                 </div>
-                <label>
+                {/* <label>
                   Dish Category:
                   <input
                     type="text"
                     value={dishCategory}
                     onChange={(e) => setDishCategory(e.target.value)}
                   />
-                </label>
+                </label> */}
               </div>
             ) : (
               <button onClick={handleTitleToggle}></button>
             )}
 
             {/* Always show the Add Restaurant button */}
-            <button className="addRestaurantButton" onClick={handleAddRestaurant}><i className="fa fa-plus" id='addingPlus'></i></button>
+            <button className="addRestaurantButton" onClick={handleAddRestaurant}>Add a Restaurant</button>
 
             {/* Show dropdown if there are 2 or more restaurants */}
             {restaurants.length > 1 && (
               <div className="restaurantSelection">
-
+                
                 <select onChange={(e) => handleRestaurantSelect(JSON.parse(e.target.value))} className='choose_select'>
 
                   <option value="" className='choose_select_options'>choose restaurant</option>
@@ -722,7 +793,7 @@ const HotelRestaurantSection = ({ partner }) => {
                   value={formData.dishCategory}
                   onChange={handleInputChange}
                 >
-                  <option value="">Select a category</option>
+                  <option value="">Best In</option>
                   <option value="Chinese Foods">Chinese Foods</option>
                   <option value="Swahili Dishes">Swahili Dishes</option>
                   <option value="African Dishes">African Dishes</option>
