@@ -109,6 +109,7 @@ const Profile = ({ onSave }) => {
                     ref={profileImageInputRef}
                     style={{ display: editImageMode ? 'block' : 'none' }}
                 />
+
                 <div className="profile_img_div">
                     <img
                         src={partner?.profileImage ? `${config.backendUrl}/${partner.profileImage.replace(/\\/g, '/')}` : profileImg}
@@ -117,6 +118,7 @@ const Profile = ({ onSave }) => {
                         ref={profileImageRef}
                     />
                 </div>
+                
                 <div className='image_button'>
                     <button
                         className="editButton profilePicBtn"

@@ -512,7 +512,7 @@ const FreshFoodsManagement = ({ partner }) => {
         <header data-equalizer-watch className="iconHeader">
           <div className="tableTitileChart">
 
-            {isEditingTitle ? (
+            {/* {isEditingTitle ? (
               <input
                 type="text"
                 value={tableTitle}
@@ -520,61 +520,125 @@ const FreshFoodsManagement = ({ partner }) => {
                 className="inputHide"
               />
 
-            ) : (
+            ) : ( */}
               <h2 className='h2TableTitle'>
                 {tableTitle}
                 <h4 className="vendorLocation">
                   {vendorLocation}
                 </h4>
+
+                <div className='func_div'>
+
+                  <button className="hideshow func_icons" onClick={handleTitleToggle}>
+
+                    {/* {isEditingTitle ? 'Save' : ''} */}
+                    <i className={`fa ${isEditingTitle ? 'fa-save' : 'fa-edit'}`} aria-hidden="true"></i>
+
+                  </button>
+
+                  <button className="func_icons func_icons_delete" onClick={handleDeleteVendor}><i className="fas fa-trash"></i></button>
+
+                  {/* Close Button when in editing mode */}
+                  {isEditingTitle && (
+                    <button className="closeButton func_icons func_icons_close" onClick={() => setIsEditingTitle(false)}>
+                      {/* Close  */}
+                      <i className="fa fa-times" aria-hidden="true"></i>
+                    </button>
+                  )}
+
+                  {/* <button className="func_icons func_icons_delete" onClick={handleDeleteVendor}><i className="fas fa-trash"></i></button> */}
+                </div>  
               </h2>
-            )}
-            <button className="hideshow" onClick={handleTitleToggle}>
-              {isEditingTitle ? 'Save' : ''}
-              <i className={`fa ${isEditingTitle ? 'fa-save' : 'fa-pencil'}`} aria-hidden="true"></i>
-            </button>
-
-            {/* Close Button when in editing mode */}
-            {isEditingTitle && (
-              <button className="closeButton" onClick={() => setIsEditingTitle(false)}>
-                Close <i className="fa fa-times" aria-hidden="true"></i>
-              </button>
-            )}
-
-            <button className="deleteButton" onClick={handleDeleteVendor}><i className="fas fa-trash"></i></button>
+            {/* )} */}
 
             {isEditingTitle ? (
               <div>
-                <label>
-                  Vendor Name:
+
+                <label className='tableEditLabels'>
+                  {/* Vendor Name: */}
+                  Name:
+
+                  <br></br>
+
                   <input
                     type="text"
                     value={tableTitle}
                     onChange={(e) => setTableTitle(e.target.value)}
+                    className='tableEditInput'
                   />
                 </label>
-                <div className="location-section">
-                  <label>
-                    Vendor Location:
-                  </label>
-                  <div id="map99" ref={mapRef} style={{ width: '100%', height: '400px' }}></div>
+
+                <label className='tableEditLabels'>
+                  Category:
+                  
+                  <br></br>
+
                   <input
                     type="text"
-                    placeholder="Enter a location"
-                    // ref={inputRef}
-                    className="headerInputs"
+                    value={foodCategory}
+                    onChange={(e) => setFoodCategory(e.target.value)}
+                    className='tableEditInput'
                   />
-                  <button onClick={handleUseMyLocation}>Use My Location</button>
-                  <p>Selected Address: {address}</p>
+                </label> 
+
+                <br></br>
+
+                <label className='tableEditLabels'>
+                    Location:
+
+                    <br></br>
+
+                    <input
+                      type="text"
+                      value={address}
+                      onChange={(e) => setTableTitle(e.target.value)}
+                      className='tableEditInput locationtableEdit'
+                    />
+                  </label>
+
+
+                <div className="location-section">
+
+                  {/* <label>
+                    Vendor Location:
+                  </label> */}
+
+                  {/* <label className='tableEditLabels'>
+                    Location:
+
+                    <br></br>
+
+                    <input
+                      type="text"
+                      value={address}
+                      onChange={(e) => setTableTitle(e.target.value)}
+                      className='tableEditInput locationtableEdit'
+                    />
+                  </label> */}
+
+                  <div id="map99" ref={mapRef} style={{ width: '100%', height: '400px' }}></div>
+
+                  {/* <input
+                    type="text"
+                    placeholder="Enter a location"
+                    ref={inputRef}
+                    className="headerInputs"
+                  /> */}
+
+                  <button onClick={handleUseMyLocation} className='orUseBtn'> Or Use My Location</button>
+
+                  {/* <p>Selected Address: {address}</p> */}
 
                 </div>
-                <label>
+
+                {/* <label>
                   Food Category:
                   <input
                     type="text"
                     value={foodCategory}
                     onChange={(e) => setFoodCategory(e.target.value)}
                   />
-                </label>
+                </label> */}
 
 
               </div>
@@ -583,8 +647,8 @@ const FreshFoodsManagement = ({ partner }) => {
             )}
 
             {/* Always show the Add Restaurant button */}
-            <button className="addRestaurantButton" onClick={handleAddVendor}><i className="fa fa-plus" id='addingPlus'></i></button>
-
+            {/* <button className="addRestaurantButton" onClick={handleAddVendor}><i className="fa fa-plus" id='addingPlus'></i></button> */}
+            <button className="addShopButton" onClick={handleAddVendor}>Add a Shop</button>
 
             {/* Show dropdown if there are 2 or more restaurants */}
             {vendors.length > 1 && (

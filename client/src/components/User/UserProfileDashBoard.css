@@ -20,10 +20,12 @@
     height: 100vh;
     /* position: relative; */
     padding-top: 0px;
+    padding-bottom: 0.5rem;
     display: flex;
     flex-direction: column;
     align-items: center;
     /* justify-content: center; */
+    overflow-y: hidden;
 }
 
 .profile_profile_bar{
@@ -40,25 +42,25 @@
     width: 100%;
     display: flex;
     justify-content: space-between;
-    padding: 10px;
+    padding: 10px 2rem;
 }
 
 .partner_welcome{
-    font-size: 35px;
+    font-size: 1.5rem;
     color: white;
+    font-weight: 600;
 }
 
 .welcome-greet {
-    /* margin-top: 5%; */
-    /* margin-bottom: -6%; */
-    font-size: 18px;
-    font-weight: 800;
+    font-size: 1.2rem;
+    font-weight: 300;
     color: var(--green);
 }
 
 .profile_logOut{
-    padding: 0.5% 1%;
+    padding: 0.3rem 0.7rem;
     font-size: 18px;
+    font-weight: 300;
     background: var(--green);
     color: white;
     border: none;
@@ -66,59 +68,66 @@
 }
 
 .profile_logOut:hover{
-    padding: 0.5% 1%;
-    font-size: 18px;
     background: white;
     color: var(--orange);
-    outline: 1px solid var(--green);
 }
 
 .profile_account_section{
     /* border: 5px solid burlywood; */
     
     position: relative;
-    margin-top: 0.2%;
     display: flex;
     align-items: center;
     justify-content: center;
+    /* padding-left: 1rem; */
+    padding-bottom: 0.1rem;
     width: 100%;
     height: 100%;
 }
 
 .profile_content{
     /* border: 5px solid black; */
+
+    height: fit-content;
+    position: relative;
+    width: 100%;
 }
 
 .categories_div{
     /* border: 1px solid greenyellow; */
 
-    margin-top: 0.5%;
+    margin: 0.3% auto;
+    /* margin-top: 0.3%; */
     display: flex;
     align-items: center;
     justify-content: space-around;
     flex-direction: row;
     height: fit-content;
+    width: 80%;
 }
 
 
 .profile_category {
     font-size: 18px;
-    font-weight: 600;
-    padding: 3px 10px;
+    /* font-weight: 600; */
+    font-weight: 400;
+    padding: 2px 0.3rem;
     color: var(--green);
-    background-color: rgba(128, 128, 128, 0.351);
+    /* background-color: rgba(128, 128, 128, 0.351); */
+    background-color: var(--green);
+    color: white;
     border: none;
     transition: linear 0.2s;
-    border-radius: 3px;
+    /* border-radius: 3px; */
     width: 10%;
     cursor: pointer;
+    border: 0.1px solid var(--orange);
 }
 
-.profile_category:hover , .profile_category:focus, .profile_category:active{
+.profile_category:hover,.profile_category:focus,.profile_category:active{
     color: var(--orange);
     background-color: white;
-    outline: 1px solid var(--orange);
-    border: none;
+    border: 0.1px solid var(--orange);
 }
 
 /* .service_drop {
@@ -157,8 +166,9 @@
     /* border: 5px solid red; */
 
     width: 100%;
-    height: 91.5%;
-    margin-top: 1%;
+    height: 94%;
+    padding-right: 0.5rem;
+    /* margin-top: 1%; */
 }
 
 
@@ -185,7 +195,79 @@
     /* border: 5px solid purple; */
 }
 
-.homeLinkUser{
-    display: flex;
-    align-items: center;
-}
+@media (max-width:480px){
+    .profile_wrapper{
+        /* border: 5px solid red; */
+        
+        height: 100vh;
+        padding-bottom: 0px;
+    }
+
+    .profile_profile_bar{
+        /* border: 5px solid green; */
+    }
+
+    .homeLinkUser {
+        display: none;
+    }
+
+    .profile_bar {
+        padding: 0.2rem 0.3rem;
+    }
+    
+    .welcome-greet {
+        font-size: 0.8rem;
+        font-weight: 400;
+        margin-bottom: 0rem;
+    }
+
+    .partner_welcome{
+        font-size: 1rem;
+        font-weight: 500;   
+    }
+
+    .profile_logOut {
+        padding: 0.1rem 0.3rem;
+        font-size: 0.7rem;
+        font-weight: 300;
+    }
+
+    .profile_account_section{
+        /* border: 5px solid green;  */
+    }
+
+    .categories_div {
+        /* border: 1px solid greenyellow; */
+
+        margin: 0.3% 0px;
+        width: 100%;
+    }
+
+    .profile_category {
+        font-size: 0.7rem;
+        font-weight: 300;
+        padding: 0.1rem 0.2rem;
+        width: fit-content;
+    }
+
+    .profile_section {
+        border: 5px solid blue;
+
+        height: 98%;
+        padding-right: 0rem;
+    }
+
+    /* .coming_div {
+        border: 5px solid pink;
+
+        display: flex;
+        flex-direction: column;
+        width: 100%;
+        height: 100%;
+        gap: 0.5rem;
+    }
+    
+    .grid_profile_one {
+        width: 100%;
+    } */
+} 
