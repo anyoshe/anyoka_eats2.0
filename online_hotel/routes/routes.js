@@ -2080,7 +2080,7 @@ router.get('/token', async (req, res) => {
       }
     });
 
-    // console.log('Access Token Response:', response.data);
+    console.log('Access Token Response:', response.data);
     res.json(response.data);
   } catch (error) {
     console.error('Error fetching access token:', error.response ? error.response.data : error.message);
