@@ -2104,7 +2104,7 @@ const generateTimestamp = () => {
 
 router.post('/mpesa/pay', async (req, res) => {
   const { phoneNumber, amount } = req.body;
-
+console.log( phoneNumber, amount);
   try {
     const timestamp = generateTimestamp();
 
@@ -2126,9 +2126,9 @@ router.post('/mpesa/pay', async (req, res) => {
     const password = Buffer.from(`${shortcode}${passkey}${timestamp}`).toString('base64');
 
 
-    // console.log('Access Token:', access_token);
-    // console.log('Timestamp:', timestamp);
-    // console.log('Password:', password);
+    console.log('Access Token:', access_token);
+    console.log('Timestamp:', timestamp);
+    console.log('Password:', password);
 
     const paymentData = {
       BusinessShortCode: shortcode,
@@ -2144,7 +2144,7 @@ router.post('/mpesa/pay', async (req, res) => {
       TransactionDesc: 'Test Payment'
     };
 
-    // console.log('Payment Data:', paymentData);
+    console.log('Payment Data:', paymentData);
 
     const paymentResponse = await axios.post('https://sandbox.safaricom.co.ke/mpesa/stkpush/v1/processrequest', paymentData, {
       headers: {
@@ -2153,7 +2153,7 @@ router.post('/mpesa/pay', async (req, res) => {
       }
     });
 
-    // console.log('Payment Response:', paymentResponse.data);
+    console.log('Payment Response:', paymentResponse.data);
     res.json(paymentResponse.data);
   } catch (error) {
     console.error('Error initiating M-Pesa payment:', error.response ? error.response.data : error.message);
