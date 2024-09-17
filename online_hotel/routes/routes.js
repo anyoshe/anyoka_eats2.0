@@ -2108,6 +2108,9 @@ console.log( phoneNumber, amount);
   try {
     const timestamp = generateTimestamp();
 
+    console.log('Access Token:', access_token);
+    console.log('Payment Data:', paymentData);
+
     // Fetch access token
     const authResponse = await axios.get('https://sandbox.safaricom.co.ke/oauth/v1/generate?grant_type=client_credentials', {
       headers: {
@@ -2115,10 +2118,12 @@ console.log( phoneNumber, amount);
       }
     });
 
+
     if (!authResponse.data.access_token) {
       throw new Error('Failed to fetch access token');
     }
 
+    console.log('Payment Response:', paymentResponse.data);
     const { access_token } = authResponse.data;
 
     // Initiate payment
