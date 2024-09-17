@@ -2040,8 +2040,9 @@ const consumerKey = process.env.CONSUMER_KEY;
 const consumerSecret = process.env.CONSUMER_SECRET;
 const shortcode = process.env.SHORTCODE;
 const passkey = process.env.PASSKEY;
-const ngrokUrl = process.env.NGROK_URL;
-
+const ngrokUrl = process.env.NODE_ENV === 'production'
+? process.env.NGROK_URL
+: process.env.NGROK_URL_LOCAL;
 router.post('/mpesa/callback', (req, res) => {
   const callbackData = req.body;
   // console.log('M-Pesa Callback Received:', callbackData);

@@ -59,13 +59,6 @@ app.use('/api', appRoutes);
 // File Uploads
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
-// // Serve static files from the React app (client/build folder)
-// app.use(express.static(path.join(__dirname, '../client/build')));  // Adjust the path
-
-// // Catch-all route to serve index.html for client-side routing
-// app.get('*', (req, res) => {
-//   res.sendFile(path.join(__dirname, '../client/build', 'index.html')); // Adjust the path
-// });
 
 // Error Handler
 function errorHandler(err, req, res, next) {
