@@ -2070,23 +2070,6 @@ router.post('/mpesa/callback', (req, res) => {
   res.sendStatus(200);
 });
 
-// Route to get M-Pesa access token
-// router.get('/token', async (req, res) => {
-//   const auth = Buffer.from(`${consumerKey}:${consumerSecret}`).toString('base64');
-//   try {
-//     const response = await axios.get('https://sandbox.safaricom.co.ke/oauth/v1/generate?grant_type=client_credentials', {
-//       headers: {
-//         'Authorization': `Basic ${auth}`
-//       }
-//     });
-
-//     console.log('Access Token Response:', response.data);
-//     res.json(response.data);
-//   } catch (error) {
-//     console.error('Error fetching access token:', error.response ? error.response.data : error.message);
-//     res.status(500).json({ error: 'Failed to fetch access token', details: error.message });
-//   }
-// });
 
 // Route to handle M-Pesa payment
 const generateTimestamp = () => {
@@ -2102,70 +2085,7 @@ const generateTimestamp = () => {
   return `${year}${month}${day}${hours}${minutes}${seconds}`;
 };
 
-// router.post('/mpesa/pay', async (req, res) => {
-//   const { phoneNumber, amount } = req.body;
-// console.log( phoneNumber, amount);
-//   try {
-//     const timestamp = generateTimestamp();
-//     console.log('Generated timestamp:', timestamp);
 
-//     console.log('Access Token:', access_token);
-//     console.log('Payment Data:', paymentData);
-
-//     // Fetch access token
-//     const authResponse = await axios.get('https://sandbox.safaricom.co.ke/oauth/v1/generate?grant_type=client_credentials', {
-//       headers: {
-//         'Authorization': `Basic ${Buffer.from(`${consumerKey}:${consumerSecret}`).toString('base64')}`
-//       }
-//     });
-
-
-//     if (!authResponse.data.access_token) {
-//       throw new Error('Failed to fetch access token');
-//     }
-
-//     console.log('Payment Response:', paymentResponse.data);
-//     const { access_token } = authResponse.data;
-
-//     // Initiate payment
-//     //const timestamp = new Date().toISOString().replace(/[-:.TZ]/g, '').slice(0, 14);
-//     const password = Buffer.from(`${shortcode}${passkey}${timestamp}`).toString('base64');
-
-
-//     console.log('Access Token:', access_token);
-//     console.log('Timestamp:', timestamp);
-//     console.log('Password:', password);
-
-//     const paymentData = {
-//       BusinessShortCode: shortcode,
-//       Password: password,
-//       Timestamp: timestamp,
-//       TransactionType: 'CustomerPayBillOnline',
-//       Amount: amount,
-//       PartyA: phoneNumber,
-//       PartyB: shortcode,
-//       PhoneNumber: phoneNumber,
-//       CallBackURL: `${ngrokUrl}/mpesa/callback`,
-//       AccountReference: 'Test123',
-//       TransactionDesc: 'Test Payment'
-//     };
-
-//     console.log('Payment Data:', paymentData);
-
-//     const paymentResponse = await axios.post('https://sandbox.safaricom.co.ke/mpesa/stkpush/v1/processrequest', paymentData, {
-//       headers: {
-//         'Authorization': `Bearer ${access_token}`,
-//         'Content-Type': 'application/json'
-//       }
-//     });
-
-//     console.log('Payment Response:', paymentResponse.data);
-//     res.json(paymentResponse.data);
-//   } catch (error) {
-//     console.error('Error initiating M-Pesa payment:', error.response ? error.response.data : error.message);
-//     res.status(500).json({ error: 'Failed to initiate payment', details: error.message });
-//   }
-// });
 
 router.post('/mpesa/pay', async (req, res) => {
   const { phoneNumber, amount } = req.body;
