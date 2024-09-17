@@ -79,14 +79,84 @@ const cartReducer = (state, action) => {
       };
     }
 
-    case INCREASE_QUANTITY:
-      return state;
+    case INCREASE_QUANTITY:{
+      const { dishCode } = action.payload;
+      const updatedItems = state.items.map(item =>
+        item.dishCode === dishCode ? { ...item, quantity: item.quantity + 1 } : item
+      );
+      const newTotalPrice = updatedItems.reduce((sum, item) => sum + item.price * item.quantity, 0);
+      const newCartCount = updatedItems.reduce((sum, item) => sum + item.quantity, 0);
 
-    case DECREASE_QUANTITY:
-      return state;
+      // Update localStorage
+      const storedCart = JSON.parse(localStorage.getItem('cart')) || [];
+      const existingStoredItem = storedCart.find(item => item.dishCode === dishCode);
 
-    case REMOVE_FROM_CART:
-      return state;
+      if (existingStoredItem) {
+        existingStoredItem.quantity++;
+      }
+
+      localStorage.setItem('cart', JSON.stringify(storedCart));
+
+      return {
+        ...state,
+        items: updatedItems,
+        totalPrice: newTotalPrice,
+        cartCount: newCartCount
+      };
+    }
+   
+
+    case DECREASE_QUANTITY:{
+      const { dishCode } = action.payload;
+      const updatedItems = state.items.map(item =>
+        item.dishCode === dishCode
+          ? { ...item, quantity: item.quantity > 1 ? item.quantity - 1 : item.quantity }
+          : item
+      ).filter(item => item.quantity > 0);
+      const newTotalPrice = updatedItems.reduce((sum, item) => sum + item.price * item.quantity, 0);
+      const newCartCount = updatedItems.reduce((sum, item) => sum + item.quantity, 0);
+
+      // Update localStorage
+      const storedCart = JSON.parse(localStorage.getItem('cart')) || [];
+      const existingStoredItem = storedCart.find(item => item.dishCode === dishCode);
+
+      if (existingStoredItem) {
+        if (existingStoredItem.quantity > 1) {
+          existingStoredItem.quantity--;
+        } else {
+          const index = storedCart.findIndex(item => item.dishCode === dishCode);
+          if (index !== -1) storedCart.splice(index, 1);
+        }
+      }
+
+      localStorage.setItem('cart', JSON.stringify(storedCart));
+
+      return {
+        ...state,
+        items: updatedItems,
+        totalPrice: newTotalPrice,
+        cartCount: newCartCount
+      };
+    }
+    case REMOVE_FROM_CART: {
+      const { dishCode } = action.payload;
+      const updatedItems = state.items.filter(item => item.dishCode !== dishCode);
+      const newTotalPrice = updatedItems.reduce((sum, item) => sum + item.price * item.quantity, 0);
+      const newCartCount = updatedItems.reduce((sum, item) => sum + item.quantity, 0);
+
+      // Update localStorage
+      const storedCart = JSON.parse(localStorage.getItem('cart')) || [];
+      const updatedStoredCart = storedCart.filter(item => item.dishCode !== dishCode);
+
+      localStorage.setItem('cart', JSON.stringify(updatedStoredCart));
+
+      return {
+        ...state,
+        items: updatedItems,
+        totalPrice: newTotalPrice,
+        cartCount: newCartCount
+      };
+    }
 
     case TOGGLE_CART_VISIBILITY:
       return {
