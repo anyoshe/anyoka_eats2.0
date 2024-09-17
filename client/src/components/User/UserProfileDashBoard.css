@@ -239,19 +239,19 @@
     .categories_div {
         /* border: 1px solid greenyellow; */
 
-        margin: 0.3% 0px;
+        margin: 0.4% 0px;
         width: 100%;
     }
 
     .profile_category {
-        font-size: 0.7rem;
+        font-size: 0.8rem;
         font-weight: 300;
-        padding: 0.1rem 0.2rem;
+        padding: 0.2rem 0.3rem;
         width: fit-content;
     }
 
     .profile_section {
-        border: 5px solid blue;
+        /* border: 5px solid blue; */
 
         height: 98%;
         padding-right: 0rem;

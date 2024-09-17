@@ -589,7 +589,7 @@ const HotelRestaurantSection = ({ partner }) => {
                   />
                 </label> */}
 
-                <label className='tableEditLabels'>
+                <label className='tableEditLabels tableBestIn'>
                   Best In:  
 
                   <br></br>
