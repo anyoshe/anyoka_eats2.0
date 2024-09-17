@@ -511,9 +511,10 @@
 }
 
 .menu_table{
-    border: 5px solid red;
+    /* border: 5px solid red; */
 
     height: 100%;
+    width: 100%;
     display: flex;
     justify-content: center;
 }
@@ -527,7 +528,7 @@
 
 /* DIV HOLDING THE ICONS IN TABLE */
 .iconHeader{ 
-    border: 5px solid green;
+    /* border: 5px solid green; */
 
     background-color: var(--orange); 
     padding: 20px 10px;
@@ -1116,19 +1117,21 @@
         position: absolute;
         min-width: 5rem;
         z-index: 5;
-        top: 2.8%;
-        left: 31%;
+        top: 3.3%;
+        left: 30%;
     }
 
     .service_drop_link {
-        padding: 0.1rem 0.7rem;
+        padding: 0.3rem 0.7rem;
 
         margin-bottom: 0.4px;
-        font-size: 0.7rem;
+        font-size: 0.8rem;
     }
 
     .profile_content{
         position: relative;
+        width: 100%;
+        padding: 0rem 0.2rem;
     }
 
     .coming_div {
@@ -1323,9 +1326,9 @@
         /* border: 5px solid green; */
 
         width: 100%;
-        padding: 0.9rem 0.1rem;
+        padding: 0.9rem 0.3rem;
         display: grid;
-        justify-content: center;
+        justify-content: left;
     }
 
     .profile_section{
@@ -1356,10 +1359,10 @@
     }
 
     .addRestaurantButton {
-        padding: 0.2rem 0.7rem;
-        font-size: 0.7rem;
+        padding: 0.3rem 0.8rem;
+        font-size: 0.8rem;
         margin-bottom: 1%;
-        margin-top: 8%;
+        margin-top: 10%;
     }
 
     .vendorLocation {
@@ -1368,23 +1371,34 @@
 
     
     .forgotten{
-        border: 5px solid red;
+        /* border: 5px solid red; */
 
         width: 95vw;
+        margin-top: 8%;
     }
 
     .locationtableEdit {
         width: 25rem;
     }
 
+    .tableEditLabels{
+        /* border: 1px solid red; */
+    
+        margin-left: 0rem;
+        text-align: left;
+    }
+
+    .tableBestIn{
+        margin-left: 0.5rem;
+    }
 
     .func_icons {
-        font-size: 0.5rem;
+        font-size: 0.7rem;
         padding: 0.2rem 0.3rem;
     }
 
     .restaurantSelection{
-        font-size: 0.7rem;
+        font-size: 0.8rem;
     }
 
     .choose_select{
@@ -1430,7 +1444,7 @@
 
     .column{
         /* border: 1px solid red; */
-        width: 100%;
+        width: 97%;
     }
 
     .addRowBtn {
@@ -1441,8 +1455,8 @@
         background-color: var(--green);
         padding: 0.1rem .2rem;
         border-radius: 0%;
-        top: -6%;
-        left: 90%;
+        top: 15%;
+        left: 93%;
     }
 
     .form_file{
@@ -1451,7 +1465,7 @@
 
     .column label {
         font-size: 0.8rem;
-        font-weight: 200;
+        font-weight: 400;
         text-align: left;
     }
 
