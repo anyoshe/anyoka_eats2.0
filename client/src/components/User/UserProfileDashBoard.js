@@ -36,7 +36,7 @@ const UserProfileDashBoard = () => {
 
   useEffect(() => {
      // Fetch partner data on mount
-     fetchPartnerData();
+    fetchPartnerData();
 
     document.addEventListener('mousedown', handleClickOutside);
     // fetchServices(); // Fetch services on component mount
