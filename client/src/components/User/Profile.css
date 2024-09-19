@@ -783,7 +783,7 @@
 
 /* FORM HOLDING INPUT FIELDS TO FILL THE TABLE */
 #chart_datas{ 
-    /* border: 1px solid green; */
+    border: 5px solid green;
 
     width: 100%;
     height: fit-content;
@@ -793,7 +793,7 @@
 }
 
 .input_wrp{
-    /* border: 1px solid red; */
+    border: 5px solid red;
 
     display: grid;
     grid-template-columns: repeat( 7, 1fr);
@@ -1428,7 +1428,7 @@
         width: 100%;
         height: fit-content;
         position: relative;
-        padding: 0.1rem 0.3rem;
+        padding: 0rem;
         margin-top: 0.1%;
         margin-bottom: 0.5rem;
     }
@@ -1438,7 +1438,7 @@
         
         display: grid;
         grid-template-columns: repeat(2, 1fr);
-        gap: 0rem;
+        gap: 0.5rem;
         height: fit-content;
     }
 
@@ -1470,11 +1470,11 @@
     }
 
     .headerInputs{
-        padding: 0.1rem 0.2rem;
+        padding: 0rem 0.2rem;
     }
 
     .small-1-input {
-        width: 90%;
+        width: 55%;
         border: none;
         padding-left: 0px;
     }
