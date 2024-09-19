@@ -1388,9 +1388,9 @@
         text-align: left;
     }
 
-    .tableBestIn{
+    /* .tableBestIn{
         margin-left: 0.5rem;
-    }
+    } */
 
     .func_icons {
         font-size: 0.7rem;
@@ -1444,7 +1444,7 @@
 
     .column{
         /* border: 1px solid red; */
-        width: 97%;
+        width: 100%;
     }
 
     .addRowBtn {

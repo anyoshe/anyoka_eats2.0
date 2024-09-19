@@ -216,9 +216,11 @@
     }
     
     .welcome-greet {
-        font-size: 0.8rem;
+        font-size: 0.9rem;
         font-weight: 400;
         margin-bottom: 0rem;
+        padding-top: 0.3rem;
+        padding-bottom: 0.3rem;
     }
 
     .partner_welcome{
