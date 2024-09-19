@@ -212,7 +212,7 @@
     }
 
     .profile_bar {
-        padding: 0.2rem 0.3rem;
+        padding: 0.4rem 0.3rem;
     }
     
     .welcome-greet {
@@ -230,12 +230,13 @@
 
     .profile_logOut {
         padding: 0.1rem 0.3rem;
-        font-size: 0.7rem;
+        font-size: 0.8rem;
         font-weight: 300;
     }
 
     .profile_account_section{
         /* border: 5px solid green;  */
+        margin-top: 0.5rem;
     }
 
     .categories_div {
