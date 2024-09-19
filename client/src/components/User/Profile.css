@@ -1470,11 +1470,12 @@
     }
 
     .headerInputs{
+        width: 80%;
         padding: 0rem 0.2rem;
     }
 
     .small-1-input {
-        width: 55%;
+        width: 60%;
         border: none;
         padding-left: 0px;
     }
