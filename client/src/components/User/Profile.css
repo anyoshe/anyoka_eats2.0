@@ -588,7 +588,7 @@
     font-size: 0.8rem;
     padding: 0.3rem 0.4rem;
     text-align: center;
-    margin-right: 0.2rem;
+    margin-right: 0.4rem;
     background: var(--green);
     border: none;
     color: white;
@@ -1362,7 +1362,7 @@
         padding: 0.3rem 0.8rem;
         font-size: 0.8rem;
         margin-bottom: 1%;
-        margin-top: 10%;
+        margin-top: 12%;
     }
 
     .vendorLocation {
@@ -1393,7 +1393,7 @@
     } */
 
     .func_icons {
-        font-size: 0.7rem;
+        font-size: 0.9rem;
         padding: 0.2rem 0.3rem;
     }
 
