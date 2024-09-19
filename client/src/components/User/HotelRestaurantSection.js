@@ -588,6 +588,7 @@ const HotelRestaurantSection = ({ partner }) => {
                     className='tableEditInput'
                   />
                 </label> */}
+                <br></br>
 
                 <label className='tableEditLabels tableBestIn'>
                   Best In:  
@@ -601,7 +602,7 @@ const HotelRestaurantSection = ({ partner }) => {
                     className='tableEditInput'
                   />
                 </label>
-
+                
                 <br></br>
                 
                 <label className='tableEditLabels'>
