@@ -59,6 +59,22 @@
     background: rgba(128, 128, 128, 0.118);
 }
 
+.orderButtons{
+    color: white;
+    background: var(--green);
+    margin-right: 0.3rem;
+    padding: 0.2rem 0.4rem;
+    cursor: pointer;
+    transition: ease-in .2s;
+    border: 1px solid var(--green);
+}
+
+.orderButtons:hover{
+    color: var(--orange);
+    background: white;
+    border: 1px solid var(--orange);
+}
+
 #profileImageInput{
     /* border: 1px solid red; */
 
@@ -1117,7 +1133,7 @@
         position: absolute;
         min-width: 5rem;
         z-index: 5;
-        top: 3.3%;
+        top: 110%;
         left: 30%;
     }
 
@@ -1341,7 +1357,38 @@
         /* padding: 20px 10px;
         height: 100%;
         z-index: 200; */
+        margin-top: 8%;
     } 
+
+    .orderCurrierDiv{
+        /* border: 5px solid green; */
+    }
+
+    .orderButtonsDiv{
+        /* border: 5px solid red; */
+        display: grid;
+        grid-template-columns: 1fr 1fr 1fr;
+        gap: 0.2rem;
+    }
+
+    .orderButtons{
+        font-size: 0.9rem;
+        border:  1px solid var(--green);
+        background: var(--green);
+        color: white;
+        transition: ease-in .2s;
+    }
+
+    .orderButtons:focus{
+        color: var(--orange);
+        border: 1px solid var(--orange);
+        background: white;
+    }
+
+
+    .orderDispalyDiv{
+        /* border: 5px solid blue; */
+    }
 
     .menu_table {
         width: 100%;
