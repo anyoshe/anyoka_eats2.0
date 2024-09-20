@@ -151,11 +151,16 @@ const UserProfileDashBoard = () => {
         return <FreshFoodsManagement partner={partner} />;
       case 'orders':
         return (
-          <div>
-            <button onClick={() => handleOrderSubsectionChange('undeliveredOrders')}>Undelivered Orders</button>
-            <button onClick={() => handleOrderSubsectionChange('undeliveredFoodOrders')}>Undelivered Food Orders</button>
-            <button onClick={() => handleOrderSubsectionChange('specialOrders')}>Special Orders</button>
-            <div>
+          <div className='orderCurrierDiv'>
+            <div className='orderButtonsDiv'>
+              <button className='orderButtons' onClick={() => handleOrderSubsectionChange('undeliveredOrders')}>Undelivered Orders</button>
+
+              <button className='orderButtons' onClick={() => handleOrderSubsectionChange('undeliveredFoodOrders')}>Undelivered Food Orders</button>
+              
+              <button className='orderButtons' onClick={() => handleOrderSubsectionChange('specialOrders')}>Undelivered Special Orders</button>
+            </div>
+
+            <div className='orderDispalyDiv'>
               {orderSubsection === 'undeliveredOrders' && <UndeliveredOrders partner={partner} />}
               {orderSubsection === 'undeliveredFoodOrders' && <UndeliveredFoodOrders partner={partner} />}
               {orderSubsection === 'specialOrders' && <SpecialOrders partner={partner} />}
@@ -205,7 +210,8 @@ const UserProfileDashBoard = () => {
     {/* logo */}
     <div className="profile_profile_bar">
       <div className='profile_bar'>
-      <a href="/" className='homeLinkUser'><FontAwesomeIcon icon={faHome}  className='homeIcon'/></a> 
+        <a href="/" className='homeLinkUser'><FontAwesomeIcon icon={faHome}  className='homeIcon'/></a> 
+        
         <div className="logoDiv">
           
           <h3 className='welcome-greet'>Welcome ,<span className='partner_welcome'>  {partner?.businessName}</span></h3>
