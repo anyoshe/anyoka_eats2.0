@@ -142,8 +142,11 @@ const DeliveredOrders = ({ partner }) => {
 
       <div id="salesTotals">
         <div id="salesTotal">
+
           <p>Total Sales: Kes. <span id="totalSales" className="sameTotal">{totalSales.toFixed(2)}</span></p>
+
           <p>Commission: Kes. <span id="commissionDue sameTotal" className="sameTotal">{commissionDue.toFixed(2)}</span></p>
+          
           <p>Total Deliveries: <span id="totalDeliveries sameTotal" className="sameTotal">{totalDeliveries}</span></p>
         </div>
       </div>

@@ -21,6 +21,8 @@
     font-family: 'Poppins',sans-serif;
 }
 
+
+
 .account_section{
     display: flex;
     align-items: center;
@@ -1128,6 +1130,61 @@
     width: 100%;
 }
 
+.button-group{
+    margin-bottom: 0.5rem;
+}
+
+.orderCurrierDiv{
+    /* border: 5px solid green; */
+    width: 100%;
+}
+
+
+
+
+
+.tablesSalesDiv{
+    /* border: 5px solid red; */
+
+    width: 100%;
+    min-height: 100vh;
+}
+
+.button-group{
+    /* border: 5px solid green; */
+
+    width: inherit;
+}
+
+.tablesSalesBtn{
+    border: 1px solid var(--green);
+    background: var(--green);
+    color: white;
+    padding: 0.3rem 0.4rem;
+    margin-right: 0.8rem;
+    transition: ease-in .2s;
+}
+
+.tablesSalesBtn:hover,.tablesSalesBtn:focus{
+    border: 1px solid var(--orange);
+    background: white;
+    color: var(--orange);
+}
+
+.content{
+    /* border: 5px solid blue;  */
+
+    width: inherit;
+    height: 93%;
+    display: flex;
+    flex-direction: column;
+    align-self: center;
+}
+
+.contenttabledivs{
+    /* border: 5px solid burlywood; */
+}
+
 @media(max-width:480px){
     .service_drop {
         position: absolute;
@@ -1362,6 +1419,7 @@
 
     .orderCurrierDiv{
         /* border: 5px solid green; */
+        /* width: 100%; */
     }
 
     .orderButtonsDiv{
@@ -1622,5 +1680,12 @@
     .deleteButton {
         padding: 0.1rem 0.2rem;
         font-size: 0.9rem;
+    }
+
+    .tablesSalesBtn {
+        padding: 0.2rem 0.3rem;
+        font-size: 0.8rem;
+        margin-right: 0.8rem;
+        transition: ease-in .2s;
     }
 }
