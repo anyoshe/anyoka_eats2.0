@@ -708,7 +708,7 @@ animation: hoverShake 0.15s linear 3;
     }
 }
 
-@media only screen and (max-width: 991px) and (min-width: 768px) {
+/* @media only screen and (max-width: 991px) and (min-width: 768px) {
     .containerDiv {
         width: 100%;
     }
@@ -731,8 +731,8 @@ animation: hoverShake 0.15s linear 3;
     .join_team_grid_div {
         grid-template-columns: 1fr;
     }
-}
-
+} */
+/* 
 @media only screen and (max-width: 767px) {
     .containerDiv {
         width: 100%;
@@ -752,10 +752,9 @@ animation: hoverShake 0.15s linear 3;
 
     .offerDisplay{
         display: flex;
-        /* flex-direction: column; */
     }
     .food-cards-container{
-       display: flex;
+        display: flex;
     }
     .join_team_grid_div {
         grid-template-columns: 1fr;
@@ -783,11 +782,11 @@ animation: hoverShake 0.15s linear 3;
     .join_team_heading {
         font-size: 24px;
     }
-} 
+}  */
 
 
 /* Tablets (portrait and landscape) */
-@media (max-width: 1199px) and (min-width: 768px) {
+/* @media (max-width: 1199px) and (min-width: 768px) {
 .join_team_section {
     padding: 20px;
 }
@@ -855,7 +854,7 @@ animation: hoverShake 0.15s linear 3;
     line-height: 1.6;
     text-align: justify;
 }
-} 
+}  */
 
 /* Mobile phones */
 /* @media (max-width: 767px) {
@@ -1226,5 +1225,150 @@ animation: hoverShake 0.15s linear 3;
         line-height: 1.5;
         text-align: justify;
         padding: 0 10px;
+    }
+}
+
+
+@media (min-width: 768px) and (max-width:1024px) {
+    .containerDiv {
+        /* border:5px solid red; */
+    }
+
+    .logo-CTA {
+        padding: 10px 0rem;
+    }
+
+    .headerSection {
+        margin-bottom: 1%;
+    }
+
+    .services-serchBar {
+        margin-top: 4%;
+    }
+
+    .services {
+        grid-template-columns: repeat(3, 1fr);
+    }
+
+    .services {
+        /* border: 5px solid green; */
+
+        row-gap: 5px;
+        column-gap: 3px;
+        margin-bottom: 10px;
+    }
+
+    .serviceDiv {
+        /* border: 1px solid red; */
+
+        height: 200px;
+        width: 190px;
+        padding: 20px 30px;
+    }
+
+    .serviceImg {
+        /* border: 1px solid blue; */
+
+        width: 150px;
+        height: 150px;
+        margin-bottom: 5px;
+        background: var(--orange);
+        top: 5px;
+    }
+
+    .serviceDiv p {
+        /* border: 1px solid blue; */
+
+        font-size: 1rem;
+        /* width: 170px; */
+        padding: 0px;
+    }
+
+    .offersSection {
+        width: 100%;
+    }
+
+    .title-offerSearch {
+        /* border: 1px solid blue; */
+    }
+
+    .offerTitle {
+        font-size: 1.4rem;
+        margin-bottom: 0rem;
+    }
+
+    .categories {
+        padding: 5px 9px;
+        font-size: 0.9rem;
+    }
+
+    .search-container {
+        width: 20em;
+    }
+
+    .search-input {
+        height: 30px;
+        padding: 0.5rem;
+        padding: 10px 10px;
+    }
+
+    .search-input:hover,.search-input:focus{
+        box-shadow: rgba(0, 0, 0, 0.35) 0px 5px 15px;
+    }
+
+    .offerDisplay {
+        grid-template-columns: repeat(4, 1fr);
+        flex-wrap: nowrap;
+        column-gap: 5px;
+    }
+
+    .FeaturedHeading {
+        font-size: 1.4rem;
+        margin-bottom: 0rem;
+    }
+
+    .featured {
+        grid-template-columns: repeat(4, 1fr);
+        column-gap: 5px;
+        row-gap: 20px;
+    }
+
+    .join_team_section {
+        /* border: 5px solid red; */
+
+        width: 100%;
+        height: fit-content;
+        padding: 10px 5px;
+        margin-bottom: 3%;
+    }
+
+    .join_team_grid_div {
+        /* border: 1px solid red; */
+
+        gap: 10px;
+        width: 100%;
+    }
+
+    .about_us_section {
+        width: 100%;
+        height: fit-content;
+    }
+
+    .aboutUs_img_div {
+        margin: 20px;
+    }
+
+    .aboutUs_img_div1 {
+        width: 250px;
+        height: 250px;
+    }
+
+    .aboutUs_img_div2 {
+        width: 150px;
+        height: 200px;
+    }
+
+    .aboutUs_paragraph {
+        font-size: 1rem;
     }
 }

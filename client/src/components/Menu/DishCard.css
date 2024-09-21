@@ -209,16 +209,25 @@
 /* Tablets (portrait and landscape) */
 @media (max-width: 1199px) and (min-width: 768px) {
   .dish-card {
-    width: 260px;
+    /* border: 5px solid red; */
+
+    width: 210px;
     height: auto;
   }
 
   .dish-image {
-    height: 220px;
+    height: 150px;
   }
 
   .dishName {
-    font-size: 18px;
+    font-size: 0.9rem;
+    margin-bottom: 0rem;
+  }
+
+  .original-price-offer {
+    margin-bottom: 0px;
+    padding: 0px;
+    font-size: 1rem
   }
 
   .dishPrice {
@@ -227,6 +236,7 @@
 
   .dishRestaurant {
     font-size: 14px;
+    padding: 2px 0px;
   }
 
   .dishAddToCart {
@@ -240,7 +250,7 @@
   .discounted-price-circle {
     top: -10%;
     right: 0%;
-    padding: 4px 5px;
+    padding: 4px 2px;
   }
 }
 
