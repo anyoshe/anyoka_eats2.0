@@ -170,14 +170,18 @@ const UserProfileDashBoard = () => {
       case 'sales':
       
       return (
-        <div>
+        <div className='tablesSalesDiv'>
           <div className="button-group">
-            <button onClick={() => handleOrderSubsectionChange('deliveredOrders')}>Dish Sales</button>
-            <button onClick={() => handleOrderSubsectionChange('deliveredFoodOrders')}>Fresh Food Sales</button>
+
+            <button onClick={() => handleOrderSubsectionChange('deliveredOrders')} className='tablesSalesBtn'>Dish Sales</button>
+
+            <button onClick={() => handleOrderSubsectionChange('deliveredFoodOrders')} className='tablesSalesBtn'>Fresh Food Sales</button>
+
           </div>
+
           <div className="content">
-            {orderSubsection === 'deliveredOrders' && <DeliveredOrders partner={partner} />}
-            {orderSubsection === 'deliveredFoodOrders' && <DeliveredFoodOrders partner={partner} />}
+            {orderSubsection === 'deliveredOrders' && <DeliveredOrders partner={partner}/>}
+            {orderSubsection === 'deliveredFoodOrders' && <DeliveredFoodOrders partner={partner}/>}
           </div>
         </div>
       );
