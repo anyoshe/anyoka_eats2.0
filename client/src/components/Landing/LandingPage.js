@@ -231,7 +231,7 @@ const LandingPage = () => {
                 {/* offer title and offer search bar */}
                 <div className="title-offerSearch">
                     <div className="title">
-                        <h2 className='offerTitle'>OFFERS</h2>
+                        <h2 className='offerTitle'>Offers</h2>
                     </div>
                 </div>
 

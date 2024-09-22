@@ -561,7 +561,7 @@ const HotelRestaurantSection = ({ partner }) => {
 
             {/* <h3 className="businessName">{partner?.restaurant}</h3> */}
             {isEditingTitle ? (
-              <div>
+              <div className='forgotten'>
                 <label className='tableEditLabels'>
                   {/* Restaurant Name: */}
                   Name : 
@@ -588,8 +588,9 @@ const HotelRestaurantSection = ({ partner }) => {
                     className='tableEditInput'
                   />
                 </label> */}
+                <br></br>
 
-                <label className='tableEditLabels'>
+                <label className='tableEditLabels tableBestIn'>
                   Best In:  
 
                   <br></br>
@@ -601,7 +602,7 @@ const HotelRestaurantSection = ({ partner }) => {
                     className='tableEditInput'
                   />
                 </label>
-
+                
                 <br></br>
                 
                 <label className='tableEditLabels'>
@@ -700,7 +701,7 @@ const HotelRestaurantSection = ({ partner }) => {
 
                 <input
                   type="file"
-                  className="headerInputs small-1-input"
+                  className="headerInputs small-1-input form_file"
                   onChange={handleFileChange}
                 />
 
@@ -829,7 +830,7 @@ const HotelRestaurantSection = ({ partner }) => {
 
         {/* TABLE DISPLAY AREA */}
 
-        <div className="tableRows">
+        <div className="tableRows" id='headerTableRows'>
           <div className="headerDiv">Picture</div>
           <div className="headerDiv headerspecial">Dish Code</div>
           <div className="headerDiv">Name</div>
@@ -857,10 +858,10 @@ const HotelRestaurantSection = ({ partner }) => {
             <div className="dishDiv headerspecial">{dish.quantity}</div>
 
             <div className="dishDiv dishdiv_button">
-              <button className="editButton" onClick={() => handleEdit(dish)} style={{ display: dish.dishCode === editingDishCode ? 'none' : 'block' }}><i className="fas fa-edit"></i>
+              <button className="editButton" id='tableEditButton' onClick={() => handleEdit(dish)} style={{ display: dish.dishCode === editingDishCode ? 'none' : 'block' }}><i className="fas fa-edit"></i>
               </button>
 
-              <button className="saveButton" onClick={handleSubmit} style={{ display: dish.dishCode === editingDishCode ? 'block' : 'none' }}>Save</button>
+              <button className="saveButton"  id='tableEditButton' onClick={handleSubmit} style={{ display: dish.dishCode === editingDishCode ? 'block' : 'none' }}>Save</button>
 
               <button className="deleteButton" onClick={() => handleDelete(dish._id)}><i className="fas fa-trash"></i>
               </button>

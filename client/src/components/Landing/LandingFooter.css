@@ -190,6 +190,7 @@
     width: 100%;
     margin-bottom: 2px;
     border: none;
+    outline: none;
     padding: 5px 10px;
 }
 
@@ -320,57 +321,22 @@
 
 
 /* MEDIA QUERIES */
-
-/* Default: Large devices (desktops, laptops) */
-/* No media query needed, as the current setup assumes large screens */
-
-/* Medium devices (tablets) */
-@media only screen and (max-width: 1024px) {
-  .top_header_div {
-    grid-template-columns: 1fr; /* Stack the top header divs vertically */
-  }
-
-  .row_two {
-    grid-template-columns: 1fr 1fr; /* Adjust for 2 columns */
-    gap: 20px; /* Add more space between columns */
-  }
-
-  .footer-logo-text {
-    font-size: 15px;
-    text-align: center; /* Center text for better readability */
-  }
-
-  .footer_logo_head {
-    font-size: 4em; /* Slightly smaller heading */
-  }
-
-  .footer-logo img {
-    max-width: 150px; /* Reduce logo size for tablets */
-  }
-
-  .contact_form_btn {
-    font-size: 14px;
-    padding: 10px; /* Increase padding for larger button tap area */
-  }
-}
-
-/* Small devices (mobile phones) */
-@media only screen and (max-width: 768px) {
-  .top_header_div {
-    grid-template-columns: 1fr; /* Stack all items vertically */
+@media (max-width: 1024px) and (max-width: 768px) {
+  /* .top_header_div {
+    grid-template-columns: 1fr; 
     text-align: center;
-  }
-
+  } */
+/* 
   .footer-logo img {
-    max-width: 120px; /* Smaller logo for mobile */
-  }
+    max-width: 120px; 
+  } */
 
   .footer_logo_head {
-    font-size: 3em; /* Reduce heading size for mobile */
+    font-size: 3em; 
   }
 
   .row_two {
-    grid-template-columns: 1fr; /* Stack the columns */
+    grid-template-columns: 1fr; 
     gap: 15px;
   }
 
@@ -380,7 +346,7 @@
 
   .contact_form_btn {
     font-size: 12px;
-    padding: 8px; /* Smaller button on mobile */
+    padding: 8px; 
   }
 
   #social_list {
@@ -390,30 +356,27 @@
   }
 
   .car, .bike {
-    width: 15%; /* Adjust animated vehicles for smaller screens */
-    height: 15%;
+    width: 10%;  
+    height: 10%;
+  }
+
+  .car {
+    bottom: 3%;
   }
 }
 
+
 /* Very small devices (small mobile phones) */
 @media only screen and (max-width: 480px) {
-  .footer-section{
-    /* border: 2px solid red; */
-  }
-
   .top_header_div{
     display: grid;
-    /* grid-template-columns: repeat(3, 1fr); */
     grid-template-columns: repeat(3,1fr);
     padding-bottom: 0rem;
     justify-content: space-around;
-    /* align-items: center; */
   }
 
   .top_header_divs{
-    /* border: 1px solid red; */
-
-    width: 9rem;
+    width: 8rem;
   }
 
   #top_header_icons{
@@ -429,26 +392,21 @@
   .top_header_divs_para{
     font-size: 0.6rem;
     width: 95%;
+    text-align: center;
   }
   
   .footer-content{
-    /* border: 5px solid green; */
-
-    /* width: 100%; */
     padding: 0px 0px;
     overflow-y: hidden;
     height: fit-content;
   }
 
-  .car,.bike {
+  /* .car,.bike {
     width: 20%;
     height: 20%; 
-  }
+  } */
 
   .row_two {
-    /* border: 5px solid red; */
-
-    /* width: 100%; */
     margin: 0;
   }
 
@@ -494,7 +452,6 @@
   }
 
   .column_contactus{
-    /* border: 5px solid red; */
     width: 100%;
     height: 80%;
     max-width: 100%;
@@ -535,5 +492,87 @@
 
   .copyright_text{
     font-size: 0.8rem;
+  }
+
+  .footer_logo_head {
+    font-size: 2em; 
+  }
+
+  .row_two {
+    grid-template-columns: 1fr; 
+    gap: 15px;
+  }
+
+  .footer-logo-text {
+    font-size: 13px;
+  }
+
+  .contact_form_btn {
+    font-size: 12px;
+    padding: 8px; 
+  }
+
+  #social_list {
+    font-size: 20px;
+    width: 35px;
+    height: 35px;
+  }
+
+  /* .car, .bike {
+    width: 15%;  
+    height: 15%;
+  } */
+}
+
+
+@media (min-width:768px){
+  .top_header_div {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+  }
+
+  .column_footer {
+    padding-top: 2%;
+  }
+
+  .footer-logo-text {
+    text-align: left;
+  }
+
+  .footer-social-icon {
+    border:none;
+}
+
+  .social_icon {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 4.5rem;
+    margin-top: 1.5rem;
+  }
+
+  #social_list {
+    font-size: 1.5rem;
+    width: 2.5rem;
+    height: 2.5rem;
+  }
+
+  .footer_contactUs_heading {
+    font-size: 1.2rem;
+  }
+
+  .your_email {
+    padding: 0.3rem 0.4rem;
+    font-size: 1rem;
+  }
+
+  .your_email:focus {
+    padding: 0.3rem 0.4rem;
+    font-size: 1rem;
+  }
+
+  .contact_text_email {
+    width: 100%;
+    height:15rem;
+    border: none;
   }
 }
