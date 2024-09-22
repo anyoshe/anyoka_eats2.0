@@ -1286,6 +1286,7 @@ animation: hoverShake 0.15s linear 3;
 
     .offersSection {
         width: 100%;
+        padding: 2px 0.2rem;
     }
 
     .title-offerSearch {
@@ -1317,9 +1318,21 @@ animation: hoverShake 0.15s linear 3;
     }
 
     .offerDisplay {
+        /* border: 5px solid red; */
+
         grid-template-columns: repeat(4, 1fr);
         flex-wrap: nowrap;
         column-gap: 5px;
+        /* align-items: center; */
+    }
+
+    .featuredSection {
+        width: 100%;
+        padding: 2px 0.2rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-direction: column;
     }
 
     .FeaturedHeading {
@@ -1331,6 +1344,13 @@ animation: hoverShake 0.15s linear 3;
         grid-template-columns: repeat(4, 1fr);
         column-gap: 5px;
         row-gap: 20px;
+    }
+
+    .DishCards {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        justify-content: center;
+        gap: 15px;
     }
 
     .join_team_section {
@@ -1346,7 +1366,16 @@ animation: hoverShake 0.15s linear 3;
         /* border: 1px solid red; */
 
         gap: 10px;
-        width: 100%;
+        width: 85%;
+    }
+
+    .join_team_image_div {
+        width: 250px;
+        height: 250px;
+    }
+    .join_img {
+        width: 250px;
+        height: 250px;
     }
 
     .about_us_section {

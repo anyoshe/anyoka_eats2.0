@@ -211,7 +211,7 @@
   .dish-card {
     /* border: 5px solid red; */
 
-    width: 210px;
+    width: 185px;
     height: auto;
   }
 
@@ -220,14 +220,24 @@
   }
 
   .dishName {
-    font-size: 0.9rem;
+    font-size: 0.8rem;
     margin-bottom: 0rem;
+    padding: 5px 0px;
   }
 
   .original-price-offer {
     margin-bottom: 0px;
     padding: 0px;
-    font-size: 1rem
+    font-size: 0.8rem
+  }
+
+  .diagonal-strikethrough {
+    font-size: 0.9rem;
+    font-weight: bold;
+  }
+
+  .diagonal-strikethrough::before {
+    color: red;
   }
 
   .dishPrice {
@@ -235,12 +245,12 @@
   }
 
   .dishRestaurant {
-    font-size: 14px;
+    font-size: 5px;
     padding: 2px 0px;
   }
 
   .dishAddToCart {
-    padding: 8px 18px;
+    padding: 8px ;
   }
 
   .rating .star {
@@ -251,6 +261,10 @@
     top: -10%;
     right: 0%;
     padding: 4px 2px;
+  }
+
+  .average {
+    font-size: 0.9rem;
   }
 }
 
