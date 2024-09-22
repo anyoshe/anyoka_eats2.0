@@ -209,16 +209,35 @@
 /* Tablets (portrait and landscape) */
 @media (max-width: 1199px) and (min-width: 768px) {
   .dish-card {
-    width: 260px;
+    /* border: 5px solid red; */
+
+    width: 185px;
     height: auto;
   }
 
   .dish-image {
-    height: 220px;
+    height: 150px;
   }
 
   .dishName {
-    font-size: 18px;
+    font-size: 0.8rem;
+    margin-bottom: 0rem;
+    padding: 5px 0px;
+  }
+
+  .original-price-offer {
+    margin-bottom: 0px;
+    padding: 0px;
+    font-size: 0.8rem
+  }
+
+  .diagonal-strikethrough {
+    font-size: 0.9rem;
+    font-weight: bold;
+  }
+
+  .diagonal-strikethrough::before {
+    color: red;
   }
 
   .dishPrice {
@@ -226,11 +245,12 @@
   }
 
   .dishRestaurant {
-    font-size: 14px;
+    font-size: 5px;
+    padding: 2px 0px;
   }
 
   .dishAddToCart {
-    padding: 8px 18px;
+    padding: 8px ;
   }
 
   .rating .star {
@@ -240,7 +260,11 @@
   .discounted-price-circle {
     top: -10%;
     right: 0%;
-    padding: 4px 5px;
+    padding: 4px 2px;
+  }
+
+  .average {
+    font-size: 0.9rem;
   }
 }
 

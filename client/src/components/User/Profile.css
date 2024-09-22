@@ -21,6 +21,8 @@
     font-family: 'Poppins',sans-serif;
 }
 
+
+
 .account_section{
     display: flex;
     align-items: center;
@@ -57,6 +59,22 @@
     /* border: 1px solid green; */
 
     background: rgba(128, 128, 128, 0.118);
+}
+
+.orderButtons{
+    color: white;
+    background: var(--green);
+    margin-right: 0.3rem;
+    padding: 0.2rem 0.4rem;
+    cursor: pointer;
+    transition: ease-in .2s;
+    border: 1px solid var(--green);
+}
+
+.orderButtons:hover{
+    color: var(--orange);
+    background: white;
+    border: 1px solid var(--orange);
 }
 
 #profileImageInput{
@@ -511,9 +529,10 @@
 }
 
 .menu_table{
-    border: 5px solid red;
+    /* border: 5px solid red; */
 
     height: 100%;
+    width: 100%;
     display: flex;
     justify-content: center;
 }
@@ -527,7 +546,7 @@
 
 /* DIV HOLDING THE ICONS IN TABLE */
 .iconHeader{ 
-    border: 5px solid green;
+    /* border: 5px solid green; */
 
     background-color: var(--orange); 
     padding: 20px 10px;
@@ -587,7 +606,7 @@
     font-size: 0.8rem;
     padding: 0.3rem 0.4rem;
     text-align: center;
-    margin-right: 0.2rem;
+    margin-right: 0.9rem;
     background: var(--green);
     border: none;
     color: white;
@@ -782,7 +801,7 @@
 
 /* FORM HOLDING INPUT FIELDS TO FILL THE TABLE */
 #chart_datas{ 
-    /* border: 1px solid green; */
+    /* border: 5px solid green; */
 
     width: 100%;
     height: fit-content;
@@ -792,12 +811,17 @@
 }
 
 .input_wrp{
-    /* border: 1px solid red; */
+    /* border: 5px solid red; */
 
     display: grid;
     grid-template-columns: repeat( 7, 1fr);
     gap: 5px;
     height: 1.8rem;
+}
+
+#map99{
+    width: '100%';
+    height: '400px';
 }
 
 .headerInputs{ 
@@ -1106,24 +1130,81 @@
     width: 100%;
 }
 
+.button-group{
+    margin-bottom: 0.5rem;
+}
+
+.orderCurrierDiv{
+    /* border: 5px solid green; */
+    width: 100%;
+}
+
+
+
+
+
+.tablesSalesDiv{
+    /* border: 5px solid red; */
+
+    width: 100%;
+    min-height: 100vh;
+}
+
+.button-group{
+    /* border: 5px solid green; */
+
+    width: inherit;
+}
+
+.tablesSalesBtn{
+    border: 1px solid var(--green);
+    background: var(--green);
+    color: white;
+    padding: 0.3rem 0.4rem;
+    margin-right: 0.8rem;
+    transition: ease-in .2s;
+}
+
+.tablesSalesBtn:hover,.tablesSalesBtn:focus{
+    border: 1px solid var(--orange);
+    background: white;
+    color: var(--orange);
+}
+
+.content{
+    /* border: 5px solid blue;  */
+
+    width: inherit;
+    height: 93%;
+    display: flex;
+    flex-direction: column;
+    align-self: center;
+}
+
+.contenttabledivs{
+    /* border: 5px solid burlywood; */
+}
+
 @media(max-width:480px){
     .service_drop {
         position: absolute;
         min-width: 5rem;
         z-index: 5;
-        top: 2.8%;
-        left: 31%;
+        top: 110%;
+        left: 30%;
     }
 
     .service_drop_link {
-        padding: 0.1rem 0.7rem;
+        padding: 0.3rem 0.7rem;
 
         margin-bottom: 0.4px;
-        font-size: 0.7rem;
+        font-size: 0.8rem;
     }
 
     .profile_content{
         position: relative;
+        width: 100%;
+        padding: 0rem 0.2rem;
     }
 
     .coming_div {
@@ -1315,38 +1396,114 @@
     }
 
     .iconHeader {
-        border: 5px solid green;
+        /* border: 5px solid green; */
 
         width: 100%;
         padding: 0.9rem 0.3rem;
         display: grid;
-        justify-content: center;
+        justify-content: left;
+    }
+
+    .profile_section{
+        /* border: 5px solid green; */
+    
+        /* display: flex; */
+        align-items: start;
+        /* flex-direction: column; */
+        width: 100%;
+        /* padding: 20px 10px;
+        height: 100%;
+        z-index: 200; */
+        margin-top: 8%;
+    } 
+
+    .orderCurrierDiv{
+        /* border: 5px solid green; */
+        /* width: 100%; */
+    }
+
+    .orderButtonsDiv{
+        /* border: 5px solid red; */
+        display: grid;
+        grid-template-columns: 1fr 1fr 1fr;
+        gap: 0.2rem;
+    }
+
+    .orderButtons{
+        font-size: 0.9rem;
+        border:  1px solid var(--green);
+        background: var(--green);
+        color: white;
+        transition: ease-in .2s;
+    }
+
+    .orderButtons:focus{
+        color: var(--orange);
+        border: 1px solid var(--orange);
+        background: white;
+    }
+
+
+    .orderDispalyDiv{
+        /* border: 5px solid blue; */
+    }
+
+    .menu_table {
+        width: 100%;
     }
 
     .h2TableTitle {
-        border: 5px solid red;
+        /* border: 5px solid red; */
 
         font-size: 1rem;
+        margin-bottom: 0rem;
+    }
+
+    #map99{
+        width: '100%'
     }
 
     .addRestaurantButton {
-        padding: 0.2rem 0.7rem;
-        font-size: 0.7rem;
+        padding: 0.3rem 0.8rem;
+        font-size: 0.8rem;
         margin-bottom: 1%;
-        margin-top: 0%;
+        margin-top: 15%;
     }
 
     .vendorLocation {
         font-size: 0.7rem;
     }
 
+    
+    .forgotten{
+        /* border: 5px solid red; */
+
+        width: 95vw;
+        margin-top: 10%;
+    }
+
+    .locationtableEdit {
+        width: 25rem;
+    }
+
+    .tableEditLabels{
+        /* border: 1px solid red; */
+    
+        margin-left: 0rem;
+        text-align: left;
+    }
+
+    /* .tableBestIn{
+        margin-left: 0.5rem;
+    } */
+
     .func_icons {
-        font-size: 0.5rem;
+        font-size: 1.2rem;
         padding: 0.2rem 0.3rem;
     }
 
     .restaurantSelection{
-        font-size: 0.7rem;
+        font-size: 0.8rem;
     }
 
     .choose_select{
@@ -1368,5 +1525,167 @@
         font-size: 0.8rem;
         padding: 0.1rem 0.4rem;
         height: 1.5rem;
+    }
+
+    #chart_datas {
+        /* border: 5px solid blue; */
+
+        width: 100%;
+        height: fit-content;
+        position: relative;
+        padding: 0rem;
+        margin-top: 0.1%;
+        margin-bottom: 0.5rem;
+    }
+
+    .input_wrp {
+        /* border: 1px solid red; */
+        
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 0.5rem;
+        height: fit-content;
+        padding-left: 0.3rem;
+    }
+
+    .column{
+        /* border: 1px solid red; */
+        width: 100%;
+    }
+
+    .addRowBtn {
+        width: auto;
+        position: absolute;
+        left: 95%;
+        font-size: 1.2rem;
+        background-color: var(--green);
+        padding: 0.1rem .2rem;
+        border-radius: 0%;
+        top: 15%;
+        left: 93%;
+    }
+
+    .form_file{
+        font-size: 0.6rem;
+    }
+
+    .column label {
+        font-size: 0.8rem;
+        font-weight: 400;
+        text-align: left;
+    }
+
+    .headerInputs{
+        width: 95%;
+        padding: 0rem 0.2rem;
+    }
+
+    .small-1-input {
+        width: 70%;
+        border: none;
+        padding-left: 0px;
+    }
+
+    .headerInputs:hover, .headerInputs:focus {
+        outline: 1px solid var(--orange);
+        padding: 0rem 0.2rem;
+    }
+
+    #headerTableRows{
+        display: none;
+    }
+
+    .addShopButton {
+        font-size: 0.8rem;
+    }
+
+
+    /* From Here */
+    /* .tableRows {
+        border: 4px solid red;
+
+        width: 100%;
+        display: grid;
+        grid-template-columns: 1fr 0.5fr 1fr 0.5fr 0.4fr 1fr 0.3fr;
+        margin-top: 0.1rem;
+        margin-bottom: 0.1rem;
+    } */
+
+    .foodTableRow{
+        display: none;
+    }
+
+    .dishDiv {
+        /* border: 1px solid green; */
+
+        text-align: center;
+        width: 100%;
+        font-size: 0.6rem;
+        position: relative;
+        padding: 0.1rem;
+    }
+
+    .dishImagePartner {
+        width: 60px;
+        height: auto;
+    }
+
+    img {
+        max-width: 100%;
+        height: auto;
+    }
+/* ################################################# */
+    /* THIS STYLES FOR THE EDIT AND DELETE BUTTON */
+    /* .dishdiv_button {
+        display: none;
+    } */
+
+    /* .dishdiv_button:focus {
+        border: 1px solid green;
+
+        position: absolute;
+        display: flex;
+        flex-direction: row;
+        justify-content: space-between;
+        align-items: center;
+        width: 3.5rem;
+        left: 85%;
+    } */
+
+    /* ############################################ */
+
+    .dishdiv_button {
+        /* border: 1px solid green; */
+
+        position: absolute;
+        display: flex;
+        flex-direction: row;
+        justify-content: space-between;
+        align-items: center;
+        width: 3.5rem;
+        left: 85%;
+    }
+
+    #tableEditButton{
+        padding: 0.1rem 0.2rem;
+        font-size: 0.9rem;
+        right: 0%;
+    }
+
+    #tableSaveButton{
+        font-size: 0.7rem;
+        margin-right: 0.2rem;
+    }
+
+    .deleteButton {
+        padding: 0.1rem 0.2rem;
+        font-size: 0.9rem;
+    }
+
+    .tablesSalesBtn {
+        padding: 0.2rem 0.3rem;
+        font-size: 0.8rem;
+        margin-right: 0.8rem;
+        transition: ease-in .2s;
     }
 }

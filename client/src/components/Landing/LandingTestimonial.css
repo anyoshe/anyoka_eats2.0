@@ -198,12 +198,12 @@
   }
 
   .slider {
-    flex-direction: column;
+    flex-direction: row;
     gap: 15px;
   }
 
   .slide-box {
-    width: 80%;
+    width: 50%;
     height: auto;
     padding: 15px;
   }
@@ -219,7 +219,7 @@
 }
 
 /* For Laptops and Tablets (Landscape) */
-@media only screen and (min-width: 769px) and (max-width: 1024px) {
+@media only screen and (min-width: 768px) and (max-width: 1024px) {
   .testimonials {
     padding: 2rem 0px;
   }
@@ -243,11 +243,16 @@
 
   .slider {
     flex-direction: row;
-    gap: 20px;
   }
 
   .slide-box {
-    width: 70%;
+    width: 50%;
+    margin-right: 0.2rem;
+  }
+
+  .comment {
+    height: 100%;
+    width: 15rem;
   }
 
   .slide-box img {
@@ -304,7 +309,7 @@
 
 @media (max-width: 480px) {
   .testimonials{
-    border: 1px solid red;
+    /* border: 1px solid red; */
 
     padding: 0px 0px;
   }

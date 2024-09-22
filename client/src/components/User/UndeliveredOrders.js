@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import config from '../../config';
+import './Profile.css';
 
 const UndeliveredOrders = ({ partner }) => {
   const [orders, setOrders] = useState([]);
@@ -93,28 +94,70 @@ const UndeliveredOrders = ({ partner }) => {
     const nextStatus = statusOrder[currentIndex + 1];
 
     return nextStatus ? (
-      <button onClick={() => updateOrderStatus(orderId, nextStatus)}>Mark as {nextStatus}</button>
+      <button className='statusbutn' onClick={() => updateOrderStatus(orderId, nextStatus)}>Mark as {nextStatus}</button>
     ) : null;
   };
 
   const createOrderElement = (order) => (
     <div key={order.orderId} className="orderDetails">
-      <p>Order ID: {order.orderId}</p>
-      <p>Customer Name: {order.customerName}</p>
-      <p>Phone Number: {order.phoneNumber}</p>
-      <p>Dish Category: {order.selectedCategory}</p>
-      <p>Location: {order.customerLocation}</p>
-      <p>Expected Delivery Time: {order.expectedDeliveryTime}</p>
-      <p>Dishes Ordered:</p>
+      <p>
+        <span className='detailsTitles'>Order ID: </span> 
+        {order.orderId}
+      </p>
+
+      <p>
+        {/* <span className='detailsTitles'>Customer Name: </span>  */}
+        <span className='detailsTitles'>Name: </span>
+        {order.customerName}
+      </p>
+
+      <p>
+        {/* <span className='detailsTitles'>Phone Number: </span>  */}
+        <span className='detailsTitles'>Number: </span> 
+        {order.phoneNumber}
+      </p>
+
+      {/* <p>Dish Category: {order.selectedCategory}</p> */}
+
+      <p>
+        <span className='detailsTitles'>Location: </span>
+        {order.customerLocation}
+      </p>
+
+      <p>
+        {/* <span className='detailsTitles'>Expected Delivery Time: </span>  */}
+        <span className='detailsTitles'>Expected Time: </span> 
+        {order.expectedDeliveryTime}
+      </p>
+
+      <p>
+        {/* <span className='detailsTitles'>Dishes Ordered: </span> */}
+        <span className='detailsTitles'>Orders: </span>
+      </p>
+
       <ul>
         {order.dishes.map((dish) => (
           <li key={dish.dishName}>{dish.dishName} - Quantity: {dish.quantity}</li>
         ))}
       </ul>
-      <p>Total Price: Kes.{order.totalPrice}.00</p>
-      <p>Created At: {new Date(order.createdAt).toLocaleString()}</p>
-      <p>Status: <span className="order-status">{order.status || 'undefined'}</span></p>
-      {getStatusButtons(order.status, order.orderId)}
+
+      <p>
+        {/* <span className='detailsTitles'>Total Price: Kes.</span> */}
+        <span className='detailsTitles'>Total: Kes.</span>
+        {order.totalPrice}.00
+      </p>
+
+      <p>
+        <span className='detailsTitles'>Created At:</span> 
+      {new Date(order.createdAt).toLocaleString()}
+      </p>
+
+      <p>
+        <span className='detailsTitles'>Status:</span> 
+        <span className="order-status">{order.status || 'undefined'}</span>
+      </p>
+
+      {getStatusButtons(order.status, order.orderId )}
     </div>
   );
 
@@ -131,27 +174,33 @@ const UndeliveredOrders = ({ partner }) => {
     <div className="dayOrders">
       <div id="ordersList">
         {Object.keys(groupedOrders).map((restaurant) => (
-          <div key={restaurant} id={`${restaurant}-section`}>
-            <h2>{restaurant}</h2>
-            <hr />
-            <ul id={`orders-${restaurant}`}>
+          <div key={restaurant} id={`${restaurant}-section`} className='orderh2Divs'>
+
+            <h2 className='orderh2title'>{restaurant}</h2>
+
+            <hr className='orderhr' />
+
+            <ul id={`orders-${restaurant}`} className='unorderdOrderList'>
               {groupedOrders[restaurant].map((order) => createOrderElement(order))}
             </ul>
           </div>
         ))}
       </div>
+
       <div id="worthSummary">
-        <p>Expected Sales: Kes. <span id="totalSalesExpected">{expectedSales.toFixed(2)}</span></p>
-        <p>Expected Commission: Kes. <span id="commissionExpected">{expectedCommission.toFixed(2)}</span></p><br />
+        <p>Expected Sales:<span id="totalSalesExpected" className='downtotals'>Ksh.{expectedSales.toFixed(2)}</span></p>
+        <p>Expected Commission:<span id="commissionExpected" className='downtotals'>Ksh.{expectedCommission.toFixed(2)}</span></p><br />
       </div>
+
       <div id="sales">
-        <div id="salesList"></div>
+        {/* <div id="salesList"></div> */}
         <div id="salesTotal">
-          <p>Total Sales: Kes. <span id="totalSales">{totalSales.toFixed(2)}</span></p>
-          <p>Commission Due: Kes. <span id="commissionDue">{commissionDue.toFixed(2)}</span></p>
-          <p>Total Deliveries Made: <span id="totalDeliveries">{totalDeliveries}</span></p>
+          <p>Total Sales:<span id="totalSales">Ksh.{totalSales.toFixed(2)}</span></p>
+          <p>Commission Due:<span id="commissionDue">Ksh.{commissionDue.toFixed(2)}</span></p>
+          <p>Total Deliveries Made:<span id="totalDeliveries">Ksh.{totalDeliveries}</span></p>
         </div>
       </div>
+
     </div>
   );
 };

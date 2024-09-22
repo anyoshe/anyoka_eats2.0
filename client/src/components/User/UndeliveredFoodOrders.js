@@ -93,28 +93,42 @@ const UndeliveredFoodOrders = ({ partner }) => {
     const nextStatus = statusFoodOrder[currentIndex + 1];
 
     return nextStatus ? (
-      <button onClick={() => updateFoodOrderStatus(orderId, nextStatus)}>Mark as {nextStatus}</button>
+      <button  className='statusbutn' onClick={() => updateFoodOrderStatus(orderId, nextStatus)}>Mark as {nextStatus}</button>
     ) : null;
   };
 
   const createFoodOrderElement = (foodOrder) => (
-    <div key={foodOrder.orderId} className="orderDetails">
-      <p>Order ID: {foodOrder.orderId}</p>
-      <p>Customer Name: {foodOrder.customerName}</p>
-      <p>Phone Number: {foodOrder.phoneNumber}</p>
-      <p>Food Category: {foodOrder.selectedCategory}</p>
-      <p>Location: {foodOrder.customerLocation}</p>
-      <p>Expected Delivery Time: {foodOrder.expectedDeliveryTime}</p>
-      <p>Foods Ordered:</p>
+    <div key={foodOrder.orderId} className="orderDetails">     
+      <p><span className='detailsTitles'>Order ID: </span> {foodOrder.orderId}</p>
+
+      <p><span className='detailsTitles'>Name: </span>{foodOrder.customerName}</p>
+
+      <p><span className='detailsTitles'>Number: </span>{foodOrder.phoneNumber}</p>
+
+      <span className='detailsTitles'>Expected Delivery Time: </span>
+
+      {/* <p>Food Category: {foodOrder.selectedCategory}</p> */}
+
+      <p><span className='detailsTitles'>Location: </span> {foodOrder.customerLocation}</p>
+
+      <p><span className='detailsTitles'>Expected Delivery Time: </span> {foodOrder.expectedDeliveryTime}</p>
+
+      <p><span className='detailsTitles'>Foods Ordered: </span></p>
+
       <ul>
         {foodOrder.foods.map((food) => (
           <li key={food.foodName}>{food.foodName} - Quantity: {food.quantity}</li>
         ))}
       </ul>
-      <p>Delivery Charges: Kes.{foodOrder.deliveryCharges}.00</p>
-      <p>Total Price: Kes.{foodOrder.totalPrice}.00</p>
-      <p>Created At: {new Date(foodOrder.createdAt).toLocaleString()}</p>
-      <p>Status: <span className="order-status">{foodOrder.status || 'undefined'}</span></p>
+
+      <p><span className='detailsTitles'>Delivery Charges: Kes.</span>{foodOrder.deliveryCharges}.00</p>
+
+      <p><span className='detailsTitles'>Total Price: Kes.</span>{foodOrder.totalPrice}.00</p>
+
+      <p><span className='detailsTitles'>Created At:</span>{new Date(foodOrder.createdAt).toLocaleString()}</p>
+
+      <p><span className='detailsTitles'>Status: </span><span className="order-status">{foodOrder.status || 'undefined'}</span></p>
+
       {getStatusButtons(foodOrder.status, foodOrder.orderId)}
     </div>
   );
@@ -133,26 +147,37 @@ const UndeliveredFoodOrders = ({ partner }) => {
       <div id="ordersList">
         {Object.keys(groupedFoodOrders).map((vendor) => (
           <div key={vendor} id={`${vendor}-section`}>
+
             <h2>{vendor}</h2>
-            <hr />
+
+            <hr className='orderhr' />
+
             <ul id={`orders-${vendor}`}>
               {groupedFoodOrders[vendor].map((foodOrder) => createFoodOrderElement(foodOrder))}
             </ul>
+
           </div>
         ))}
       </div>
+
       <div id="worthSummary">
-        <p>Expected Sales: Kes. <span id="totalSalesExpected">{expectedSales.toFixed(2)}</span></p>
-        <p>Expected Commission: Kes. <span id="commissionExpected">{expectedCommission.toFixed(2)}</span></p><br />
+
+        <p>Expected Sales: <span id="totalSalesExpected" className='downtotals'> Ksh.{expectedSales.toFixed(2)}</span></p>
+
+        <p>Expected Commission: <span id="commissionExpected" className='downtotals'>Ksh.{expectedCommission.toFixed(2)}</span></p><br />
+
       </div>
+
       <div id="sales">
-        <div id="salesList"></div>
+        {/* <div id="salesList"></div> */}
+
         <div id="salesTotal">
           <p>Total Sales: Kes. <span id="totalSales">{totalSales.toFixed(2)}</span></p>
           <p>Commission Due: Kes. <span id="commissionDue">{commissionDue.toFixed(2)}</span></p>
           <p>Total Deliveries Made: <span id="totalDeliveries">{totalDeliveries}</span></p>
         </div>
       </div>
+
     </div>
   );
 };

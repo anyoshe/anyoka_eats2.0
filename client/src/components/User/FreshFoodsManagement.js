@@ -782,7 +782,7 @@ const FreshFoodsManagement = ({ partner }) => {
 
         {/* TABLE DISPLAY AREA */}
 
-        <div className="tableRows">
+        <div className="tableRows foodTableRow">
           <div className="headerDiv">Picture</div>
           <div className="headerDiv">Food Code</div>
           <div className="headerDiv">Name</div>

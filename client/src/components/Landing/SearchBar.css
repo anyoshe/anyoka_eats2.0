@@ -259,6 +259,7 @@
   .search__input{
     padding: 0.5rem 1rem;
     text-align: center;
+    width: 400px;
   }
 
 .search__input:hover,
