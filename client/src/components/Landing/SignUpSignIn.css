@@ -19,7 +19,7 @@
 }
 
 .authForm{
-  border: 5px solid black;
+  /* border: 5px solid black; */
 
   background: #f6f5f7;
   place-content: center; 
@@ -573,4 +573,78 @@ btnScaled {
     left: 50%; 
     transform: translateX(-50%);
   } */
+}
+
+@media only screen and (min-width: 768px) and (max-width: 1024px) {
+
+  .authForm {
+    border: none;
+    padding: 0.7rem 0.3rem;
+  }
+
+  .square {
+    height: 25%;
+    top: -5%;
+    left: 55%;
+  }
+
+  .container {
+    width: 100%;
+    height: 90%;
+    background-color: #FFF;
+  }
+
+  .form-container {
+    /* border:5px solid red; */
+
+    width: 60%;
+    height: 100%;
+    padding: 0px;
+  }
+
+  form {
+    padding: 0px 45px;
+  }
+
+  .createAccount{
+    margin-bottom: 0rem;
+    /* font-size: 1.5rem; */
+  }
+
+  .social-container {
+    /* margin: 8px 0px; */
+  }
+
+  .infield {
+    margin: 5px 0px;
+    width: 105%;
+  } 
+
+  .input-sign {
+    width: 100%;
+    padding: 10px 0.3rem;
+    font-size: 0.9rem;
+    border-radius: 0px;
+  } 
+
+  .overlay-container {
+    width: 40%;
+  }
+
+  .overlay-right {
+    right: 0;
+    transform: translateX(0%);
+    width: 300px;
+    padding: 0px 30px;
+  } 
+
+  .overlay-left {
+    width: 300px;
+    padding: 0px 30px;
+  }
+
+  .forgot {
+    margin-top: 1rem;
+    font-size: 0.7rem;
+  }
 }

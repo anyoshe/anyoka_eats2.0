@@ -29,11 +29,11 @@ const PaymentOptionsModal = ({ show, handleClose, handlePayment }) => {
           </div>
           <div className="modal-body">
             <h6>Select your preferred payment method</h6>
-            <button type="button" className="btn btn-success m-2" onClick={() => handlePayment('mpesa')}>Mpesa</button>
-            <button type="button" className="btn btn-primary m-2" onClick={() => handlePayment('visa')}>Visa Card</button>
+            <button type="button" className="optionPay" onClick={() => handlePayment('mpesa')}>Mpesa</button>
+            <button type="button" className="optionPay" onClick={() => handlePayment('visa')}>Visa Card</button>
           </div>
           <div className="modal-footer">
-            <button type="button" className="btn btn-secondary" onClick={handleClose}>Close</button>
+            <button type="button" className="optionPay" onClick={handleClose}>Close</button>
           </div>
         </div>
       </div>
@@ -241,7 +241,7 @@ const OrderSummaryModal = ({ show, handleClose, restaurantName, orderedDishes = 
         const data = await response.json(); 
         console.log('Order saved successfully:', data);
         alert('Order recieved successfully! Your order will be processed and dispatched as soon as possible.');
-       
+      
       } else {
         const error = await response.json();
         console.error('Error saving order:', error);
