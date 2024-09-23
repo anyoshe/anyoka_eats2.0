@@ -57,14 +57,23 @@ const FoodCart = () => {
               <ul id="cartItems">
                 {state.items.map((item, index) => (
                   <li key={index} className="d-flex justify-content-between align-items-center">
-                    <span className='itemDishName'> <span className='DishDetailSpan'>{item.foodName}</span>
-                    <span className='DishDetailSpan'>Kes.{(item.price * item.quantity)}</span>
+
+                    <span className='itemDishName detailDishName'> 
+                      <span className='DishDetailSpan'>{item.foodName}</span>
+
+                      <span className='DishDetailSpan'>Kes.{(item.price * item.quantity)}</span>
                     </span>
+
                     <div className="d-flex align-items-center">
-                      <button className="btn btn-outline-secondary btn-sm me-2 minus-plus minus" onClick={() => handleDecreaseQuantity(item.foodCode)}>-</button>
+                      {/* <button className="btn btn-outline-secondary btn-sm me-2 minus-plus minus valueControllers" onClick={() => handleDecreaseQuantity(item.foodCode)}>-</button> */}
+                      <button className="btn-outline-secondary btn-sm me-2 minus-plus minus valueControllers" onClick={() => handleDecreaseQuantity(item.foodCode)}>-</button>
+
                       <span  className='menuDishQuantity'>{item.quantity}</span>
-                      <button className="btn btn-outline-secondary btn-sm ms-2 minus-plus plus" onClick={() => handleIncreaseQuantity(item.foodCode)}>+</button>
-                      <button className="btn btn-danger btn-sm ms-2 menuDelete" onClick={() => handleRemoveFromCart(item.foodCode)}>Delete</button>
+                      
+                      {/* <button className="btn btn-outline-secondary btn-sm ms-2 minus-plus plus valueControllers" onClick={() => handleIncreaseQuantity(item.foodCode)}>+</button> */}
+                      <button className="btn-outline-secondary btn-sm ms-2 minus-plus plus  valueControllers" onClick={() => handleIncreaseQuantity(item.foodCode)}>+</button>
+
+                      <button className="btn-danger btn-sm ms-2 menuDelete" onClick={() => handleRemoveFromCart(item.foodCode)}>Delete</button>
                     </div>
                   </li>
                 ))}

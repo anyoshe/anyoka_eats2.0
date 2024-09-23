@@ -8,7 +8,7 @@
 }
 
 #fresh_cart{
-   transition: ease-in .2s;
+    transition: ease-in .2s;
 }
 
 #fresh_cart:hover{

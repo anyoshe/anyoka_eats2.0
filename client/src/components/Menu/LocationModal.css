@@ -74,4 +74,21 @@
     outline: 1px solid orange;
 }
 
+.landingCancel{
+    color: white;
+    background: var(--green);
+    border: none;
+    padding: 0.5rem 1rem;
+    transition: ease-in .2
+}
+
+@media (max-width:480px) {
+    .InputBtn {
+        width: 100%;
+    }
+
+    #customerLocation {
+        width: 100%;
+    }
+}
 

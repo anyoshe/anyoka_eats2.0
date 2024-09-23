@@ -1009,13 +1009,15 @@ animation: hoverShake 0.15s linear 3;
 
     .title-offerSearch{
         margin-bottom: 0;
-        text-align: center;
         padding: 0;
+        padding-left: 1rem;
+        text-align: left;
     }
 
     .offerTitle{
         font-size: 1.1rem;
         font-weight: 700;
+        text-transform: uppercase;
     }
 
     .category-dispaly{
@@ -1084,12 +1086,13 @@ animation: hoverShake 0.15s linear 3;
 
     .FeaturedDiv{
         margin-top: 1%;
-        text-align: center;
+        /* text-align: center; */
     }
 
     .FeaturedHeading{
         font-size: 1.1rem;
         font-weight: 700;
+        margin-bottom: 1rem;
     }
 
     .DishCards{
@@ -1109,6 +1112,8 @@ animation: hoverShake 0.15s linear 3;
         gap: 5px;
         align-items: center;
         justify-content: center;
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
     }
 
     .join_team_section {
@@ -1244,6 +1249,10 @@ animation: hoverShake 0.15s linear 3;
 
     .services-serchBar {
         margin-top: 4%;
+    }
+
+    .search__input {
+        width: 550px;
     }
 
     .services {
