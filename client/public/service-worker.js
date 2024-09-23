@@ -101,91 +101,94 @@ const urlsToCache = [
 //     }
 //   });
 
-// Limit dynamic cache size
-const MAX_DYNAMIC_CACHE_ITEMS = 50;
-
 // Install event - cache static files
 self.addEventListener('install', (event) => {
-  event.waitUntil(
-    caches.open(CACHE_NAME).then((cache) => {
-      return cache.addAll(urlsToCache);
-    })
-  );
-});
-
-// Activate event - clear old caches and manage cache updates
-self.addEventListener('activate', (event) => {
-  const cacheWhitelist = [CACHE_NAME, DYNAMIC_CACHE_NAME]; // Whitelist current cache names
-  event.waitUntil(
-    caches.keys().then((cacheNames) => {
-      return Promise.all(
-        cacheNames.map((cacheName) => {
-          if (!cacheWhitelist.includes(cacheName)) {
-            return caches.delete(cacheName); // Delete old caches
-          }
+    event.waitUntil(
+      caches.open(CACHE_NAME).then((cache) => {
+        return cache.addAll(urlsToCache).catch((error) => {
+          console.error('Caching failed:', error);
+        });
+      })
+    );
+  });
+  
+  // Activate event - clear old caches and manage cache updates
+  self.addEventListener('activate', (event) => {
+    const cacheWhitelist = [CACHE_NAME, DYNAMIC_CACHE_NAME]; // Whitelist current cache names
+    event.waitUntil(
+      caches.keys().then((cacheNames) => {
+        return Promise.all(
+          cacheNames.map((cacheName) => {
+            if (!cacheWhitelist.includes(cacheName)) {
+              return caches.delete(cacheName); // Delete old caches
+            }
+          })
+        );
+      })
+    );
+  });
+  
+  // Fetch event - cache dynamic content (API responses) and manage fallback
+  self.addEventListener('fetch', (event) => {
+    const requestUrl = new URL(event.request.url);
+  
+    // Handle navigation requests (e.g., HTML pages)
+    if (event.request.mode === 'navigate') {
+      event.respondWith(
+        caches.match(event.request).then((cachedResponse) => {
+          return cachedResponse || fetch(event.request).catch(() => caches.match('/offline.html')); // Fallback to offline.html
         })
       );
-    })
-  );
-});
-
-// Fetch event - cache dynamic content (API responses) and manage fallback
-self.addEventListener('fetch', (event) => {
-  const requestUrl = new URL(event.request.url);
-
-  // Handle navigation requests (e.g., HTML pages)
-  if (event.request.mode === 'navigate') {
-    event.respondWith(
-      caches.match(event.request).then((cachedResponse) => {
-        return cachedResponse || fetch(event.request).catch(() => caches.match('/offline.html')); // Fallback to offline.html
-      })
-    );
-  } 
-  // Cache API requests (like fetching products)
-  else if (requestUrl.pathname.startsWith('/api/')) {
-    event.respondWith(
-      caches.match(event.request).then((cachedResponse) => {
-        return cachedResponse || fetch(event.request).then((networkResponse) => {
-          return caches.open(DYNAMIC_CACHE_NAME).then((cache) => {
-            // Clone and store the response in cache
-            cache.put(event.request, networkResponse.clone());
-            // Limit the dynamic cache size
-            limitCacheSize(DYNAMIC_CACHE_NAME, MAX_DYNAMIC_CACHE_ITEMS);
-            return networkResponse;
-          });
-        });
-      })
-    );
-  } 
-  // For other assets (CSS, JS, images)
-  else {
-    event.respondWith(
-      caches.match(event.request).then((cachedResponse) => {
-        return cachedResponse || fetch(event.request).then((networkResponse) => {
-          if (!networkResponse || networkResponse.status !== 200 || networkResponse.type !== 'basic') {
-            return networkResponse;
+    } 
+    // Cache API requests (like fetching products)
+    else if (requestUrl.pathname.startsWith('/api/')) {
+      event.respondWith(
+        caches.match(event.request).then((cachedResponse) => {
+          if (cachedResponse) {
+            return cachedResponse; // Serve cached response if available
           }
-
-          // Clone the response so we can cache it
-          const responseToCache = networkResponse.clone();
-          caches.open(CACHE_NAME).then((cache) => {
-            cache.put(event.request, responseToCache);
+          return fetch(event.request).then((networkResponse) => {
+            return caches.open(DYNAMIC_CACHE_NAME).then((cache) => {
+              cache.put(event.request, networkResponse.clone());
+              limitCacheSize(DYNAMIC_CACHE_NAME, 50); // Limit dynamic cache size
+              return networkResponse;
+            });
+          }).catch(() => {
+            // If the fetch fails, serve the offline page
+            return caches.match('/offline.html');
           });
-
-          return networkResponse;
-        });
-      })
-    );
-  }
-});
-
-// Function to limit the number of items in the dynamic cache
-function limitCacheSize(cacheName, maxItems) {
-  caches.open(cacheName).then((cache) => {
-    cache.keys().then((keys) => {
-      if (keys.length > maxItems) {
-        cache.delete(keys[0]).then(() => limitCacheSize(cacheName, maxItems)); // Recursively delete oldest entries
-      }
-    });
+        })
+      );
+    } 
+    // For other assets (CSS, JS, images)
+    else {
+      event.respondWith(
+        caches.match(event.request).then((cachedResponse) => {
+          return cachedResponse || fetch(event.request).then((networkResponse) => {
+            if (!networkResponse || networkResponse.status !== 200 || networkResponse.type !== 'basic') {
+              return networkResponse;
+            }
+  
+            // Clone the response so we can cache it
+            const responseToCache = networkResponse.clone();
+            caches.open(CACHE_NAME).then((cache) => {
+              cache.put(event.request, responseToCache);
+            });
+  
+            return networkResponse;
+          });
+        })
+      );
+    }
   });
-}
+  
+  // Function to limit the number of items in the dynamic cache
+  function limitCacheSize(cacheName, maxItems) {
+    caches.open(cacheName).then((cache) => {
+      cache.keys().then((keys) => {
+        if (keys.length > maxItems) {
+          cache.delete(keys[0]).then(() => limitCacheSize(cacheName, maxItems)); // Recursively delete oldest entries
+        }
+      });
+    });
+  }
