@@ -59,7 +59,7 @@ app.use('/api', appRoutes);
 // File Uploads
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 // Serve static files from the "public" directory
-// app.use(express.static(path.join(__dirname, '../client/public')));
+app.use(express.static(path.join(__dirname, '../client/public')));
 
 // Serve static files from the 'public' directory
 app.use(express.static(path.join(__dirname, '../client/build')));
