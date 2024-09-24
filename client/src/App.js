@@ -13,9 +13,12 @@ import OutsideCateringLandingPage from './components/OutsideCatering/OutsideCate
 import UserProfileDashBoard from './components/User/UserProfileDashBoard';
 import { PartnerProvider } from './contexts/PartnerContext';
 import DishCategories from './components/Menu/DishCategories';
+import InstallPrompt from './components/Header/InstallPrompt';
 
 function App() {
     return (
+        
+       
         <Router>
             <PartnerProvider>
                 <CartProvider>
@@ -48,6 +51,7 @@ function App() {
                 </CartProvider>
             </PartnerProvider>
         </Router>
+        
     );
 }
 
