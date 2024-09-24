@@ -1,26 +1,23 @@
 /* global google */
 import React, { useEffect, useState } from 'react';
 import OrderSummaryModal from './FoodOrderSummaryModal';
+
+import { useFreshFoodCart } from './FreshFoodCartContext';
+
 const googleApiKey = process.env.REACT_APP_GOOGLE_API_KEY;
 
-// Update fallbackLocations to use vendor names as keys
-const fallbackLocations = {
-  "Old Market Malindi": { lat: -3.2191971243260338, lng: 40.12079213531878 },
-  "Vendor B": { lat: -3.222577, lng: 40.114147 },
-  "Vendor C": { lat: -3.210163, lng: 40.117003 },
-};
-
-const FoodLocationModal = ({ show, handleClose, vendorName, vendorLocation, orderedFoods = [] }) => {
+const FoodLocationModal = ({ show, handleClose, vendors = [], orderedFoods = [] }) => {
+  const { state, dispatch } = useFreshFoodCart();
   const [map, setMap] = useState(null);
   const [marker, setMarker] = useState(null);
   const [vendorCoords, setVendorCoords] = useState(null);
   const [pinnedLocation, setPinnedLocation] = useState(null);
   const [showOrderSummary, setShowOrderSummary] = useState(false);
-  const [manualInput, setManualInput] = useState('');
+
+  const fallbackVendorLocation = "1600 Amphitheatre Parkway, Mountain View, CA"; // Hardcoded fallback
 
   useEffect(() => {
     if (show) {
-      console.log('Showing FoodLocationModal. VendorLocation:', vendorLocation);
       const script = document.createElement('script');
       script.src = `https://maps.googleapis.com/maps/api/js?key=${googleApiKey}&callback=initMap&libraries=places`;
       script.async = true;
@@ -49,87 +46,23 @@ const FoodLocationModal = ({ show, handleClose, vendorName, vendorLocation, orde
 
         setMap(newMap);
 
-        const geocodeVendorLocation = () => {
-  
-          const geocoder = new google.maps.Geocoder();
-        
-          // Function to attempt geocoding the vendor name
-          function attemptGeocodeByVendorName() {
-            if (vendorName) {
-              // Try geocoding the vendor name if vendorLocation wasn't provided
-              geocoder.geocode({ address: vendorName }, (results, status) => {
-                if (status === 'OK' && results.length > 0) {
-                  const location = results[0].geometry.location;
-                  const newVendorCoords = { lat: location.lat(), lng: location.lng() };
-                  setVendorCoords(newVendorCoords);
-                  newMap.setCenter(newVendorCoords);
-                  new google.maps.Marker({
-                    map: newMap,
-                    position: newVendorCoords,
-                    label: 'Vendor',
-                  });
-                  console.log('Vendor coordinates set from vendorName:', newVendorCoords);
-                } else {
-                  console.error('Geocoding failed for vendorName. Status:', status);
-                  fallbackToHardcodedLocation();
-                }
-              });
-            } else {
-              // vendorName is not provided
-              fallbackToHardcodedLocation();
-            }
-          }
-        
-          // Function to handle fallback to hardcoded locations
-          function fallbackToHardcodedLocation() {
-            const fallbackLocation = fallbackLocations[vendorName];
-            if (fallbackLocation) {
-              setVendorCoords(fallbackLocation);
-              newMap.setCenter(fallbackLocation);
-              new google.maps.Marker({
-                map: newMap,
-                position: fallbackLocation,
-                label: 'Vendor',
-              });
-              console.log('Fallback coordinates set:', fallbackLocation);
-              alert(`Geocoding failed. Using fallback location for ${vendorName}.`);
-            } else {
-              console.error('No fallback location found for vendorName:', vendorName);
-              alert('Unable to locate vendor. Please use a different vendor.');
-            }
-          }
-        
-          // Check if vendorLocation is provided (in coordinates form)
+        if (vendors.length > 0) {
+          const lastVendor = vendors.length === 1 ? vendors[0] : vendors[vendors.length - 1];
+          console.log("Last Vendor:", lastVendor);
+
+          const vendorLocation = lastVendor.vendorLocation || null;
+
           if (vendorLocation) {
-            // Try geocoding the provided vendor location address
-            geocoder.geocode({ address: vendorLocation }, (results, status) => {
-              if (status === 'OK' && results.length > 0) {
-                const location = results[0].geometry.location;
-                const newVendorCoords = { lat: location.lat(), lng: location.lng() };
-                setVendorCoords(newVendorCoords);
-                newMap.setCenter(newVendorCoords);
-                new google.maps.Marker({
-                  map: newMap,
-                  position: newVendorCoords,
-                  label: 'Vendor',
-                });
-                console.log('Vendor coordinates set from vendorLocation:', newVendorCoords);
-              } else {
-                console.error('Geocoding failed for vendorLocation. Status:', status);
-                // If vendorLocation geocoding fails, fallback to next step
-                attemptGeocodeByVendorName();
-              }
-            });
+            geocodeAddress(vendorLocation, newMap);
           } else {
-            // vendorLocation not provided, try geocoding by vendorName
-            attemptGeocodeByVendorName();
+            // Try geocoding the vendor's name as a fallback
+            console.log("Vendor location missing, attempting to geocode vendor name:", lastVendor.vendor);
+            geocodeVendorName(lastVendor.vendor, newMap);
           }
-        };
-        
-        // Call geocodeVendorLocation
-        geocodeVendorLocation();
-        
-        
+        } else {
+          console.error('No vendors available.');
+          alert('No vendor information available.');
+        }
       };
 
       return () => {
@@ -138,7 +71,53 @@ const FoodLocationModal = ({ show, handleClose, vendorName, vendorLocation, orde
         setMarker(null);
       };
     }
-  }, [show, vendorLocation]);
+  }, [show, vendors]);
+
+  const geocodeAddress = (address, mapInstance) => {
+    const geocoder = new google.maps.Geocoder();
+    geocoder.geocode({ address }, (results, status) => {
+      if (status === 'OK' && results.length > 0) {
+        const location = results[0].geometry.location;
+        const newVendorCoords = { lat: location.lat(), lng: location.lng() };
+        console.log("Geocoded Address Coordinates:", newVendorCoords);
+        setVendorCoords(newVendorCoords);
+        mapInstance.setCenter(newVendorCoords);
+        new google.maps.Marker({
+          map: mapInstance,
+          position: newVendorCoords,
+          label: 'Vendor',
+        });
+      } else {
+        console.error('Geocoding failed for address. Status:', status);
+        alert('Unable to locate the vendor address. Attempting to use a fallback location.');
+        // Fallback to hardcoded location if geocoding fails
+        geocodeAddress(fallbackVendorLocation, mapInstance);
+      }
+    });
+  };
+
+  const geocodeVendorName = (vendorName, mapInstance) => {
+    const geocoder = new google.maps.Geocoder();
+    geocoder.geocode({ address: vendorName }, (results, status) => {
+      if (status === 'OK' && results.length > 0) {
+        const location = results[0].geometry.location;
+        const newVendorCoords = { lat: location.lat(), lng: location.lng() };
+        console.log("Geocoded Vendor Name Coordinates:", newVendorCoords);
+        setVendorCoords(newVendorCoords);
+        mapInstance.setCenter(newVendorCoords);
+        new google.maps.Marker({
+          map: mapInstance,
+          position: newVendorCoords,
+          label: 'Vendor',
+        });
+      } else {
+        console.error('Geocoding failed for vendor name. Status:', status);
+        alert('Unable to geocode the vendor name. Attempting to use a fallback location.');
+        // Fallback to hardcoded location if vendor name geocoding fails
+        geocodeAddress(fallbackVendorLocation, mapInstance);
+      }
+    });
+  };
 
   const updateCustomerLocation = async (latLng) => {
     const lat = latLng.lat();
@@ -149,45 +128,6 @@ const FoodLocationModal = ({ show, handleClose, vendorName, vendorLocation, orde
       setPinnedLocation({ lat, lng, address });
     } catch (error) {
       console.error('Error updating customer location:', error);
-    }
-  };
-
-  const handleInputChange = async (event) => {
-    setManualInput(event.target.value);
-    try {
-      const { lat, lng } = await getCoordinatesForAddress(event.target.value);
-      setPinnedLocation({ lat, lng, address: event.target.value });
-      map.setCenter({ lat, lng });
-      if (marker) {
-        marker.setPosition({ lat, lng });
-      } else {
-        const newMarker = new google.maps.Marker({
-          position: { lat, lng },
-          map: map,
-          draggable: true,
-        });
-        setMarker(newMarker);
-      }
-    } catch (error) {
-      console.error('Error setting pinned location:', error);
-    }
-  };
-
-  const getCoordinatesForAddress = async (address) => {
-    const url = `https://maps.googleapis.com/maps/api/geocode/json?address=${encodeURIComponent(address)}&key=${googleApiKey}`;
-    try {
-      const response = await fetch(url);
-      const data = await response.json();
-      if (data.status === 'OK' && data.results.length > 0) {
-        const location = data.results[0].geometry.location;
-        return { lat: location.lat, lng: location.lng };
-      } else {
-        console.error('No coordinates found for address:', address);
-        throw new Error('No coordinates found for the given address');
-      }
-    } catch (error) {
-      console.error('Error fetching coordinates for address:', error);
-      throw error;
     }
   };
 
@@ -204,16 +144,35 @@ const FoodLocationModal = ({ show, handleClose, vendorName, vendorLocation, orde
     });
   };
 
-  const handleOkClick = () => {
-    console.log('Vendor Coords:', vendorCoords);
-  console.log('Pinned Location:', pinnedLocation);
+  const handleOkClick = async () => {
+    console.log('Vendor Coordinates:', vendorCoords);
+    console.log('Pinned Location:', pinnedLocation);
     if (vendorCoords && pinnedLocation) {
-      console.log(vendorCoords, pinnedLocation);
+      const distance = await calculateDistance(vendorCoords, pinnedLocation);
+      console.log('Distance (in km):', distance);
       setShowOrderSummary(true);
     } else {
-      console.error('Both vendorCoords and pinnedLocation need to be set before proceeding.');
       alert('Please make sure both vendor and customer locations are set before proceeding.');
     }
+  };
+
+  const calculateDistance = (vendorCoords, pinnedLocation) => {
+    const service = new google.maps.DistanceMatrixService();
+    return new Promise((resolve, reject) => {
+      service.getDistanceMatrix({
+        origins: [new google.maps.LatLng(pinnedLocation.lat, pinnedLocation.lng)],
+        destinations: [new google.maps.LatLng(vendorCoords.lat, vendorCoords.lng)],
+        travelMode: 'DRIVING',
+      }, (response, status) => {
+        if (status === 'OK') {
+          const distanceInMeters = response.rows[0].elements[0].distance.value;
+          const distanceInKm = distanceInMeters / 1000;
+          resolve(distanceInKm);
+        } else {
+          reject('Error calculating distance: ' + status);
+        }
+      });
+    });
   };
 
   return (
@@ -226,37 +185,9 @@ const FoodLocationModal = ({ show, handleClose, vendorName, vendorLocation, orde
               <button type="button" className="btn-close" data-bs-dismiss="modal" aria-label="Close" onClick={handleClose}></button>
             </div>
             <div className="modal-body" style={{ maxHeight: 'calc(100vh - 210px)', overflowY: 'auto' }}>
-              <div><strong>Vendor Location:</strong> {vendorLocation}</div>
+              <div><strong>Vendor Location:</strong> {vendorCoords ? `${vendorCoords.lat}, ${vendorCoords.lng}` : 'Fetching...'}</div>
               <div id="mapContainer" style={{ height: '400px' }}></div>
               <input type="text" id="customerLocation" className="form-control mt-3" placeholder="Delivery Location" readOnly />
-              <button type="button" className="btn btn-primary mt-3" onClick={() => {
-                if (navigator.geolocation) {
-                  navigator.geolocation.getCurrentPosition(async (position) => {
-                    const { latitude, longitude } = position.coords;
-                    const address = await getReadableAddress(latitude, longitude);
-                    document.getElementById('customerLocation').value = address;
-                    setPinnedLocation({ lat: latitude, lng: longitude, address });
-                    map.setCenter({ lat: latitude, lng: longitude });
-                    if (marker) {
-                      marker.setPosition({ lat: latitude, lng: longitude });
-                    } else {
-                      const newMarker = new google.maps.Marker({
-                        position: { lat: latitude, lng: longitude },
-                        map: map,
-                        draggable: true,
-                      });
-                      setMarker(newMarker);
-                    }
-                  }, () => {
-                    alert('Please enable location services.');
-                  });
-                } else {
-                  alert('Your browser does not support geolocation.');
-                }
-              }}>
-                Use My Current Location
-              </button>
-              <input type="text" className="form-control mt-3" value={manualInput} onChange={handleInputChange} placeholder="Enter address manually" />
             </div>
             <div className="modal-footer">
               <button type="button" className="btn btn-secondary" data-bs-dismiss="modal" onClick={handleClose}>Close</button>
@@ -270,16 +201,16 @@ const FoodLocationModal = ({ show, handleClose, vendorName, vendorLocation, orde
         <OrderSummaryModal
           show={showOrderSummary}
           handleClose={() => setShowOrderSummary(false)}
-          vendorName={vendorName}
-          vendorLocation={vendorCoords}
-          pinnedLocation={pinnedLocation}
+          vendorName={vendors.length === 1 ? vendors[0]?.vendor : vendors[vendors.length - 1]?.vendor}
+          vendorLocation={vendorCoords} // This is correct, should pass vendorCoords
           orderedFoods={orderedFoods}
+          pinnedLocation={pinnedLocation}
+          totalDistanceBetweenVendors={state.totalDistance}
         />
       )}
+
     </>
   );
 };
 
 export default FoodLocationModal;
-
-

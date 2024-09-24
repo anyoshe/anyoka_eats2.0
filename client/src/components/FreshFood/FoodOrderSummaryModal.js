@@ -1,21 +1,33 @@
-import React, { useState } from 'react';
+/* global google */
+import React, { useState, useEffect } from 'react';
 import config from '../../config';
 import axios from 'axios';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap/dist/js/bootstrap.bundle.min';
 
-
 const googleApiKey = process.env.REACT_APP_GOOGLE_API_KEY;
-// Function to calculate distance
-const calculateDistance = (lat1, lon1, lat2, lon2) => { 
-  const R = 6371; // Radius of the Earth in km
-  const dLat = (lat2 - lat1) * Math.PI / 180;
-  const dLon = (lon2 - lon1) * Math.PI / 180;
-  const a =
-    0.5 - Math.cos(dLat) / 2 +
-    Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
-    (1 - Math.cos(dLon)) / 2;
-  return R * 2 * Math.asin(Math.sqrt(a));
+
+const calculateDistance = async (lat1, lon1, lat2, lon2) => {
+  const service = new google.maps.DistanceMatrixService();
+
+  return new Promise((resolve, reject) => {
+    service.getDistanceMatrix(
+      {
+        origins: [new google.maps.LatLng(lat1, lon1)],  // Starting point (vendor)
+        destinations: [new google.maps.LatLng(lat2, lon2)],  // End point (customer or pinned location)
+        travelMode: 'DRIVING',  // You can change to 'WALKING', 'BICYCLING', or 'TRANSIT'
+      },
+      (response, status) => {
+        if (status === 'OK') {
+          const distanceInMeters = response.rows[0].elements[0].distance.value;  // Distance in meters
+          const distanceInKm = distanceInMeters / 1000;  // Convert to kilometers
+          resolve(distanceInKm);
+        } else {
+          reject(`Error calculating distance: ${status}`);
+        }
+      }
+    );
+  });
 };
 
 const PaymentOptionsModal = ({ show, handleClose, handlePayment }) => {
@@ -41,65 +53,80 @@ const PaymentOptionsModal = ({ show, handleClose, handlePayment }) => {
   );
 };
 
-const OrderSummaryModal = ({ show, handleClose, vendorName, orderedFoods = [], vendorLocation, pinnedLocation }) => {
+const OrderSummaryModal = ({
+  show, handleClose, vendorName, orderedFoods = [], vendorLocation, pinnedLocation, totalDistanceBetweenVendors
+}) => {
   const [contactNumber, setContactNumber] = useState('');
   const [selectedTime, setSelectedTime] = useState('');
   const [showPaymentModal, setShowPaymentModal] = useState(false);
+  const [distanceToPinned, setDistanceToPinned] = useState(0);
+  const [deliveryCharges, setDeliveryCharges] = useState(0);
+  const [grandTotal, setGrandTotal] = useState(0);
 
-  if (!vendorLocation || !pinnedLocation) {
-    console.error('Vendor or pinned location is missing:', { vendorLocation, pinnedLocation });
-    return null;
-  }
+  const foodOrdersByVendor = orderedFoods.reduce((acc, food) => {
+    const vendorName = food.vendor;  // Assuming food.vendorName or food.vendorId references the vendor.
+    if (!acc[vendorName]) {
+      acc[vendorName] = {
+        vendorName: food.vendorName,
+        foods: [],
+      };
+    }
+    acc[vendorName].foods.push(food);
+    return acc;
+  }, {});
 
-  const distance = calculateDistance(vendorLocation.lat, vendorLocation.lng, pinnedLocation.lat, pinnedLocation.lng);
+  const isSingleVendor = Object.keys(foodOrdersByVendor).length === 1;
 
-  let deliveryCharges = 0;
-  if (distance <= 1) {
-    deliveryCharges = 50; // Base charge for distances up to 2 km
-  } else {
-    deliveryCharges = 50 + (Math.ceil(distance - 1) * 30); // Base charge plus KES 30 for every km beyond 2 km
-  }
+  // Fetch distance on component load
+  useEffect(() => {
+    if (vendorLocation && pinnedLocation) {
+      async function fetchDistance() {
+        try {
+          const calculatedDistanceToPinned = await calculateDistance(vendorLocation.lat, vendorLocation.lng, pinnedLocation.lat, pinnedLocation.lng);
+          setDistanceToPinned(calculatedDistanceToPinned);
 
-  const totalFoodsPrice = orderedFoods.reduce((total, food) => total + food.price * food.quantity, 0);
-  const grandTotal = totalFoodsPrice + deliveryCharges;
+          const totalDistance = totalDistanceBetweenVendors + calculatedDistanceToPinned;
+          console.log('Total Distance:', totalDistance);
 
-  const handleContactNumberChange = (e) => {
-    setContactNumber(e.target.value);
-  };
+          const newDeliveryCharges = totalDistance <= 1 ? 50 : 50 + (Math.ceil(totalDistance - 1) * 30);
+          setDeliveryCharges(newDeliveryCharges);
 
-  // const handleWhatsAppSignIn = () => {
-  //   // Replace with actual WhatsApp sign-in logic or link
-  //   window.open(`https://wa.me/${contactNumber}`, '_blank');
-  // };
-  const handleTimeChange = (e) => {
-    setSelectedTime(e.target.value);
-  };
+          const totalFoodsPrice = orderedFoods.reduce((total, food) => total + food.price * food.quantity, 0);
+          setGrandTotal(totalFoodsPrice + newDeliveryCharges);
+        } catch (error) {
+          console.error('Error fetching distance:', error);
+        }
+      }
+
+      fetchDistance();
+    }
+  }, [vendorLocation, pinnedLocation, totalDistanceBetweenVendors, orderedFoods]);
+
+  const handleContactNumberChange = (e) => setContactNumber(e.target.value);
+  const handleTimeChange = (e) => setSelectedTime(e.target.value);
 
   const handleConfirmOrder = () => {
-
-      // Check if contact number is provided or the user has signed in with WhatsApp
-      if (!contactNumber) {
-        alert('Please enter your contact number or sign in with WhatsApp.');
-        return; // Prevent further execution
-      }
-      if (!selectedTime) {
-        alert('Please enter the time you expect your order.');
-        return; // Prevent further execution
-      }
+    if (!contactNumber) {
+      alert('Please enter your contact number');
+      return;
+    }
+    if (!selectedTime) {
+      alert('Please enter the time you expect your order.');
+      return;
+    }
     setShowPaymentModal(true);
   };
 
-
   const getReadableAddress = async (latitude, longitude) => {
     const url = `https://maps.googleapis.com/maps/api/geocode/json?latlng=${latitude},${longitude}&key=${googleApiKey}`;
-    
+
     try {
       const response = await fetch(url);
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
       const data = await response.json();
-      
+
       if (data.status === 'OK' && data.results.length > 0) {
         // Extracting the most relevant address
         const address = data.results[0].formatted_address;
@@ -117,109 +144,78 @@ const OrderSummaryModal = ({ show, handleClose, vendorName, orderedFoods = [], v
 
   const handlePayment = async (method) => {
     try {
-      switch (method) {
-        case 'visa':
-          console.log('Processing Visa Card payment...');
-          // Implement Visa payment logic here
-          break;
-        case 'mpesa':
-          console.log('Processing M-Pesa payment...');
-  
-          const paymentPhoneNumber = prompt('Enter your M-Pesa phone number (format: 254712345678):', '254');
-          if (!paymentPhoneNumber || !/^254\d{9}$/.test(paymentPhoneNumber)) {
-            alert('Please enter a valid phone number in the format 254712345678.');
-            return;
+      if (method === 'mpesa') {
+        const paymentPhoneNumber = prompt('Enter your M-Pesa phone number (format: 254712345678):', '254');
+        if (!paymentPhoneNumber || !/^254\d{9}$/.test(paymentPhoneNumber)) {
+          alert('Please enter a valid phone number.');
+          return;
+        }
+
+        let amount;
+        let validAmount = false;
+        while (!validAmount) {
+          amount = prompt('Enter the amount to pay:', grandTotal);
+          if (isNaN(amount) || amount <= 0 || amount.includes('.') || !Number.isInteger(Number(amount))) {
+            alert('Please enter a valid whole number.');
+          } else {
+            validAmount = true;
           }
-  
-          let amount;
-          let validAmount = false;
-  
-          // Keep prompting the user until a valid whole number amount is entered
-          while (!validAmount) {
-            amount = prompt('Enter the amount to pay:', grandTotal);
-            if (isNaN(amount) || amount <= 0) {
-              alert('Please enter a valid amount.');
-            } else if (amount.includes('.') || !Number.isInteger(Number(amount))) {
-              alert('Please enter a whole number amount without decimal points.');
-            } else {
-              validAmount = true;
-            }
-          }
-  
-          try {
-            const response = await initiateMpesaPayment(paymentPhoneNumber, amount);
-            if (response && response.ResponseCode === '0') {
-              alert('Your Payment is successful!  Thank you');
-              setShowPaymentModal(false);
-  
-              const address = await getReadableAddress(pinnedLocation.lat, pinnedLocation.lng);
-  
+        }
+
+        const response = await initiateMpesaPayment(paymentPhoneNumber, amount);
+        if (response && response.ResponseCode === '0') {
+          alert('Payment successful!');
+          setShowPaymentModal(false);
+
+          const address = await getReadableAddress(pinnedLocation.lat, pinnedLocation.lng);
+
+          if (isSingleVendor) {
+            const [vendor] = Object.keys(foodOrdersByVendor);
+            const vendorFoodsPrice = foodOrdersByVendor[vendor].foods.reduce((total, food) => total + food.price * food.quantity, 0);
+
+            const foodOrderDetails = {
+              phoneNumber: contactNumber,
+              selectedVendor: vendor,
+              customerLocation: address,
+              expectedDeliveryTime: selectedTime,
+              foods: foodOrdersByVendor[vendor].foods,
+              deliveryCharges,
+              totalPrice: vendorFoodsPrice + deliveryCharges,
+            };
+
+            await saveOrderToDatabase(foodOrderDetails);
+          } else {
+            for (const [vendor, vendorFoods] of Object.entries(foodOrdersByVendor)) {
+              const vendorFoodsPrice = vendorFoods.foods.reduce((total, food) => total + food.price * food.quantity, 0);
+
               const foodOrderDetails = {
                 phoneNumber: contactNumber,
-                selectedVendor: vendorName,
+                selectedVendor: vendor,
                 customerLocation: address,
                 expectedDeliveryTime: selectedTime,
-                foods: orderedFoods,
-                deliveryCharges: deliveryCharges,
-                totalPrice: amount,
+                foods: vendorFoods.foods,
+                deliveryCharges,  // You can adjust this for each vendor if needed
+                totalPrice: vendorFoodsPrice + deliveryCharges,
               };
-  
+
               await saveOrderToDatabase(foodOrderDetails);
-              clearCart();
-              setTimeout(() => {
-                window.location.href = '/';
-              }, 2000);
-            } else {
-              handlePaymentFailure();
             }
-          } catch (error) {
-            console.error('M-Pesa payment error:', error);
-            alert('Error initiating M-Pesa payment. Please try again.');
-            handlePaymentFailure();
           }
-          break;
-        default:
-          console.error('Unsupported payment method.');
-          break;
+
+          clearCart();
+          setTimeout(() => {
+            window.location.href = '/';
+          }, 2000);
+        } else {
+          handlePaymentFailure();
+        }
+      } else {
+        console.error('Unsupported payment method.');
       }
     } catch (error) {
       console.error('Error in handlePayment:', error);
-      alert('An error occurred while processing the payment. Please try again.');
+      alert('An error occurred while processing the payment.');
     }
-  };
-  
-  
-
-  const handlePaymentFailure = () => {
-    const retry = window.confirm('Payment transfer failed! Would you like to try again?');
-    if (retry) {
-      handlePayment('mpesa');
-    } else {
-      const saveForLater = window.confirm('Would you like to save the order for later?');
-      if (saveForLater) {
-        alert('Your order has been saved for later.');
-        saveOrderForLater();
-      } else {
-        alert('Order has been canceled.');
-        setShowPaymentModal(false);
-       
-      }
-    } setTimeout(() => {
-          window.location.href = '/';
-        }, 2000);
-  };
-
-  const saveOrderForLater = () => {
-    const foodOrderDetails = {
-      phoneNumber: contactNumber,
-      selectedVendor: vendorName,
-      customerLocation: pinnedLocation,
-      expectedDeliveryTime: selectedTime,
-      foods: orderedFoods,
-      deliveryCharges: deliveryCharges,
-      totalPrice: grandTotal,
-    };
-    localStorage.setItem('savedOrder', JSON.stringify(foodOrderDetails));
   };
 
   const initiateMpesaPayment = async (phoneNumber, amount) => {
@@ -254,16 +250,60 @@ const OrderSummaryModal = ({ show, handleClose, vendorName, orderedFoods = [], v
     }
   };
 
-  
+
+  // const saveOrderToDatabase = async (foodOrderDetails) => {
+  //   const maxRetries = 5; // Maximum number of retry attempts
+  //   let attempts = 0;
+  //   let orderSaved = false;
+
+  //   while (attempts < maxRetries && !orderSaved) {
+  //     try {
+  //       console.log('Sending foodOrderDetails to database:', foodOrderDetails);
+
+  //       // Send the updated foodOrderDetails to the backend
+  //       const response = await fetch(`${config.backendUrl}/api/paidFoodOrder`, {
+  //         method: 'POST',
+  //         headers: {
+  //           'Content-Type': 'application/json',
+  //         },
+  //         body: JSON.stringify(foodOrderDetails),
+  //       });
+
+  //       console.log('Response from backend:', response);
+
+  //       if (response.ok) {
+  //         const data = await response.json();
+  //         console.log('Order saved successfully:', data);
+  //         alert('Order recieved successfully! Your order will be processed and dispatched as soon as possible.');
+  //         orderSaved = true;
+  //       } else {
+  //         const error = await response.json();
+  //         console.error('Error saving order:', error);
+  //         alert('Error saving order: ' + error.message);
+  //         attempts++;
+  //       }
+  //     } catch (error) {
+  //       console.error('Error saving order:', error);
+  //       alert('Error saving order. Please check your network and try again.');
+  //       attempts++;
+  //     }
+
+  //     // If the order was not saved and we have reached the maximum retries
+  //     if (!orderSaved && attempts >= maxRetries) {
+  //       alert('Failed to save order after multiple attempts. Please check your network and try again later.');
+  //     }
+  //   }
+  // };
+
   const saveOrderToDatabase = async (foodOrderDetails) => {
     const maxRetries = 5; // Maximum number of retry attempts
     let attempts = 0;
     let orderSaved = false;
-  
+
     while (attempts < maxRetries && !orderSaved) {
       try {
         console.log('Sending foodOrderDetails to database:', foodOrderDetails);
-  
+
         // Send the updated foodOrderDetails to the backend
         const response = await fetch(`${config.backendUrl}/api/paidFoodOrder`, {
           method: 'POST',
@@ -272,36 +312,41 @@ const OrderSummaryModal = ({ show, handleClose, vendorName, orderedFoods = [], v
           },
           body: JSON.stringify(foodOrderDetails),
         });
-  
+
+        console.log('Response from backend:', response);
+
         if (response.ok) {
           const data = await response.json();
           console.log('Order saved successfully:', data);
-          alert('Order recieved successfully! Your order will be processed and dispatched as soon as possible.');
+          alert('Order received successfully! Your order will be processed and dispatched as soon as possible.');
           orderSaved = true;
         } else {
           const error = await response.json();
           console.error('Error saving order:', error);
-          alert('Error saving order: ' + error.message);
+          alert('Error saving order: ' + (error.message || 'An unknown error occurred.'));
           attempts++;
         }
       } catch (error) {
         console.error('Error saving order:', error);
-        alert('Error saving order. Please check your network and try again.');
+
+        // Handling network-related errors with a fallback message
+        const errorMessage = error.message || 'Network error. Please check your connection and try again.';
+        alert('Error saving order: ' + errorMessage);
         attempts++;
       }
-  
-      // If the order was not saved and we have reached the maximum retries
-      if (!orderSaved && attempts >= maxRetries) {
-        alert('Failed to save order after multiple attempts. Please check your network and try again later.');
-      }
     }
-  };
-  
+
+    if (!orderSaved && attempts >= maxRetries) {
+      alert('Failed to save the order after multiple attempts. Please try again later.');
+    }
+};
+
+
   const clearCart = () => {
     const cartItemsElement = document.getElementById('cartItems');
     const totalPriceElement = document.getElementById('totalPrice');
     const cartCountElement = document.getElementById('cartCount');
-  
+
     if (cartItemsElement) {
       while (cartItemsElement.firstChild) {
         cartItemsElement.removeChild(cartItemsElement.firstChild);
@@ -310,6 +355,40 @@ const OrderSummaryModal = ({ show, handleClose, vendorName, orderedFoods = [], v
     if (totalPriceElement) totalPriceElement.textContent = 'KES 0.00';
     if (cartCountElement) cartCountElement.textContent = '0';
   };
+
+  const handlePaymentFailure = () => {
+    const retry = window.confirm('Payment transfer failed! Would you like to try again?');
+    if (retry) {
+      handlePayment('mpesa');
+    } else {
+      const saveForLater = window.confirm('Would you like to save the order for later?');
+      if (saveForLater) {
+        alert('Your order has been saved for later.');
+        saveOrderForLater();
+      } else {
+        alert('Order has been canceled.');
+        setShowPaymentModal(false);
+
+      }
+    } setTimeout(() => {
+      window.location.href = '/';
+    }, 2000);
+  };
+
+  const saveOrderForLater = () => {
+    const foodOrderDetails = {
+      phoneNumber: contactNumber,
+      selectedVendor: vendorName,
+      customerLocation: pinnedLocation,
+      expectedDeliveryTime: selectedTime,
+      foods: orderedFoods,
+      deliveryCharges: deliveryCharges,
+      totalPrice: grandTotal,
+    };
+    localStorage.setItem('savedOrder', JSON.stringify(foodOrderDetails));
+  };
+
+
 
   return (
     <>
@@ -331,15 +410,7 @@ const OrderSummaryModal = ({ show, handleClose, vendorName, orderedFoods = [], v
                   onChange={handleContactNumberChange}
                   placeholder="Enter your contact number"
                   required
-                /><br></br>
-                {/* <p>Or You Can</p>
-                <button
-                  type="button"
-                  className="btn btn-success"
-                  onClick={handleWhatsAppSignIn}
-                >
-                  Sign in with WhatsApp
-                </button> */}
+                />
               </div>
               <div className="form-group my-3">
                 <label htmlFor="deliveryTime">Expected Delivery Time</label>
@@ -349,23 +420,28 @@ const OrderSummaryModal = ({ show, handleClose, vendorName, orderedFoods = [], v
                   id="deliveryTime"
                   value={selectedTime}
                   onChange={handleTimeChange}
-                  required="true"
+                  required
                 />
               </div>
-              <h5>{vendorName}</h5>
-              <ul className="list-group mb-3">
-                <p>Foods ordered</p>
-                {orderedFoods.map((food, index) => (
-                  <li key={index} className="list-group-item d-flex justify-content-between lh-sm">
-                    <div>
 
-                      <h6 className="my-0">{food.foodName}</h6>
-                      <small className="text-muted">{food.foodDescription}</small>
-                    </div>
-                    <span className="text-muted">{food.quantity} x KES {food.price.toFixed(2)}</span>
-                  </li>
-                ))}
-              </ul>
+              {/* Display ordered foods grouped by vendor */}
+              {Object.entries(foodOrdersByVendor).map(([vendorName, { foods }], vendorIndex) => (
+                <div key={vendorIndex}>
+                  <h5>{vendorName}</h5>
+                  <ul className="list-group mb-3">
+                    {foods.map((food, index) => (
+                      <li key={index} className="list-group-item d-flex justify-content-between lh-sm">
+                        <div>
+                          <h6 className="my-0">{food.foodName}</h6>
+                          <small className="text-muted">{food.foodDescription}</small>
+                        </div>
+                        <span className="text-muted">{food.quantity} x KES {food.price.toFixed(2)}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              ))}
+
               <div className="d-flex justify-content-between">
                 <span>Delivery Charges (KES)</span>
                 <strong>{deliveryCharges.toFixed(2)}</strong>
@@ -382,10 +458,10 @@ const OrderSummaryModal = ({ show, handleClose, vendorName, orderedFoods = [], v
           </div>
         </div>
       </div>
+
       <PaymentOptionsModal show={showPaymentModal} handleClose={() => setShowPaymentModal(false)} handlePayment={handlePayment} />
     </>
   );
 };
 
 export default OrderSummaryModal;
-

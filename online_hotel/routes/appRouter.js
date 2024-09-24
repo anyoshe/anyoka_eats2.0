@@ -320,28 +320,26 @@ appRouter.get('/vendors/:partnerId', async (req, res) => {
 // Route to get vendor location
 appRouter.get('/vendors/vendor/:vendorName', async (req, res) => {
   try {
-    const vendorName = req.params.vendorName;
+    // Get vendor name from URL and normalize (trim and lowercase)
+    const vendorName = req.params.vendorName.trim().toLowerCase();
     console.log('Received request for vendor location:', vendorName);
 
-    // Fetch vendor details from the database using vendor name
-    const vendor = await Vendor.findOne({ vendor: vendorName }); // Adjust if field name is 'vendor'
- console.log(vendor); 
+    // Search for the vendor in the database, case-insensitive
+    const vendor = await Vendor.findOne({ vendor: new RegExp(`^${vendorName}$`, 'i') });
+
     if (!vendor) {
       return res.status(404).json({ message: 'Vendor not found' });
     }
 
-    // Return vendor location
+    // Respond with the vendor's location
     return res.status(200).json({
-      vendorLocation: vendor.vendorLocation
-     
+      vendorLocation: vendor.vendorLocation,
     });
-  
   } catch (error) {
     console.error('Error fetching vendor location:', error);
     res.status(500).json({ message: 'Server error' });
   }
 });
-
 appRouter.get('/vendors/:vendorId', async (req, res) => {
   const { vendorId } = req.params;
 
@@ -519,7 +517,7 @@ const orderSchema = new Schema({
       price: { type: Number, required: true }
     }
   ],
-  deliveryCharges: { type: Number, required: true },
+  deliveryCharges: { type: Number, required: false },
   totalPrice: { type: Number, required: true },
   createdAt: { type: Date, default: Date.now },
   delivered: { type: Boolean, default: false },
@@ -556,39 +554,73 @@ appRouter.post('/paidFoodOrder', async (req, res) => {
 });
 
 // Function to save order details in the database
+// async function saveOrder(foodOrderDetails) {
+//   console.log(foodOrderDetails);
+//   const foodOrder = new FoodOrder({
+//     orderId: foodOrderDetails.orderId,
+//     phoneNumber: foodOrderDetails.phoneNumber,
+//     selectedCategory: foodOrderDetails.selectedCategory,
+//     selectedVendor: foodOrderDetails.selectedVendor,
+//     customerLocation: foodOrderDetails.customerLocation,
+//     expectedDeliveryTime: foodOrderDetails.expectedDeliveryTime,
+//     foods: foodOrderDetails.foods,
+//     // deliveryCharges: foodOrderDetails.deliveryCharges,
+//     totalPrice: foodOrderDetails.totalPrice,
+//     delivered: false,
+//     paid: true, // Assuming the payment was successful
+//     status: foodOrderDetails.status
+//   });
+
+//   // Conditionally add userId and customerName if they exist
+//   if (foodOrderDetails.userId) {
+//     foodOrder.userId = foodOrderDetails.userId;
+//   }
+
+//   if (foodOrderDetails.customerName) {
+//     foodOrder.customerName = foodOrderDetails.customerName;
+//   }
+
+//   try {
+//     await foodOrder.save();
+//     console.log('Order saved successfully');
+//   } catch (error) {
+//     console.error('Error saving order:', error);
+//     throw error; // Rethrow the error so that it can be handled by the caller
+//   }
+// }
+
 async function saveOrder(foodOrderDetails) {
-  const foodOrder = new FoodOrder({
-    orderId: foodOrderDetails.orderId,
-    phoneNumber: foodOrderDetails.phoneNumber,
-    selectedCategory: foodOrderDetails.selectedCategory,
-    selectedVendor: foodOrderDetails.selectedVendor,
-    customerLocation: foodOrderDetails.customerLocation,
-    expectedDeliveryTime: foodOrderDetails.expectedDeliveryTime,
-    foods: foodOrderDetails.foods,
-    deliveryCharges: foodOrderDetails.deliveryCharges,
-    totalPrice: foodOrderDetails.totalPrice,
-    delivered: false,
-    paid: true, // Assuming the payment was successful
-    status: foodOrderDetails.status
-  });
-
-  // Conditionally add userId and customerName if they exist
-  if (foodOrderDetails.userId) {
-    order.userId = foodOrderDetails.userId;
-  }
-
-  if (foodOrderDetails.customerName) {
-    order.customerName = foodOrderDetails.customerName;
-  }
-
+  console.log(foodOrderDetails);
   try {
+    const foodOrder = new FoodOrder({
+      orderId: foodOrderDetails.orderId,
+      phoneNumber: foodOrderDetails.phoneNumber,
+      selectedVendor: foodOrderDetails.selectedVendor,
+      customerLocation: foodOrderDetails.customerLocation,
+      expectedDeliveryTime: foodOrderDetails.expectedDeliveryTime,
+      foods: foodOrderDetails.foods,
+      totalPrice: foodOrderDetails.totalPrice,
+      delivered: false,
+      paid: true,
+      status: foodOrderDetails.status
+    });
+
+    if (foodOrderDetails.userId) {
+      foodOrder.userId = foodOrderDetails.userId;
+    }
+
+    if (foodOrderDetails.customerName) {
+      foodOrder.customerName = foodOrderDetails.customerName;
+    }
+
     await foodOrder.save();
     console.log('Order saved successfully');
   } catch (error) {
     console.error('Error saving order:', error);
-    throw error; // Rethrow the error so that it can be handled by the caller
+    throw error;
   }
 }
+
 //get orders
 appRouter.get('/orders/:orderId', async (req, res) => {
   try {
