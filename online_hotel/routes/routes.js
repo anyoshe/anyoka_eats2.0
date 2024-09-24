@@ -124,6 +124,7 @@ const partnerSchema = new mongoose.Schema({
   email: { type: String, required: false, unique: true },
   location: { type: String, required: false },
   password: { type: String, required: true },
+  googleId: { type: String, required: false },
   profileImage: { type: String, required: false },
   contact: { type: mongoose.Schema.Types.ObjectId, ref: 'Contact' }
 });
@@ -202,6 +203,19 @@ router.post('/login', async (req, res) => {
     res.status(500).send(err.message);
   }
 });
+
+// Google login route - redirects to Google for authentication
+router.get('/api/auth/google', passport.authenticate('google', { scope: ['profile', 'email'] }));
+
+// Callback route for Google to redirect to after login
+router.get('/api/auth/google/callback', 
+  passport.authenticate('google', { failureRedirect: '/' }),
+  (req, res) => {
+    // Successful authentication, redirect to frontend with JWT token
+    const token = req.user.token;
+    res.redirect(`${process.env.FRONTEND_URL}/login?token=${token}`);
+  }
+);
 
 // Route to get partner details by contact number
 router.get('/partner/:contactNumber', async (req, res) => {
@@ -2069,6 +2083,7 @@ router.post('/mpesa/callback', (req, res) => {
   // Respond with a success status to acknowledge receipt
   res.sendStatus(200);
 });
+
 
 
 // Route to handle M-Pesa payment
