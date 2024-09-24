@@ -16,6 +16,7 @@ import Testimonials from '../Landing/LandingTestimonial';
 import FooterComponent from '../Landing/LandingFooter';
 import FoodCardLand from '../FreshFood/FoodCardLand';
 import DishCardLand from '../Menu/DishCardLand';
+import InstallPrompt from '../Header/InstallPrompt';
 
 
 
@@ -159,8 +160,9 @@ const LandingPage = () => {
 
                 {/* searchBar & services */}
                 <div className="services-serchBar">
-                    <SearchBar />
+                    <SearchBar /><InstallPrompt />
 
+                     
                     {/* welcome message/slogan */}
                     <div className="services_slogan">
                         <div className="slogan">
