@@ -123,9 +123,9 @@
 }
 
 @media screen and (max-width: 500px) {
- .slide-box {
-    padding: 0 55px;
-  }
+  .slide-box {
+      padding: 0 55px;
+    }
 }
 
 /* For Mobile Phones (Portrait & Landscape) */

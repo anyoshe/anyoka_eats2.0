@@ -113,7 +113,7 @@ function SignUpSignIn() {
                 {/* Sign Up Section */}
                 <div className="form-container sign-up-container">
                     <form onSubmit={handleSubmitSignUp}>
-                        <h1>Create Account</h1>
+                        <h1 className='createAccount'>Create Account</h1>
 
                         <div className="social-container">
                             <a href="#" className="log_social_icons" ><i className="fab fa-facebook-f"></i></a>

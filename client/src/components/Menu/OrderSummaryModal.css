@@ -51,3 +51,18 @@
     font-weight: 800;
     font-size: 16px;
 }
+
+.optionPay{
+    background: var(--green);
+    color: white;
+    padding: 0.4rem 0.5rem;
+    margin-right: 0.3rem;
+    border: none;
+    transition: ease-in .2s;
+}
+
+.optionPay:hover,.optionPay:focus{
+    background: white;
+    color: var(--orange);
+    outline: 1px solid var(--orange);
+}
