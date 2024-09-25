@@ -66,14 +66,17 @@ const Cart = () => {
                 {state.items.map((item, index) => (
                   <li key={index} className="d-flex justify-content-between align-items-center">
                     <span className='itemDishName'>
-                      <span className='DishDetailSpan'>{item.dishName}</span> 
+                      <span className='DishDetailSpan detailDishName'>{item.dishName}</span> 
                       <span className='DishDetailSpan'>Ksh.{(item.price * item.quantity)}</span>
                     </span>
 
                     <div className="d-flex align-items-center">
-                      <button className="btn-outline-secondary btn-sm me-2 minus-plus minus" onClick={() => handleDecreaseQuantity(item.dishCode)}>-</button>
+                      <button className="btn-outline-secondary btn-sm me-2 minus-plus minus valueControllers" onClick={() => handleDecreaseQuantity(item.dishCode)}>-</button>
+
                       <span className='menuDishQuantity'>{item.quantity}</span>
-                      <button className="btn-outline-secondary btn-sm ms-2 minus-plus plus" onClick={() => handleIncreaseQuantity(item.dishCode)}>+</button>
+
+                      <button className="btn-outline-secondary btn-sm ms-2 minus-plus plus valueControllers" onClick={() => handleIncreaseQuantity(item.dishCode)}>+</button>
+
                       <button className="btn-danger btn-sm ms-2 menuDelete" onClick={() => handleRemoveFromCart(item.dishCode)}>Delete</button>
                     </div>
                   </li>
@@ -109,7 +112,7 @@ const Cart = () => {
 
       {/* Cart Trigger */}
       <a href="#" id="cart2" onClick={handleCartClick}>
-        <i className="fas fa-shopping-cart"></i><span id="cartCount">{state.cartCount}</span>
+        <i className="fas fa-shopping-cart"></i><span id="cartCount" className='cartCountFood'>{state.cartCount}</span>
       </a>
     </>
   );

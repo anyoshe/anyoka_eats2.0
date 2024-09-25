@@ -50,5 +50,17 @@
 
 }
 
+@media (max-width:480px){
+  .restaurant-heading{
+    font-size: 1rem;
+  }
 
+  .dishes-container {
+    /* border: 5px solid green; */
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    column-gap: 5px;
+    row-gap: 10px;
+}
+}
   

@@ -255,7 +255,7 @@ const LocationModal = ({ show, handleClose, restaurantName, orderedDishes = [] }
             </div>
             <div className="modal-footer">
               <button type="button" className="cancel_Ok_btn" onClick={handleOkClick}>OK</button>
-              <button type="button" className="btn-secondary" data-bs-dismiss="modal" onClick={handleClose}>Cancel</button>
+              <button type="button" className="btn-secondary landingCancel" data-bs-dismiss="modal" onClick={handleClose}>Cancel</button>
             </div>
           </div>
         </div>
