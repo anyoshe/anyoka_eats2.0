@@ -61,37 +61,15 @@ app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 // Serve static files from the "public" directory
 app.use(express.static(path.join(__dirname, '../client/public')));
 
-
-const maintenanceMode = true; // Change this to `false` when disabling maintenance mode
-
-// Maintenance mode middleware
-app.use((req, res, next) => {
-  if (maintenanceMode) {
-    // Serve the under-construction.html file
-    res.sendFile(path.join(__dirname, '../client/public', 'under-construction.html'));
-  } else {
-    next(); // If not in maintenance mode, continue to the normal routes
-  }
-});
-
-
-// // Serve static files from the 'public' directory
-// app.use(express.static(path.join(__dirname, '../client/build')));
-
-// // The "catchall" handler: for any request that doesn't
-// // match one above, send back index.html.
-// app.get('*', (req, res) => {
-//   res.sendFile(path.join(__dirname, '../client/build/index.html')); // Adjusted path
-// });
-
 // Serve static files from the 'public' directory
 app.use(express.static(path.join(__dirname, '../client/build')));
 
 // The "catchall" handler: for any request that doesn't
 // match one above, send back index.html.
 app.get('*', (req, res) => {
-  res.sendFile(path.join(__dirname, '../client/build/under-construction.html')); // Adjusted path
+  res.sendFile(path.join(__dirname, '../client/build/index.html')); // Adjusted path
 });
+
 // Error Handler
 function errorHandler(err, req, res, next) {
   console.error(err.stack); 
