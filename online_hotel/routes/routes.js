@@ -2175,15 +2175,74 @@ router.post('/send-receipt', async (req, res) => {
   }
 });
 
-// Function to send receipt
+// // Function to send receipt
+// async function sendReceipt(phoneNumber, amount) {
+//   const message = `Thank you for your payment of KES ${amount}. Your order is being processed.`;
+//   // Logic to send SMS (you can use a service like Twilio or any other SMS gateway)
+//   await axios.post('https://sms-gateway-api/send', {
+//     to: phoneNumber,
+//     message: message
+//   });
+// }
+// Example of SMS sending route
+router.post('/sendSms', async (req, res) => {
+  const { phoneNumber, message } = req.body;
+ console.log(phoneNumber, message);
+  // Your logic for sending SMS goes here
+  try {
+    // Call your SMS sending service (like Twilio or any other)
+    const smsResponse = await sendSmsService(phoneNumber, message);
+    res.status(200).json(smsResponse);
+  } catch (error) {
+    console.error('Error sending SMS:', error);
+    res.status(500).json({ error: 'Failed to send SMS' });
+  }
+});
+// Import Africa's Talking SDK
+const africastalking = require('africastalking')({
+  apiKey: process.env.SMSAPIKEY,  // Replace with your Africa's Talking API Key
+  username: 'sandbox' // Replace with your Africa's Talking username
+});
+
+// Access the SMS service
+const sms = africastalking.SMS;
+
+// Function to send M-Pesa payment receipt via SMS
 async function sendReceipt(phoneNumber, amount) {
+  // Message to be sent to the user
   const message = `Thank you for your payment of KES ${amount}. Your order is being processed.`;
-  // Logic to send SMS (you can use a service like Twilio or any other SMS gateway)
-  await axios.post('https://sms-gateway-api/send', {
-    to: phoneNumber,
-    message: message
-  });
+  
+  const options = {
+      to: [phoneNumber],  // The recipient's phone number (e.g., +2547XXXXXXXX)
+      message: message,   // The receipt message
+      from: 'YourShortCodeOrSenderID' // Optional. Specify if you have a short code or sender ID
+  };
+  
+  try {
+      // Send the SMS using Africa's Talking
+      const response = await sms.send(options);
+      console.log('SMS Sent Successfully:', response);
+  } catch (error) {
+      console.error('Failed to send SMS:', error);
+  }
 }
+
+// Example use case
+async function processPaymentAndSendReceipt(paymentDetails, userPhoneNumber) {
+  // Simulate successful payment processing
+  const paymentSuccess = true;  // Replace with actual payment logic
+  
+  if (paymentSuccess) {
+      // Send the receipt after successful payment
+      await sendReceipt(userPhoneNumber, paymentDetails.amount);
+  }
+}
+
+// Example test case
+const paymentDetails = { amount: 500 };
+const userPhoneNumber = "+2547XXXXXXXX";  // Replace with the user's phone number
+processPaymentAndSendReceipt(paymentDetails, userPhoneNumber);
+
 
 // TESTMONIALS SECTION 
 
