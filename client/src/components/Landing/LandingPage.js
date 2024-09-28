@@ -333,7 +333,7 @@ const LandingPage = () => {
                     <div className="FeaturedDiv">
                         <h2 className="FeaturedHeading">Featured Hotels</h2>
                     </div>
-                 
+                
                     <div className="DishCards">
                         {topRatedRestaurants && topRatedRestaurants.length > 0 ? (
                             topRatedRestaurants.map((restaurant, index) => (
@@ -388,7 +388,9 @@ const LandingPage = () => {
                             </div>
 
                             {/* <!-- SIGN UP BUTTON --> */}
-                            <button className="signup">Sign Up</button>
+                            <Link to="/sign-up-sign-in" >
+                                <button className="signup">Sign Up</button>
+                            </Link>
                         </div>
 
                         {/* <div className="join_team_choices">
@@ -415,7 +417,9 @@ const LandingPage = () => {
                             </div>
 
                             {/* <!-- SIGN UP BUTTON --> */}
-                            <button className="signup">Sign Up</button>
+                            <Link to="/driverCreateAccount" >
+                                <button className="signup" >Sign Up</button>
+                            </Link>
                         </div>
                     </div>
                 </div>

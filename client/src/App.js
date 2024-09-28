@@ -8,6 +8,8 @@ import LandingFreshFood from './components/FreshFood/LandingFreshFood';
 import { FreshFoodCartProvider } from './components/FreshFood/FreshFoodCartContext';
 // import NavBar from './components/Header/Navbar';
 import SignUpSignIn from './components/Landing/SignUpSignIn';
+import DriverDashboard from './components/Landing/DriverDashboard';
+import DriverCreateAccount from './components/Landing/DriverCreateAccount';
 import ConferenceLandingPage from './components/Conferences/ConferenceLandingPage';
 import OutsideCateringLandingPage from './components/OutsideCatering/OutsideCateringLandingPage';
 import UserProfileDashBoard from './components/User/UserProfileDashBoard';
@@ -18,7 +20,7 @@ import InstallPrompt from './components/Header/InstallPrompt';
 function App() {
     return (
         
-       
+    
         <Router>
             <PartnerProvider>
                 <CartProvider>
@@ -27,6 +29,8 @@ function App() {
                 <Routes>
                     <Route path="/" element={<LandingPage />} />
                     <Route path="/sign-up-sign-in" element={<SignUpSignIn />} />
+                    <Route path="/DriverDashboard" element={<DriverDashboard />} />
+                    <Route path="/driverCreateAccount" element={<DriverCreateAccount />} />
                     <Route path="/dashboard" element={<UserProfileDashBoard />} />
                     <Route path="/menu" element={
                         <CartProvider>

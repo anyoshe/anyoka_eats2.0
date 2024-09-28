@@ -112,7 +112,9 @@ function SignUpSignIn() {
 
                 {/* Sign Up Section */}
                 <div className="form-container sign-up-container">
+
                     <form onSubmit={handleSubmitSignUp}>
+
                         <h1 className='createAccount'>Create Account</h1>
 
                         <div className="social-container">
@@ -127,8 +129,8 @@ function SignUpSignIn() {
                             <input 
                                 className='input-sign'
                                 type="text"
-                                placeholder="User Name"
-                                name="businessName"
+                                placeholder="Official Names"
+                                name="OfficialNames"
                                 value={formData.businessName}
                                 onChange={handleInputChange}
                                 required
@@ -138,9 +140,9 @@ function SignUpSignIn() {
                         <div className="infield">
                             <input
                                 className='input-sign'
-                                type="text"
-                                placeholder="Type (Hotel, Conference space, Catering e.t.c)"
-                                name="businessType"
+                                type="number"
+                                placeholder="ID Number"
+                                name="IDNumber"
                                 value={formData.businessType}
                                 onChange={handleInputChange}
                                 required
@@ -150,37 +152,25 @@ function SignUpSignIn() {
                         <div className="infield">
                             <input
                                 className='input-sign'
-                                type="text"
-                                placeholder="Contact Number"
-                                name="contactNumber"
+                                type="number"
+                                placeholder="Driver Licence Number"
+                                name="DriverLicenceNumber"
                                 value={formData.contactNumber}
                                 onChange={handleInputChange}
                                 required
                             />
                         </div>
 
-                        {/* <div className="infield">
+                        <div className="infield">
                             <input
                                 className='input-sign'
-                                type="email"
-                                placeholder="Email"
-                                name="email"
+                                type="number"
+                                placeholder="Number Plate"
+                                name="NumberPlate"
                                 value={formData.email}
                                 onChange={handleInputChange}
                             />
-                        </div> */}
-                        
-                        {/* <div className="infield">
-                            <input
-                                className='input-sign'
-                                type="text"
-                                placeholder="Business Location"
-                                name="location"
-                                value={formData.location}
-                                onChange={handleInputChange}
-                                required
-                            />
-                        </div> */}
+                        </div>
                         
                         <div className="infield">
                             <input
@@ -207,6 +197,7 @@ function SignUpSignIn() {
                         </div>
 
                         <button className='loginBtn logphone' type="submit">Sign Up</button>
+
                     </form>
                 </div>
 
@@ -227,8 +218,8 @@ function SignUpSignIn() {
                             <input
                                 className='input-sign'
                                 type="text"
-                                placeholder="User Name"
-                                name="businessName"
+                                placeholder="Official Names"
+                                name="Official Names"
                                 value={formData.businessName}
                                 onChange={handleInputChange}
                             />
@@ -237,9 +228,9 @@ function SignUpSignIn() {
                         <div className="infield">
                             <input
                                 className='input-sign'
-                                type="text"
-                                placeholder="Contact Number"
-                                name="contactNumber"
+                                type="number"
+                                placeholder="ID Number"
+                                name="ID Number"
                                 value={formData.contactNumber}
                                 onChange={handleInputChange}
                                 required
