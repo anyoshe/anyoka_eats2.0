@@ -72,8 +72,8 @@ const LandingPage = () => {
             try {
                 const response = await axios.get(`${config.backendUrl}/api/discounts`);
                 // console.log("Full response:", response.data); 
-                const fetchedFoods = response.data; 
-                const discountedFoods = fetchedFoods.slice(0, 5); 
+                const fetchedFoods = response.data;
+                const discountedFoods = fetchedFoods.slice(0, 5);
                 setDiscountedFoods(discountedFoods);
             } catch (error) {
                 console.error('Error fetching discounted foods:', error);
@@ -162,6 +162,7 @@ const LandingPage = () => {
                 <div className="services-serchBar">
                     <SearchBar /><InstallPrompt />
 
+
                     {/* welcome message/slogan */}
                     <div className="services_slogan">
                         <div className="slogan">
@@ -225,7 +226,7 @@ const LandingPage = () => {
                         </div>
                     </div>
                 </div>
-            </section> 
+            </section>
 
             {/* offers section */}
             <section className="offersSection">
@@ -245,7 +246,7 @@ const LandingPage = () => {
                             <button className="categories categoryBtn" onMouseOver={handleMouseOver} onMouseOut={handleMouseOut}>
                                 Categories
                             </button>
-                            
+
                             {dropdownOpen && (
                                 <div className="dropdown-content" onMouseOver={handleMouseOver} onMouseOut={handleMouseOut}>
                                     <a href="#Food" onClick={selectOption}>Food</a>
@@ -256,7 +257,7 @@ const LandingPage = () => {
                                 </div>
                             )}
                         </div>
-                    
+
                         <div className="search-container">
                             <input
                                 type="text"
@@ -278,41 +279,49 @@ const LandingPage = () => {
 
                             {/* Display Search Results */}
                             {searchResults.length > 0 && (
-                            <div className="search-results">
-                                {searchResults.map((result, index) => (
-                                    <div key={index} className="search-result-item">
-                                        <a href={`/${result.type}/${result.dishCode}`}      className="search-result-item-a">
-                                            {result.dishName && result.restaurant}
-                                        </a>
-                                    </div>
-                                ))}
-                            </div>
-                        )}
+                                <div className="search-results">
+                                    {searchResults.map((result, index) => (
+                                        <div key={index} className="search-result-item">
+                                            <a href={`/${result.type}/${result.dishCode}`} className="search-result-item-a">
+                                                {result.dishName && result.restaurant}
+                                            </a>
+                                        </div>
+                                    ))}
+                                </div>
+                            )}
                         </div>
                     </div>
 
                     <div className="offers-container">
                         {/* offer display */}
-                        <div className="offerDispaly">
-                            
-                            <div className="offerDisplay">
-                                {dishes.map(dish => (
-                                    <DishCardLand key={dish.dishCode} dish={dish} source="offers" />
-                                ))}
-                            </div>
-                        </div> 
-
                         
-                       {/* Discounted Foods */}
-                        {discountedFoods.length > 0 && (
+                            {dishes.length > 0 ? (
                                 <div>
                                     <div className="offerDisplay">
-                                        {discountedFoods.map(food => (
-                                            <FoodCardLand key={food.foodCode} food={food} />
+                                        {dishes.map(dish => (
+                                            <DishCardLand key={dish.dishCode} dish={dish} source="offers" />
                                         ))}
                                     </div>
                                 </div>
+                            ) : (
+                                <p>No discounted dishes available at the moment. Please check back later.</p>
                             )}
+                        
+
+
+                        {/* Discounted Foods */}
+                        {discountedFoods.length > 0 ? (
+                            <div>
+                                <div className="offerDisplay">
+                                    {discountedFoods.map(food => (
+                                        <FoodCardLand key={food.foodCode} food={food} />
+                                    ))}
+                                </div>
+                            </div>
+                        ) : (
+                            <p>No discounted foods available at the moment. Keep checking for updates.</p>
+                        )}
+
                     </div>
                 </div>
             </section>
@@ -324,13 +333,19 @@ const LandingPage = () => {
                     <div className="FeaturedDiv">
                         <h2 className="FeaturedHeading">Featured Hotels</h2>
                     </div>
+                 
                     <div className="DishCards">
-                        {topRatedRestaurants.map((restaurant, index) => (
-                            <RestaurantCard key={index} restaurant={restaurant} />
-                        ))}
+                        {topRatedRestaurants && topRatedRestaurants.length > 0 ? (
+                            topRatedRestaurants.map((restaurant, index) => (
+                                <RestaurantCard key={index} restaurant={restaurant} />
+                            ))
+                        ) : (
+                            <p>No featured hotels available at the moment. Keep checking for the updates</p>
+                        )}
                     </div>
+
                 </div>
-                
+
                 <div className='divFood divFeatured'>
                     {/* Food heading */}
                     <div className="FeaturedDiv">
@@ -339,10 +354,15 @@ const LandingPage = () => {
 
                     {/* Food features */}
                     <div className="featuredFood featured">
-                        {getTopRatedDishes().map(dish => (
-                            <DishCardLand key={dish.dishCode} dish={dish} source="featured" />
-                        ))}
+                        {getTopRatedDishes().length > 0 ? (
+                            getTopRatedDishes().map(dish => (
+                                <DishCardLand key={dish.dishCode} dish={dish} source="featured" />
+                            ))
+                        ) : (
+                            <p>No featured dishes available at the moment. Please check back later.</p>
+                        )}
                     </div>
+
                 </div>
             </section>
 
@@ -367,7 +387,7 @@ const LandingPage = () => {
                                 <img src={serviceProviderImg} alt="Service Provider" className="join_img" />
                             </div>
 
-                             {/* <!-- SIGN UP BUTTON --> */}
+                            {/* <!-- SIGN UP BUTTON --> */}
                             <button className="signup">Sign Up</button>
                         </div>
 
@@ -388,7 +408,7 @@ const LandingPage = () => {
 
                             {/* <!-- <p className="join_explanation">Deliver food orders for people and earn</p> --> */}
                             <p className="join_explanation">Do you have a job.Fulfill delivery orders for customers and earn per trip</p>
-                             {/* <!-- IMAGE DIV AND IMAGE --> */}
+                            {/* <!-- IMAGE DIV AND IMAGE --> */}
                             <div className="join_team_image_div">
                                 <img src={deliveryParsonImg} alt="Delivery Person" className="join_img" />
 
@@ -410,14 +430,14 @@ const LandingPage = () => {
                     <div className="about_us_content">
 
                         <div className="aboutUs_img_div aboutUs_img_div1">
-                            <img src={profileImg} alt="Founder's Picture" className="about_us_img"/>
+                            <img src={profileImg} alt="Founder's Picture" className="about_us_img" />
                         </div>
 
                         <div className="aboutUs_img_div aboutUs_img_div2">
-                            <img src={profileImg2} alt="Co-founder's Picture" className="about_us_img"/>
+                            <img src={profileImg2} alt="Co-founder's Picture" className="about_us_img" />
                         </div>
 
-                            <p className="aboutUs_paragraph">At Anyoka Eats, our mission is to transform the dining experience with a seamless, innovative online restaurant platform. Founded by a passionate team dedicated to enhancing food discovery and ordering, we combine cutting-edge technology with a love for great food.
+                        <p className="aboutUs_paragraph">At Anyoka Eats, our mission is to transform the dining experience with a seamless, innovative online restaurant platform. Founded by a passionate team dedicated to enhancing food discovery and ordering, we combine cutting-edge technology with a love for great food.
 
                             Our platform brings together a diverse range of restaurants and cuisines, allowing users to effortlessly browse, order, and enjoy their favorite dishes. With features like real-time order tracking, personalized recommendations, and a user-friendly interface, we strive to make every meal memorable.
 
@@ -428,7 +448,7 @@ const LandingPage = () => {
                             Our team, composed of experts in web development, user experience design, and culinary arts, works tirelessly to ensure that our platform not only meets but exceeds customer expectations. From dynamic dish updates to intuitive search functionalities, we are committed to providing an exceptional online dining experience.
 
                             Join us on this culinary journey and discover how Anyoka Eats is redefining the future of dining, events, and personalized food experiences.
-                            </p>
+                        </p>
                     </div>
 
                 </div>

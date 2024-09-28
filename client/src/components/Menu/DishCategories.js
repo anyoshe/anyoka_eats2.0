@@ -43,7 +43,7 @@ const DishCategories = () => {
       
     fetchData();
   }, []);
-
+  const availableDishes = dishes;
   // Fetch discounted dishes when the view changes to 'discounted'
   useEffect(() => {
     if (view === 'discounted') {
@@ -58,14 +58,17 @@ const DishCategories = () => {
       fetchDiscountedDishes();
     }
   }, [view]);
+  const availableDiscountedDishes = discountedDishes; // or fetch them using a function if needed
 
   const getTopRatedDishes = () => {
     return [...dishes].sort((a, b) => b.averageRating - a.averageRating).slice(0, 12);
   };
+  const topRatedDishes = getTopRatedDishes(); // Fetch the top-rated dishes
 
   const getPopularDishes = () => {
     return [...dishes].sort((a, b) => b.averageRating - a.averageRating).slice(0, 12);
   };
+    const popularDishes = getPopularDishes(); 
 
   const getPopularRestaurants = () => {
     return [...restaurants].sort((a, b) => b.averageRating - a.averageRating).slice(0, 4);
@@ -91,9 +94,17 @@ const DishCategories = () => {
           <div className='popularDishDiv menuDivs'>
             <h5 className='menuHeader'>Popular Dishes</h5>
             <ul id="popular-dishes" className="dish-list">
-              {getPopularDishes().map(dish => (
+              {/* {getPopularDishes().map(dish => (
                 <DishCard key={dish.dishCode} dish={dish} addToCart={() => {}} />
-              ))}
+              ))} */}
+              
+                {popularDishes.length > 0 ? (
+                  popularDishes.map(dish => (
+                    <DishCard key={dish.dishCode} dish={dish} addToCart={() => { }} />
+                  ))
+                ) : (
+                  <p>No popular dishes available at the moment. Please check back later.</p>
+                )}
             </ul>
           </div>
         )}
@@ -102,9 +113,16 @@ const DishCategories = () => {
               <div className='allDishDiv menuDivs'>
                 <h5 className='menuHeader'>All Dishes</h5>
                 <ul id="all-dishes" className="dish-list">
-                  {dishes.map(dish => (
+                  {/* {dishes.map(dish => (
                     <DishCard key={dish.dishCode} dish={dish} addToCart={() => {}} />
-                  ))}
+                  ))} */}
+                {availableDishes.length > 0 ? (
+                  availableDishes.map(dish => (
+                    <DishCard key={dish.dishCode} dish={dish} addToCart={() => { }} />
+                  ))
+                ) : (
+                  <p>No dishes available at the moment. Please check back later.</p>
+                )}
                 </ul>
               </div>
             )}
@@ -113,9 +131,19 @@ const DishCategories = () => {
           <div className='discountedDishDiv menuDivs'>
             <h5 className='menuHeader'>Discounted and Offers</h5>
             <ul id="discounted-dishes" className="dish-list">
-              {discountedDishes.map(dish => (
+              {/* {discountedDishes.map(dish => (
                 <DishCard key={dish.dishCode} dish={dish} addToCart={() => {}} />
-              ))}
+              ))} */}
+               
+
+                {availableDiscountedDishes.length > 0 ? (
+                  availableDiscountedDishes.map(dish => (
+                    <DishCard key={dish.dishCode} dish={dish} addToCart={() => { }} />
+                  ))
+                ) : (
+                  <p>No discounted dishes available at the moment. Please check back later.</p>
+                )}
+
             </ul>
           </div>
         )}
@@ -126,6 +154,16 @@ const DishCategories = () => {
                 {getTopRatedDishes().map(dish => (
                   <DishCard key={dish.dishCode} dish={dish} addToCart={() => {}} />
                 ))}
+                
+
+                {topRatedDishes.length > 0 ? (
+                  topRatedDishes.map(dish => (
+                    <DishCard key={dish.dishCode} dish={dish} addToCart={() => { }} />
+                  ))
+                ) : (
+                  <p>No top-rated dishes available at the moment. Please check back later.</p>
+                )}
+
               </ul>
             </div>
           )}
