@@ -190,8 +190,8 @@ const FoodLocationModal = ({ show, handleClose, vendors = [], orderedFoods = [] 
               <input type="text" id="customerLocation" className="form-control mt-3" placeholder="Delivery Location" readOnly />
             </div>
             <div className="modal-footer">
-              <button type="button" className="btn btn-secondary" data-bs-dismiss="modal" onClick={handleClose}>Close</button>
-              <button type="button" className="btn btn-primary" onClick={handleOkClick}>Ok</button>
+              <button type="button" className="btn btn-secondary valueControllers" data-bs-dismiss="modal" onClick={handleClose}>Close</button>
+              <button type="button" className="btn btn-primary valueControllers" onClick={handleOkClick}>Ok</button>
             </div>
           </div>
         </div>

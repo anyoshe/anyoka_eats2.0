@@ -162,7 +162,6 @@ const LandingPage = () => {
                 <div className="services-serchBar">
                     <SearchBar /><InstallPrompt />
 
-                     
                     {/* welcome message/slogan */}
                     <div className="services_slogan">
                         <div className="slogan">
@@ -180,12 +179,12 @@ const LandingPage = () => {
                             </Link>
 
                             {/* Outside Catering */}
-                            <Link to={'/outside-catering'}>
-                                <div id="cateringService" className="serviceDiv">
+                            {/* <Link to={'/outside-catering'}> */}
+                                <div id="disabled" className="serviceDiv">
                                     <img src={cateringImg} alt="Outside Catering" className="serviceImg" />
                                     <p>Outside Catering</p>
                                 </div>
-                            </Link>
+                            {/* </Link> */}
 
                             {/* Special Order */}
                             <div id="specialOrderService" className="serviceDiv">
@@ -202,12 +201,12 @@ const LandingPage = () => {
                             </Link>
 
                             {/* Conferencing & Meeting */}
-                            <Link to={'/conferences'}>
-                                <div id="conferencingService" className="serviceDiv">
+                            {/* <Link to={'/conferences'}> */}
+                                <div id="disabled" className="serviceDiv">
                                     <img src={conferencingImg} alt="Conferencing & Meeting" className="serviceImg" />
                                     <p>Conference & Meeting</p>
                                 </div>
-                            </Link>
+                            {/* </Link> */}
 
                             {/* Track Your Order */}
 
