@@ -57,9 +57,7 @@ app.use('/api', routes);
 app.use('/api', appRoutes);
 
 // File Uploads
-// app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
-app.use('/uploads', express.static(path.join('/var/data/uploads')));
-
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 // app.use('/uploads', express.static(path.join(__dirname, '/var/data/uploads')));
 // Serve static files from the persistent disk
 app.use('/uploads/images', express.static(path.join('/var/data/uploads/images')));
