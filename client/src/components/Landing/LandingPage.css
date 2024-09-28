@@ -171,6 +171,10 @@
     object-fit: cover;
 }
 
+#moreServices:disabled{
+    background: grey;
+}
+
 .serviceImg{
     position: absolute;
     transition: transform 0.3s ease;
@@ -190,6 +194,17 @@
 .faIcons{
     color: var(--orange);
 }
+
+#disabled{
+    pointer-events: none; 
+    opacity: 0.5;       
+    cursor: not-allowed; 
+    transition: ease-in .2s;
+}
+
+/* #disabled:hover{
+    cursor: pointer;
+} */
 
 .serviceDiv p{
     font-weight: 700;
