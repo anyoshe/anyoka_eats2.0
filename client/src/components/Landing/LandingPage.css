@@ -603,15 +603,15 @@ animation: hoverShake 0.15s linear 3;
     background: var(--green);
     font-size: 18px;
     margin-bottom: 5px;
-    width: 40%;
+    width: 7rem;
     transition: 0.2s ease-in;
 }
 
 .signup:hover{
-   cursor: pointer;
-   background: white;
-   outline: 1px solid var(--orange);
-   color: var(--orange);
+    cursor: pointer;
+    background: white;
+    outline: 1px solid var(--orange);
+    color: var(--orange);
 }
 
 .about_us_section{
@@ -1249,7 +1249,7 @@ animation: hoverShake 0.15s linear 3;
 }
 
 
-@media (min-width: 768px) and (max-width:1024px) {
+@media (min-width: 768px) and (max-width:1023px) {
     .containerDiv {
         /* border:5px solid red; */
     }
