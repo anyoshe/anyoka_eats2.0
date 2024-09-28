@@ -168,7 +168,7 @@ const OrderSummaryModal = ({ show, handleClose, restaurantName, orderedDishes = 
       const saveForLater = window.confirm('Would you like to save the order for later?');
       if (saveForLater) {
         alert('Your order has been saved for later.');
-        saveOrderForLater();
+        // saveOrderForLater();
       } else {
         alert('Order has been canceled.');
         setShowPaymentModal(false);
