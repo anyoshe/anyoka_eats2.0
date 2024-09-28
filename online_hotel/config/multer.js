@@ -85,18 +85,15 @@
 const multer = require('multer');
 const path = require('path');
 
-// Define the new root path on the persistent disk
-const rootUploadPath = '/var/data/uploads'; // Now everything will be saved under /var/data/uploads/
-
-// Set storage engine for general images
+// Set storage engine for images
 const storage = multer.diskStorage({
-  destination: path.join(rootUploadPath, 'images'), // Save images in /var/data/uploads/images
+  destination: '/var/data/uploads/images', // <-- Persistent disk location
   filename: (req, file, cb) => {
     cb(null, file.fieldname + '-' + Date.now() + path.extname(file.originalname));
   }
 });
 
-// Initialize upload for general images
+// Initialize upload variable for images
 const upload = multer({
   storage: storage,
   limits: { fileSize: 1000000 }, // 1MB file size limit
@@ -105,26 +102,9 @@ const upload = multer({
   }
 }).single('image');
 
-// Set storage engine for profile images
-const profileStorage = multer.diskStorage({
-  destination: path.join(rootUploadPath, 'profile-images'), // Save profile images in /var/data/uploads/profile-images
-  filename: (req, file, cb) => {
-    cb(null, 'profile-' + Date.now() + path.extname(file.originalname));
-  }
-});
-
-// Initialize upload for profile images
-const uploadProfileImage = multer({
-  storage: profileStorage,
-  limits: { fileSize: 1000000 }, // 1MB file size limit
-  fileFilter: (req, file, cb) => {
-    checkFileType(file, cb);
-  }
-}).single('profileImage');
-
-// Set storage engine for conference images/files
+// Set storage engine for conference files
 const conferenceStorage = multer.diskStorage({
-  destination: path.join(rootUploadPath, 'conferences'), // Save conference files in /var/data/uploads/conferences
+  destination: '/var/data/uploads/conferences', // <-- Persistent disk location for conferences
   filename: (req, file, cb) => {
     cb(null, Date.now() + path.extname(file.originalname));
   }
@@ -142,11 +122,28 @@ const uploadMultiple = multer({
   { name: 'floorPlans', maxCount: 4 }
 ]);
 
-// Function to check file types (images and videos)
+// Set storage engine for profile images
+const profileStorage = multer.diskStorage({
+  destination: '/var/data/uploads/profile-images', // <-- Persistent disk location for profile images
+  filename: (req, file, cb) => {
+    cb(null, 'profile-' + Date.now() + path.extname(file.originalname));
+  }
+});
+
+// Initialize upload variable for profile images
+const uploadProfileImage = multer({
+  storage: profileStorage,
+  limits: { fileSize: 1000000 }, // 1MB file size limit
+  fileFilter: (req, file, cb) => {
+    checkFileType(file, cb);
+  }
+}).single('profileImage');
+
+// Function to check file types (reused)
 function checkFileType(file, cb) {
   const imageFiletypes = /jpeg|jpg|png|gif/;
   const videoFiletypes = /mp4|webm|ogg/;
-
+  
   const isImage = imageFiletypes.test(path.extname(file.originalname).toLowerCase());
   const isVideo = videoFiletypes.test(path.extname(file.originalname).toLowerCase());
 
@@ -156,7 +153,7 @@ function checkFileType(file, cb) {
   if ((isImage && imageMimetype) || (isVideo && videoMimetype)) {
     return cb(null, true);
   } else {
-    cb(new Error('Error: Only images and videos are allowed!'));
+    cb(new Error('Error: Images and Videos Only!'));
   }
 }
 
