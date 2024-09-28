@@ -178,17 +178,47 @@ const OrderSummaryModal = ({ show, handleClose, restaurantName, orderedDishes = 
         }, 2000);
   };
 
-  const saveOrderForLater = () => {
-    const orderDetails = {
+  const sendSmsNotification = async (paymentData) => {
+    const smsDetails = {
+      phoneNumber: contactNumber,
+      message: `Your payment of KSH ${grandTotal.toFixed(2)} was successful! Your order will be delivered to ${pinnedLocation} by ${selectedTime}.`,
+    };
+    
+    try {
+      const response = await axios.post(`${config.backendUrl}/api/sendSms`, smsDetails, {
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+      
+      if (response.status === 200) {
+        console.log('SMS sent successfully:', response.data);
+      } else {
+        console.error('Failed to send SMS:', response.data);
+      }
+    } catch (error) {
+      console.error('Error sending SMS:', error);
+      alert('There was an issue sending the SMS notification. Please check your network and try again.');
+    }
+  };
+
+  const handlePaymentSuccess = async (data) => {
+    await sendSmsNotification(data); // Send SMS notification
+    
+    alert('Payment successful! Your order is being processed.');
+    const address = await getReadableAddress(pinnedLocation.lat, pinnedLocation.lng);
+    saveOrderToDatabase({
       phoneNumber: contactNumber,
       selectedRestaurant: restaurantName,
-      customerLocation: pinnedLocation,
+      customerLocation: address,
       expectedDeliveryTime: selectedTime,
       dishes: orderedDishes,
       deliveryCharges: deliveryCharges,
       totalPrice: grandTotal,
-    };
-    localStorage.setItem('savedOrder', JSON.stringify(orderDetails));
+    });
+    
+    clearCart();
+    setShowPaymentModal(false);
   };
 
   const initiateMpesaPayment = async (phoneNumber, amount) => {
@@ -204,11 +234,13 @@ const OrderSummaryModal = ({ show, handleClose, restaurantName, orderedDishes = 
       if (response.status === 200) {
         const data = response.data;
         if (data.ResponseCode === '0') {
+          handlePaymentSuccess(data); // Handle success
           alert(data.CustomerMessage);
-          return data;
+          // return data;
         } else {
           console.error('Payment failed:', data.ResponseDescription);
           alert('Payment failed. Please try again.');
+          handlePaymentFailure(); // Handle failure
           return null;
         }
       } else {
@@ -222,6 +254,18 @@ const OrderSummaryModal = ({ show, handleClose, restaurantName, orderedDishes = 
       return null;
     }
   };
+  // const saveOrderForLater = () => {
+  //   const orderDetails = {
+  //     phoneNumber: contactNumber,
+  //     selectedRestaurant: restaurantName,
+  //     customerLocation: pinnedLocation,
+  //     expectedDeliveryTime: selectedTime,
+  //     dishes: orderedDishes,
+  //     deliveryCharges: deliveryCharges,
+  //     totalPrice: grandTotal,
+  //   };
+  //   localStorage.setItem('savedOrder', JSON.stringify(orderDetails));
+  // };
 
   const saveOrderToDatabase = async (orderDetails) => {
     try {
