@@ -46,24 +46,57 @@ const Profile = ({ onSave }) => {
     const toggleEditImageMode = () => setEditImageMode(!editImageMode);
     const toggleEditSection = () => setEditSectionMode(!editSectionMode);
 
+    // const saveProfileImage = async () => {
+    //     const file = profileImageInputRef.current.files[0];
+    //     if (file) {
+    //         const formData = new FormData();
+    //         formData.append('profileImage', file);
+    //         formData.append('partnerId', partner._id); // Append partnerId
+
+    //         try {
+    //             const response = await fetch(`${config.backendUrl}/api/upload-profile-image`, {
+    //                 method: 'POST',
+    //                 body: formData,
+    //             });
+
+    //             const data = await response.json();
+
+    //             if (response.ok) {
+    //                 console.log('Uploaded image data:', data);
+    //                 updatePartnerDetails({ ...partner, profileImage: data.profileImage });
+    //                 onSave(); // Notify parent component about the change
+    //             } else {
+    //                 console.error('Error uploading image:', data.message);
+    //             }
+    //         } catch (error) {
+    //             console.error('Error uploading image:', error);
+    //         }
+
+    //         setEditImageMode(false);
+    //     }
+    // };
+
     const saveProfileImage = async () => {
         const file = profileImageInputRef.current.files[0];
         if (file) {
             const formData = new FormData();
             formData.append('profileImage', file);
             formData.append('partnerId', partner._id); // Append partnerId
-
+    
             try {
                 const response = await fetch(`${config.backendUrl}/api/upload-profile-image`, {
                     method: 'POST',
                     body: formData,
                 });
-
+    
                 const data = await response.json();
-
+    
                 if (response.ok) {
                     console.log('Uploaded image data:', data);
-                    updatePartnerDetails({ ...partner, profileImage: data.profileImage });
+                    
+                    // Update partner details and display the correct image URL
+                    const profileImageUrl = `${config.backendUrl}${data.profileImage}`; // Prepend domain
+                    updatePartnerDetails({ ...partner, profileImage: profileImageUrl });
                     onSave(); // Notify parent component about the change
                 } else {
                     console.error('Error uploading image:', data.message);
@@ -71,11 +104,11 @@ const Profile = ({ onSave }) => {
             } catch (error) {
                 console.error('Error uploading image:', error);
             }
-
+    
             setEditImageMode(false);
         }
     };
-
+    
     const saveSection = async () => {
         try {
             const response = await axios.put(`${config.backendUrl}/api/partners/${partner._id}`, formData);

@@ -249,21 +249,53 @@ res.status(200).json({ message: 'Partner updated successfully', updatedPartner }
 });
 
 
+// router.post('/upload-profile-image', (req, res) => {
+//   uploadProfileImage(req, res, async (err) => {
+//     if (err) {
+//       return res.status(400).json({ message: err.message });
+//     }
+
+//     // Assuming the image path is stored in req.file after upload
+//     const imagePath = req.file.path; // This depends on how you handle the upload. It might be req.file.filename if you store the filename only.
+
+//     try {
+//       // Find the partner by ID and update their profileImage field
+//       const { partnerId } = req.body; // partnerId should be sent in the request body
+//       const updatedPartner = await Partner.findByIdAndUpdate(
+//         partnerId,
+//         { profileImage: imagePath },
+//         { new: true }
+//       );
+
+//       if (!updatedPartner) {
+//         return res.status(404).json({ message: 'Partner not found' });
+//       }
+
+//       res.status(200).json({
+//         message: 'Image uploaded and profile updated successfully',
+//         profileImage: updatedPartner.profileImage,
+//       });
+//     } catch (error) {
+//       console.error('Error updating partner profile image:', error);
+//       res.status(500).json({ message: 'Server error' });
+//     }
+//   });
+// });
+
+
 router.post('/upload-profile-image', (req, res) => {
   uploadProfileImage(req, res, async (err) => {
     if (err) {
       return res.status(400).json({ message: err.message });
     }
 
-    // Assuming the image path is stored in req.file after upload
-    const imagePath = req.file.path; // This depends on how you handle the upload. It might be req.file.filename if you store the filename only.
+    const imagePath = req.file.path;
 
     try {
-      // Find the partner by ID and update their profileImage field
-      const { partnerId } = req.body; // partnerId should be sent in the request body
+      const { partnerId } = req.body;
       const updatedPartner = await Partner.findByIdAndUpdate(
         partnerId,
-        { profileImage: imagePath },
+        { profileImage: `/uploads/profile-images/${req.file.filename}` }, // Save relative URL
         { new: true }
       );
 
@@ -271,9 +303,10 @@ router.post('/upload-profile-image', (req, res) => {
         return res.status(404).json({ message: 'Partner not found' });
       }
 
+      // Return the relative URL path instead of the server path
       res.status(200).json({
         message: 'Image uploaded and profile updated successfully',
-        profileImage: updatedPartner.profileImage,
+        profileImage: `/uploads/profile-images/${req.file.filename}`, // Return relative URL
       });
     } catch (error) {
       console.error('Error updating partner profile image:', error);
