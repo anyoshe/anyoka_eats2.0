@@ -179,7 +179,7 @@ const Profile = ({ onSave }) => {
                     type="file"
                     id="profileImageInput"
                     className="profile-image-input"
-                    onChange={handleFileChange} // Handle file change separately
+                    onChange={saveProfileImage}  // Directly call saveProfileImage on file change
                     ref={profileImageInputRef}
                     style={{ display: editImageMode ? 'block' : 'none' }}
                 />
