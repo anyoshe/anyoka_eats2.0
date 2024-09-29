@@ -25,12 +25,39 @@ export const PartnerProvider = ({ children }) => {
         }));
     };
 
+    // const updateContactDetails = async (updatedContact) => {
+    //     try {
+    //         const formattedContact = {
+    //             email: updatedContact.email.map(email => email.trim()),
+    //             phoneNumbers: updatedContact.phoneNumbers.map(phone => phone.trim()),
+    //             faxNumbers: updatedContact.faxNumbers.map(fax => fax.trim())
+    //         };
+    
+    //         const response = await fetch(`${config.backendUrl}/api/contacts/${partner._id}`, {
+    //             method: 'PUT',
+    //             headers: {
+    //                 'Content-Type': 'application/json',
+    //             },
+    //             body: JSON.stringify(formattedContact),
+    //         });
+    
+    //         if (!response.ok) {
+    //             throw new Error('Failed to update contact details');
+    //         }
+    
+    //         const updatedContactFromServer = await response.json();
+    //         setContact(updatedContactFromServer);
+    //     } catch (error) {
+    //         console.error('Error updating contact:', error);
+    //     }
+    // };
+
     const updateContactDetails = async (updatedContact) => {
         try {
             const formattedContact = {
-                email: updatedContact.email.map(email => email.trim()),
-                phoneNumbers: updatedContact.phoneNumbers.map(phone => phone.trim()),
-                faxNumbers: updatedContact.faxNumbers.map(fax => fax.trim())
+                email: (updatedContact.email || []).map(email => email.trim()),           // Ensure it's an array
+                phoneNumbers: (updatedContact.phoneNumbers || []).map(phone => phone.trim()), // Ensure it's an array
+                faxNumbers: (updatedContact.faxNumbers || []).map(fax => fax.trim())        // Ensure it's an array
             };
     
             const response = await fetch(`${config.backendUrl}/api/contacts/${partner._id}`, {
@@ -51,6 +78,7 @@ export const PartnerProvider = ({ children }) => {
             console.error('Error updating contact:', error);
         }
     };
+    
     
     useEffect(() => {
         const storedPartner = JSON.parse(localStorage.getItem('partnerDetails'));
