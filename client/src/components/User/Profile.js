@@ -82,20 +82,22 @@ const Profile = ({ onSave }) => {
             const formData = new FormData();
             formData.append('profileImage', file);
             formData.append('partnerId', partner._id); // Append partnerId
-    
+
             try {
                 const response = await fetch(`${config.backendUrl}/api/upload-profile-image`, {
                     method: 'POST',
                     body: formData,
                 });
-    
+
                 const data = await response.json();
-    
+
                 if (response.ok) {
                     console.log('Uploaded image data:', data);
-                    
-                    // Update partner details and display the correct image URL
-                    const profileImageUrl = `${config.backendUrl}${data.profileImage}`; // Prepend domain
+
+                    // Construct the correct URL to display the profile image
+                    const profileImageUrl = `${config.backendUrl}${data.profileImage.replace(/\\/g, '/')}`; // Ensure no extra slash
+
+                    // Update the state with the new profile image URL
                     updatePartnerDetails({ ...partner, profileImage: profileImageUrl });
                     onSave(); // Notify parent component about the change
                 } else {
@@ -104,11 +106,12 @@ const Profile = ({ onSave }) => {
             } catch (error) {
                 console.error('Error uploading image:', error);
             }
-    
+
             setEditImageMode(false);
         }
     };
-    
+
+
     const saveSection = async () => {
         try {
             const response = await axios.put(`${config.backendUrl}/api/partners/${partner._id}`, formData);
@@ -133,7 +136,7 @@ const Profile = ({ onSave }) => {
     return (
         <div id="profileImageSection" className="account_details">
             {/* Profile Image Section */}
-            <div className="essential_image">
+            {/* <div className="essential_image">
                 <input
                     type="file"
                     id="profileImageInput"
@@ -145,13 +148,51 @@ const Profile = ({ onSave }) => {
 
                 <div className="profile_img_div">
                     <img
-                        src={partner?.profileImage ? `${config.backendUrl}/${partner.profileImage.replace(/\\/g, '/')}` : profileImg}
+                        // src={partner?.profileImage ? `${config.backendUrl}/${partner.profileImage.replace(/\\/g, '/')}` : profileImg}
+                        src={partner?.profileImage ? `${config.backendUrl}${partner.profileImage.replace(/\\/g, '/')}` : profileImg}
                         alt="Business Profile"
                         className="account_profile_img"
                         ref={profileImageRef}
                     />
                 </div>
                 
+                <div className='image_button'>
+                    <button
+                        className="editButton profilePicBtn"
+                        onClick={toggleEditImageMode}
+                    >
+                        {editImageMode ? 'Cancel' : 'Edit Picture'}
+                    </button>
+
+                    {editImageMode && (
+                        <button
+                            className="saveButton profilePicBtn"
+                            onClick={saveProfileImage}
+                        >
+                            Save
+                        </button>
+                    )}
+                </div>
+            </div> */}
+            <div className="essential_image">
+                <input
+                    type="file"
+                    id="profileImageInput"
+                    className="profile-image-input"
+                    onChange={handleFileChange} // Handle file change separately
+                    ref={profileImageInputRef}
+                    style={{ display: editImageMode ? 'block' : 'none' }}
+                />
+
+                <div className="profile_img_div">
+                    <img
+                        src={partner?.profileImage ? `${config.backendUrl}${partner.profileImage.replace(/\\/g, '/')}` : profileImg}
+                        alt="Business Profile"
+                        className="account_profile_img"
+                        ref={profileImageRef}
+                    />
+                </div>
+
                 <div className='image_button'>
                     <button
                         className="editButton profilePicBtn"
@@ -209,7 +250,7 @@ const Profile = ({ onSave }) => {
                             disabled={!editSectionMode}
                         />
                     </div>
-                    
+
                     <div className="essential_grid_content">
                         <input
                             type="text"
