@@ -13,6 +13,7 @@ import DriverCreateAccount from './components/Landing/DriverCreateAccount';
 import ConferenceLandingPage from './components/Conferences/ConferenceLandingPage';
 import OutsideCateringLandingPage from './components/OutsideCatering/OutsideCateringLandingPage';
 import UserProfileDashBoard from './components/User/UserProfileDashBoard';
+import QuoteForm from './components/FreshFood/Getquote';
 import { PartnerProvider } from './contexts/PartnerContext';
 import DishCategories from './components/Menu/DishCategories';
 import InstallPrompt from './components/Header/InstallPrompt';
@@ -31,6 +32,7 @@ function App() {
                     <Route path="/sign-up-sign-in" element={<SignUpSignIn />} />
                     <Route path="/DriverDashboard" element={<DriverDashboard />} />
                     <Route path="/driverCreateAccount" element={<DriverCreateAccount />} />
+                    <Route path="/QuoteForm" element={<QuoteForm />} />
                     <Route path="/dashboard" element={<UserProfileDashBoard />} />
                     <Route path="/menu" element={
                         <CartProvider>
