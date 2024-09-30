@@ -124,6 +124,7 @@
 
 .fresh_category li {
     list-style: none;
+    cursor: pointer;
 }
 
 .fresh_link{
@@ -132,6 +133,7 @@
     font-size: 16px;
     transition: ease-in 0.2s;
     margin: 0px 10px;
+    transition: ease-in .2s;
 }
 
 .fresh_link:hover, .fresh_link:focus{
