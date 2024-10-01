@@ -1327,6 +1327,8 @@ async function saveOrder(orderDetails) {
 }
 // Update order status
 router.patch('/updateOrderStatus/:orderId', async (req, res) => {
+  console.log('Updating order status for:', req.params.orderId);
+  console.log('Request body:', req.body);
   try {
     const { orderId } = req.params;
     const { status } = req.body;
