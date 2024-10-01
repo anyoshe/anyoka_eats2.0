@@ -14,7 +14,7 @@ const Dashboard = () => {
     const [driverImage, setDriverImage] = useState(null); // New state for driver image
     const [editing, setEditing] = useState(false); // State to toggle editing mode
 
-    useEffect(() => {
+    // useEffect(() => {
         const fetchOrders = async () => {
             try {
                 const response = await fetch(`${config.backendUrl}/api/orders`);
@@ -66,7 +66,7 @@ const Dashboard = () => {
             }
         };
         
-
+        useEffect(() => {
         fetchOrders();
         fetchDriverDetails();
     }, []);
@@ -79,13 +79,62 @@ const Dashboard = () => {
         setShowProfileCard(prev => !prev);
     };
 
-    const handleAcceptOrder = (order) => {
-        setSelectedOrder(order);
+    // const handleAcceptOrder = (order) => {
+    //     setSelectedOrder(order);
+    // };
+    const handleAcceptOrder = async (order) => {
+        try {
+            // Call the API to update the order status
+            const response = await fetch(`${config.backendUrl}/api/updateOrderStatus/${order.order}`, {
+                method: 'PATCH',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ status: 'Dispatched' }), // Update the status to 'Dispatched'
+            });
+    
+            if (!response.ok) {
+                throw new Error('Failed to accept the order');
+            }
+    
+            const updatedOrder = await response.json();
+            console.log(updatedOrder);
+    
+            // Optionally, you might want to update your local state to reflect the accepted order
+            setSelectedOrder(order); // Set the selected order for display
+            // Fetch orders again to refresh the list
+            fetchOrders(); // Refresh the orders to remove the accepted order from the list
+        } catch (error) {
+            console.error('Error accepting order:', error);
+        }
     };
+    
 
-    const handleDeclineOrder = () => {
-        setSelectedOrder(null);
+    const handleDeclineOrder = async () => {
+        if (!selectedOrder) return; // Exit if no order is selected
+    
+        try {
+            // Call the API to update the order status
+            const response = await fetch(`${config.backendUrl}/api/updateOrderStatus/${selectedOrder.order}`, {
+                method: 'PATCH',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ status: 'Processed and packed' }), // Update the status to 'Processed and packed'
+            });
+    
+            if (!response.ok) {
+                throw new Error('Failed to decline the order');
+            }
+    
+            // Optionally, you might want to update your local state
+            setSelectedOrder(null); // Clear the selected order
+            fetchOrders(); // Refresh the orders to get the updated list
+        } catch (error) {
+            console.error('Error declining order:', error);
+        }
     };
+    
     const handleUpdateDriver = async () => {
         const formData = new FormData();
         formData.append('location', location);
