@@ -270,7 +270,7 @@ const LandingFreshFood = () => {
       <section className="wholesale">
         <h2 className='fresh-wholesale-title'>Wholesale & Bulk Orders</h2>
         <p className='fresh-wholesale-para'>Looking for bulk purchases? Contact us for exclusive wholesale prices and offers.</p>
-        <a href="#contact" className="wholesale-cta-button">Get a Quote</a>
+        <a href="/QuoteForm" className="wholesale-cta-button">Get a Quote</a>
       </section>
 
       <FooterComponent />
