@@ -330,6 +330,10 @@ const Dashboard = () => {
             try {
                 const response = await fetch(`${config.backendUrl}/api/orders`);
                 const data = await response.json();
+
+            // Filter the orders to only include those with the status 'Processed and packed'
+            const processedOrders = data.filter(order => order.status === 'Processed and packed');
+            
                 const formattedOrders = data.map(order => ({
                     id: order._id,
                     name: order.selectedRestaurant,
