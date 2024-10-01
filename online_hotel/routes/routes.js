@@ -2193,82 +2193,42 @@ router.get('/driverDetails', async (req, res) => {
   }
 });
 
-// Update driver details
-// router.patch('/driverDetails', async (req, res) => {
-//   const { location, vehicleType } = req.body;
-//   try {
-//       const updatedDriver = await Driver.findOneAndUpdate(
-//           {}, // Adjust query if you have a specific driver ID to update
-//           { location, vehicleType },
-//           { new: true, runValidators: true }
-//       );
-//       if (!updatedDriver) {
-//           return res.status(404).json({ message: 'Driver not found' });
-//       }
-//       res.json(updatedDriver);
-//   } catch (error) {
-//       console.error('Error updating driver details:', error);
-//       res.status(500).json({ message: 'Server error' });
-//   }
-// });
 
-// router.patch('/driverDetails', upload, async (req, res) => {
-//   const { location, vehicleType } = req.body;
-//   const driverImage = req.file ? req.file.path : null; // Get the uploaded image path
-
-//   try {
-//       const updatedDriver = await Driver.findOneAndUpdate(
-//           {}, // Adjust query if you have a specific driver ID to update
-//           { location, vehicleType, driverImage }, // Include the image field
-//           { new: true, runValidators: true }
-//       );
-
-//       if (!updatedDriver) {
-//           return res.status(404).json({ message: 'Driver not found' });
-//       }
-
-//       res.json(updatedDriver);
-//   } catch (error) {
-//       console.error('Error updating driver details:', error);
-//       res.status(500).json({ message: 'Server error' });
-//   }
-// });
-
-router.patch('/driverDetails', upload, async (req, res) => {
-  console.log("Request received:", req.body);
-  const { location, vehicleType, IDNumber, DriverLicenceNumber } = req.body; // Get details from the request body
-  const driverImage = req.file ? `/uploads/images/${req.file.filename}` : null; // Get the uploaded image's relative path
-
-  try {
-    // Build the update object dynamically
-    const updateData = { location, vehicleType };
-
-    // Only add driverImage if a new image was uploaded
-    if (driverImage) {
-      updateData.driverImage = driverImage;
+  router.patch('/driverDetails', upload, async (req, res) => {
+    console.log("Request received:", req.body);
+    const { location, vehicleType, driverId } = req.body; // Use driverId from the request body
+    const driverImage = req.file ? `/uploads/images/${req.file.filename}` : null; // Get the uploaded image's relative path
+  
+    try {
+      // Build the update object dynamically
+      const updateData = { location, vehicleType };
+  
+      // Only add driverImage if a new image was uploaded
+      if (driverImage) {
+        updateData.driverImage = driverImage;
+      }
+  
+      // Find the driver by driverId and update details
+      const updatedDriver = await Driver.findByIdAndUpdate(
+        driverId, // Use the driverId to find the driver
+        updateData, // Update with location, vehicleType, and optionally driverImage
+        { new: true, runValidators: true } // Return the updated document
+      );
+  
+      if (!updatedDriver) {
+        console.log("Driver not found");
+        return res.status(404).json({ message: 'Driver not found' });
+      }
+  
+      res.status(200).json({
+        message: 'Driver details updated successfully',
+        driver: updatedDriver
+      });
+    } catch (error) {
+      console.error('Error updating driver details:', error);
+      res.status(500).json({ message: 'Server error' });
     }
-
-    // Find the driver by IDNumber or DriverLicenceNumber and update details
-    const updatedDriver = await Driver.findOneAndUpdate(
-      { $or: [{ IDNumber }, { DriverLicenceNumber }] }, // Match either by IDNumber or DriverLicenceNumber
-      updateData, // Update with location, vehicleType, and optionally driverImage
-      { new: true, runValidators: true } // Return the updated document
-    );
-
-    if (!updatedDriver) {
-      console.log("Driver not found");
-      return res.status(404).json({ message: 'Driver not found' });
-    }
-
-    res.status(200).json({
-      message: 'Driver details updated successfully',
-      driver: updatedDriver
-    });
-  } catch (error) {
-    console.error('Error updating driver details:', error);
-    res.status(500).json({ message: 'Server error' });
-  }
-});
+  });
 
 
 //PAYMENTS AND UPDATE ROUTES

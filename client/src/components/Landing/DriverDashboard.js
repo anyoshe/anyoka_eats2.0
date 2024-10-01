@@ -76,7 +76,6 @@ const Dashboard = () => {
     const handleDeclineOrder = () => {
         setSelectedOrder(null);
     };
-
     const handleUpdateDriver = async () => {
         const formData = new FormData();
         formData.append('location', location);
@@ -84,14 +83,17 @@ const Dashboard = () => {
         if (driverImage) {
             formData.append('image', driverImage); // Include the image if available
         }
-
+    
+        // Add the driver ID fetched earlier
+        formData.append('driverId', driverDetails._id); // Assuming driverDetails contains the driver's data
+    
         try {
             console.log(formData);
             const response = await fetch(`${config.backendUrl}/api/driverDetails`, {
                 method: 'PATCH', // Use PATCH for updating
                 body: formData,
             });
-
+    
             if (response.ok) {
                 const updatedDriver = await response.json();
                 setDriverDetails(updatedDriver); // Update driver details after successful patch
@@ -104,6 +106,7 @@ const Dashboard = () => {
             console.error('Error updating driver details:', error);
         }
     };
+    
 
     return (
         <div className="dial-slider_wrapper">
@@ -124,7 +127,7 @@ const Dashboard = () => {
                             <div className={`profile-card-overlay ${showProfileCard ? 'show' : ''}`}>
                                 <div className="profile-cards">
                                     <div className="image">
-                                        {/* <img src={driverImage || 'default-image.jpg'} alt="Driver" height="60%" width="60%" /> */}
+                                        <img src={driverImage} alt="Driver" height="60%" width="60%" />
                                         <div className="image-upload">
                                             {editing && (
                                                 <>
