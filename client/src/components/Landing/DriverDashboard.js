@@ -333,8 +333,8 @@ const Dashboard = () => {
 
             // Filter the orders to only include those with the status 'Processed and packed'
             const processedOrders = data.filter(order => order.status === 'Processed and packed');
-            
-                const formattedOrders = data.map(order => ({
+
+                   const formattedOrders = processedOrders.map(order => ({
                     id: order._id,
                     name: order.selectedRestaurant,
                     pickup: order.selectedRestaurantLocation || order.selectedRestaurant,
