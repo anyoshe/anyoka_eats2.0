@@ -16,7 +16,7 @@ import UserProfileDashBoard from './components/User/UserProfileDashBoard';
 import { PartnerProvider } from './contexts/PartnerContext';
 import DishCategories from './components/Menu/DishCategories';
 import InstallPrompt from './components/Header/InstallPrompt';
-
+import { DriverProvider } from './contexts/DriverContext';
 function App() {
     return (
         
@@ -29,8 +29,17 @@ function App() {
                 <Routes>
                     <Route path="/" element={<LandingPage />} />
                     <Route path="/sign-up-sign-in" element={<SignUpSignIn />} />
-                    <Route path="/DriverDashboard" element={<DriverDashboard />} />
-                    <Route path="/driverCreateAccount" element={<DriverCreateAccount />} />
+                    {/* Move the DriverProvider inside the Route elements */}
+                    <Route path="/DriverDashboard" element={
+                                <DriverProvider>
+                                    <DriverDashboard />
+                                </DriverProvider>
+                            } />
+                            <Route path="/driverCreateAccount" element={
+                                <DriverProvider>
+                                    <DriverCreateAccount />
+                                </DriverProvider>
+                            } />
                     <Route path="/dashboard" element={<UserProfileDashBoard />} />
                     <Route path="/menu" element={
                         <CartProvider>

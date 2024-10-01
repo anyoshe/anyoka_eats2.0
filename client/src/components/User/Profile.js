@@ -46,36 +46,6 @@ const Profile = ({ onSave }) => {
     const toggleEditImageMode = () => setEditImageMode(!editImageMode);
     const toggleEditSection = () => setEditSectionMode(!editSectionMode);
 
-    // const saveProfileImage = async () => {
-    //     const file = profileImageInputRef.current.files[0];
-    //     if (file) {
-    //         const formData = new FormData();
-    //         formData.append('profileImage', file);
-    //         formData.append('partnerId', partner._id); // Append partnerId
-
-    //         try {
-    //             const response = await fetch(`${config.backendUrl}/api/upload-profile-image`, {
-    //                 method: 'POST',
-    //                 body: formData,
-    //             });
-
-    //             const data = await response.json();
-
-    //             if (response.ok) {
-    //                 console.log('Uploaded image data:', data);
-    //                 updatePartnerDetails({ ...partner, profileImage: data.profileImage });
-    //                 onSave(); // Notify parent component about the change
-    //             } else {
-    //                 console.error('Error uploading image:', data.message);
-    //             }
-    //         } catch (error) {
-    //             console.error('Error uploading image:', error);
-    //         }
-
-    //         setEditImageMode(false);
-    //     }
-    // };
-
     const saveProfileImage = async () => {
         const file = profileImageInputRef.current.files[0];
         if (file) {
@@ -135,45 +105,6 @@ const Profile = ({ onSave }) => {
 
     return (
         <div id="profileImageSection" className="account_details">
-            {/* Profile Image Section */}
-            {/* <div className="essential_image">
-                <input
-                    type="file"
-                    id="profileImageInput"
-                    className="profile-image-input"
-                    onChange={saveProfileImage}
-                    ref={profileImageInputRef}
-                    style={{ display: editImageMode ? 'block' : 'none' }}
-                />
-
-                <div className="profile_img_div">
-                    <img
-                        // src={partner?.profileImage ? `${config.backendUrl}/${partner.profileImage.replace(/\\/g, '/')}` : profileImg}
-                        src={partner?.profileImage ? `${config.backendUrl}${partner.profileImage.replace(/\\/g, '/')}` : profileImg}
-                        alt="Business Profile"
-                        className="account_profile_img"
-                        ref={profileImageRef}
-                    />
-                </div>
-                
-                <div className='image_button'>
-                    <button
-                        className="editButton profilePicBtn"
-                        onClick={toggleEditImageMode}
-                    >
-                        {editImageMode ? 'Cancel' : 'Edit Picture'}
-                    </button>
-
-                    {editImageMode && (
-                        <button
-                            className="saveButton profilePicBtn"
-                            onClick={saveProfileImage}
-                        >
-                            Save
-                        </button>
-                    )}
-                </div>
-            </div> */}
             <div className="essential_image">
                 <input
                     type="file"
