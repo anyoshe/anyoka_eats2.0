@@ -2235,6 +2235,7 @@ router.get('/driverDetails', async (req, res) => {
 // });
 
 router.patch('/driverDetails', upload, async (req, res) => {
+  console.log("Request received:", req.body);
   const { location, vehicleType, IDNumber, DriverLicenceNumber } = req.body; // Get details from the request body
   const driverImage = req.file ? `/uploads/images/${req.file.filename}` : null; // Get the uploaded image's relative path
 
@@ -2255,6 +2256,7 @@ router.patch('/driverDetails', upload, async (req, res) => {
     );
 
     if (!updatedDriver) {
+      console.log("Driver not found");
       return res.status(404).json({ message: 'Driver not found' });
     }
 
