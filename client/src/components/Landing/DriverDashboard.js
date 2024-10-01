@@ -46,16 +46,26 @@ const Dashboard = () => {
         const fetchDriverDetails = async () => {
             try {
                 const response = await fetch(`${config.backendUrl}/api/driverDetails`); // Adjust endpoint as needed
+                if (!response.ok) {
+                    throw new Error('Failed to fetch driver details');
+                }
+                
                 const data = await response.json();
                 console.log(data);
+                
+                // Construct the full driver image URL
+                const driverImage = `${config.backendUrl}${data.driverImage}`;
+                
+                // Update state with fetched data
                 setDriverDetails(data);
                 setLocation(data.location || ''); // Initialize input field with existing location
                 setVehicleType(data.vehicleType || ''); // Initialize input field with existing vehicle type
-                setDriverImage(data.driverImage || null); // Initialize driver image
+                setDriverImage(driverImage || null); // Initialize driver image with the full URL
             } catch (error) {
                 console.error('Failed to fetch driver details:', error);
             }
         };
+        
 
         fetchOrders();
         fetchDriverDetails();
@@ -127,7 +137,7 @@ const Dashboard = () => {
                             <div className={`profile-card-overlay ${showProfileCard ? 'show' : ''}`}>
                                 <div className="profile-cards">
                                     <div className="image">
-                                        <img src={driverImage} alt="Driver" height="60%" width="60%" />
+                                    {driverImage && <img src={driverImage} alt="Driver" />}
                                         <div className="image-upload">
                                             {editing && (
                                                 <>
