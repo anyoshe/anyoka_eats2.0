@@ -4,6 +4,8 @@ import OrderSummaryModal from './FoodOrderSummaryModal';
 
 import { useFreshFoodCart } from './FreshFoodCartContext';
 
+import './FoodLocationalModal.css';
+
 const googleApiKey = process.env.REACT_APP_GOOGLE_API_KEY;
 
 const FoodLocationModal = ({ show, handleClose, vendors = [], orderedFoods = [] }) => {
@@ -178,20 +180,28 @@ const FoodLocationModal = ({ show, handleClose, vendors = [], orderedFoods = [] 
   return (
     <>
       <div className={`modal fade ${show ? 'show' : ''}`} id="locationModal" tabIndex="-1" aria-labelledby="locationModalLabel" aria-hidden="true" style={{ display: show ? 'block' : 'none' }}>
-        <div className="modal-dialog modal-lg">
+        <div className="modal-dialog modal-lg freshfoodDalog">
+
           <div className="modal-content">
+
             <div className="modal-header">
+
               <h5 className="modal-title" id="locationModalLabel">Pin Your Delivery Location</h5>
+
               <button type="button" className="btn-close" data-bs-dismiss="modal" aria-label="Close" onClick={handleClose}></button>
+              
             </div>
-            <div className="modal-body" style={{ maxHeight: 'calc(100vh - 210px)', overflowY: 'auto' }}>
+              <div className="modal-body" style={{ maxHeight: 'calc(100vh - 210px)', overflowY: 'auto' }}>
+
               <div><strong>Vendor Location:</strong> {vendorCoords ? `${vendorCoords.lat}, ${vendorCoords.lng}` : 'Fetching...'}</div>
+
               <div id="mapContainer" style={{ height: '400px' }}></div>
               <input type="text" id="customerLocation" className="form-control mt-3" placeholder="Delivery Location" readOnly />
             </div>
+
             <div className="modal-footer">
-              <button type="button" className="btn btn-secondary valueControllers" data-bs-dismiss="modal" onClick={handleClose}>Close</button>
-              <button type="button" className="btn btn-primary valueControllers" onClick={handleOkClick}>Ok</button>
+              <button type="button" className="valueControllers" data-bs-dismiss="modal" onClick={handleClose}>Close</button>
+              <button type="button" className="valueControllers" onClick={handleOkClick}>Ok</button>
             </div>
           </div>
         </div>

@@ -1,3 +1,14 @@
-.modal-dialog {
-    overflow-y: scroll;
+.freshfoodDalog {
+    /* overflow-y: hidden; */
+    margin-top: 3%;
+    /* z-index: 10000; */
+}
+
+
+.valueControllers{
+    color: white;
+    background: var(--green);
+    border: none;
+    padding: 0.5rem 1rem;
+    transition: ease-in .2;
 }

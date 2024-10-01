@@ -14,3 +14,16 @@
 #fresh_cart:hover{
     color: white;
 }
+
+#cartCount2{
+    position: absolute;
+    top: 3%; 
+    right: 4.8%;
+    font-weight: 600;
+    font-size: 18px;
+    color: red;
+}
+
+#cart2{
+    margin-right: 5%;
+}

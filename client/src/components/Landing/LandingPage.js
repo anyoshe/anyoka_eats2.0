@@ -175,7 +175,8 @@ const LandingPage = () => {
                             <Link to="/menu">
                                 <div id="foodService" className="serviceDiv">
                                     <img src={foodImg} alt="Food" className="serviceImg" />
-                                    <p>Food</p>
+                                    {/* <p>Food</p> */}
+                                    <p>Ready Meals</p>
                                 </div>
                             </Link>
 
@@ -194,12 +195,12 @@ const LandingPage = () => {
                             </div>
 
                             {/* More */}
-                            <Link to={'/user'}>
+                            {/* <Link to={'/user'}> */}
                                 <div id="moreServices" className="serviceDiv">
                                     <FontAwesomeIcon icon={faPlusSquare} className="faIcons fa-7x" />
                                     <p>More</p>
                                 </div>
-                            </Link>
+                            {/* </Link> */}
 
                             {/* Conferencing & Meeting */}
                             {/* <Link to={'/conferences'}> */}
@@ -433,13 +434,13 @@ const LandingPage = () => {
 
                     <div className="about_us_content">
 
-                        <div className="aboutUs_img_div aboutUs_img_div1">
+                        {/* <div className="aboutUs_img_div aboutUs_img_div1">
                             <img src={profileImg} alt="Founder's Picture" className="about_us_img" />
-                        </div>
+                        </div> */}
 
-                        <div className="aboutUs_img_div aboutUs_img_div2">
+                        {/* <div className="aboutUs_img_div aboutUs_img_div2">
                             <img src={profileImg2} alt="Co-founder's Picture" className="about_us_img" />
-                        </div>
+                        </div> */}
 
                         <p className="aboutUs_paragraph">At Anyoka Eats, our mission is to transform the dining experience with a seamless, innovative online restaurant platform. Founded by a passionate team dedicated to enhancing food discovery and ordering, we combine cutting-edge technology with a love for great food.
 
