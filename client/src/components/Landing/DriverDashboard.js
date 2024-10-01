@@ -50,8 +50,8 @@ const Dashboard = () => {
                 console.log(data);
                 setDriverDetails(data);
                 setLocation(data.location || ''); // Initialize input field with existing location
-                setVehicleType(data.NumberPlate || ''); // Initialize input field with existing vehicle type
-                setDriverImage(data.image || null); // Initialize driver image
+                setVehicleType(data.vehicleType || ''); // Initialize input field with existing vehicle type
+                setDriverImage(data.driverImage || null); // Initialize driver image
             } catch (error) {
                 console.error('Failed to fetch driver details:', error);
             }
