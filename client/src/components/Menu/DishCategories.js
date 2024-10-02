@@ -134,7 +134,7 @@ const DishCategories = () => {
               {/* {discountedDishes.map(dish => (
                 <DishCard key={dish.dishCode} dish={dish} addToCart={() => {}} />
               ))} */}
-               
+
 
                 {availableDiscountedDishes.length > 0 ? (
                   availableDiscountedDishes.map(dish => (

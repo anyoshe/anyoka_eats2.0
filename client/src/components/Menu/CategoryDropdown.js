@@ -81,7 +81,7 @@ const CategoryDropdown = ({ addToCart, searchQuery }) => {
 
           <div className="modal-dialog modal-lg">
 
-            <div className="modal-content">
+            <div className="modal-content byModalContent">
 
               <div className="modal-header">
                 <h5 className="modal-title" id="dishModalLabel">By Cuisine</h5>
