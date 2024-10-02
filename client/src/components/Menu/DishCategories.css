@@ -215,4 +215,9 @@
     .dish-list {
         padding-left: 0.2rem;
     }
+
+    .dish-list {
+        column-gap: 5px;
+        row-gap: 10px;
+    }
 }
