@@ -2,6 +2,8 @@ import React, { useState, useEffect } from 'react';
 import './DriverDashboard.css';
 import '@fortawesome/fontawesome-free/css/all.min.css';
 import config from '../../config';
+import { useNavigate } from 'react-router-dom';
+import SignUpSignIn from './DriverCreateAccount';
 
 const Dashboard = () => {
     const [isOnline, setIsOnline] = useState(false);
@@ -14,6 +16,7 @@ const Dashboard = () => {
     const [driverImage, setDriverImage] = useState(null); // New state for driver image
     const [editing, setEditing] = useState(false); // State to toggle editing mode
 
+    const navigate = useNavigate();
     // useEffect(() => {
         const fetchOrders = async () => {
             try {
@@ -43,34 +46,52 @@ const Dashboard = () => {
             }
         };
 
-        const fetchDriverDetails = async () => {
-            try {
-                const response = await fetch(`${config.backendUrl}/api/driverDetails`); // Adjust endpoint as needed
-                if (!response.ok) {
-                    throw new Error('Failed to fetch driver details');
-                }
-                
-                const data = await response.json();
-                console.log(data);
-                
-                // Construct the full driver image URL
-                const driverImage = `${config.backendUrl}${data.driverImage}`;
-                
-                // Update state with fetched data
-                setDriverDetails(data);
-                setLocation(data.location || ''); // Initialize input field with existing location
-                setVehicleType(data.vehicleType || ''); // Initialize input field with existing vehicle type
-                setDriverImage(driverImage || null); // Initialize driver image with the full URL
-            } catch (error) {
-                console.error('Failed to fetch driver details:', error);
+    const fetchDriverDetails = async (driverId) => {
+        console.log('Fetching details for Driver ID:', driverId); // Log the driverId
+        try {
+            const response = await fetch(`${config.backendUrl}/api/driverDetails/${driverId}`);
+            console.log('Response status:', response.status);
+            
+            const text = await response.text();
+            console.log('Response text:', text);
+            
+            if (!response.ok) {
+                throw new Error('Failed to fetch driver details');
             }
-        };
-        
-        useEffect(() => {
-        fetchOrders();
-        fetchDriverDetails();
-    }, []);
+    
+            const data = JSON.parse(text);
+            console.log('Fetched Driver Details:', data);
+            
+             // Check for driver ID in the response
+        if (!data._id) {
+            console.error('Driver ID is missing in the fetched data');
+            return;
+        }
+            // Construct the full driver image URL
+            const driverImage = `${config.backendUrl}${data.driverImage}`;
+            
+            // Update state with fetched data
+            setDriverDetails(data);
+            console.log('Driver Details set:', data);
+            setLocation(data.location || '');
+            setVehicleType(data.vehicleType || '');
+            setDriverImage(driverImage || null);
+        } catch (error) {
+            console.error('Failed to fetch driver details:', error);
+        }
+    };
 
+    useEffect(() => {
+        const driverId = localStorage.getItem('driverId'); // Retrieve the driver ID from local storage
+        if (driverId) {
+            console.log('Driver ID set in local storage:', driverId); // Log the driverId instead
+            fetchDriverDetails(driverId); // Fetch driver details using the stored driver ID
+            fetchOrders(); // Call fetchOrders if necessary
+        } else {
+            console.error('Driver ID not found in local storage');
+        }
+    }, []);
+    
     const toggleOnlineStatus = () => {
         setIsOnline(prev => !prev);
     };
@@ -79,9 +100,6 @@ const Dashboard = () => {
         setShowProfileCard(prev => !prev);
     };
 
-    // const handleAcceptOrder = (order) => {
-    //     setSelectedOrder(order);
-    // };
     const handleAcceptOrder = async (order) => {
         try {
             // Call the API to update the order status
@@ -139,15 +157,21 @@ const Dashboard = () => {
         const formData = new FormData();
         formData.append('location', location);
         formData.append('vehicleType', vehicleType);
+        
         if (driverImage) {
             formData.append('image', driverImage); // Include the image if available
         }
     
-        // Add the driver ID fetched earlier
-        formData.append('driverId', driverDetails._id); // Assuming driverDetails contains the driver's data
+        // Check if driverDetails is set and contains the _id
+        if (driverDetails && driverDetails._id) {
+            formData.append('driverId', driverDetails._id); // Ensure _id exists before appending
+            console.log('Driver ID:', driverDetails._id); // Log the driver ID to ensure it's set
+        } else {
+            console.error('Driver ID is undefined. Cannot update driver details.');
+            return; // Stop execution if driverId is not available
+        }
     
         try {
-            console.log(formData);
             const response = await fetch(`${config.backendUrl}/api/driverDetails`, {
                 method: 'PATCH', // Use PATCH for updating
                 body: formData,
@@ -164,6 +188,14 @@ const Dashboard = () => {
         } catch (error) {
             console.error('Error updating driver details:', error);
         }
+    };
+    
+    
+    
+    const handleLogout = () => {
+        localStorage.removeItem('authToken');
+        localStorage.removeItem('driverId');
+        navigate('/');
     };
     
 
@@ -256,6 +288,9 @@ const Dashboard = () => {
                                                 {editing ? 'Save Changes' : 'Edit Profile'}
                                             </button>
                                         </div>
+                                        <button className="logout_btn" onClick={handleLogout}>
+                                            Logout
+                                        </button>
                                     </div>
                                 </div>
                             </div>

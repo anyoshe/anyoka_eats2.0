@@ -2040,8 +2040,8 @@ router.post('/trackSearch', async (req, res) => {
 //DRIVER'S SCHEMA AND ROUTES
 const driverSchema = new mongoose.Schema({
   OfficialNames: { type: String, required: true },
-  IDNumber: { type: Number, required: true, unique: true },
-  DriverLicenceNumber: { type: String, required: true, unique: true },
+  IDNumber: { type: Number, required: true, unique: true},
+  DriverLicenceNumber: { type: String, required: true },
   NumberPlate: { type: String, required: false },
   password: { type: String, required: true },
   createdAt: { type: Date, default: Date.now },
@@ -2068,44 +2068,62 @@ driverSchema.methods.comparePassword = function (candidatePassword) {
 };
 
 const Driver = mongoose.model('Driver', driverSchema);
-// JWT secret key
-// Driver Signup Route (routes/routes.js or appRouter.js)
+
+
+router.get('/driver', authenticateToken, async (req, res) => {
+  try {
+      const driver = await Driver.findById(req.user.id); // Assuming req.user.id is set after token authentication
+      if (!driver) {
+          return res.status(404).json({ message: 'Driver not found' });
+      }
+      res.json(driver);  // Ensure driver object is returned in JSON format
+  } catch (error) {
+      res.status(500).json({ error: 'Server error' });
+  }
+});
+// Backend Example - Driver Signup (Express.js)
+
+
+const generateAuthToken = (user) => {
+    const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, { expiresIn: '1h' });  // Adjust the secret and expiration as needed
+    return token;
+};
 router.post('/driverSignup', async (req, res) => {
-  console.log('Received sign-up request:', req.body); // Log incoming request body
+  const { OfficialNames, IDNumber, DriverLicenceNumber, NumberPlate, password } = req.body;
+
+  // Create a new driver instance using the DriverModel
+  const newDriver = new Driver({
+      OfficialNames,
+      IDNumber,
+      DriverLicenceNumber,
+      NumberPlate,
+      password,
+      // MongoDB automatically generates an _id field
+  });
 
   try {
-      const { OfficialNames, IDNumber, DriverLicenceNumber, NumberPlate, password } = req.body;
-
-      // Hash the password
-      const hashedPassword = await bcrypt.hash(password, 10);
-
-      // Create a new driver
-      const newDriver = new Driver({
-          OfficialNames,
-          IDNumber,
-          DriverLicenceNumber,
-          NumberPlate,
-          password: hashedPassword,
-      });
-
       await newDriver.save();
-      console.log('New driver created:', newDriver); // Log new driver info
-
-      // Generate JWT token for the driver
-      const token = jwt.sign(
-          {
-              id: newDriver._id,
-              role: 'driver',
+      
+      // Generate a token after saving the driver
+      const token = generateAuthToken(newDriver); // JWT generation logic
+      
+       // Respond with the driver's ID and any other necessary data
+       res.status(201).json({
+        _id: newDriver._id,  // Ensure this is included
+        token,  // If you're returning a token as well
+          driver: {
+              // Return the MongoDB generated _id as driverId
+              driverId: newDriver._id, // Use MongoDB's generated ID
+              OfficialNames: newDriver.OfficialNames,
+              IDNumber: newDriver.IDNumber,
+              DriverLicenceNumber: newDriver.DriverLicenceNumber,
+              NumberPlate: newDriver.NumberPlate,
+              password: newDriver.password
           },
-          JWT_SECRET,
-          { expiresIn: '1h' }
-      );
-
-      // Send the token in the response
-      res.json({ token });
-  } catch (error) {
-      console.error('Error during sign-up:', error); // Log the error
-      res.status(500).json({ error: 'Failed to sign up driver' });
+      });
+  } catch (err) {
+      console.error('Error during driver signup:', err.message);
+      res.status(400).send(err.message); // Return error message
   }
 });
 
@@ -2146,49 +2164,28 @@ router.post('/driverLogin', async (req, res) => {
   }
 });
 
-
-// Route to get the current logged-in driver's data
-router.get('/driver', verifyToken, async (req, res) => {
-  console.log('Fetching driver data for ID:', req.driverId); // Log the driver ID
-
+router.get('/driverDetails/:id', async (req, res) => {
   try {
-      const driver = await Driver.findById(req.driverId);
-      if (!driver) {
-          console.log('Driver not found for ID:', req.driverId);
-          return res.status(404).json({ message: 'Driver not found' });
-      }
-      res.status(200).json(driver);
-  } catch (error) {
-      console.error('Error fetching driver data:', error); // Log the error
-      res.status(500).json({ message: 'Error fetching driver data' });
-  }
-});
+      const driverId = req.params.id; // Get driver ID from request parameters
 
-// Middleware to verify JWT token
-function verifyToken(req, res, next) {
-  const token = req.headers['authorization']?.split(' ')[1]; // Get the token from the Authorization header
-  if (!token) {
-      return res.status(403).json({ message: 'No token provided' });
-  }
+      // Find the driver by ID
+      const driver = await Driver.findById(driverId);
 
-  try {
-      const decoded = jwt.verify(token, JWT_SECRET); // Verify the token
-      req.driverId = decoded.id; // Set driverId from the token payload
-      next(); // Proceed to the next middleware or route handler
-  } catch (error) {
-      res.status(401).json({ message: 'Invalid or expired token' });
-  }
-}
-
-
-// Get driver details
-router.get('/driverDetails', async (req, res) => {
-  try {
-      const driver = await Driver.findOne(); // Adjust logic if needed (e.g., finding by user ID)
       if (!driver) {
           return res.status(404).json({ message: 'Driver not found' });
       }
-      res.json(driver);
+
+      // Return driver details including the driver ID
+      res.status(200).json({
+          OfficialNames: driver.OfficialNames,
+          IDNumber: driver.IDNumber,
+          DriverLicenceNumber: driver.DriverLicenceNumber,
+          NumberPlate: driver.NumberPlate,
+          location: driver.location,
+          vehicleType: driver.vehicleType,
+          driverImage: driver.driverImage,
+          _id: driver._id // Include the driver ID
+      });
   } catch (error) {
       console.error('Error fetching driver details:', error);
       res.status(500).json({ message: 'Server error' });
@@ -2196,42 +2193,86 @@ router.get('/driverDetails', async (req, res) => {
 });
 
 
+  // router.patch('/driverDetails', upload, async (req, res) => {
+  //   console.log("Request received:", req.body);
+  //   const { location, vehicleType, driverId } = req.body; // Use driverId from the request body
+  //   const driverImage = req.file ? `/uploads/images/${req.file.filename}` : null; // Get the uploaded image's relative path
+  
+  //   try {
+  //     // Build the update object dynamically
+  //     const updateData = { location, vehicleType };
+  
+  //     // Only add driverImage if a new image was uploaded
+  //     if (driverImage) {
+  //       updateData.driverImage = driverImage;
+  //     }
+  
+  //     // Find the driver by driverId and update details
+  //     const updatedDriver = await Driver.findByIdAndUpdate(
+  //       driverId, // Use the driverId to find the driver
+  //       updateData, // Update with location, vehicleType, and optionally driverImage
+  //       { new: true, runValidators: true } // Return the updated document
+  //     );
+  
+  //     if (!updatedDriver) {
+  //       console.log("Driver not found");
+  //       return res.status(404).json({ message: 'Driver not found' });
+  //     }
+  
+  //     res.status(200).json({
+  //       message: 'Driver details updated successfully',
+  //       driver: updatedDriver
+  //     });
+  //   } catch (error) {
+  //     console.error('Error updating driver details:', error);
+  //     res.status(500).json({ message: 'Server error' });
+  //   }
+  // });
+
   router.patch('/driverDetails', upload, async (req, res) => {
     console.log("Request received:", req.body);
-    const { location, vehicleType, driverId } = req.body; // Use driverId from the request body
-    const driverImage = req.file ? `/uploads/images/${req.file.filename}` : null; // Get the uploaded image's relative path
-  
-    try {
-      // Build the update object dynamically
-      const updateData = { location, vehicleType };
-  
-      // Only add driverImage if a new image was uploaded
-      if (driverImage) {
-        updateData.driverImage = driverImage;
-      }
-  
-      // Find the driver by driverId and update details
-      const updatedDriver = await Driver.findByIdAndUpdate(
-        driverId, // Use the driverId to find the driver
-        updateData, // Update with location, vehicleType, and optionally driverImage
-        { new: true, runValidators: true } // Return the updated document
-      );
-  
-      if (!updatedDriver) {
-        console.log("Driver not found");
-        return res.status(404).json({ message: 'Driver not found' });
-      }
-  
-      res.status(200).json({
-        message: 'Driver details updated successfully',
-        driver: updatedDriver
-      });
-    } catch (error) {
-      console.error('Error updating driver details:', error);
-      res.status(500).json({ message: 'Server error' });
-    }
-  });
+    
+    const { location, vehicleType, driverId } = req.body; // Destructure location, vehicleType, and driverId from request body
+    const driverImage = req.file ? `/uploads/images/${req.file.filename}` : null; // Handle uploaded image
 
+    // Ensure driverId is provided and valid
+    if (!driverId) {
+        return res.status(400).json({ message: 'Driver ID is required' });
+    }
+
+    try {
+        // Build the update object dynamically
+        const updateData = { location, vehicleType };
+
+        // Only add driverImage if a new image was uploaded
+        if (driverImage) {
+            updateData.driverImage = driverImage;
+        }
+
+        // Find the driver by driverId and update the details
+        const updatedDriver = await Driver.findByIdAndUpdate(
+            driverId, // Use driverId from request body to find driver
+            updateData, // Update with location, vehicleType, and optionally driverImage
+            { new: true, runValidators: true } // Return updated document after validation
+        );
+
+        // Handle case where driver is not found
+        if (!updatedDriver) {
+            console.log("Driver not found");
+            return res.status(404).json({ message: 'Driver not found' });
+        }
+
+        // Successfully updated the driver details
+        res.status(200).json({
+            message: 'Driver details updated successfully',
+            driver: updatedDriver
+        });
+    } catch (error) {
+        // Handle any errors during the update
+        console.error('Error updating driver details:', error);
+        res.status(500).json({ message: 'Server error' });
+    }
+});
 
 //PAYMENTS AND UPDATE ROUTES
 router.post('/updatePaidStatus', async (req, res) => {
