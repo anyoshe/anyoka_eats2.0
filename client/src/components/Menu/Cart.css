@@ -215,4 +215,9 @@
         top: 8%; 
         right: 2%;
     }
+
+    .cartModalContent{
+        width: 140%;
+        margin-left: -20%;
+    }
 }
