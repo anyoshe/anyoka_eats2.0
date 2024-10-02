@@ -189,3 +189,30 @@
         /* padding-right: 0.1rem; */
     }
 }
+
+
+@media (min-width: 768px) and (max-width:1023px) {
+    .restaurantSection{
+        display: none;
+    }
+
+    #dish-categories{
+        grid-template-columns: 100%;
+    }
+
+    .category-buttons {
+        margin-left: 0.9rem;
+    }
+
+    .switchButtons {
+        border-radius: 0%;
+    }
+
+    .menuHeader {
+        margin-left: 1%;
+    }
+
+    .dish-list {
+        padding-left: 1rem;
+    }
+}
