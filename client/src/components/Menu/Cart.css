@@ -208,3 +208,16 @@
         font-size: 0.8rem;
     }
 }
+
+
+@media (min-width: 768px) and (max-width:1023px) {
+    #cartCount{
+        top: 8%; 
+        right: 2%;
+    }
+
+    .cartModalContent{
+        width: 140%;
+        margin-left: -20%;
+    }
+}

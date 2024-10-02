@@ -66,5 +66,17 @@
   .menu-container{
     margin-top: 12%;
   }
+}
 
+
+@media (min-width: 768px) and (max-width:1023px) {
+  .homeLink {
+    margin-left: 1%;
+  }
+
+  .menu-container{
+    /* border: 1px solid ; */
+
+    margin-top: 9%;
+  }
 }

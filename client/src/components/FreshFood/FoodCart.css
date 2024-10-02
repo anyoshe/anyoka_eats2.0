@@ -27,3 +27,9 @@
 #cart2{
     margin-right: 5%;
 }
+
+@media (min-width: 768px) and (max-width:1023px) {
+    #cart2 {
+        margin-right: 3%;
+    }
+}

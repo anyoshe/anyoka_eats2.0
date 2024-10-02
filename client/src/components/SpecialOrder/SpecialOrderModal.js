@@ -299,7 +299,7 @@ const SpecialOrderModal = ({ closeModal }) => {
                 {/* <label htmlFor="orderDetails" className='specialLabels'>Order Details</label> */}
                 <textarea
                   className="formControl"
-                  id="orderDetails"
+                  // id="orderDetails"
                   name="orderDetails"
                   rows="3"
                   placeholder="Provide details of your special order"
