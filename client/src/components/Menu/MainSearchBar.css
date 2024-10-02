@@ -106,6 +106,10 @@
 
 @media (min-width: 768px) and (max-width:1023px) {
   .search-bar-container{
-      width: 60%;
+      width: 70%;
+  }
+
+  .by_btn{
+    margin-right: 0.5rem;
   }
 }
