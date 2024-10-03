@@ -1121,6 +1121,7 @@ const orderSchema = new Schema({
   paid: { type: Boolean, default: false },
   // userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: false },
   status: { type: String, enum: ['Order received', 'Processed and packed', 'Dispatched', 'Delivered'], default: 'Order received' },
+  driverId: { type: String, required: false },
 });
 
 const Order = model('Order', orderSchema);
@@ -1348,6 +1349,102 @@ router.patch('/updateOrderStatus/:orderId', async (req, res) => {
     res.status(500).json({ message: 'Error updating order status', error });
 }
 });
+
+// Backend API route to accept an order
+router.patch('/driverUpdateOrderStatus/:orderId', async (req, res) => {
+  console.log('Updating order status for:', req.params.orderId); // Check if orderId is correctly received
+  console.log('Request body:', req.body); // Ensure driverId and status are included
+
+  try {
+      const { orderId } = req.params; // Get orderId from the URL parameter
+      const { status, driverId } = req.body; // Ensure you're receiving driverId and status
+
+      // Find and update the order using the orderId field
+      const updatedOrder = await Order.findOneAndUpdate(
+          { orderId: orderId }, // Use the orderId field in the query
+          { status, driverId }, // Set the new status and driverId
+          { new: true } // Return the updated document
+      );
+
+      if (!updatedOrder) {
+          console.log('Order not found for ID:', orderId); // Log if order is not found
+          return res.status(404).json({ message: 'Order not found' });
+      }
+
+      console.log('Order updated successfully:', updatedOrder); // Log the updated order
+      res.json(updatedOrder); // Respond with the updated order
+  } catch (error) {
+      console.error('Error updating order status:', error); // Log the error
+      res.status(500).json({ message: 'Error updating order status' }); // Respond with a 500 error
+  }
+});
+
+// Assuming you have a function in your order model to find an order by orderId and driverId
+// router.get('/fetchOrderByStatus/:orderId/:driverId', async (req, res) => {
+//   const { orderId, driverId } = req.params;
+
+//   try {
+//       const order = await Order.findOne({ orderId: orderId, driverId: driverId }); // Match order by orderId and driverId
+
+//       if (!order) {
+//           return res.status(404).json({ message: 'Order not found' });
+//       }
+
+//       res.json(order); // Respond with the found order
+//   } catch (error) {
+//       console.error('Error fetching order:', error);
+//       res.status(500).json({ message: 'Error fetching order' });
+//   }
+// });
+
+router.get('/fetchOrderByStatus/:orderId/:driverId', async (req, res) => {
+  const { orderId, driverId } = req.params;
+
+  try {
+      // Find the order by matching the order ID and driver ID
+      const order = await Order.findOne({ orderId: orderId, driverId: driverId });
+
+      // If no order is found, return a 404 status with a message
+      if (!order) {
+          return res.status(404).json({ message: 'Order not found' });
+      }
+
+      // Respond with the found order
+      res.json(order);
+  } catch (error) {
+      console.error('Error fetching order:', error);
+      res.status(500).json({ message: 'Error fetching order' });
+  }
+});
+
+// New route to fetch dispatched orders for a specific driver
+router.get('/fetchDriverDispatchedOrders/:driverId', async (req, res) => {
+  const { driverId } = req.params;
+  try {
+      const dispatchedOrders = await Order.find({ driverId, status: 'Dispatched' });
+      res.json(dispatchedOrders);
+  } catch (error) {
+      res.status(500).json({ error: 'Error fetching dispatched orders' });
+  }
+});
+
+// Backend API route to fetch orders accepted by a specific driver
+router.get('/fetchOrdersByDriver/:driverId', async (req, res) => {
+  const { driverId } = req.params;
+
+  try {
+      const orders = await Order.find({ driverId, status: 'Dispatched' });
+      
+      if (orders.length === 0) {
+          return res.status(404).json({ message: 'No orders found for this driver' });
+      }
+
+      res.json(orders);
+  } catch (error) {
+      res.status(500).json({ message: 'Error fetching driver\'s orders' });
+  }
+});
+
 
 // Fetch undelivered orders
 router.get('/orders/undelivered', async (req, res) => {
