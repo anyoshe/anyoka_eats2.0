@@ -32,4 +32,10 @@
     #cart2 {
         margin-right: 3%;
     }
+
+    #cartCount2 {
+        position: absolute;
+        top: -1%;
+        right: 2.8%;
+    }
 }
