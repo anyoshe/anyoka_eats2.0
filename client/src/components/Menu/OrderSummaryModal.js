@@ -125,26 +125,8 @@ const OrderSummaryModal = ({ show, handleClose, restaurantName, orderedDishes = 
           }
           const response = await initiateMpesaPayment(paymentPhoneNumber, amount);
           if (response && response.ResponseCode === '0') {
-            alert('Your Payment is successful! Thank you');
-            setShowPaymentModal(false);
-            
-
-            const address = await getReadableAddress(pinnedLocation.lat, pinnedLocation.lng);
-            
-            const orderDetails = {
-              phoneNumber: contactNumber,
-              selectedRestaurant: restaurantName,
-              customerLocation: address,
-              expectedDeliveryTime: selectedTime,
-              dishes: orderedDishes,
-              deliveryCharges: deliveryCharges,
-              totalPrice: amount,
-            };
-            await saveOrderToDatabase(orderDetails);
-            clearCart();
-            setTimeout(() => {
-              window.location.href = '/';
-            }, 2000);
+            // Success is already handled inside initiateMpesaPayment
+            return; // Ensure early return on success
           } else {
             handlePaymentFailure();
           }
@@ -159,67 +141,7 @@ const OrderSummaryModal = ({ show, handleClose, restaurantName, orderedDishes = 
         return;
     }
   };
-
-  const handlePaymentFailure = () => {
-    const retry = window.confirm('Payment transfer failed! Would you like to try again?');
-    if (retry) {
-      handlePayment('mpesa');
-    } else {
-      const saveForLater = window.confirm('Would you like to save the order for later?');
-      if (saveForLater) {
-        alert('Your order has been saved for later.');
-        // saveOrderForLater();
-      } else {
-        alert('Order has been canceled.');
-        setShowPaymentModal(false);
-      }
-    } setTimeout(() => {
-          window.location.href = '/';
-        }, 2000);
-  };
-
-  const sendSmsNotification = async (paymentData) => {
-    const smsDetails = {
-      phoneNumber: contactNumber,
-      message: `Your payment of KSH ${grandTotal.toFixed(2)} was successful! Your order will be delivered to ${pinnedLocation} by ${selectedTime}.`,
-    };
-    
-    try {
-      const response = await axios.post(`${config.backendUrl}/api/sendSms`, smsDetails, {
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      });
-      
-      if (response.status === 200) {
-        console.log('SMS sent successfully:', response.data);
-      } else {
-        console.error('Failed to send SMS:', response.data);
-      }
-    } catch (error) {
-      console.error('Error sending SMS:', error);
-      alert('There was an issue sending the SMS notification. Please check your network and try again.');
-    }
-  };
-
-  const handlePaymentSuccess = async (data) => {
-    await sendSmsNotification(data); // Send SMS notification
-    
-    alert('Payment successful! Your order is being processed.');
-    const address = await getReadableAddress(pinnedLocation.lat, pinnedLocation.lng);
-    saveOrderToDatabase({
-      phoneNumber: contactNumber,
-      selectedRestaurant: restaurantName,
-      customerLocation: address,
-      expectedDeliveryTime: selectedTime,
-      dishes: orderedDishes,
-      deliveryCharges: deliveryCharges,
-      totalPrice: grandTotal,
-    });
-    
-    clearCart();
-    setShowPaymentModal(false);
-  };
+  
 
   const initiateMpesaPayment = async (phoneNumber, amount) => {
     try {
@@ -234,9 +156,9 @@ const OrderSummaryModal = ({ show, handleClose, restaurantName, orderedDishes = 
       if (response.status === 200) {
         const data = response.data;
         if (data.ResponseCode === '0') {
-          handlePaymentSuccess(data); // Handle success
           alert(data.CustomerMessage);
-          // return data;
+          await handlePaymentSuccess(data); // Handle success
+          return data; // Ensure it returns after success
         } else {
           console.error('Payment failed:', data.ResponseDescription);
           alert('Payment failed. Please try again.');
@@ -254,19 +176,53 @@ const OrderSummaryModal = ({ show, handleClose, restaurantName, orderedDishes = 
       return null;
     }
   };
-  // const saveOrderForLater = () => {
-  //   const orderDetails = {
-  //     phoneNumber: contactNumber,
-  //     selectedRestaurant: restaurantName,
-  //     customerLocation: pinnedLocation,
-  //     expectedDeliveryTime: selectedTime,
-  //     dishes: orderedDishes,
-  //     deliveryCharges: deliveryCharges,
-  //     totalPrice: grandTotal,
-  //   };
-  //   localStorage.setItem('savedOrder', JSON.stringify(orderDetails));
-  // };
-
+  
+  const handlePaymentSuccess = async (data) => {
+    try {
+      const address = await getReadableAddress(pinnedLocation.lat, pinnedLocation.lng);
+  
+      // Save the order to the database first
+      const orderDetails = {
+        phoneNumber: contactNumber,
+        selectedRestaurant: restaurantName,
+        customerLocation: address,
+        expectedDeliveryTime: selectedTime,
+        dishes: orderedDishes,
+        deliveryCharges: deliveryCharges,
+        totalPrice: grandTotal,
+      };
+  
+      await saveOrderToDatabase(orderDetails); // Save order to the database
+  
+      // Send the SMS notification, but catch errors separately
+      try {
+        await sendSmsNotification(data);
+      } catch (smsError) {
+        console.error('Error sending SMS:', smsError);
+        // SMS failure should not impact the main success flow
+      }
+  
+      alert('Payment successful! Your order is being processed.');
+      clearCart();
+      setShowPaymentModal(false);
+  
+      // Redirect after successful order processing
+      redirectToHomePage();
+  
+    } catch (error) {
+      console.error('Error during payment success process:', error);
+      alert('There was an issue processing your order. Please try again.');
+    }
+  };
+  
+  // Separate redirection logic into a function
+  const redirectToHomePage = () => {
+    // Delay redirection for 2 seconds to allow user to see the success alert
+    setTimeout(() => {
+      window.location.href = '/';
+    }, 2000);
+  };
+  
   const saveOrderToDatabase = async (orderDetails) => {
     try {
 
@@ -297,6 +253,31 @@ const OrderSummaryModal = ({ show, handleClose, restaurantName, orderedDishes = 
     }
   };
 
+  const sendSmsNotification = async (paymentData) => {
+    const smsDetails = {
+      phoneNumber: contactNumber,
+      message: `Your payment of KSH ${grandTotal.toFixed(2)} was successful! Your order will be delivered to ${pinnedLocation} by ${selectedTime}.`,
+    };
+    
+    try {
+      const response = await axios.post(`${config.backendUrl}/api/sendSms`, smsDetails, {
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+      
+      if (response.status === 200) {
+        console.log('SMS sent successfully:', response.data);
+      } else {
+        console.error('Failed to send SMS:', response.data);
+      }
+    } catch (error) {
+      console.error('Error sending SMS:', error);
+      alert('There was an issue sending the SMS notification. Please check your network and try again.');
+    }
+  };
+
+
   const clearCart = () => {
     const cartItemsElement = document.getElementById('cartItems');
     const totalPriceElement = document.getElementById('totalPrice');
@@ -309,6 +290,44 @@ const OrderSummaryModal = ({ show, handleClose, restaurantName, orderedDishes = 
     if (totalPriceElement) totalPriceElement.textContent = 'KES 0.00';
     if (cartCountElement) cartCountElement.textContent = '0';
   };
+  
+
+  const handlePaymentFailure = () => {
+    const retry = window.confirm('Payment transfer failed! Would you like to try again?');
+    if (retry) {
+      handlePayment('mpesa');
+    } else {
+      const saveForLater = window.confirm('Would you like to save the order for later?');
+      if (saveForLater) {
+        alert('Your order has been saved for later.');
+        saveOrderForLater();
+      } else {
+        alert('Order has been canceled. Your cart will remain saved.');
+        
+      }
+
+      setShowPaymentModal(false);
+    } 
+    
+    setTimeout(() => {
+          window.location.href = '/';
+        }, 2000);
+  };
+  const saveOrderForLater = () => {
+    const address =  getReadableAddress(pinnedLocation.lat, pinnedLocation.lng);
+    const orderDetails = {
+      phoneNumber: contactNumber,
+      selectedRestaurant: restaurantName,
+      customerLocation: address,
+      expectedDeliveryTime: selectedTime,
+      dishes: orderedDishes,
+      deliveryCharges: deliveryCharges,
+      totalPrice: grandTotal,
+    };
+    localStorage.setItem('savedOrder', JSON.stringify(orderDetails));
+  };
+
+  
 
   return (
     <>
