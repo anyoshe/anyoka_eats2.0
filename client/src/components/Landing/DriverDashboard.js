@@ -15,9 +15,11 @@ const Dashboard = () => {
     const [vehicleType, setVehicleType] = useState('');
     const [driverImage, setDriverImage] = useState(null); // New state for driver image
     const [editing, setEditing] = useState(false); // State to toggle editing mode
+    const [timer, setTimer] = useState(0); // Timer state for the countdown
+    const [orderTimerId, setOrderTimerId] = useState(null); // Timer ID for clearing later
 
     const navigate = useNavigate();
-    // useEffect(() => {
+    
         const fetchOrders = async () => {
             try {
                 const response = await fetch(`${config.backendUrl}/api/orders`);
@@ -117,9 +119,12 @@ const Dashboard = () => {
     
             const updatedOrder = await response.json();
             console.log(updatedOrder);
-    
+            setSelectedOrder(updatedOrder); // Set the selected order
+            setOrders([]); // Clear other orders
+            setTimer(15 * 60); // Set timer for 15 minutes (in seconds)
+            startTimer();
             // Optionally, you might want to update your local state to reflect the accepted order
-            setSelectedOrder(order); // Set the selected order for display
+            // setSelectedOrder(order); // Set the selected order for display
             // Fetch orders again to refresh the list
             fetchOrders(); // Refresh the orders to remove the accepted order from the list
         } catch (error) {
@@ -127,6 +132,43 @@ const Dashboard = () => {
         }
     };
     
+    const startTimer = () => {
+        if (orderTimerId) clearInterval(orderTimerId); // Clear previous timer if exists
+        const id = setInterval(() => {
+            setTimer(prev => {
+                if (prev <= 0) {
+                    clearInterval(id);
+                    revertOrderStatus(); // Automatically revert order status
+                    return 0;
+                }
+                return prev - 1;
+            });
+        }, 1000); // Update timer every second
+        setOrderTimerId(id); // Save the timer ID
+    };
+
+    const revertOrderStatus = async () => {
+        if (!selectedOrder) return;
+        try {
+            const response = await fetch(`${config.backendUrl}/api/updateOrderStatus/${selectedOrder.order}`, {
+                method: 'PATCH',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ status: 'Processed and packed' }),
+            });
+
+            if (!response.ok) {
+                throw new Error('Failed to revert the order status');
+            }
+
+            setSelectedOrder(null); // Clear selected order
+            fetchOrders(); // Refresh the orders
+        } catch (error) {
+            console.error('Error reverting order status:', error);
+        }
+    };
+
 
     const handleDeclineOrder = async () => {
         if (!selectedOrder) return; // Exit if no order is selected
@@ -148,10 +190,19 @@ const Dashboard = () => {
             // Optionally, you might want to update your local state
             setSelectedOrder(null); // Clear the selected order
             fetchOrders(); // Refresh the orders to get the updated list
+            clearInterval(orderTimerId); // Clear the timer
+            setTimer(0); // Reset the timer
         } catch (error) {
             console.error('Error declining order:', error);
         }
     };
+
+    const formatTime = (seconds) => {
+        const minutes = Math.floor(seconds / 60);
+        const secs = seconds % 60;
+        return `${minutes}:${secs < 10 ? `0${secs}` : secs}`; // Format time as MM:SS
+    };
+
     
     const handleUpdateDriver = async () => {
         const formData = new FormData();
@@ -311,6 +362,8 @@ const Dashboard = () => {
                                 <p>Net Pay: {selectedOrder.netPay}</p>
                                 <p>Expected Delivery Time: {selectedOrder.expectedDeliveryTime}</p>
                                 <p>Customer Contact: {selectedOrder.phoneNumber}</p>
+                                <p>Status: {selectedOrder.status}</p>
+                                 <p>Timer: {formatTime(timer)}</p>
                                 <button className="decline_order_btn" onClick={handleDeclineOrder}>Decline</button>
                             </div>
                         </div>
