@@ -411,3 +411,53 @@
         width: 100%;
     }
 }
+
+
+@media (min-width: 768px) and (max-width:1023px) {
+    .main-category{
+        margin-top: 8%;
+        width: 100%;
+        padding: 10px;
+    }
+
+    .fresh_page_heading {
+        font-size: 20px;
+    }
+
+    .fresh_link {
+        padding: 10px 5px;
+        font-size: 0.8rem;
+        margin: 0px 10px;
+        text-align: center;
+    }
+
+    .fresh_category {
+        padding: 10px;
+        height: 10%;
+    }
+
+    .discoverTitle{
+        font-size: 25px;
+    }
+
+    .category-grid {
+        grid-template-columns: repeat(4, 1fr);
+        column-gap: 5px;
+    }
+
+    .fresh-page-offers-section {
+        width: 100%;
+        padding: 0px 0.3rem;
+    }
+
+    .fresh-page-offers-title {
+        font-size: 20px;
+    }
+
+    .offer-page-grid {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        row-gap: 15px;
+        column-gap: 5px;
+    }
+}
