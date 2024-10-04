@@ -1379,6 +1379,54 @@ router.patch('/driverUpdateOrderStatus/:orderId', async (req, res) => {
   }
 });
 
+
+router.patch('/revertOrderStatus/:orderId', async (req, res) => {
+  console.log('Reverting order status for:', req.params.orderId); // Log the orderId
+  console.log('Request body:', req.body); // Ensure driverId is included
+
+  try {
+    const { orderId } = req.params; // Get orderId from the URL parameter
+    const { driverId } = req.body; // Extract driverId from request body
+
+    // Find the order using the orderId
+    const order = await Order.findOne({ orderId: orderId });
+
+    if (!order) {
+      console.log('Order not found for ID:', orderId); // Log if order is not found
+      return res.status(404).json({ message: 'Order not found' });
+    }
+
+    // Logic to revert the order status (this will depend on your specific flow)
+    // For instance, reverting from 'Delivered' to 'Dispatched' or to the previous status
+    let newStatus;
+    switch (order.status) {
+      case 'Delivered':
+        newStatus = 'Dispatched';
+        break;
+      case 'Dispatched':
+        newStatus = 'Processed and packed';
+        break;
+      case 'Processed and packed':
+        newStatus = 'Order received';
+        break;
+      default:
+        return res.status(400).json({ message: 'Cannot revert status any further' });
+    }
+
+    // Update the order with the reverted status and remove the driverId
+    order.status = newStatus;
+    order.driverId = null; // Optionally clear driverId if reverting removes driver assignment
+    const revertedOrder = await order.save();
+
+    console.log('Order status reverted successfully:', revertedOrder); // Log success
+    res.json(revertedOrder); // Respond with the reverted order details
+
+  } catch (error) {
+    console.error('Error reverting order status:', error); // Log any errors
+    res.status(500).json({ message: 'Error reverting order status' }); // Respond with a 500 error
+  }
+});
+
 // Assuming you have a function in your order model to find an order by orderId and driverId
 // router.get('/fetchOrderByStatus/:orderId/:driverId', async (req, res) => {
 //   const { orderId, driverId } = req.params;

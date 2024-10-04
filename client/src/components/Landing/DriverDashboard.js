@@ -73,36 +73,6 @@ const Dashboard = () => {
             console.error('Error fetching dispatched orders:', error);
         }
     };
-    
-    
-    const fetchOrders = async () => {
-        try {
-            const response = await fetch(`${config.backendUrl}/api/orders`);
-            const data = await response.json();
-
-            // Filter the orders to only include those with the status 'Processed and packed'
-            const processedOrders = data.filter(order => order.status === 'Processed and packed');
-
-            const formattedOrders = processedOrders.map(order => ({
-                id: order._id,
-                name: order.selectedRestaurant,
-                pickup: order.selectedRestaurantLocation || order.selectedRestaurant,
-                order: order.orderId,
-                dropoff: order.customerLocation,
-                deliveryCharges: `Ksh ${order.deliveryCharges}`,
-                commission: `Ksh ${order.deliveryCharges * 0.2}`,
-                netPay: `Ksh ${order.deliveryCharges - (order.deliveryCharges * 0.2)}`,
-                expectedDeliveryTime: new Date(order.expectedDeliveryTime).toLocaleString(),
-                phoneNumber: order.phoneNumber,
-                status: order.status,
-                dishes: order.dishes
-            }));
-            setOrders(formattedOrders);
-        } catch (error) {
-            console.error('Failed to fetch orders:', error);
-        }
-    };
-
     const fetchDriverDetails = async (driverId) => {
         console.log('Fetching details for Driver ID:', driverId); // Log the driverId
         try {
@@ -138,7 +108,6 @@ const Dashboard = () => {
         }
     };
 
-
     const toggleOnlineStatus = () => {
         setIsOnline(prev => !prev);
     };
@@ -147,6 +116,97 @@ const Dashboard = () => {
         setShowProfileCard(prev => !prev);
     };
 
+    
+    window.onload = () => {
+        checkForOngoingOrder(); // First check if the driver has an ongoing order
+        monitorOrderStatus(); // Monitor the order status to remove it upon delivery or driver decline
+    };
+    
+    // Function to check for ongoing order and restore state
+    const checkForOngoingOrder = () => {
+        const savedOrder = localStorage.getItem(`driver_${driverId}_currentOrder`);
+        const savedTime = localStorage.getItem(`driver_${driverId}_timerStartTime`);
+    
+        if (savedOrder && savedTime) {
+            const elapsedTime = Math.floor((Date.now() - parseInt(savedTime)) / 1000);
+            const remainingTime = 300 - elapsedTime; // 5 minutes (300 seconds) - elapsed time
+    
+            if (remainingTime > 0) {
+                setSelectedOrder(JSON.parse(savedOrder)); // Restore the saved order for the specific driver
+                startTimer(JSON.parse(savedOrder).orderId, driverId); // Resume the timer for this driver
+                setTimer(remainingTime); // Restore the remaining time
+            } else {
+                // Timer has already expired, revert order status for this driver
+                revertOrderStatus(JSON.parse(savedOrder).orderId, driverId);
+    
+                // Clear localStorage as the timer expired
+                localStorage.removeItem(`driver_${driverId}_currentOrder`);
+                localStorage.removeItem(`driver_${driverId}_timerStartTime`);
+                localStorage.removeItem(`driver_${driverId}_remainingTime`);
+    
+                // No ongoing order, so fetch new orders
+                fetchOrders();
+            }
+        } else {
+            console.log("No ongoing order found for driver, fetching new orders");
+            // No ongoing order, so fetch new orders
+            fetchOrders();
+        }
+    };
+    
+    // Function to fetch new orders if there's no ongoing order
+    const fetchOrders = async () => {
+        try {
+            const response = await fetch(`${config.backendUrl}/api/orders`);
+            const data = await response.json();
+    
+            // Filter the orders to only include those with the status 'Processed and packed'
+            const processedOrders = data.filter(order => order.status === 'Processed and packed');
+    
+            const formattedOrders = processedOrders.map(order => ({
+                id: order._id,
+                name: order.selectedRestaurant,
+                pickup: order.selectedRestaurantLocation || order.selectedRestaurant,
+                order: order.orderId,
+                dropoff: order.customerLocation,
+                deliveryCharges: `Ksh ${order.deliveryCharges}`,
+                commission: `Ksh ${order.deliveryCharges * 0.2}`,
+                netPay: `Ksh ${order.deliveryCharges - (order.deliveryCharges * 0.2)}`,
+                expectedDeliveryTime: new Date(order.expectedDeliveryTime).toLocaleString(),
+                phoneNumber: order.phoneNumber,
+                status: order.status,
+                dishes: order.dishes
+            }));
+    
+            setOrders(formattedOrders);
+        } catch (error) {
+            console.error('Failed to fetch orders:', error);
+        }
+    };
+    
+    // Function to monitor order status changes (e.g., after delivery or driver decline)
+    const monitorOrderStatus = async () => {
+        const savedOrder = localStorage.getItem(`driver_${driverId}_currentOrder`);
+        if (savedOrder) {
+            const { orderId } = JSON.parse(savedOrder);
+    
+            try {
+                // Fetch the current order status from the backend
+                const response = await fetch(`${config.backendUrl}/api/getOrderStatus/${orderId}`);
+                const orderData = await response.json();
+    
+                if (orderData.status === 'Delivered' || orderData.status === 'Declined') {
+                    // Remove order from view and clear localStorage
+                    setSelectedOrder(null);
+                    localStorage.removeItem(`driver_${driverId}_currentOrder`);
+                    localStorage.removeItem(`driver_${driverId}_timerStartTime`);
+                    localStorage.removeItem(`driver_${driverId}_remainingTime`);
+                }
+            } catch (error) {
+                console.error('Error fetching order status:', error);
+            }
+        }
+    };
     
 
     const handleAcceptOrder = async (order) => {
@@ -257,36 +317,64 @@ const Dashboard = () => {
         setOrderTimerId(id); // Save the timer ID
     };
     
-    
-    const checkForOngoingOrder = () => {
-        const savedOrder = localStorage.getItem(`driver_${driverId}_currentOrder`);
-        const savedTime = localStorage.getItem(`driver_${driverId}_timerStartTime`);
-    
-        if (savedOrder && savedTime) {
-            const elapsedTime = Math.floor((Date.now() - parseInt(savedTime)) / 1000);
-            const remainingTime = 300 - elapsedTime; // 5 minutes (300 seconds) - elapsed time
-    
-            if (remainingTime > 0) {
-                setSelectedOrder(JSON.parse(savedOrder)); // Restore the saved order for the specific driver
-                startTimer(JSON.parse(savedOrder).orderId, driverId); // Resume the timer for this driver
-                setTimer(remainingTime); // Restore the remaining time
-            } else {
-                // Timer has already expired, revert order status for this driver
-                revertOrderStatus(JSON.parse(savedOrder).orderId, driverId);
-    
-                // Clear localStorage as the timer expired
-                localStorage.removeItem(`driver_${driverId}_currentOrder`);
-                localStorage.removeItem(`driver_${driverId}_timerStartTime`);
-                localStorage.removeItem(`driver_${driverId}_remainingTime`);
-            }
-        } else {
-            console.log("No ongoing order found for driver, fetching new orders");
-            // Fetch new orders or handle accordingly
-        }
-    };
-    
-    // Call checkForOngoingOrder on page load to restore any ongoing order for the driver
-    window.onload = checkForOngoingOrder;
+
+// window.onload = () => {
+//     checkForOngoingOrder();
+//     monitorOrderStatus(); // Monitor the status of the order to remove it upon delivery or driver decline
+// };
+
+// // Function to check for ongoing order and restore state
+// const checkForOngoingOrder = () => {
+//     const savedOrder = localStorage.getItem(`driver_${driverId}_currentOrder`);
+//     const savedTime = localStorage.getItem(`driver_${driverId}_timerStartTime`);
+
+//     if (savedOrder && savedTime) {
+//         const elapsedTime = Math.floor((Date.now() - parseInt(savedTime)) / 1000);
+//         const remainingTime = 300 - elapsedTime; // 5 minutes (300 seconds) - elapsed time
+
+//         if (remainingTime > 0) {
+//             setSelectedOrder(JSON.parse(savedOrder)); // Restore the saved order for the specific driver
+//             startTimer(JSON.parse(savedOrder).orderId, driverId); // Resume the timer for this driver
+//             setTimer(remainingTime); // Restore the remaining time
+//         } else {
+//             // Timer has already expired, revert order status for this driver
+//             revertOrderStatus(JSON.parse(savedOrder).orderId, driverId);
+
+//             // Clear localStorage as the timer expired
+//             localStorage.removeItem(`driver_${driverId}_currentOrder`);
+//             localStorage.removeItem(`driver_${driverId}_timerStartTime`);
+//             localStorage.removeItem(`driver_${driverId}_remainingTime`);
+//         }
+//     } else {
+//         console.log("No ongoing order found for driver, fetching new orders");
+//         // Fetch new orders or handle accordingly
+//     }
+// };
+
+// // Function to monitor order status changes (e.g., after delivery or driver decline)
+// const monitorOrderStatus = async () => {
+//     const savedOrder = localStorage.getItem(`driver_${driverId}_currentOrder`);
+//     if (savedOrder) {
+//         const { orderId } = JSON.parse(savedOrder);
+
+//         try {
+//             // Fetch the current order status from the backend
+//             const response = await fetch(`${config.backendUrl}/api/getOrderStatus/${orderId}`);
+//             const orderData = await response.json();
+
+//             if (orderData.status === 'Delivered' || orderData.status === 'Declined') {
+//                 // Remove order from view and clear localStorage
+//                 setSelectedOrder(null);
+//                 localStorage.removeItem(`driver_${driverId}_currentOrder`);
+//                 localStorage.removeItem(`driver_${driverId}_timerStartTime`);
+//                 localStorage.removeItem(`driver_${driverId}_remainingTime`);
+//             }
+//         } catch (error) {
+//             console.error('Error fetching order status:', error);
+//         }
+//     }
+// };
+
     
     
     const revertOrderStatus = async (orderId, driverId) => {
