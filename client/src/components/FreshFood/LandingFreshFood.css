@@ -63,6 +63,10 @@
     border: none;
 }
 
+.discoverTitle{
+    margin-bottom: 2rem;
+}
+
 .fresh_glass:hover{
     color: var(--orange);
     outline: 1px solid var(--orange);
@@ -71,8 +75,8 @@
 }
 
 .fresh_bar_input:hover,.fresh_bar_input:focus {
-   outline: 1px solid var(--orange);
-   color: var(--orange);
+    outline: 1px solid var(--orange);
+    color: var(--orange);
 }
 
 .landing-fresh-foods-header .icons a {
@@ -155,7 +159,7 @@
     font-weight: 600;
     padding: 5px 10px;
     margin-top: 1%;
-    margin-bottom: 1%;
+    margin-bottom: 2%;
     font-style: normal;
     color: var(--green);
     text-decoration: underline; 
@@ -438,6 +442,7 @@
 
     .discoverTitle{
         font-size: 25px;
+        margin-bottom: 1rem;
     }
 
     .category-grid {
@@ -452,6 +457,7 @@
 
     .fresh-page-offers-title {
         font-size: 20px;
+        margin-bottom: 1rem;
     }
 
     .offer-page-grid {
