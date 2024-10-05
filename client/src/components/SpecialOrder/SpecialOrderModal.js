@@ -183,7 +183,7 @@ const SpecialOrderModal = ({ closeModal }) => {
 
       <div className="special-modal-dialog" role="document">
 
-        <div className="modalContent">
+        <div className="modalContent specialModalContent">
 
           <div className="modalHeader">
 
@@ -257,11 +257,11 @@ const SpecialOrderModal = ({ closeModal }) => {
                   required
                 />
 
-               <div className='locationBtns'>
+              <div className='locationBtns'>
                   <button type="button" className="specialPin" onClick={showMap}>Pin Location on Map</button>
 
                   <button type="button" className="specialPin" onClick={handleUseCurrentLocation}>Use My Current Location</button>
-               </div>
+              </div>
 
                 <div id="map" className="mt-3"></div>
                 
@@ -301,6 +301,7 @@ const SpecialOrderModal = ({ closeModal }) => {
                   className="formControl"
                   // id="orderDetails"
                   name="orderDetails"
+                  id="specialOrderArea"
                   rows="3"
                   placeholder="Provide details of your special order"
                   value={formData.orderDetails}

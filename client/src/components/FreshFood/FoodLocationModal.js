@@ -182,7 +182,7 @@ const FoodLocationModal = ({ show, handleClose, vendors = [], orderedFoods = [] 
       <div className={`modal fade ${show ? 'show' : ''}`} id="locationModal" tabIndex="-1" aria-labelledby="locationModalLabel" aria-hidden="true" style={{ display: show ? 'block' : 'none' }}>
         <div className="modal-dialog modal-lg freshfoodDalog">
 
-          <div className="modal-content">
+          <div className="modal-content foodCartlocationContent">
 
             <div className="modal-header">
 

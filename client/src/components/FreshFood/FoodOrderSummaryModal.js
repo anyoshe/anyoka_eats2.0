@@ -4,6 +4,7 @@ import config from '../../config';
 import axios from 'axios';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap/dist/js/bootstrap.bundle.min';
+import { right } from '@popperjs/core';
 
 const googleApiKey = process.env.REACT_APP_GOOGLE_API_KEY;
 
@@ -41,11 +42,11 @@ const PaymentOptionsModal = ({ show, handleClose, handlePayment }) => {
           </div>
           <div className="modal-body">
             <h6>Select your preferred payment method</h6>
-            <button type="button" className="btn btn-success m-2" onClick={() => handlePayment('mpesa')}>Mpesa</button>
-            <button type="button" className="btn btn-primary m-2" onClick={() => handlePayment('visa')}>Visa Card</button>
+            <button type="button" style={{ marginRight: "1rem" }} className="valueControllers mpesavalue" onClick={() => handlePayment('mpesa')}>Mpesa</button>
+            <button type="button" className="valueControllers" onClick={() => handlePayment('visa')}>Visa Card</button>
           </div>
           <div className="modal-footer">
-            <button type="button" className="btn btn-secondary" onClick={handleClose}>Close</button>
+            <button type="button" className="valueControllers" onClick={handleClose}>Close</button>
           </div>
         </div>
       </div>
@@ -452,8 +453,8 @@ const OrderSummaryModal = ({
               </div>
             </div>
             <div className="modal-footer">
-              <button type="button" className="btn btn-secondary" onClick={handleClose}>Close</button>
-              <button type="button" className="btn btn-primary" onClick={handleConfirmOrder}>Confirm Order</button>
+              <button type="button" className="valueControllers" onClick={handleClose}>Close</button>
+              <button type="button" className="valueControllers" onClick={handleConfirmOrder}>Confirm Order</button>
             </div>
           </div>
         </div>
