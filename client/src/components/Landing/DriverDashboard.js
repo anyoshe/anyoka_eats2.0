@@ -60,9 +60,9 @@ const Dashboard = () => {
                 console.log("Reverting status for dispatched orders");
                 
                 // Iterate through each dispatched order and revert its status
-                // for (const order of dispatchedOrdersData) {
-                //     await revertOrderStatus(order.orderId); // Call the revert function with the order ID
-                // }
+                for (const order of dispatchedOrdersData) {
+                    await revertOrderStatus(order.orderId); // Call the revert function with the order ID
+                }
     
                 // After reverting the status, fetch the new set of orders
                 fetchOrders(); 
@@ -317,65 +317,6 @@ const Dashboard = () => {
         setOrderTimerId(id); // Save the timer ID
     };
     
-
-// window.onload = () => {
-//     checkForOngoingOrder();
-//     monitorOrderStatus(); // Monitor the status of the order to remove it upon delivery or driver decline
-// };
-
-// // Function to check for ongoing order and restore state
-// const checkForOngoingOrder = () => {
-//     const savedOrder = localStorage.getItem(`driver_${driverId}_currentOrder`);
-//     const savedTime = localStorage.getItem(`driver_${driverId}_timerStartTime`);
-
-//     if (savedOrder && savedTime) {
-//         const elapsedTime = Math.floor((Date.now() - parseInt(savedTime)) / 1000);
-//         const remainingTime = 300 - elapsedTime; // 5 minutes (300 seconds) - elapsed time
-
-//         if (remainingTime > 0) {
-//             setSelectedOrder(JSON.parse(savedOrder)); // Restore the saved order for the specific driver
-//             startTimer(JSON.parse(savedOrder).orderId, driverId); // Resume the timer for this driver
-//             setTimer(remainingTime); // Restore the remaining time
-//         } else {
-//             // Timer has already expired, revert order status for this driver
-//             revertOrderStatus(JSON.parse(savedOrder).orderId, driverId);
-
-//             // Clear localStorage as the timer expired
-//             localStorage.removeItem(`driver_${driverId}_currentOrder`);
-//             localStorage.removeItem(`driver_${driverId}_timerStartTime`);
-//             localStorage.removeItem(`driver_${driverId}_remainingTime`);
-//         }
-//     } else {
-//         console.log("No ongoing order found for driver, fetching new orders");
-//         // Fetch new orders or handle accordingly
-//     }
-// };
-
-// // Function to monitor order status changes (e.g., after delivery or driver decline)
-// const monitorOrderStatus = async () => {
-//     const savedOrder = localStorage.getItem(`driver_${driverId}_currentOrder`);
-//     if (savedOrder) {
-//         const { orderId } = JSON.parse(savedOrder);
-
-//         try {
-//             // Fetch the current order status from the backend
-//             const response = await fetch(`${config.backendUrl}/api/getOrderStatus/${orderId}`);
-//             const orderData = await response.json();
-
-//             if (orderData.status === 'Delivered' || orderData.status === 'Declined') {
-//                 // Remove order from view and clear localStorage
-//                 setSelectedOrder(null);
-//                 localStorage.removeItem(`driver_${driverId}_currentOrder`);
-//                 localStorage.removeItem(`driver_${driverId}_timerStartTime`);
-//                 localStorage.removeItem(`driver_${driverId}_remainingTime`);
-//             }
-//         } catch (error) {
-//             console.error('Error fetching order status:', error);
-//         }
-//     }
-// };
-
-    
     
     const revertOrderStatus = async (orderId, driverId) => {
         try {
@@ -397,6 +338,9 @@ const Dashboard = () => {
             localStorage.removeItem(`driver_${driverId}_currentOrder`);
             localStorage.removeItem(`driver_${driverId}_timerStartTime`);
             localStorage.removeItem(`driver_${driverId}_remainingTime`);
+
+              // **Immediately update the UI**
+        await fetchOrders(); // Call fetchOrders to refresh the order list on the UI
         } catch (error) {
             console.error('Error reverting order status:', error);
         }
@@ -476,6 +420,7 @@ const Dashboard = () => {
     const handleLogout = () => {
         localStorage.removeItem('authToken');
         localStorage.removeItem('driverId');
+        
         navigate('/');
     };
 
