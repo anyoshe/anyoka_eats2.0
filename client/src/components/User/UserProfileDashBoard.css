@@ -96,7 +96,7 @@
 }
 
 .categories_div{
-    border: 1px solid greenyellow;
+    /* border: 1px solid greenyellow; */
 
     margin-top: -0.3%;
     position: fixed;
@@ -285,3 +285,30 @@
         width: 100%;
     } */
 } 
+
+
+@media (min-width: 768px) and (max-width:1023px) {
+    .profile_account_section{
+        margin-top: 8%;
+    }
+
+    .categories_div {
+        margin-top: -0.6%;
+    }
+
+    .profile_category {
+        font-size: 15px;
+    }
+
+    .profile_section {
+        margin-top: 4%;
+    }
+
+    .coming_div {
+        flex-direction: column;
+    }
+
+    .grid_profile_one {
+        width: 100%;
+    }
+}

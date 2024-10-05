@@ -137,10 +137,11 @@
   font-size: 15px;
   padding: 5px;
   border: none;
+  outline: none;
   margin-bottom: 2px;
 }
 
-.specialPin:hover{
+.specialPin:hover,.specialPin:focus{
   background: white;
   color: var(--orange);
   outline: 1px solid var(--orange);
@@ -222,14 +223,73 @@
 } */
 
 /* Styling for screens below 700px */
-@media (max-width: 700px) {
+@media(max-width : 480px){
+  #specialOrderModal {
+    margin-top: 10%;
+  }
+
+  .specialModalContent{
+    width: 400px;
+    margin-left: -5.5rem;
+  }
+
+  .specialTriple{
+    grid-template-columns:1fr;
+    gap: 5px;
+  }
+
+  #specialOrderArea{
+    height: 7rem;
+  }
+}
+
+
+/* @media (max-width: 700px) {
   .specialOrderModal {
     width: 100%;
     margin-left: 0;
     font-size: 12px;
   }
-   .hero-background {
+
+  .hero-background {
     height: 300px;
     background-size: contain;
   } 
+} */
+
+
+@media (min-width: 768px) and (max-width:1023px) {
+  .specialModalContent{
+    width: 700px;
+    margin-left: -10rem;
+  }
+
+  .specialTriple{
+    grid-template-columns:1fr;
+    gap: 5px;
+  }
+
+  .special_times{
+    /* width: 5rem; */
+  }
+
+  #specialOrderArea{
+    height: 10rem;
+  }
+
+  #map {
+    height: 200px;
+    width: 100%;
+    margin-top: 10px;
+    display: none;
+  }
+
+  #specialOrderModal {
+    margin-top: 8%;
+    height: 95vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  
 }
