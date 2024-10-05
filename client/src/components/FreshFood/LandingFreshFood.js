@@ -242,7 +242,9 @@ const LandingFreshFood = () => {
             <li className={`fresh_link ${activeCategory === 'Sea Foods and Fish' ? 'active' : ''}`} onClick={() => handleCategoryClick('Sea Foods and Fish')}>Sea Foods & Fish</li>
           </ul>
         </div>
+
         <h2 className='discoverTitle'>Discover Our Selection</h2>
+        
         <div className="category-grid">
           {filteredFoods.length > 0 ? (
             filteredFoods.map((food) => (

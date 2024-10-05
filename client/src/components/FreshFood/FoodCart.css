@@ -38,4 +38,11 @@
         top: -1%;
         right: 2.8%;
     }
+
+    .foodCartModalContent{
+        width: 140%;
+        margin-left: -20%;
+    }
 }
+
+
