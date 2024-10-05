@@ -1689,3 +1689,15 @@
         transition: ease-in .2s;
     }
 }
+
+
+@media (min-width: 768px) and (max-width:1023px) {
+    /* #profileImageSection{
+        flex-direction: row;
+    } */
+
+    .profile_img_div {
+        width: 40%;
+        height: 70%;
+    }
+}
