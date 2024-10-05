@@ -56,7 +56,7 @@ const FoodCart = () => {
       {/* Cart Modal */}
       <div className={`modal fade ${showCartModal ? 'show' : ''}`} id="cartModal" tabIndex="-1" aria-labelledby="cartModalLabel" aria-hidden="true" style={{ display: showCartModal ? 'block' : 'none' }}>
         <div className="modal-dialog modal-lg">
-          <div className="modal-content">
+          <div className="modal-content foodCartModalContent">
             <div className="modal-header">
               <h5 className="modal-title" id="cartModalLabel">My Order</h5>
             </div>
