@@ -60,9 +60,9 @@ const Dashboard = () => {
                 console.log("Reverting status for dispatched orders");
                 
                 // Iterate through each dispatched order and revert its status
-                for (const order of dispatchedOrdersData) {
-                    await revertOrderStatus(order.orderId); // Call the revert function with the order ID
-                }
+                // for (const order of dispatchedOrdersData) {
+                //     await revertOrderStatus(order.orderId); // Call the revert function with the order ID
+                // }
     
                 // After reverting the status, fetch the new set of orders
                 fetchOrders(); 
