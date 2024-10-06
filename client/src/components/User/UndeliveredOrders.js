@@ -79,87 +79,112 @@ const UndeliveredOrders = ({ partner }) => {
   };
   
 
-  const updateOrderStatus = async (orderId, nextStatus) => {
-    try {
-      await axios.patch(`${config.backendUrl}/api/updateOrderStatus/${orderId}`, { status: nextStatus });
-      fetchOrders();
-    } catch (error) {
-      console.error('Error updating order status:', error);
+const fetchDriverDetails = async (driverId) => {
+  try {
+    console.log(`Fetching driver details for driverId: ${driverId}`);
+    const response = await axios.get(`${config.backendUrl}/api/getDriverDetails/${driverId}`);
+    console.log('Driver details fetched:', response.data);
+    return response.data; // Ensure driver details are included here
+  } catch (error) {
+    console.error('Error fetching driver details:', error);
+    throw error;
+  }
+};
+
+const updateOrderStatus = async (orderId, currentStatus, nextStatus, driverId) => {
+  try {
+    let driverDetails = null;
+    let pickedAt = null;
+
+    // If the next status is "On Transit", fetch driver details and add a timestamp
+    if (nextStatus === 'On Transit') {
+      if (!driverId) {
+        throw new Error('Driver ID is required to move to On Transit');
+      }
+
+      driverDetails = await fetchDriverDetails(driverId);
+      pickedAt = new Date().toISOString(); // Add timestamp
     }
-  };
 
-  const getStatusButtons = (status, orderId) => {
-    const statusOrder = ['Order received', 'Processed and packed', 'Dispatched', 'Delivered'];
-    const currentIndex = statusOrder.indexOf(status);
-    const nextStatus = statusOrder[currentIndex + 1];
+    // Send the updated order status to the backend
+    const response = await axios.patch(`${config.backendUrl}/api/updateOrderStatus/${orderId}`, {
+      status: nextStatus,
+      driverId,
+      ...(driverDetails && { driverDetails }),
+      ...(pickedAt && { pickedAt })
+    });
 
-    return nextStatus ? (
-      <button className='statusbutn' onClick={() => updateOrderStatus(orderId, nextStatus)}>Mark as {nextStatus}</button>
-    ) : null;
-  };
+    // Assuming the backend response includes the updated order
+    const updatedOrder = response.data.order;
 
-  const createOrderElement = (order) => (
-    <div key={order.orderId} className="orderDetails">
-      <p>
-        <span className='detailsTitles'>Order ID: </span> 
-        {order.orderId}
-      </p>
+    // Now you need to update the UI with the updated order details
+    // If you're storing orders in a state, update the state here
+    updateOrdersInUI(updatedOrder);  // Create this function to update your state/UI
 
-      <p>
-        {/* <span className='detailsTitles'>Customer Name: </span>  */}
-        <span className='detailsTitles'>Name: </span>
-        {order.customerName}
-      </p>
+    fetchOrders(); // Optionally re-fetch all orders if needed
+  } catch (error) {
+    console.error('Error updating order status:', error);
+  }
+};
 
-      <p>
-        {/* <span className='detailsTitles'>Phone Number: </span>  */}
-        <span className='detailsTitles'>Number: </span> 
-        {order.phoneNumber}
-      </p>
 
-      {/* <p>Dish Category: {order.selectedCategory}</p> */}
-
-      <p>
-        <span className='detailsTitles'>Location: </span>
-        {order.customerLocation}
-      </p>
-
-      <p>
-        {/* <span className='detailsTitles'>Expected Delivery Time: </span>  */}
-        <span className='detailsTitles'>Expected Time: </span> 
-        {order.expectedDeliveryTime}
-      </p>
-
-      <p>
-        {/* <span className='detailsTitles'>Dishes Ordered: </span> */}
-        <span className='detailsTitles'>Orders: </span>
-      </p>
-
-      <ul>
-        {order.dishes.map((dish) => (
-          <li key={dish.dishName}>{dish.dishName} - Quantity: {dish.quantity}</li>
-        ))}
-      </ul>
-
-      <p>
-        {/* <span className='detailsTitles'>Total Price: Kes.</span> */}
-        <span className='detailsTitles'>Total: Kes.</span>
-        {order.totalPrice}.00
-      </p>
-
-      <p>
-        <span className='detailsTitles'>Created At:</span> 
-      {new Date(order.createdAt).toLocaleString()}
-      </p>
-
-      <p>
-        <span className='detailsTitles'>Status:</span> 
-        <span className="order-status">{order.status || 'undefined'}</span>
-      </p>
-
-      {getStatusButtons(order.status, order.orderId )}
-    </div>
+const updateOrdersInUI = (updatedOrder) => {
+  setOrders((prevOrders) =>
+    prevOrders.map((order) =>
+      order.orderId === updatedOrder.orderId ? updatedOrder : order
+    )
   );
+};
+
+// Function to render status buttons based on current status
+const getStatusButtons = (status, orderId, driverId) => {
+  const statusOrder = ['Order received', 'Processed and packed', 'Dispatched', 'On Transit', 'Delivered'];
+  const currentIndex = statusOrder.indexOf(status);
+  const nextStatus = statusOrder[currentIndex + 1];
+
+  // For "Dispatched" status, pass driverId to transition to "On Transit"
+  return nextStatus ? (
+    <button 
+      className='statusbutn' 
+      onClick={() => updateOrderStatus(orderId, status, nextStatus, driverId)}
+    >
+      Mark as {nextStatus}
+    </button>
+  ) : null;
+};
+
+const createOrderElement = (order) => (
+  <div key={order.orderId} className="orderDetails">
+    <p><span className='detailsTitles'>Order ID: </span> {order.orderId}</p>
+    <p><span className='detailsTitles'>Name: </span>{order.customerName}</p>
+    <p><span className='detailsTitles'>Number: </span>{order.phoneNumber}</p>
+    <p><span className='detailsTitles'>Location: </span>{order.customerLocation}</p>
+    <p><span className='detailsTitles'>Expected Time: </span>{order.expectedDeliveryTime}</p>
+    <p><span className='detailsTitles'>Orders: </span></p>
+    <ul>
+      {order.dishes.map((dish) => (
+        <li key={dish.dishName}>{dish.dishName} - Quantity: {dish.quantity}</li>
+      ))}
+    </ul>
+    <p><span className='detailsTitles'>Total: Kes.</span>{order.totalPrice}.00</p>
+    <p><span className='detailsTitles'>Created At: </span>{new Date(order.createdAt).toLocaleString()}</p>
+    <p><span className='detailsTitles'>Status: </span><span className="order-status">{order.status || 'undefined'}</span></p>
+
+    {/* Driver details are shown only if they exist */}
+    {order.driverDetails && (
+      <>
+        <p><span className='detailsTitles'>Driver Name: </span>{order.driverDetails.name}</p>
+        <p><span className='detailsTitles'>Driver Contact: </span>{order.driverDetails.contactNumber}</p>
+        <p><span className='detailsTitles'>Vehicle Registration: </span>{order.driverDetails.vehicleRegistration}</p>
+        <p><span className='detailsTitles'>Picked At: </span>{new Date(order.pickedAt).toLocaleString()}</p>
+      </>
+    )}
+
+    {/* Pass driverId if order is dispatched and ready to be marked as On Transit */}
+    {getStatusButtons(order.status, order.orderId, order.driverId)}
+  </div>
+);
+
 
   const groupedOrders = orders.reduce((acc, order) => {
     const key = order.selectedRestaurant;
