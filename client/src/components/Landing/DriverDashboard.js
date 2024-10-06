@@ -12,6 +12,7 @@ const Dashboard = () => {
     const [orders, setOrders] = useState([]);
     const [driverDetails, setDriverDetails] = useState({});
     const [location, setLocation] = useState('');
+    const [contactNumber, setContactNumber] = useState('');
     const [vehicleType, setVehicleType] = useState('');
     const [driverImage, setDriverImage] = useState(null); // New state for driver image
     const [editing, setEditing] = useState(false); // State to toggle editing mode
@@ -60,9 +61,9 @@ const Dashboard = () => {
                 console.log("Reverting status for dispatched orders");
                 
                 // Iterate through each dispatched order and revert its status
-                // for (const order of dispatchedOrdersData) {
-                //     await revertOrderStatus(order.orderId); // Call the revert function with the order ID
-                // }
+                for (const order of dispatchedOrdersData) {
+                    await revertOrderStatus(order.orderId); // Call the revert function with the order ID
+                }
     
                 // After reverting the status, fetch the new set of orders
                 fetchOrders(); 
@@ -101,6 +102,7 @@ const Dashboard = () => {
             setDriverDetails(data);
             console.log('Driver Details set:', data);
             setLocation(data.location || '');
+            setContactNumber(data.contactNumber || '');
             setVehicleType(data.vehicleType || '');
             setDriverImage(driverImage || null);
         } catch (error) {
@@ -241,7 +243,7 @@ const Dashboard = () => {
             await fetchOrderByStatus(updatedOrder.orderId, driverId); // Pass the driverId here
     
             // Start the timer only after the order has been set
-            setTimer(3 * 60); // 3 minutes = 180 seconds (for testing purposes)
+            setTimer(7 * 60); // Example: 7 minutes
             startTimer(updatedOrder.orderId, driverId); // Pass driverId to startTimer
             
             // Clear other orders from the view for the specific driver
@@ -255,6 +257,7 @@ const Dashboard = () => {
             console.error('Error accepting order:', error);
         }
     };
+    
 
     
     const fetchOrderByStatus = async (orderId, driverId) => {
@@ -381,6 +384,7 @@ const Dashboard = () => {
     const handleUpdateDriver = async () => {
         const formData = new FormData();
         formData.append('location', location);
+        formData.append('contactNumber', contactNumber);
         formData.append('vehicleType', vehicleType);
 
         if (driverImage) {
@@ -469,6 +473,19 @@ const Dashboard = () => {
                                                 />
                                             ) : (
                                                 <span>{driverDetails.location}</span>
+                                            )}
+                                        </span>
+                                        <span className="contactNumber">
+                                            <i className="fas fa-phone-alt profile_icon" aria-hidden="true"></i>
+                                            {editing ? (
+                                                <input
+                                                    type="number"
+                                                    value={contactNumber}
+                                                    onChange={(e) => setContactNumber(e.target.value)}
+                                                    placeholder="Enter your Phone Number"
+                                                />
+                                            ) : (
+                                                <span>{driverDetails.contactNumber}</span>
                                             )}
                                         </span>
                                         <div className="Vehicle">

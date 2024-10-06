@@ -1120,8 +1120,14 @@ const orderSchema = new Schema({
   delivered: { type: Boolean, default: false },
   paid: { type: Boolean, default: false },
   // userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: false },
-  status: { type: String, enum: ['Order received', 'Processed and packed', 'Dispatched', 'Delivered'], default: 'Order received' },
+  status: { type: String, enum: ['Order received', 'Processed and packed', 'Dispatched', 'On Transit', 'Delivered'], default: 'Order received' },
   driverId: { type: String, required: false },
+  driverDetails: {
+    name: { type: String },
+    contactNumber: { type: String },
+    vehicleRegistration: { type: String }
+  },
+  pickedAt: { type: Date }
 });
 
 const Order = model('Order', orderSchema);
@@ -1332,24 +1338,24 @@ router.patch('/updateOrderStatus/:orderId', async (req, res) => {
   console.log('Request body:', req.body);
   try {
     const { orderId } = req.params;
-    const { status } = req.body;
+    const { status, driverDetails, pickedAt } = req.body; // Added new fields from frontend
 
+    // Find order by orderId (UUID) and update the status
     const order = await Order.findOneAndUpdate(
-        { orderId: orderId },
-        { status: status },
-        { new: true }
+      { orderId: orderId }, // Match the UUID
+      { status, driverDetails, pickedAt },
+      { new: true }
     );
 
     if (!order) {
-        return res.status(404).json({ message: 'Order not found' });
+      return res.status(404).json({ message: 'Order not found' });
     }
 
     res.json({ message: 'Order status updated successfully', order });
-} catch (error) {
+  } catch (error) {
     res.status(500).json({ message: 'Error updating order status', error });
-}
+  }
 });
-
 // Backend API route to accept an order
 router.patch('/driverUpdateOrderStatus/:orderId', async (req, res) => {
   console.log('Updating order status for:', req.params.orderId); // Check if orderId is correctly received
@@ -1427,23 +1433,26 @@ router.patch('/revertOrderStatus/:orderId', async (req, res) => {
   }
 });
 
-// Assuming you have a function in your order model to find an order by orderId and driverId
-// router.get('/fetchOrderByStatus/:orderId/:driverId', async (req, res) => {
-//   const { orderId, driverId } = req.params;
+// GET order by ID
+router.get('/getOrder/:orderId', async (req, res) => {
+  const { orderId } = req.params;
 
-//   try {
-//       const order = await Order.findOne({ orderId: orderId, driverId: driverId }); // Match order by orderId and driverId
+  try {
+    // Fetch the order details from the database
+    const order = await Order.findById(orderId).populate('driverId'); // Assuming driverId references a Driver model
 
-//       if (!order) {
-//           return res.status(404).json({ message: 'Order not found' });
-//       }
+    // Check if the order exists
+    if (!order) {
+      return res.status(404).json({ message: 'Order not found' });
+    }
 
-//       res.json(order); // Respond with the found order
-//   } catch (error) {
-//       console.error('Error fetching order:', error);
-//       res.status(500).json({ message: 'Error fetching order' });
-//   }
-// });
+    // Send the order details back to the client
+    res.status(200).json(order);
+  } catch (error) {
+    console.error('Error fetching order:', error);
+    res.status(500).json({ message: 'Server error', error: error.message });
+  }
+});
 
 router.get('/fetchOrderByStatus/:orderId/:driverId', async (req, res) => {
   const { orderId, driverId } = req.params;
@@ -2191,6 +2200,7 @@ const driverSchema = new mongoose.Schema({
   password: { type: String, required: true },
   createdAt: { type: Date, default: Date.now },
   location: { type: String, default: '' },
+  contactNumber: { type: Number, default: 0 },
   vehicleType: { type: String, default: '' },
   driverImage: { type: String, default:	null}
 });
@@ -2327,6 +2337,7 @@ router.get('/driverDetails/:id', async (req, res) => {
           DriverLicenceNumber: driver.DriverLicenceNumber,
           NumberPlate: driver.NumberPlate,
           location: driver.location,
+          contactNumber: driver.contactNumber,
           vehicleType: driver.vehicleType,
           driverImage: driver.driverImage,
           _id: driver._id // Include the driver ID
@@ -2337,47 +2348,36 @@ router.get('/driverDetails/:id', async (req, res) => {
   }
 });
 
+// GET driver details by driverId
+router.get('/getDriverDetails/:driverId', async (req, res) => {
+  try {
+    const driverId = req.params.driverId;
 
-  // router.patch('/driverDetails', upload, async (req, res) => {
-  //   console.log("Request received:", req.body);
-  //   const { location, vehicleType, driverId } = req.body; // Use driverId from the request body
-  //   const driverImage = req.file ? `/uploads/images/${req.file.filename}` : null; // Get the uploaded image's relative path
-  
-  //   try {
-  //     // Build the update object dynamically
-  //     const updateData = { location, vehicleType };
-  
-  //     // Only add driverImage if a new image was uploaded
-  //     if (driverImage) {
-  //       updateData.driverImage = driverImage;
-  //     }
-  
-  //     // Find the driver by driverId and update details
-  //     const updatedDriver = await Driver.findByIdAndUpdate(
-  //       driverId, // Use the driverId to find the driver
-  //       updateData, // Update with location, vehicleType, and optionally driverImage
-  //       { new: true, runValidators: true } // Return the updated document
-  //     );
-  
-  //     if (!updatedDriver) {
-  //       console.log("Driver not found");
-  //       return res.status(404).json({ message: 'Driver not found' });
-  //     }
-  
-  //     res.status(200).json({
-  //       message: 'Driver details updated successfully',
-  //       driver: updatedDriver
-  //     });
-  //   } catch (error) {
-  //     console.error('Error updating driver details:', error);
-  //     res.status(500).json({ message: 'Server error' });
-  //   }
-  // });
+    // Fetch the driver's details from the database
+    const driver = await Driver.findById(driverId);
+
+    // If driver not found, return an error
+    if (!driver) {
+      return res.status(404).json({ message: 'Driver not found' });
+    }
+
+    // Return driver details
+    res.status(200).json({
+      name: driver.OfficialNames,
+      contactNumber: driver.contactNumber,
+      vehicleRegistration: driver.NumberPlate
+    });
+  } catch (error) {
+    console.error('Error fetching driver details:', error);
+    res.status(500).json({ message: 'Server error' });
+  }
+});
+
 
   router.patch('/driverDetails', upload, async (req, res) => {
     console.log("Request received:", req.body);
     
-    const { location, vehicleType, driverId } = req.body; // Destructure location, vehicleType, and driverId from request body
+    const { location, contactNumber, vehicleType, driverId } = req.body; // Destructure location, contactNumber, vehicleType, and driverId from request body
     const driverImage = req.file ? `/uploads/images/${req.file.filename}` : null; // Handle uploaded image
 
     // Ensure driverId is provided and valid
@@ -2387,7 +2387,7 @@ router.get('/driverDetails/:id', async (req, res) => {
 
     try {
         // Build the update object dynamically
-        const updateData = { location, vehicleType };
+        const updateData = { location, contactNumber, vehicleType };
 
         // Only add driverImage if a new image was uploaded
         if (driverImage) {
