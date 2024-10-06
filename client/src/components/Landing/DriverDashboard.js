@@ -19,8 +19,9 @@ const Dashboard = () => {
     const [timer, setTimer] = useState(0); // Timer state for the countdown
     const [orderTimerId, setOrderTimerId] = useState(null); // Timer ID for clearing later
     const [driverId, setDriverId] = useState(null); // Initialize state for driverId
-    const [dispatchedOrders, setDispatchedOrders] = useState([]);
+    // const [dispatchedOrders, setDispatchedOrders] = useState([]);
     const [orderId, setOrderId] = useState(null); // State to hold orderId
+    const [orderStatus, setOrderStatus] = useState('');
 
 
     const navigate = useNavigate();
@@ -38,7 +39,7 @@ const Dashboard = () => {
     useEffect(() => {
         if (driverId) {
             fetchDriverDetails(driverId); // Fetch driver details using the stored driver ID
-            fetchDispatchedOrders(driverId); // Fetch dispatched orders using the stored driver ID
+            // fetchDispatchedOrders(driverId); // Fetch dispatched orders using the stored driver ID
             fetchOrders(); // Call fetchOrders if necessary
            // restoreTimerState();
             fetchOrderByStatus();
@@ -47,33 +48,33 @@ const Dashboard = () => {
     
 
     
-    const fetchDispatchedOrders = async (driverId) => {
-        console.log("Driver ID passed to fetchDispatchedOrders:", driverId);
-        try {
-            const response = await fetch(`${config.backendUrl}/api/fetchDriverDispatchedOrders/${driverId}`);
-            console.log("Response received:", response);
-            if (!response.ok) throw new Error('Failed to fetch dispatched orders');
+    // const fetchDispatchedOrders = async (driverId) => {
+    //     console.log("Driver ID passed to fetchDispatchedOrders:", driverId);
+    //     try {
+    //         const response = await fetch(`${config.backendUrl}/api/fetchDriverDispatchedOrders/${driverId}`);
+    //         console.log("Response received:", response);
+    //         if (!response.ok) throw new Error('Failed to fetch dispatched orders');
             
-            const dispatchedOrdersData = await response.json();
-            console.log("Dispatched Orders Fetched:", dispatchedOrdersData);
+    //         const dispatchedOrdersData = await response.json();
+    //         console.log("Dispatched Orders Fetched:", dispatchedOrdersData);
             
-            if (dispatchedOrdersData.length > 0) {
-                console.log("Reverting status for dispatched orders");
+    //         if (dispatchedOrdersData.length > 0) {
+    //             console.log("Reverting status for dispatched orders");
                 
-                // Iterate through each dispatched order and revert its status
-                for (const order of dispatchedOrdersData) {
-                    await revertOrderStatus(order.orderId); // Call the revert function with the order ID
-                }
+    //             // Iterate through each dispatched order and revert its status
+    //             // for (const order of dispatchedOrdersData) {
+    //             //     await revertOrderStatus(order.orderId); // Call the revert function with the order ID
+    //             // }
     
-                // After reverting the status, fetch the new set of orders
-                fetchOrders(); 
-            } else {
-                fetchOrders(); // If no dispatched orders, fetch regular orders
-            }
-        } catch (error) {
-            console.error('Error fetching dispatched orders:', error);
-        }
-    };
+    //             // After reverting the status, fetch the new set of orders
+    //             fetchOrders(); 
+    //         } else {
+    //             fetchOrders(); // If no dispatched orders, fetch regular orders
+    //         }
+    //     } catch (error) {
+    //         console.error('Error fetching dispatched orders:', error);
+    //     }
+    // };
     const fetchDriverDetails = async (driverId) => {
         console.log('Fetching details for Driver ID:', driverId); // Log the driverId
         try {
@@ -211,116 +212,208 @@ const Dashboard = () => {
     };
     
 
-    const handleAcceptOrder = async (order) => {
-        try {
-            // Ensure the driver ID is available
-            if (!driverId) {
-                throw new Error('Driver ID is not set');
-            }
-    
-            // Log the order being accepted
-            console.log('Order being accepted:', order.order); 
-            console.log('Driver ID:', driverId); 
-    
-            // Update the order status to 'Dispatched' and assign the driver ID
-            const response = await fetch(`${config.backendUrl}/api/driverUpdateOrderStatus/${order.order}`, {
-                method: 'PATCH',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({ status: 'Dispatched', driverId }) // Update status and set driverId
-            });
-    
-            if (!response.ok) {
-                throw new Error('Failed to accept the order');
-            }
-    
-            // Get the updated order details
-            const updatedOrder = await response.json();
-            console.log('Order accepted and dispatched:', updatedOrder);
-    
-            // Fetch and display only the dispatched order for the specific driver
-            await fetchOrderByStatus(updatedOrder.orderId, driverId); // Pass the driverId here
-    
-            // Start the timer only after the order has been set
-            setTimer(7 * 60); // Example: 7 minutes
-            startTimer(updatedOrder.orderId, driverId); // Pass driverId to startTimer
-            
-            // Clear other orders from the view for the specific driver
-            setOrders([]); 
-    
-            // Store the driver-specific order and timer details in localStorage
-            localStorage.setItem(`driver_${driverId}_order`, JSON.stringify({ orderId: updatedOrder.order, driverId }));
-            localStorage.setItem(`driver_${driverId}_timerStartTime`, Date.now()); // Save the timer start time
-    
-        } catch (error) {
-            console.error('Error accepting order:', error);
+const handleAcceptOrder = async (order) => {
+    try {
+        if (!driverId) {
+            throw new Error('Driver ID is not set');
         }
-    };
-    
 
-    
-    const fetchOrderByStatus = async (orderId, driverId) => {
-        try {
-            console.log("Fetching order by status for Order ID:", orderId, "and Driver ID:", driverId);
-            const response = await fetch(`${config.backendUrl}/api/fetchOrderByStatus/${orderId}/${driverId}`);
-    
-            if (!response.ok) {
-                throw new Error('Failed to fetch the order by status');
-            }
-    
-            const fetchedOrder = await response.json();
-            console.log("Fetched order:", fetchedOrder);
-    
-            // Store the driver-specific order and timer details in localStorage
-            localStorage.setItem(`driver_${driverId}_currentOrder`, JSON.stringify(fetchedOrder));
-            localStorage.setItem(`driver_${driverId}_timerStartTime`, Date.now()); // Save the start time of the timer
-    
-            setSelectedOrder(fetchedOrder); // Store the fetched order for display
-            console.log("Selected Order Set:", fetchedOrder);
-    
-            // Start the timer when the order is fetched, for the specific driver
-            startTimer(fetchedOrder.orderId, driverId); // Pass the orderId and driverId to startTimer
-        } catch (error) {
-            console.error('Error fetching order by status:', error);
+        console.log('Order being accepted:', order.order);
+        console.log('Driver ID:', driverId);
+
+        // Update the order status to 'Dispatched' and assign the driver ID
+        const response = await fetch(`${config.backendUrl}/api/driverUpdateOrderStatus/${order.order}`, {
+            method: 'PATCH',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ status: 'Dispatched', driverId }) // Update status and set driverId
+        });
+
+        if (!response.ok) {
+            throw new Error('Failed to accept the order');
         }
-    };
-    
-    // Timer logic
 
-    const startTimer = (orderId, driverId) => {
-        if (orderTimerId) clearInterval(orderTimerId); // Clear previous timer if exists
-    
-        // Retrieve any remaining time from localStorage for the specific driver
-        const remainingTime = localStorage.getItem(`driver_${driverId}_remainingTime`);
-        const timeToCount = remainingTime ? parseInt(remainingTime) : 300; // 5 minutes (300 seconds) if no saved timer
-    
-        const id = setInterval(() => {
-            setTimer((prev) => {
+        const updatedOrder = await response.json();
+        console.log('Order accepted and dispatched:', updatedOrder);
+
+        // Start the timer only after the order has been set
+        setTimer(7 * 60); // Example: 7 minutes
+        startTimer(updatedOrder.orderId, driverId); // Start the timer for this order
+
+        // Clear other orders from the view for the specific driver
+        setOrders([]);
+
+        // Store the driver-specific order in localStorage
+        localStorage.setItem(`driver_${driverId}_order`, JSON.stringify({ orderId: updatedOrder.order, driverId }));
+
+        // Start checking the order status every 90 seconds
+        startOrderStatusCheck(updatedOrder.orderId, driverId);
+
+    } catch (error) {
+        console.error('Error accepting order:', error);
+    }
+};
+
+
+const fetchOrderByStatus = async (orderId, driverId) => {
+    try {
+        console.log("Fetching order by status for Order ID:", orderId, "and Driver ID:", driverId);
+        const response = await fetch(`${config.backendUrl}/api/fetchOrderByStatus/${orderId}/${driverId}`);
+
+        if (!response.ok) {
+            throw new Error('Failed to fetch the order by status');
+        }
+
+        const fetchedOrder = await response.json();
+        console.log("Fetched order:", fetchedOrder);
+
+        localStorage.setItem(`driver_${driverId}_currentOrder`, JSON.stringify(fetchedOrder));
+        localStorage.setItem(`driver_${driverId}_timerStartTime`, Date.now()); // Save the start time of the timer
+
+        setSelectedOrder(fetchedOrder); // Store the fetched order for display
+        // console.log("Selected Order Set:", fetchedOrder);
+        
+        return fetchedOrder; // Ensure to return the fetched order
+    } catch (error) {
+        console.error('Error fetching order by status:', error);
+    }
+};
+
+
+const startTimer = (orderId, driverId) => {
+    if (orderTimerId) clearInterval(orderTimerId); // Clear previous timer if exists
+
+    console.log(`Starting timer for Order ID: ${orderId}, Driver ID: ${driverId}`);
+
+    const id = setInterval(async () => {
+        console.log('Checking order status and updating timer...');
+
+        // Fetch the latest order status
+        const fetchedOrder = await fetchOrderByStatus(orderId, driverId);
+        console.log('Fetched order status:', fetchedOrder.status);
+
+        // Only continue counting down if the status is still 'Dispatched'
+        if (fetchedOrder && fetchedOrder.status === 'Dispatched') {
+            setTimer(prev => {
                 console.log("Timer countdown:", prev);
                 if (prev <= 0) {
                     clearInterval(id);
-                    console.log("Timer ended, calling revertOrderStatus"); // Log when the timer ends
-                    revertOrderStatus(orderId, driverId); // Pass the orderId and driverId to revertOrderStatus
-    
+                    console.log("Timer ended, calling revertOrderStatus");
+                    revertOrderStatus(orderId, driverId);
                     // Clear localStorage for the specific driver once the timer ends
-                    localStorage.removeItem(`driver_${driverId}_currentOrder`);
-                    localStorage.removeItem(`driver_${driverId}_timerStartTime`);
-                    localStorage.removeItem(`driver_${driverId}_remainingTime`);
-    
+                    clearDriverStorage(driverId);
                     return 0;
                 }
-    
-                // Save the remaining time in localStorage for the specific driver
-                localStorage.setItem(`driver_${driverId}_remainingTime`, prev - 1);
-    
-                return prev - 1;
+                return prev - 1; // Decrease the timer
             });
-        }, 1000); // Update timer every second
-        setOrderTimerId(id); // Save the timer ID
+        } else {
+            // If the order status is not 'Dispatched', stop the timer
+            console.log(`Order status is ${fetchedOrder.status}, stopping timer.`);
+            clearInterval(id);
+        }
+    }, 1000); // Check every second for the timer countdown
+
+    setOrderTimerId(id); // Save the timer ID
+};
+
+const clearDriverStorage = (driverId) => {
+    localStorage.removeItem(`driver_${driverId}_currentOrder`);
+    localStorage.removeItem(`driver_${driverId}_timerStartTime`);
+    localStorage.removeItem(`driver_${driverId}_remainingTime`);
+};
+
+const startOrderStatusCheck = (orderId, driverId) => {
+    console.log(`Starting status check for Order ID: ${orderId}, Driver ID: ${driverId}`);
+    const intervalId = setInterval(async () => {
+        try {
+            const response = await fetch(`${config.backendUrl}/api/fetchOrderByStatus/${orderId}/${driverId}`);
+            if (!response.ok) {
+                throw new Error('Failed to fetch the order status');
+            }
+
+            const fetchedOrder = await response.json();
+            console.log("Fetched order status during 90s check:", fetchedOrder.status);
+
+            // If the order status is 'On Transit', stop the timer and update the order display
+            if (fetchedOrder.status === 'On Transit') {
+                console.log("Order is now on transit. Stopping checks and timer.");
+                clearInterval(intervalId); // Stop the status check
+                clearInterval(orderTimerId); // Stop the timer
+                // Call a function to update the UI to mark as delivered
+                markOrderAsDelivered(fetchedOrder);
+                return;
+            }
+        } catch (error) {
+            console.error('Error fetching order status during 90s check:', error);
+        }
+    }, 90 * 1000); // Check every 90 seconds
+};
+
+const markOrderAsDelivered = async (orderId, driverId) => {
+    console.log("markOrderAsDelivered function called");
+
+    // Check if the order is available and in transit
+    // if (!selectedOrder || selectedOrder.status !== 'On Transit') {
+        if (!selectedOrder || selectedOrder?.status !== 'On Transit') {
+        console.log("Order is not in transit or not selected.");
+        alert('Order is not in transit, cannot mark as delivered.');
+        return false; // Indicate failure
+    }
+
+    // Prepare payload for update
+    const payload = {
+        status: 'Delivered',
+        driverId: driverId // Assuming this variable is defined
     };
-    
-    
+
+    try {
+        // Make the PATCH request to update the order status
+        const response = await fetch(`${config.backendUrl}/api/driverUpdateOrderStatus/${orderId}`, {
+            method: 'PATCH',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(payload),
+        });
+
+        if (!response.ok) {
+            throw new Error('Failed to update order status');
+        }
+
+        const updatedOrder = await response.json();
+        setSelectedOrder(updatedOrder); // Update the state with the new order details
+        alert('Order marked as delivered successfully.');
+        return true; // Indicate success
+    } catch (error) {
+        console.error('Error marking order as delivered:', error);
+        alert('Failed to mark order as delivered.');
+        return false; // Indicate failure
+    }
+};
+
+const handleMarkAsDelivered = async () => {
+    const orderId = selectedOrder?.orderId; // Use optional chaining to safely get orderId
+
+    if (!orderId) {
+        console.log("No order ID found.");
+        alert('No order selected to mark as delivered.');
+        return;
+    }
+
+    const success = await markOrderAsDelivered(orderId); // Call the function to mark the order as delivered
+
+    if (success) {
+        console.log('Order marked as delivered successfully.');
+
+        await fetchOrders();
+        // Additional actions can be taken here if needed
+    } else {
+        console.log('Failed to mark order as delivered.');
+    }
+};
+
+
     const revertOrderStatus = async (orderId, driverId) => {
         try {
             const response = await fetch(`${config.backendUrl}/api/revertOrderStatus/${orderId}`, { 
@@ -542,68 +635,88 @@ const Dashboard = () => {
                 </div>
 
                 <div className="driver_body">
-                    {selectedOrder ? (
-                        <div className="map_div">
-                            <div className="order_delivery_details">
-                                <p>Order ID: {selectedOrder.orderId}</p>
-                                <p>Restaurant: {selectedOrder.selectedRestaurant}</p>
-                                <p>Pickup Location: {selectedOrder.selectedRestaurant}</p>
-                                <p>Dropoff Location: {selectedOrder.customerLocation}</p>
-                                <p>Gross Delivery Charges: {selectedOrder.deliveryCharges}</p>
-                                <p>Commission: {selectedOrder.commission}</p>
-                                <p>Net Pay: {selectedOrder.netPay}</p>
-                                <p>Expected Delivery Time: {selectedOrder.expectedDeliveryTime}</p>
-                                <p>Customer Contact: {selectedOrder.phoneNumber}</p>
-                                <p>Status: {selectedOrder.status}</p>
-                                <p>Timer: {formatTime(timer)}</p>
-                                <button className="decline_order_btn" onClick={handleDeclineOrder}>Decline</button>
-                            </div>
-                        </div>
-                    ) : (
-                        orders.map(order => (
-                            <div className="order_container_div" key={order.id}>
-                                <div className="hotel_name_div">
-                                    <p className="order_p">Restaurant</p>
-                                    <span className="order_detail_input">{order.name}</span>
-                                </div>
-                                <div className="hotel_name_div">
-                                    <p className="order_p">Pickup Location</p>
-                                    <span className="order_detail_input">{order.pickup}</span>
-                                </div>
-                                <div className="hotel_name_div">
-                                    <p className="order_p">Order ID</p>
-                                    <span className="order_detail_input">{order.order}</span>
-                                </div>
-                                <div className="hotel_name_div">
-                                    <p className="order_p">Dropoff Location</p>
-                                    <span className="order_detail_input">{order.dropoff}</span>
-                                </div>
-                                <div className="hotel_name_div">
-                                    <p className="order_p">Delivery Charges</p>
-                                    <span className="order_detail_input">{order.deliveryCharges}</span>
-                                </div>
-                                <div className="hotel_name_div">
-                                    <p className="order_p">Commission</p>
-                                    <span className="order_detail_input">{order.commission}</span>
-                                </div>
-                                <div className="hotel_name_div">
-                                    <p className="order_p">Net Pay</p>
-                                    <span className="order_detail_input">{order.netPay}</span>
-                                </div>
-                                <div className="hotel_name_div">
-                                    <p className="order_p">Expected Delivery Time</p>
-                                    <span className="order_detail_input">{order.expectedDeliveryTime}</span>
-                                </div>
-                                <div className="hotel_name_div">
-                                    <p className="order_p">Customer Contact</p>
-                                    <span className="order_detail_input">{order.phoneNumber}</span>
-                                </div>
-                                <button className="accept_order_btn" onClick={() => handleAcceptOrder(order)}>Accept Order</button>
-                            </div>
-                        ))
-                    )}
+    {/* Check if an order is selected */}
+    {selectedOrder ? (
+        <div className="map_div">
+            <div className="order_delivery_details">
+                <p>Order ID: {selectedOrder.orderId}</p>
+                <p>Restaurant: {selectedOrder.selectedRestaurant}</p>
+                <p>Pickup Location: {selectedOrder.selectedRestaurant}</p>
+                <p>Dropoff Location: {selectedOrder.customerLocation}</p>
+                <p>Gross Delivery Charges: {selectedOrder.deliveryCharges}</p>
+                <p>Commission: {selectedOrder.commission}</p>
+                <p>Net Pay: {selectedOrder.netPay}</p>
+                <p>Expected Delivery Time: {selectedOrder.expectedDeliveryTime}</p>
+                <p>Customer Contact: {selectedOrder.phoneNumber}</p>
+                <p>Status: {selectedOrder.status}</p>
+                <p>Timer: {formatTime(timer)}</p>
 
+                {/* Button to mark as delivered */}
+                {selectedOrder.status === 'On Transit' ? (
+                    <button 
+                        className="accept_order_btn" 
+                        onClick={() => handleMarkAsDelivered(selectedOrder.orderId)}
+                    >
+                        Mark as Delivered
+                    </button>
+                ) : (
+                    <button className="decline_order_btn" onClick={handleDeclineOrder}>
+                        Decline
+                    </button>
+                )}
+            </div>
+        </div>
+    ) : (
+        // Display orders if no order is selected
+        orders.map((order) => (
+            <div className="order_container_div" key={order.id}>
+                <div className="hotel_name_div">
+                    <p className="order_p">Restaurant</p>
+                    <span className="order_detail_input">{order.name}</span>
                 </div>
+                <div className="hotel_name_div">
+                    <p className="order_p">Pickup Location</p>
+                    <span className="order_detail_input">{order.pickup}</span>
+                </div>
+                <div className="hotel_name_div">
+                    <p className="order_p">Order ID</p>
+                    <span className="order_detail_input">{order.orderId}</span>
+                </div>
+                <div className="hotel_name_div">
+                    <p className="order_p">Dropoff Location</p>
+                    <span className="order_detail_input">{order.dropoff}</span>
+                </div>
+                <div className="hotel_name_div">
+                    <p className="order_p">Delivery Charges</p>
+                    <span className="order_detail_input">{order.deliveryCharges}</span>
+                </div>
+                <div className="hotel_name_div">
+                    <p className="order_p">Commission</p>
+                    <span className="order_detail_input">{order.commission}</span>
+                </div>
+                <div className="hotel_name_div">
+                    <p className="order_p">Net Pay</p>
+                    <span className="order_detail_input">{order.netPay}</span>
+                </div>
+                <div className="hotel_name_div">
+                    <p className="order_p">Expected Delivery Time</p>
+                    <span className="order_detail_input">{order.expectedDeliveryTime}</span>
+                </div>
+                <div className="hotel_name_div">
+                    <p className="order_p">Customer Contact</p>
+                    <span className="order_detail_input">{order.phoneNumber}</span>
+                </div>
+                
+                {/* Button to accept the order */}
+                <button className="accept_order_btn" onClick={() => handleAcceptOrder(order)}>
+                    Accept Order
+                </button>
+            </div>
+        ))
+    )}
+</div>
+
+
             </div>
         </div>
     );
