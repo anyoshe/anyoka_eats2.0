@@ -47,34 +47,6 @@ const Dashboard = () => {
     }, [driverId]); // This runs whenever driverId changes
     
 
-    
-    // const fetchDispatchedOrders = async (driverId) => {
-    //     console.log("Driver ID passed to fetchDispatchedOrders:", driverId);
-    //     try {
-    //         const response = await fetch(`${config.backendUrl}/api/fetchDriverDispatchedOrders/${driverId}`);
-    //         console.log("Response received:", response);
-    //         if (!response.ok) throw new Error('Failed to fetch dispatched orders');
-            
-    //         const dispatchedOrdersData = await response.json();
-    //         console.log("Dispatched Orders Fetched:", dispatchedOrdersData);
-            
-    //         if (dispatchedOrdersData.length > 0) {
-    //             console.log("Reverting status for dispatched orders");
-                
-    //             // Iterate through each dispatched order and revert its status
-    //             // for (const order of dispatchedOrdersData) {
-    //             //     await revertOrderStatus(order.orderId); // Call the revert function with the order ID
-    //             // }
-    
-    //             // After reverting the status, fetch the new set of orders
-    //             fetchOrders(); 
-    //         } else {
-    //             fetchOrders(); // If no dispatched orders, fetch regular orders
-    //         }
-    //     } catch (error) {
-    //         console.error('Error fetching dispatched orders:', error);
-    //     }
-    // };
     const fetchDriverDetails = async (driverId) => {
         console.log('Fetching details for Driver ID:', driverId); // Log the driverId
         try {
@@ -350,12 +322,12 @@ const startOrderStatusCheck = (orderId, driverId) => {
     }, 90 * 1000); // Check every 90 seconds
 };
 
+
 const markOrderAsDelivered = async (orderId, driverId) => {
     console.log("markOrderAsDelivered function called");
 
     // Check if the order is available and in transit
-    // if (!selectedOrder || selectedOrder.status !== 'On Transit') {
-        if (!selectedOrder || selectedOrder?.status !== 'On Transit') {
+    if (!selectedOrder || selectedOrder?.status !== 'On Transit') {
         console.log("Order is not in transit or not selected.");
         alert('Order is not in transit, cannot mark as delivered.');
         return false; // Indicate failure
@@ -401,18 +373,26 @@ const handleMarkAsDelivered = async () => {
         return;
     }
 
-    const success = await markOrderAsDelivered(orderId); // Call the function to mark the order as delivered
+    const success = await markOrderAsDelivered(orderId, selectedOrder.driverId); // Call the function to mark the order as delivered
 
     if (success) {
         console.log('Order marked as delivered successfully.');
+        
+        // Clear the UI by resetting the selected order
+        setSelectedOrder(null); // Clear the currently selected order
 
-        await fetchOrders();
-        // Additional actions can be taken here if needed
+        await fetchOrders(); // Fetch new orders from the server
+
+        // You may want to check if orders state is updated
+        console.log('Updated orders state:', orders);
+        
+        // Optionally, you can also clear any UI state related to displayed orders if applicable
+        // setOrders([]); // Uncomment this if you need to clear existing displayed orders
+
     } else {
         console.log('Failed to mark order as delivered.');
     }
 };
-
 
     const revertOrderStatus = async (orderId, driverId) => {
         try {
