@@ -234,7 +234,8 @@ const vendorSchema = new mongoose.Schema({
   }},
   foodCategory: { type: String, required: true },
   averageRating: { type: Number, default: 0 },
-  ratingCount: { type: Number, default: 0 }
+  ratingCount: { type: Number, default: 0 },
+  _id: { type: String, required: true }
 });
 
 const Vendor = mongoose.model("Vendor", vendorSchema);
@@ -493,7 +494,6 @@ appRouter.get('/rating/:item_id/:item_type', async (req, res) => {
 });
 
 
-//ORDER SCHEMAS AND ITS ROUTES
 const orderFoodSchema = new Schema({
   food: { type: String, required: true },
   foodName: { type: String, required: true },
@@ -505,121 +505,275 @@ const orderSchema = new Schema({
   orderId: { type: String, required: true, unique: true },
   customerName: { type: String, required: false },
   phoneNumber: { type: String, required: true },
-  selectedCategory: { type: String, required: false },
-  selectedVendor: { type: String, required: true },
   customerLocation: { type: String, required: true },
   expectedDeliveryTime: { type: String, required: true },
-  foods: [
+  deliveryCharges: { type: Number, required: true },
+  // Track vendor-specific orders
+  vendorOrders: [
     {
-      foodCode: { type: String, required: true },
-      foodName: { type: String, required: true },
-      quantity: { type: Number, required: true },
-      price: { type: Number, required: true }
+      vendor: { type: String, required: true },  // Reference to the vendor
+      foods: [
+        {
+          foodCode: { type: String, required: true },
+          foodName: { type: String, required: true },
+          quantity: { type: Number, required: true },
+          price: { type: Number, required: true }
+        }
+      ],
+      deliveryCharges: { type: Number, required: false },
+      vendorLocation: { type: String, required: true },
+      totalPrice: { type: Number, required: true },
+      status: { type: String, enum: ['Order received', 'Processed and packed', 'Dispatched', 'On Transit', 'Delivered'], default: 'Order received' },
+      processedTime: { type: Date } // To track when each vendor order is processed
     }
   ],
-  deliveryCharges: { type: Number, required: false },
-  totalPrice: { type: Number, required: true },
+
+  // General status tracking
+  totalPrice: { type: Number, required: true },  // Total price of the combined orders
   createdAt: { type: Date, default: Date.now },
   delivered: { type: Boolean, default: false },
   paid: { type: Boolean, default: false },
   userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: false },
-  status: { type: String, enum: ['Order received', 'Processed and packed', 'Dispatched', 'Delivered'], default: 'Order received' },
+  
+  // Overall order status
+  overallStatus: { type: String, enum: ['Waiting for vendors', 'Ready for pickup', 'Dispatched', 'On Transit', 'Delivered'], default: 'Waiting for vendors' },
 });
 
 const FoodOrder = model('FoodOrder', orderSchema);
 
 
+const vendorOrderSchema = new Schema({
+  orderId: { type: String, required: true, unique: true }, 
+  parentOrderId: { type: String, required: true },
+  vendor: { type: String, required: true },
+  foods: {
+    type: [{
+      foodCode: { type: String, required: true },
+      foodName: { type: String, required: true },
+      quantity: { type: Number, required: true },
+      price: { type: Number, required: true }
+    }],
+    validate: {
+      validator: function(foods) {
+        return foods && foods.length > 0; // Ensure there is at least one food item
+      },
+      message: 'At least one food item is required.'
+    },
+    required: true // Set this to true to ensure the field itself is required
+  },
+  deliveryCharges: { type: Number, required: false },
+  vendorLocation: { type: String, required: true },
+  totalPrice: { type: Number, required: true },
+  status: { 
+    type: String, 
+    enum: ['Order received', 'Processed and packed', 'Dispatched', 'On Transit', 'Delivered'], 
+    default: 'Order received' 
+  },
+  processedTime: { type: Date }
+});
 
-//WORKINGS AFTER MPESA PAYMENT HAS BEEN DONE
+const VendorOrder = model('VendorOrder', vendorOrderSchema);
+
 appRouter.post('/paidFoodOrder', async (req, res) => {
   console.log('Received order data:', req.body);
-  console.log('foodOrderDetails');
+  console.log('Received order data (stringified):', JSON.stringify(req.body, null, 2));
+
   try {
     const foodOrderDetails = req.body;
 
-    // Ensure unique order ID
-    foodOrderDetails.orderId = uuidv4();
-
-    // Set initial status
+    // Ensure unique parent order ID
+    // foodOrderDetails.orderId = uuidv4(); // Parent order ID
     foodOrderDetails.status = 'Order received';
 
-    // Save order to database
+    console.log('Generated unique parent order ID:', foodOrderDetails.orderId);
+
+    // Save both parent and child orders
     await saveOrder(foodOrderDetails);
 
     res.status(200).json({ message: 'Order saved successfully' });
   } catch (error) {
-    console.error('Error saving order:', error);
+    console.error('Error in /paidFoodOrder route:', error);
     res.status(500).json({ error: 'Failed to save order' });
   }
 });
 
-// Function to save order details in the database
-// async function saveOrder(foodOrderDetails) {
-//   console.log(foodOrderDetails);
-//   const foodOrder = new FoodOrder({
-//     orderId: foodOrderDetails.orderId,
-//     phoneNumber: foodOrderDetails.phoneNumber,
-//     selectedCategory: foodOrderDetails.selectedCategory,
-//     selectedVendor: foodOrderDetails.selectedVendor,
-//     customerLocation: foodOrderDetails.customerLocation,
-//     expectedDeliveryTime: foodOrderDetails.expectedDeliveryTime,
-//     foods: foodOrderDetails.foods,
-//     // deliveryCharges: foodOrderDetails.deliveryCharges,
-//     totalPrice: foodOrderDetails.totalPrice,
-//     delivered: false,
-//     paid: true, // Assuming the payment was successful
-//     status: foodOrderDetails.status
-//   });
-
-//   // Conditionally add userId and customerName if they exist
-//   if (foodOrderDetails.userId) {
-//     foodOrder.userId = foodOrderDetails.userId;
-//   }
-
-//   if (foodOrderDetails.customerName) {
-//     foodOrder.customerName = foodOrderDetails.customerName;
-//   }
-
-//   try {
-//     await foodOrder.save();
-//     console.log('Order saved successfully');
-//   } catch (error) {
-//     console.error('Error saving order:', error);
-//     throw error; // Rethrow the error so that it can be handled by the caller
-//   }
-// }
 
 async function saveOrder(foodOrderDetails) {
-  console.log(foodOrderDetails);
+  console.log('Inside saveOrder function. Details:', foodOrderDetails);
+
   try {
-    const foodOrder = new FoodOrder({
+    // First, create the parent order without the vendorOrders
+    const parentOrder = new FoodOrder({
       orderId: foodOrderDetails.orderId,
       phoneNumber: foodOrderDetails.phoneNumber,
-      selectedVendor: foodOrderDetails.selectedVendor,
       customerLocation: foodOrderDetails.customerLocation,
       expectedDeliveryTime: foodOrderDetails.expectedDeliveryTime,
-      foods: foodOrderDetails.foods,
       totalPrice: foodOrderDetails.totalPrice,
+      deliveryCharges: foodOrderDetails.deliveryCharges,
       delivered: false,
       paid: true,
-      status: foodOrderDetails.status
+      status: foodOrderDetails.status,
+      createdAt: new Date(),
+      vendorOrders: [] // This will be updated later
     });
 
     if (foodOrderDetails.userId) {
-      foodOrder.userId = foodOrderDetails.userId;
+      parentOrder.userId = foodOrderDetails.userId;
     }
 
     if (foodOrderDetails.customerName) {
-      foodOrder.customerName = foodOrderDetails.customerName;
+      parentOrder.customerName = foodOrderDetails.customerName;
     }
 
-    await foodOrder.save();
-    console.log('Order saved successfully');
+    console.log('Parent order (initial) to be saved:', parentOrder);
+
+    // Now map through vendorOrders, already passed via `foodOrderDetails`
+    const vendorOrders = foodOrderDetails.vendorOrders.map(order => {
+      if (!order.foods || order.foods.length === 0) {
+        console.error(`Error: No foods found for vendor ${order.vendor}. Skipping this vendor.`);
+        return null; // Skip this vendor if no foods
+      }
+
+      return {
+        ...order,
+        orderId: uuidv4() // Generate unique order ID for each vendor order
+      };
+    }).filter(order => order !== null); // Filter out null orders if no foods
+
+    console.log('Mapped vendor orders:', vendorOrders);
+
+    // Save the parent order first without vendor orders
+    await parentOrder.save();
+    console.log('Parent order saved successfully:', parentOrder);
+
+    // Save each vendor-specific order as a child order
+    const savedVendorOrders = [];
+    for (const vendorOrder of vendorOrders) {
+      const childOrder = new VendorOrder({
+        parentOrderId: parentOrder.orderId, // Reference to the parent order
+        vendor: vendorOrder.vendor,
+        foods: vendorOrder.foods,
+        totalPrice: vendorOrder.totalPrice,
+        vendorLocation: vendorOrder.vendorLocation,
+        status: vendorOrder.status,
+        processedTime: vendorOrder.processedTime,
+        orderId: vendorOrder.orderId // Reuse the generated unique order ID for each vendor order
+      });
+
+      const savedChildOrder = await childOrder.save();
+      console.log(`Child order for vendor ${vendorOrder.vendor} saved successfully with ID: ${savedChildOrder.orderId}`);
+      
+      savedVendorOrders.push(savedChildOrder); // Collect saved vendor orders
+    }
+
+    // Update the parent order with the saved vendor orders
+    parentOrder.vendorOrders = savedVendorOrders;
+    await parentOrder.save(); // Save the updated parent order
+    console.log('Parent order updated with vendor orders:', parentOrder);
+
   } catch (error) {
-    console.error('Error saving order:', error);
+    console.error('Error saving order in saveOrder function:', error);
     throw error;
   }
 }
+
+// Assuming you're using Express and have already set up your app and router
+appRouter.get('/driverDashboard/orders/readyForPickup', async (req, res) => {
+  try {
+    // Log incoming request details
+    console.log('Incoming request:', {
+      method: req.method,
+      url: req.url,
+      headers: req.headers,
+      body: req.body // Note: req.body will only show data if you're using body parsing middleware like body-parser
+    });
+
+    // Fetch parent orders with status 'Ready for pickup'
+    const orders = await FoodOrder.find({ overallStatus: 'Ready for pickup' })
+      .populate('vendorOrders.foods') // Populate food details within vendor orders
+      .exec();
+
+    // Check if orders are found
+    if (orders.length === 0) {
+      return res.status(404).json({ message: 'No orders ready for pickup found.' });
+    }
+
+    // Respond with the fetched orders
+    res.status(200).json(orders);
+  } catch (error) {
+    console.error('Error fetching orders for driver dashboard:', error.message);
+    res.status(500).json({ error: 'Failed to fetch orders for driver dashboard.' });
+  }
+});
+
+
+// PATCH route to update parent order status and dispatch it
+// Router to update the food order (parent) status
+appRouter.patch('/driverUpdateFoodOrderStatus/:orderId', async (req, res) => {
+  console.log('Updating food order status for:', req.params.orderId);
+  console.log('Request body:', req.body);
+
+  try {
+      const { orderId } = req.params; // Get the parent orderId from the URL
+      const { status, driverId } = req.body; // Get the status and driverId from the request body
+
+      // Find and update the parent food order using the orderId
+      const updatedFoodOrder = await FoodOrder.findOneAndUpdate(
+          { orderId: orderId }, // Use the parent orderId in the query
+          { overallStatus: status, driverId }, // Update overallStatus and driverId
+          { new: true } // Return the updated document
+      );
+
+      if (!updatedFoodOrder) {
+          console.log('Food order not found for ID:', orderId);
+          return res.status(404).json({ message: 'Food order not found' });
+      }
+
+      console.log('Food order updated successfully:', updatedFoodOrder);
+
+      // Optionally, update the status of vendorOrders if needed
+      updatedFoodOrder.vendorOrders.forEach(async (vendorOrder) => {
+          vendorOrder.status = status;
+          await vendorOrder.save();
+      });
+
+      res.json(updatedFoodOrder); // Respond with the updated order
+  } catch (error) {
+      console.error('Error updating food order status:', error);
+      res.status(500).json({ message: 'Error updating food order status' });
+  }
+});
+
+
+// PATCH route to update vendor-specific food orders for the given parent order
+appRouter.patch('/driverUpdateFoodOrderStatus/:foodOrderId', async (req, res) => {
+  try {
+    const { foodOrderId } = req.params;
+    const { status, driverId } = req.body;
+
+    if (!foodOrderId || !status || !driverId) {
+      return res.status(400).json({ error: 'Missing required fields' });
+    }
+
+    // Find the specific vendor order
+    const vendorOrder = await VendorOrder.findOne({ 'foods.foodName': foodOrderId });
+    if (!vendorOrder) {
+      return res.status(404).json({ error: 'Vendor order not found' });
+    }
+
+    // Update the food order's status
+    vendorOrder.status = status;
+    vendorOrder.driverId = driverId;
+    await vendorOrder.save();
+
+    console.log(`Food order ${foodOrderId} status updated to ${status} by driver ${driverId}`);
+
+    res.status(200).json(vendorOrder);
+  } catch (error) {
+    console.error('Error updating food order status:', error.message);
+    res.status(500).json({ error: 'Failed to update food order status' });
+  }
+});
 
 //get orders
 appRouter.get('/orders/:orderId', async (req, res) => {
@@ -634,7 +788,58 @@ appRouter.get('/orders/:orderId', async (req, res) => {
     res.status(500).json({ message: 'Server error' });
   }
 });
-// Update order status
+
+const updateVendorOrderStatus = async (orderId, vendorId, newStatus) => {
+  // Step 1: Retrieve the parent order using the orderId
+  const order = await FoodOrder.findOne({ orderId });
+  
+  if (!order) {
+    throw new Error('Order not found');
+  }
+
+  // Step 2: Find the specific vendor's order within the parent order's vendorOrders
+  const vendorOrder = order.vendorOrders.find(v => v.vendor === vendorId);
+  
+  if (!vendorOrder) {
+    throw new Error('Vendor order not found');
+  }
+
+  // Step 3: Update the status of the vendor's order
+  vendorOrder.status = newStatus;
+
+  // Step 4: If the new status is "Processed and packed", update the processedTime
+  if (newStatus === 'Processed and packed') {
+    vendorOrder.processedTime = Date.now();
+  }
+
+  // Step 5: Check if all vendor orders are 'Processed and packed'
+  const allProcessed = order.vendorOrders.every(v => v.status === 'Processed and packed');
+
+  // Step 6: If all vendor orders are 'Processed and packed', update the overall status
+  if (allProcessed) {
+    order.overallStatus = 'Ready for pickup';
+  }
+
+  // Step 7: Save the updated order
+  await order.save();
+  return order;
+};
+
+// PATCH route for updating a vendor order's status
+appRouter.patch('/updateFoodOrderStatus/:orderId/:vendorId', async (req, res) => {
+  try {
+    const { orderId, vendorId } = req.params;
+    const { status } = req.body;
+
+    // Update the vendor order status
+    const updatedOrder = await updateVendorOrderStatus(orderId, vendorId, status);
+
+    res.json({ message: 'Order status updated successfully', updatedOrder });
+  } catch (error) {
+    res.status(500).json({ message: 'Error updating order status', error: error.message });
+  }
+});
+
 appRouter.patch('/updateFoodOrderStatus/:orderId', async (req, res) => {
   try {
     const { orderId } = req.params;
@@ -656,6 +861,30 @@ appRouter.patch('/updateFoodOrderStatus/:orderId', async (req, res) => {
   }
 });
 
+
+// Update the status of a food parent order
+appRouter.patch('/driverUpdateFoodOrderStatus/:orderId', async (req, res) => {
+  const { orderId } = req.params;
+  const { status, driverId } = req.body;
+
+  try {
+      const updatedOrder = await FoodOrder.findOneAndUpdate(
+          { orderId },
+          { $set: { 'vendorOrders.$[].status': status, overallStatus: status, driverId: driverId } },
+          { new: true }
+      );
+
+      if (!updatedOrder) {
+          return res.status(404).json({ message: 'Food order not found' });
+      }
+
+      res.json(updatedOrder);
+  } catch (error) {
+      console.error('Error updating food order status:', error);
+      res.status(500).json({ message: 'Error updating food order status' });
+  }
+});
+
 // Fetch undelivered orders
 appRouter.get('/orders/undelivered', async (req, res) => {
   try {
@@ -663,6 +892,26 @@ appRouter.get('/orders/undelivered', async (req, res) => {
     res.json(orders);
   } catch (err) {
     res.status(500).send('Server Error');
+  }
+});
+
+// Fetch parent orders with status "Ready for pickup" for driver dashboard
+appRouter.get('/driverOrders', async (req, res) => {
+  console.log(req.body);
+  try {
+    // Find parent orders that are "Ready for pickup" and not yet delivered
+    const parentOrders = await FoodOrder.find({
+      delivered: false, 
+      overallStatus: 'Ready for pickup'  // Update to use overallStatus
+    }).populate('vendorOrders'); // Ensure vendorOrders is correctly populated
+
+    console.log("Fetched Parent Orders:", parentOrders);
+    
+    // Return the fetched parent orders to the driver dashboard
+    res.status(200).json(parentOrders);
+  } catch (error) {
+    console.error('Error fetching driver orders:', error);
+    res.status(500).json({ error: 'Failed to fetch orders for driver' });
   }
 });
 

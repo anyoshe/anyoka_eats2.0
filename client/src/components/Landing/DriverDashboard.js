@@ -129,16 +129,32 @@ const Dashboard = () => {
         }
     };
     
-    // Function to fetch new orders if there's no ongoing order
+    
     const fetchOrders = async () => {
         try {
-            const response = await fetch(`${config.backendUrl}/api/orders`);
-            const data = await response.json();
+            // Fetch all orders
+            const allOrdersResponse = await fetch(`${config.backendUrl}/api/orders`);
+            const allOrdersData = await allOrdersResponse.json();
+            console.log(allOrdersData);
     
-            // Filter the orders to only include those with the status 'Processed and packed'
-            const processedOrders = data.filter(order => order.status === 'Processed and packed');
+            // Fetch orders that are ready for pickup
+            const readyForPickupResponse = await fetch(`${config.backendUrl}/api/driverDashboard/orders/readyForPickup`);
+            if (!readyForPickupResponse.ok) {
+                throw new Error(`HTTP error! status: ${readyForPickupResponse.status}`);
+            }
+            
+            const readyForPickupData = await readyForPickupResponse.json(); // No more 'text()' here
+            console.log(readyForPickupData);
     
-            const formattedOrders = processedOrders.map(order => ({
+            // Check if the responses are arrays
+            if (!Array.isArray(allOrdersData) || !Array.isArray(readyForPickupData)) {
+                console.error('Unexpected response format:', { allOrdersData, readyForPickupData });
+                return;
+            }
+    
+            // Filter and format the processed orders from all orders
+            const processedOrders = allOrdersData.filter(order => order.status === 'Processed and packed');
+            const formattedProcessedOrders = processedOrders.map(order => ({
                 id: order._id,
                 name: order.selectedRestaurant,
                 pickup: order.selectedRestaurantLocation || order.selectedRestaurant,
@@ -150,15 +166,44 @@ const Dashboard = () => {
                 expectedDeliveryTime: new Date(order.expectedDeliveryTime).toLocaleString(),
                 phoneNumber: order.phoneNumber,
                 status: order.status,
-                dishes: order.dishes
+                dishes: order.dishes,
             }));
     
-            setOrders(formattedOrders);
+            // Format the ready for pickup orders
+            const formattedReadyForPickupOrders = readyForPickupData.map(order => ({
+                id: order._id,
+                name: order.selectedRestaurant,
+                pickup: order.selectedRestaurantLocation || order.selectedRestaurant,
+                order: order.orderId,
+                dropoff: order.customerLocation,
+                deliveryCharges: `Ksh ${order.deliveryCharges}`,
+                commission: `Ksh ${order.deliveryCharges * 0.2}`,
+                netPay: `Ksh ${order.deliveryCharges - (order.deliveryCharges * 0.2)}`,
+                expectedDeliveryTime: new Date(order.expectedDeliveryTime).toLocaleString(),
+                phoneNumber: order.phoneNumber,
+                status: order.overallStatus,
+                vendorOrders: order.vendorOrders.map(vendorOrder => ({
+                    vendor: vendorOrder.vendor,
+                    totalPrice: vendorOrder.totalPrice,
+                    foods: vendorOrder.foods.map(food => ({
+                        foodName: food.foodName,
+                        quantity: food.quantity,
+                        price: `Ksh ${food.price}`,
+                    }))
+                })),
+            }));
+    
+            // Combine both formatted orders
+            const combinedOrders = [...formattedProcessedOrders, ...formattedReadyForPickupOrders];
+    
+            // Update the state with the combined orders
+            setOrders(combinedOrders);
         } catch (error) {
             console.error('Failed to fetch orders:', error);
         }
     };
     
+
     // Function to monitor order status changes (e.g., after delivery or driver decline)
     const monitorOrderStatus = async () => {
         const savedOrder = localStorage.getItem(`driver_${driverId}_currentOrder`);
@@ -184,49 +229,92 @@ const Dashboard = () => {
     };
     
 
-const handleAcceptOrder = async (order) => {
-    try {
-        if (!driverId) {
-            throw new Error('Driver ID is not set');
+    const handleAcceptOrder = async (order) => {
+        try {
+            if (!driverId) {
+                throw new Error('Driver ID is not set');
+            }
+    
+            console.log('Order being accepted:', order.order);
+            console.log('Driver ID:', driverId);
+    
+            let response;
+    
+            // Check if it's a food (vendor) order or a regular restaurant order
+            if (order.vendorOrders && order.vendorOrders.length > 0) {
+                // Update the status of the vendor order (food parent order)
+                response = await fetch(`${config.backendUrl}/api/driverUpdateFoodOrderStatus/${order.order}`, {
+                    method: 'PATCH',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ 
+                        status: 'Dispatched', 
+                        driverId 
+                    })
+                });
+            } else {
+                // Update the status of the restaurant order
+                response = await fetch(`${config.backendUrl}/api/driverUpdateOrderStatus/${order.order}`, {
+                    method: 'PATCH',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ 
+                        status: 'Dispatched', 
+                        driverId 
+                    })
+                });
+            }
+    
+            if (!response.ok) {
+                throw new Error('Failed to accept the order');
+            }
+    
+            const updatedOrder = await response.json();
+            console.log('Order accepted and dispatched:', updatedOrder);
+    
+            // Start the timer only after the order has been set
+            setTimer(7 * 60); // Example: 7 minutes
+            startTimer(updatedOrder.orderId, driverId); // Start the timer for this order
+    
+            // Clear other orders from the view for the specific driver
+            setOrders([]);
+    
+            // Store the driver-specific order in localStorage
+            localStorage.setItem(`driver_${driverId}_order`, JSON.stringify({ orderId: updatedOrder.order, driverId }));
+    
+            // Start checking the order status every 90 seconds
+            startOrderStatusCheck(updatedOrder.orderId, driverId);
+    
+        } catch (error) {
+            console.error('Error accepting order:', error);
         }
+    };
+    
+// const fetchOrderByStatus = async (orderId, driverId) => {
+//     try {
+//         console.log("Fetching order by status for Order ID:", orderId, "and Driver ID:", driverId);
+//         const response = await fetch(`${config.backendUrl}/api/fetchOrderByStatus/${orderId}/${driverId}`);
 
-        console.log('Order being accepted:', order.order);
-        console.log('Driver ID:', driverId);
+//         if (!response.ok) {
+//             throw new Error('Failed to fetch the order by status');
+//         }
 
-        // Update the order status to 'Dispatched' and assign the driver ID
-        const response = await fetch(`${config.backendUrl}/api/driverUpdateOrderStatus/${order.order}`, {
-            method: 'PATCH',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({ status: 'Dispatched', driverId }) // Update status and set driverId
-        });
+//         const fetchedOrder = await response.json();
+//         console.log("Fetched order:", fetchedOrder);
 
-        if (!response.ok) {
-            throw new Error('Failed to accept the order');
-        }
+//         localStorage.setItem(`driver_${driverId}_currentOrder`, JSON.stringify(fetchedOrder));
+//         localStorage.setItem(`driver_${driverId}_timerStartTime`, Date.now()); // Save the start time of the timer
 
-        const updatedOrder = await response.json();
-        console.log('Order accepted and dispatched:', updatedOrder);
-
-        // Start the timer only after the order has been set
-        setTimer(7 * 60); // Example: 7 minutes
-        startTimer(updatedOrder.orderId, driverId); // Start the timer for this order
-
-        // Clear other orders from the view for the specific driver
-        setOrders([]);
-
-        // Store the driver-specific order in localStorage
-        localStorage.setItem(`driver_${driverId}_order`, JSON.stringify({ orderId: updatedOrder.order, driverId }));
-
-        // Start checking the order status every 90 seconds
-        startOrderStatusCheck(updatedOrder.orderId, driverId);
-
-    } catch (error) {
-        console.error('Error accepting order:', error);
-    }
-};
-
+//         setSelectedOrder(fetchedOrder); // Store the fetched order for display
+//         // console.log("Selected Order Set:", fetchedOrder);
+        
+//         return fetchedOrder; // Ensure to return the fetched order
+//     } catch (error) {
+//         console.error('Error fetching order by status:', error);
+//     }
+// };
 
 const fetchOrderByStatus = async (orderId, driverId) => {
     try {
@@ -244,14 +332,12 @@ const fetchOrderByStatus = async (orderId, driverId) => {
         localStorage.setItem(`driver_${driverId}_timerStartTime`, Date.now()); // Save the start time of the timer
 
         setSelectedOrder(fetchedOrder); // Store the fetched order for display
-        // console.log("Selected Order Set:", fetchedOrder);
         
         return fetchedOrder; // Ensure to return the fetched order
     } catch (error) {
         console.error('Error fetching order by status:', error);
     }
 };
-
 
 const startTimer = (orderId, driverId) => {
     if (orderTimerId) clearInterval(orderTimerId); // Clear previous timer if exists

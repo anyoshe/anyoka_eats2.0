@@ -1,7 +1,7 @@
 /* global google */
 import React, { useEffect, useState } from 'react';
 import OrderSummaryModal from './FoodOrderSummaryModal';
-
+import config from '../../config';
 import { useFreshFoodCart } from './FreshFoodCartContext';
 
 import './FoodLocationalModal.css';
@@ -48,30 +48,45 @@ const FoodLocationModal = ({ show, handleClose, vendors = [], orderedFoods = [] 
 
         setMap(newMap);
 
-        if (vendors.length > 0) {
-          const lastVendor = vendors.length === 1 ? vendors[0] : vendors[vendors.length - 1];
-          console.log("Last Vendor:", lastVendor);
-
-          const vendorLocation = lastVendor.vendorLocation || null;
-
-          if (vendorLocation) {
-            geocodeAddress(vendorLocation, newMap);
-          } else {
-            // Try geocoding the vendor's name as a fallback
-            console.log("Vendor location missing, attempting to geocode vendor name:", lastVendor.vendor);
-            geocodeVendorName(lastVendor.vendor, newMap);
+      if (vendors.length > 0) {
+        // Assume the last vendor in the list is the one with the most recent order
+        const lastVendor = vendors[vendors.length - 1];
+        console.log("Last Vendor (by order):", lastVendor);
+      
+        const fetchVendorLocation = async (vendorName) => {
+          try {
+            const response = await fetch(`${config.backendUrl}/api/vendors/vendor/${vendorName}`);
+            if (!response.ok) {
+              throw new Error(`Error fetching vendor location: ${response.statusText}`);
+            }
+            const locationData = await response.json();
+            return locationData.vendorLocation;
+          } catch (error) {
+            console.error("Error fetching vendor location:", error);
+            return null;
           }
-        } else {
-          console.error('No vendors available.');
-          alert('No vendor information available.');
-        }
-      };
-
+        };
+      
+        // Fetch the vendor location from the backend using the vendor's name
+        fetchVendorLocation(lastVendor.vendor).then((vendorLocation) => {
+          if (vendorLocation) {
+            geocodeAddress(vendorLocation, newMap); // Use the vendor's location to geocode
+          } else {
+            console.log("Vendor location missing, attempting to geocode vendor name:", lastVendor.vendor);
+            geocodeVendorName(lastVendor.vendor, newMap); // Fallback to using the vendor's name for geocoding
+          }
+        });
+      } else {
+        console.error('No vendors available.');
+        alert('No vendor information available.');
+      }
+    }
       return () => {
         document.head.removeChild(script);
         setMap(null);
         setMarker(null);
       };
+      
     }
   }, [show, vendors]);
 
@@ -121,9 +136,10 @@ const FoodLocationModal = ({ show, handleClose, vendors = [], orderedFoods = [] 
     });
   };
 
+ 
   const updateCustomerLocation = async (latLng) => {
-    const lat = latLng.lat();
-    const lng = latLng.lng();
+    const lat = typeof latLng.lat === 'function' ? latLng.lat() : latLng.lat;
+    const lng = typeof latLng.lng === 'function' ? latLng.lng() : latLng.lng;
     try {
       const address = await getReadableAddress(lat, lng);
       document.getElementById('customerLocation').value = address;
@@ -132,6 +148,7 @@ const FoodLocationModal = ({ show, handleClose, vendors = [], orderedFoods = [] 
       console.error('Error updating customer location:', error);
     }
   };
+  
 
   const getReadableAddress = async (lat, lng) => {
     const geocoder = new google.maps.Geocoder();
@@ -155,6 +172,39 @@ const FoodLocationModal = ({ show, handleClose, vendors = [], orderedFoods = [] 
       setShowOrderSummary(true);
     } else {
       alert('Please make sure both vendor and customer locations are set before proceeding.');
+    }
+  };
+ 
+   // Function to pin the user's current location using Geolocation API
+   const handlePinMyLocation = () => {
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          const latLng = {
+            lat: position.coords.latitude,
+            lng: position.coords.longitude,
+          };
+          map.setCenter(latLng);
+
+          if (marker) {
+            marker.setPosition(latLng);
+          } else {
+            const newMarker = new google.maps.Marker({
+              position: latLng,
+              map: map,
+              draggable: true,
+            });
+            setMarker(newMarker);
+          }
+          updateCustomerLocation(latLng);
+        },
+        (error) => {
+          console.error('Error getting location: ', error);
+          alert('Unable to retrieve your location.');
+        }
+      );
+    } else {
+      alert('Geolocation is not supported by your browser.');
     }
   };
 
@@ -198,7 +248,7 @@ const FoodLocationModal = ({ show, handleClose, vendors = [], orderedFoods = [] 
               <div id="mapContainer" style={{ height: '400px' }}></div>
               <input type="text" id="customerLocation" className="form-control mt-3" placeholder="Delivery Location" readOnly />
             </div>
-
+            <button className="btn btn-primary mt-3" onClick={handlePinMyLocation}>Pin My Location</button>
             <div className="modal-footer">
               <button type="button" className="valueControllers" data-bs-dismiss="modal" onClick={handleClose}>Close</button>
               <button type="button" className="valueControllers" onClick={handleOkClick}>Ok</button>

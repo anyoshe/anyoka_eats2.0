@@ -5,6 +5,7 @@ import axios from 'axios';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap/dist/js/bootstrap.bundle.min';
 import { right } from '@popperjs/core';
+import { v4 as uuidv4 } from 'uuid';
 
 const googleApiKey = process.env.REACT_APP_GOOGLE_API_KEY;
 
@@ -252,94 +253,105 @@ const OrderSummaryModal = ({
   };
 
 
-  // const saveOrderToDatabase = async (foodOrderDetails) => {
-  //   const maxRetries = 5; // Maximum number of retry attempts
-  //   let attempts = 0;
-  //   let orderSaved = false;
+const saveOrderToDatabase = async (foodOrderDetails) => {
+  const maxRetries = 5; // Maximum number of retry attempts
+  let attempts = 0;
+  let orderSaved = false;
 
-  //   while (attempts < maxRetries && !orderSaved) {
-  //     try {
-  //       console.log('Sending foodOrderDetails to database:', foodOrderDetails);
+  // Create a unique parent order ID
+  const parentOrderId = generateUniqueOrderId(); // Implement this function to generate a unique ID
 
-  //       // Send the updated foodOrderDetails to the backend
-  //       const response = await fetch(`${config.backendUrl}/api/paidFoodOrder`, {
-  //         method: 'POST',
-  //         headers: {
-  //           'Content-Type': 'application/json',
-  //         },
-  //         body: JSON.stringify(foodOrderDetails),
-  //       });
+  // Create the base order object
+  const orderToSave = {
+    orderId: parentOrderId,
+    phoneNumber: foodOrderDetails.phoneNumber,
+    customerLocation: foodOrderDetails.customerLocation,
+    expectedDeliveryTime: foodOrderDetails.expectedDeliveryTime,
+    totalPrice: 0, // This will be calculated below
+    deliveryCharges,
+    vendorOrders: [], // Will populate with vendor-specific orders
+    createdAt: new Date(),
+    delivered: false,
+    paid: true, // Assuming payment is successful
+  };
 
-  //       console.log('Response from backend:', response);
+  // Calculate vendor orders and total price
+  for (const [vendor, vendorFoods] of Object.entries(foodOrdersByVendor)) {
+    console.log('Food orders by vendor:', foodOrdersByVendor);
 
-  //       if (response.ok) {
-  //         const data = await response.json();
-  //         console.log('Order saved successfully:', data);
-  //         alert('Order recieved successfully! Your order will be processed and dispatched as soon as possible.');
-  //         orderSaved = true;
-  //       } else {
-  //         const error = await response.json();
-  //         console.error('Error saving order:', error);
-  //         alert('Error saving order: ' + error.message);
-  //         attempts++;
-  //       }
-  //     } catch (error) {
-  //       console.error('Error saving order:', error);
-  //       alert('Error saving order. Please check your network and try again.');
-  //       attempts++;
-  //     }
+    const vendorFoodsPrice = vendorFoods.foods.reduce((total, food) => total + food.price * food.quantity, 0);
 
-  //     // If the order was not saved and we have reached the maximum retries
-  //     if (!orderSaved && attempts >= maxRetries) {
-  //       alert('Failed to save order after multiple attempts. Please check your network and try again later.');
-  //     }
-  //   }
-  // };
+    if (!vendorFoods.foods || vendorFoods.foods.length === 0) {
+      console.error(`No foods found for vendor: ${vendor}`);
+      continue; // Skip this vendor if no foods are found
+    }
+// Here we convert lat/lng to a string format
+const vendorLocationString = `${vendorLocation.lat}, ${vendorLocation.lng}`;
 
-  const saveOrderToDatabase = async (foodOrderDetails) => {
-    const maxRetries = 5; // Maximum number of retry attempts
-    let attempts = 0;
-    let orderSaved = false;
+    const vendorOrder = {
 
-    while (attempts < maxRetries && !orderSaved) {
-      try {
-        console.log('Sending foodOrderDetails to database:', foodOrderDetails);
+      vendor: vendor, 
+      foods: vendorFoods.foods.map(food => ({
+        foodCode: food.foodCode,
+        foodName: food.foodName,
+        quantity: food.quantity,
+        price: food.price,
+      })),
+      vendorLocation: vendorLocationString,
+      totalPrice: vendorFoodsPrice,
+      status: 'Order received',
+      processedTime: null, // Will be set later when processing starts
+    };
 
-        // Send the updated foodOrderDetails to the backend
-        const response = await fetch(`${config.backendUrl}/api/paidFoodOrder`, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify(foodOrderDetails),
-        });
+    console.log('Vendor order being created:', vendorOrder);
 
-        console.log('Response from backend:', response);
+    orderToSave.vendorOrders.push(vendorOrder);
+    orderToSave.totalPrice += vendorOrder.totalPrice; // Aggregate total price
+  }
 
-        if (response.ok) {
-          const data = await response.json();
-          console.log('Order saved successfully:', data);
-          alert('Order received successfully! Your order will be processed and dispatched as soon as possible.');
-          orderSaved = true;
-        } else {
-          const error = await response.json();
-          console.error('Error saving order:', error);
-          alert('Error saving order: ' + (error.message || 'An unknown error occurred.'));
-          attempts++;
-        }
-      } catch (error) {
+  console.log('Order to Save:', JSON.stringify(orderToSave, null, 2)); // Debugging line
+  console.log('Final order to save:', orderToSave);
+
+  while (attempts < maxRetries && !orderSaved) {
+    try {
+      console.log('Sending orderToSave to database:', orderToSave);
+
+      const response = await fetch(`${config.backendUrl}/api/paidFoodOrder`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(orderToSave),
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        console.log('Order saved successfully:', data);
+        alert('Order received successfully! Your order will be processed and dispatched as soon as possible.');
+        orderSaved = true;
+      } else {
+        const error = await response.json();
         console.error('Error saving order:', error);
-
-        // Handling network-related errors with a fallback message
-        const errorMessage = error.message || 'Network error. Please check your connection and try again.';
-        alert('Error saving order: ' + errorMessage);
+        alert('Error saving order: ' + (error.message || 'An unknown error occurred.'));
         attempts++;
       }
+    } catch (error) {
+      console.error('Error saving order:', error);
+      const errorMessage = error.message || 'Network error. Please check your connection and try again.';
+      alert('Error saving order: ' + errorMessage);
+      attempts++;
     }
+  }
 
-    if (!orderSaved && attempts >= maxRetries) {
-      alert('Failed to save the order after multiple attempts. Please try again later.');
-    }
+  if (!orderSaved && attempts >= maxRetries) {
+    alert('Failed to save the order after multiple attempts. Please try again later.');
+  }
+};
+
+
+// Function to generate a unique order ID
+const generateUniqueOrderId = () => {
+  return uuidv4(); // Generate a random UUID
 };
 
 
