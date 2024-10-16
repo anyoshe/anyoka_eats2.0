@@ -360,3 +360,28 @@
   }
 }
 
+
+@media (max-width: 320px){
+  .testimonial_description {
+    font-size: 0.9rem;
+    margin-bottom: 0;
+    width: 100%;
+    padding: 0rem 0rem;
+  }
+
+  .slide-box {
+      height: 20rem;
+    }
+
+  
+  .slider{
+    gap: 0.1rem;
+  }
+
+  .comment {
+    width: 12rem;
+    padding: 0.2rem;
+    font-size: 0.8rem;
+  }
+}
+
