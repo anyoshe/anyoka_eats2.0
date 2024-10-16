@@ -318,10 +318,6 @@
     width: 12.8rem;
   }
 
-  .dish-image-wrapper{
-
-  }
-
   .dish-image{
     height: 9rem;
     border-radius: 0;
@@ -368,5 +364,15 @@
 
   .dishAddToCart{
     font-size: 0.8rem;
+  }
+}
+
+
+@media (max-width: 320px){
+  .discounted-price-circle{
+    padding: 0.1rem 0.1rem;
+    font-size: 0.6rem;
+    top: -1%;
+    right: 0%;
   }
 }
