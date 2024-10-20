@@ -50,7 +50,34 @@
 
 }
 
-@media (max-width:480px){
+@media (max-width:320px){
+  #dishModalBody{
+    width: 100vw;
+    left: -3%;
+  }
+
+  #dishesModalContent {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    column-gap: 1px;
+    row-gap: 5px;
+    /* padding-left: 1.5px; */
+  }
+
+  #dishModalLabel {
+    font-size: 14px;
+  }
+
+  .restaurant-heading{
+    font-size: 14px;
+  }
+
+  #categoryModalBody{
+    padding: 1.5px;
+  }
+}
+
+@media (min-width: 376px) and  (max-width:480px){
   .restaurant-heading{
     font-size: 1rem;
   }
