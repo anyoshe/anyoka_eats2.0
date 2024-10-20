@@ -137,7 +137,52 @@
     padding-left: 0px;
 }
 
-@media (max-width:480px){
+
+@media (max-width:320px){
+    /* .NavBarContainer {
+        width: 100vw;
+    } */
+
+    .category-buttons {
+        margin-left: 0rem;
+        justify-content: space-around;
+        width: 100vw;
+        padding: 0rem;
+    }
+
+    .dishesSection {
+        margin-top: 3.5%;
+        width: 100vw;
+    }
+
+    .switchButtons {
+        padding: 0.1rem 0.6rem;
+        font-size: 0.6rem;
+    }
+
+    .menuHeader{
+        width: 98%;
+        margin-top: 2%;
+        margin-left: 1%;
+        padding: 0.2rem 0.1rem;
+        font-weight: 600;
+        font-size: 0.9rem;
+    }
+
+    .dish-list {
+        grid-template-columns: repeat(2,1fr);
+        column-gap: 5px;
+        row-gap: 10px;
+        padding-left: 0.1rem;
+    }
+
+    .restaurantSection{
+        display: none;
+    }
+
+}
+
+@media (min-width: 376px) and (max-width:480px){
     .restaurantSection{
         display: none;
     }

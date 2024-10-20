@@ -82,7 +82,14 @@
     transition: ease-in .2
 }
 
-@media (max-width:480px) {
+
+@media (max-width:320px){
+    .modal-dialog{
+        margin-top: 0%;
+    }
+}
+
+@media (min-width: 376px) and  (max-width:480px) {
     .InputBtn {
         width: 100%;
     }

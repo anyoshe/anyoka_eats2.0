@@ -45,9 +45,42 @@
   margin-top: 4%; 
 }
 
+@media (max-width:320px){
+  #navline {
+    width: 100%;
+  }
+
+  .homeLink{
+    display: none;
+  }
+
+  .search-bar-container {
+    width: 100%;
+    max-width: 400px;
+  }
+
+  .by_btn {
+    font-size: 0.6rem;
+    margin-right: 0.1rem;
+    padding: 0.2rem;
+  }
+
+  .by_reataurant_select {
+    padding: 0.1rem;
+    font-size: 0.6rem;
+  }
+
+  .menu-container {
+    margin-top: 14%;
+  }
+
+  .dishesSection {
+    margin-top: 1%;
+  }
+}
 
 /* Media screens */
-@media (max-width: 480px) {
+@media (min-width: 376px) and (max-width: 480px) {
   .NavBarContainer{
     /* border: 5px solid red; */
 
