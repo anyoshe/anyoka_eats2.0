@@ -231,13 +231,13 @@ const LocationModal = ({ show, handleClose, restaurantName, orderedDishes = [] }
     <>
       <div className={`modal fade ${show ? 'show' : ''}`} id="locationModal" tabIndex="-1" aria-labelledby="locationModalLabel" aria-hidden="true" style={{ display: show ? 'block' : 'none' }}>
         <div className="modal-dialog modal-lg">
-          <div className="modal-content cartModalContent">
+          <div className="modal-content cartModalContent" id='locationModalContent'>
             <div className="modal-header">
               <h5 className="modal-title" id="locationModalLabel">Pin Your Delivery Location</h5>
             </div>
 
-            <div className="modal-body">
-              <div><span className='fromSpan'>From: </span> {restaurantName}</div>
+            <div className="modal-body" id='locationModalBody'>
+              <div id='locationFromDiv'><span className='fromSpan'>From: </span> {restaurantName}</div>
               <div id="mapContainer"></div>
 
               <div className='useMylocation'>
