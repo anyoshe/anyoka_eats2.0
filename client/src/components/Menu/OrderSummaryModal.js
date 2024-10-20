@@ -333,7 +333,7 @@ const OrderSummaryModal = ({ show, handleClose, restaurantName, orderedDishes = 
     <>
       <div className={`modal fade ${show ? 'show' : ''}`} id="orderSummaryModal" tabIndex="-1" aria-labelledby="orderSummaryModalLabel" aria-hidden="true" style={{ display: show ? 'block' : 'none' }}>
         <div className="modal-dialog modal-lg orderModal">
-          <div className="modal-content cartModalContent">
+          <div className="modal-content cartModalContent" id='sumaryModalcontent'>
             <div className="modal-header">
               <h5 className="modal-title" id="orderSummaryModalLabel">Order Summary</h5>
             </div>
