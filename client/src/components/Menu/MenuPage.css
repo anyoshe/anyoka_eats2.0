@@ -80,7 +80,7 @@
 }
 
 /* Media screens */
-@media (min-width: 376px) and (max-width: 480px) {
+@media (min-width: 375px) and (max-width: 480px) {
   .NavBarContainer{
     /* border: 5px solid red; */
 
