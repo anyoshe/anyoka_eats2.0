@@ -581,3 +581,10 @@
     border: none;
   }
 }
+
+
+@media (max-width: 320px){
+  .top_header_divs {
+    width: 7rem;
+  }
+}

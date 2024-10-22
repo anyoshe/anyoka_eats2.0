@@ -66,3 +66,11 @@
     color: var(--orange);
     outline: 1px solid var(--orange);
 }
+
+
+@media (max-width:320px){
+    #sumaryModalcontent{
+        left: -2%;
+        margin-top: 2%;
+    }
+}

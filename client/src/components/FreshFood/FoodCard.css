@@ -159,7 +159,44 @@
   font-size: 0.9em;
 }
 
-@media (max-width: 480px) {
+@media (max-width: 320px){
+  .dish-card{
+    width: 9.7rem;
+  }
+
+  .food-image{
+    height: 7.5rem;
+    border-radius: 0;
+    width: 100%;
+  }
+
+
+  .fresh_original {
+    padding: 3px;
+    font-size: 0.8em;
+  }
+
+  .fresh-original-strikethrough {
+    font-size: 1em;
+  }
+
+  .dishRestaurant {
+    font-size: 10px;
+    padding: 3px 0px;
+  }
+
+  .dishAddToCart {
+    padding: 0.2rem 0.7rem;
+    width: 70%;
+    margin-bottom: 0rem;
+  }
+
+  .average {
+    font-size: 0.7rem;
+  }
+}
+
+@media (min-width: 376px) and (max-width: 480px) {
   .dish-card{
     width: 12.8rem;
   }

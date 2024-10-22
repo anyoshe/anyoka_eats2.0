@@ -701,7 +701,7 @@ animation: hoverShake 0.15s linear 3;
     }
 } */
 
-@media only screen and (max-width: 1199px) and (min-width: 992px) {
+/* @media only screen and (max-width: 1199px) and (min-width: 992px) {
     .containerDiv {
         width: 95%;
     }
@@ -721,7 +721,7 @@ animation: hoverShake 0.15s linear 3;
     .join_team_grid_div {
         grid-template-columns: repeat(2, 1fr);
     }
-}
+} */
 
 /* @media only screen and (max-width: 991px) and (min-width: 768px) {
     .containerDiv {
@@ -936,7 +936,338 @@ animation: hoverShake 0.15s linear 3;
 }
 } */
 
-@media (max-width: 480px) {
+
+@media (max-width: 320px){
+    .containerDiv {
+        max-width: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-direction: column;
+        margin-right: 0px;
+        overflow: hidden;
+    }
+
+    /* .headerSection {
+        height: auto; 
+        width: 100%;
+        margin-top: 2%;
+        border-bottom: 1px solid rgba(128, 128, 128, 0.577);
+    } */
+
+    .logo-CTA {
+        padding: 0.5rem 0.3rem;
+    }
+
+    .land_logo {
+        margin-bottom: 0;
+        font-size: 1.2rem;
+    }
+
+    .landing_sign {
+        padding: 0.3rem 0.5rem; 
+        font-size: 0.8rem; 
+        margin-right: 0;
+    }
+
+    .search__input {
+
+
+        width: 100%;
+        padding: 0.3rem 0.3rem;
+        font-size: 0.7rem;
+        line-height: 18px;
+        text-align: center;
+    }
+
+    .services_slogan{
+        margin-top: 0;
+    }
+    
+    .slogan{
+        margin-bottom: 0;
+    }
+
+    .sloganParagraph{
+        font-size: 1rem;
+        margin-bottom: 0;
+        font-weight: 200;
+    }
+
+    .services{
+        grid-template-columns: repeat(3 , 1fr);
+        gap: 0px;
+        margin-bottom: 0;
+        row-gap: 0;
+    }
+
+    .serviceDiv{
+        width: 7rem;
+        height: 9rem;
+        padding: 0;
+    }
+
+    .serviceImg{
+        width: 5.5rem;
+        height: 5.5rem;
+        margin-bottom: 0px;
+    }
+
+    .more_icon{
+        font-size: 6em;
+        margin-top: -1.2rem;
+    }
+
+    .serviceDiv p{
+        font-size: 0.7rem;
+        bottom: 1rem;
+        margin-bottom: 0;
+        width: 8rem;
+    }
+
+    #longConference{
+        margin-bottom: -1rem;
+        width: 7rem;
+    }
+
+    .offersSection{
+        width: 100%;
+        padding: 0;
+        padding-top: 0rem;
+    }
+
+    .title-offerSearch{
+        margin-bottom: 0;
+        padding: 0;
+        padding-left: 0.2rem;
+        text-align: left;
+    }
+
+    .offerTitle{
+        font-size: 1rem;
+        font-weight: 700;
+        text-transform: uppercase;
+    }
+
+    .category-dispaly{
+        width: 100%;
+    }
+
+    .offerNavContainer{
+        padding: 0rem 0.2rem;
+    }
+
+    .allBtn{
+        display: none;
+    }
+
+    .categories {
+        padding: 3px 6px;
+        font-size: 10px;
+    }
+
+    .categories:focus{
+        font-size: 0.8rem;
+        padding: 0.2rem 0.5rem;
+    }
+
+    .search-container{
+        width: 11em;
+    }
+
+    .search-input{
+        padding-top: 0.2rem 0rem;
+        padding-left: 0.2rem;
+        width: 80%;
+        font-size: 0.7rem;
+        outline: none;
+        box-shadow: rgba(0, 0, 0, 0.35) 0px 5px 15px;
+        flex: none;
+    }
+
+    .search-btn{
+        padding: 0.4rem;
+    }
+
+    .offers-container{
+        margin-top: 0.5rem;
+    }
+
+    .offerDispaly{
+        margin-top: 0%;
+    }
+
+    .offerDisplay{
+        margin-top: 0.5rem;
+        display: grid;
+        grid-template-columns: repeat(2,1fr);
+        column-gap: 0.3rem;
+        row-gap: 0.3rem;
+        padding: 0rem 0.2rem;
+    }
+
+    .featuredSection{
+        width: 100%;
+        margin-bottom: 2%;
+    }
+
+    .featuredSection{
+        padding: 0px;
+    }
+
+    .divHotel{
+        width: 100%;
+    }
+
+    .FeaturedDiv{
+        margin-top: 1%;
+        margin-bottom: 0.2rem;
+    }
+
+    .FeaturedHeading{
+        font-size: 1rem;
+        font-weight: 700;
+        margin-bottom: 0.3rem;
+    }
+
+    .DishCards{
+        padding: 0.2rem;
+        gap: 0.1rem; 
+        grid-template-columns: repeat(2,1fr);
+    }
+
+    .featuredFood{
+        padding: 0rem;
+        min-width: 100%;
+    }
+
+    .featured{
+        gap: 5px;
+        align-items: center;
+        justify-content: center;
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .join_team_section {
+        margin-top: 0.5rem;
+        padding: 0.1rem;
+        width: 100%;
+        height: fit-content;
+    }
+
+    .join_team_div {
+        width: 100%;
+    }
+
+    .paragraph_div{
+        margin-bottom: 2%;
+    }
+
+    .join_team_heading{
+        font-size: 1rem;
+        /* font-weight: 700; */
+        margin-bottom: 0;
+    }
+
+    .join_team_grid_div {
+        display: grid;
+        grid-template-columns: repeat(2 ,1fr);
+        gap: 1px;
+        width: 100%;
+    }
+
+    .join_team_choices {
+        text-align: center;
+        border: none;
+        width: 10rem;
+    }
+
+    .join_title{
+        padding: 0.3rem;
+        font-size: 0.8rem;
+    }
+
+    .join_explanation{
+        font-size: 0.7rem;
+    }
+
+    .join_team_image_div{
+        width: 6.5rem;
+        height: 6.5rem;
+        margin-bottom: 0.2rem;
+    }
+
+    .join_img {
+        width: 100%;
+        height: 100%;
+    }
+
+    .signup {
+        padding: 0.3rem;
+        font-size: 0.7rem;
+        width: 5rem;
+    }
+    
+    .about_us_section {
+        padding: 0.5rem 0.1rem;
+        width: 100%;
+        height: fit-content;
+        margin-bottom: 0;
+    }
+
+    .about_us_div {
+        width: 100%;
+        padding: 0;
+    }
+
+    .about_us_title{
+        font-size: 1.3rem;
+        padding-bottom: 0;
+        font-weight: 700;
+    }
+
+    .about_us_content {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .aboutUs_img_div {
+        border: 1px solid red;
+
+        text-align: center;
+        margin-bottom: 15px;
+        margin-bottom: 0;
+        display: none;
+    }
+
+    .aboutUs_img_div1{
+        height: 8rem;
+        width: 9rem;
+    }
+
+    .aboutUs_img_div2{
+        height: 8.8rem;
+        width: 9rem;
+    }
+
+    .about_us_img {
+        width: 100%;
+        height: 100%;
+        border-radius: 50%;
+    }
+
+    .aboutUs_paragraph {
+        font-size: 14px;
+        line-height: 1.5;
+        text-align: justify;
+        padding: 0 10px;
+    }
+} 
+
+
+@media (min-width: 376px) and (max-width: 480px){
     .containerDiv {
         max-width: 100%;
         display: flex;

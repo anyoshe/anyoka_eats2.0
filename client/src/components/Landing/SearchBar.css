@@ -223,9 +223,20 @@
   }
 } */
 
+@media (max-width: 320px){
+  .search__container{
+    /* border: 2px solid red; */
+
+    padding-top: 0.7rem;
+    width: 95vw;
+    height: 3rem;
+    /* margin-bottom: 0.5rem; */
+    margin-top: 1rem;
+  }
+}
 
 
-@media (max-width: 480px) {
+@media (max-width: 480px)  and (min-width:376px) {
   .searchBar {
     /* border: 1px solid blue; */
 

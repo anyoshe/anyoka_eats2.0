@@ -28,7 +28,27 @@
     row-gap: 10px;
 }
 
-@media (max-width: 480px){
+
+@media (max-width:320px){
+    #exampleModalBody{
+        width: 100vw;
+        left: -2%;
+    }
+
+    #dishesModalContent {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        column-gap: 1px;
+        row-gap: 5px;
+        padding-left: 1.5px;
+    }
+
+    #exampleModalLabel {
+        font-size: 14px;
+    }
+}
+
+@media (min-width: 376px) and (max-width: 480px){
     .by_reataurant_select{
         border: 1px solid green;
         padding: 0.1rem;

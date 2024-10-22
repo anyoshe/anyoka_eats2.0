@@ -197,7 +197,7 @@ const LandingPage = () => {
                             {/* More */}
                             {/* <Link to={'/user'}> */}
                                 <div id="moreServices" className="serviceDiv">
-                                    <FontAwesomeIcon icon={faPlusSquare} className="faIcons fa-7x" />
+                                    <FontAwesomeIcon icon={faPlusSquare} className="faIcons fa-7x more_icon" />
                                     <p>More</p>
                                 </div>
                             {/* </Link> */}
@@ -206,7 +206,7 @@ const LandingPage = () => {
                             {/* <Link to={'/conferences'}> */}
                                 <div id="disabled" className="serviceDiv">
                                     <img src={conferencingImg} alt="Conferencing & Meeting" className="serviceImg" />
-                                    <p>Conference & Meeting</p>
+                                    <p id='longConference'>Conference & Meeting</p>
                                 </div>
                             {/* </Link> */}
 
@@ -214,7 +214,8 @@ const LandingPage = () => {
 
                             <div id="trackOrder" className="serviceDiv" onClick={openModal}>
                                 <img src={trackOrderImg} alt="Track Your Order" className="serviceImg" />
-                                <p>Track Your Order</p>
+                                {/* <p>Track Your Order</p> */}
+                                <p>Track Order</p>
                             </div>
 
                             {/* Fresh Foods */}

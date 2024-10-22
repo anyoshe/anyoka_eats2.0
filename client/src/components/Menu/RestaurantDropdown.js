@@ -81,11 +81,11 @@ const RestaurantDropdown = ({ addToCart, searchQuery }) => {
       {modalVisible && (
         <div className="modal fade show" id="dishesModal" tabIndex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true" style={{ display: 'block' }}>
 
-          <div className="modal-dialog modal-lg">
+          <div className="modal-dialog modal-lg" id="exampleModalBody">
             <div className="modal-content byModalContent">
               <div className="modal-header">
                 <h5 className="modal-title" id="exampleModalLabel">By Restaurant</h5>
-                <button type="button" className="btn-close" onClick={handleCloseModal} aria-label="Close">&times;</button>
+                <button type="button" className="btn-close" onClick={handleCloseModal} aria-label="Close"></button>
               </div>
 
               <div className="modal-body" id="dishesModalContent">
