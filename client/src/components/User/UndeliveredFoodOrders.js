@@ -1,162 +1,3 @@
-// import React, { useEffect, useState } from 'react';
-// import axios from 'axios';
-// import config from '../../config';
-
-// const UndeliveredFoodOrders = ({ partner }) => {
-//   const [foodOrders, setFoodOrders] = useState([]);
-//   const [expectedSales, setExpectedSales] = useState(0);
-//   const [expectedCommission, setExpectedCommission] = useState(0);
-//   const [totalSales, setTotalSales] = useState(0);
-//   const [commissionDue, setCommissionDue] = useState(0);
-//   const [totalDeliveries, setTotalDeliveries] = useState(0);
-//   const [partnerVendors, setPartnerVendors] = useState([]);
-
-//   useEffect(() => {
-//     const fetchPartnerVendors = async () => {
-//       try {
-//         const response = await axios.get(`${config.backendUrl}/api/partners/${partner._id}/vendors`);
-//         setPartnerVendors(response.data);
-//       } catch (error) {
-//         console.error('Error fetching partner vendors:', error);
-//       }
-//     };
-  
-//     fetchPartnerVendors();
-//   }, [partner]);
-  
-//   useEffect(() => {
-//     if (partnerVendors.length > 0) {
-//       fetchFoodOrders();
-//     }
-//   }, [partnerVendors]);
-  
-//   const fetchFoodOrders = async () => {
-//     try {
-//       console.log('Fetching foodOrders...');
-//       const response = await axios.get(`${config.backendUrl}/api/foodOrders`);
-//       const allFoodOrders = response.data.filter(foodOrder => foodOrder.status !== undefined);
-//       const undeliveredFoodOrders = allFoodOrders.filter(foodOrder => foodOrder.status !== 'Delivered');
-
-//       console.log('Partner Vendors during fetchFoodOrders:', partnerVendors);
-  
-//       const filteredFoodOrders = undeliveredFoodOrders.filter(foodOrder => 
-//         partnerVendors.some(vendor => 
-//           vendor.vendor === foodOrder.selectedVendor 
-//         )
-//       );
-      
-//       console.log('Filtered FoodOrders:', filteredFoodOrders);
-  
-//       setFoodOrders(filteredFoodOrders);
-//       calculateTotals(filteredFoodOrders);
-  
-//     } catch (error) {
-//       console.error('Error fetching foodOrders:', error);
-//     }
-//   };
-  
-//   const calculateTotals = (foodOrders) => {
-//     let expectedSalesTotal = 0;
-//     let deliveredSalesTotal = 0;
-//     let deliveriesCount = 0;
-  
-//     foodOrders.forEach(foodOrder => {
-//       if (foodOrder.status !== 'Delivered') {
-//         expectedSalesTotal += foodOrder.totalPrice;
-//       } else {
-//         deliveredSalesTotal += foodOrder.totalPrice;
-//         deliveriesCount += 1;
-//       }
-//     });
-  
-//     setExpectedSales(expectedSalesTotal);
-//     setExpectedCommission(expectedSalesTotal * 0.1); // 10% margin
-//     setTotalSales(deliveredSalesTotal);
-//     setCommissionDue(deliveredSalesTotal * 0.1); // 10% margin
-//     setTotalDeliveries(deliveriesCount);
-//   };
-
-//   const updateFoodOrderStatus = async (orderId, vendorId, nextStatus) => {
-//     try {
-//       await axios.patch(`${config.backendUrl}/api/updateFoodOrderStatus/${orderId}/${vendorId}`, { status: nextStatus });
-//       fetchFoodOrders();
-//     } catch (error) {
-//       console.error('Error updating foodOrder status:', error);
-//     }
-//   };
-
-//   const getStatusButtons = (status, orderId, vendorId) => {
-//     const statusFoodOrder = ['Order received', 'Processed and packed', 'Dispatched', 'On Transit', 'Delivered'];
-//     const currentIndex = statusFoodOrder.indexOf(status);
-//     const nextStatus = statusFoodOrder[currentIndex + 1];
-
-//     return nextStatus ? (
-//       <button className='statusbutn' onClick={() => updateFoodOrderStatus(orderId, vendorId, nextStatus)}>Mark as {nextStatus}</button>
-//     ) : null;
-//   };
-
-//   const createFoodOrderElement = (foodOrder) => (
-//     <div key={foodOrder.orderId} className="orderDetails">     
-//       <p><span className='detailsTitles'>Order ID: </span> {foodOrder.orderId}</p>
-//       <p><span className='detailsTitles'>Name: </span>{foodOrder.customerName}</p>
-//       <p><span className='detailsTitles'>Number: </span>{foodOrder.phoneNumber}</p>
-//       <p><span className='detailsTitles'>Location: </span> {foodOrder.customerLocation}</p>
-//       <p><span className='detailsTitles'>Expected Delivery Time: </span> {foodOrder.expectedDeliveryTime}</p>
-//       <p><span className='detailsTitles'>Foods Ordered: </span></p>
-//       <ul>
-//         {foodOrder.foods.map((food) => (
-//           <li key={food.foodName}>{food.foodName} - Quantity: {food.quantity}</li>
-//         ))}
-//       </ul>
-//       <p><span className='detailsTitles'>Delivery Charges: Kes.</span>{foodOrder.deliveryCharges}.00</p>
-//       <p><span className='detailsTitles'>Total Price: Kes.</span>{foodOrder.totalPrice}.00</p>
-//       <p><span className='detailsTitles'>Created At:</span>{new Date(foodOrder.createdAt).toLocaleString()}</p>
-//       <p><span className='detailsTitles'>Status: </span><span className="order-status">{foodOrder.status || 'undefined'}</span></p>
-//       {getStatusButtons(foodOrder.status, foodOrder.orderId, foodOrder.selectedVendor)}
-//     </div>
-//   );
-
-//   const groupedFoodOrders = foodOrders.reduce((acc, foodOrder) => {
-//     const key = foodOrder.selectedVendor;
-//     if (!acc[key]) {
-//       acc[key] = [];
-//     }
-//     acc[key].push(foodOrder);
-//     return acc;
-//   }, {});
-
-//   return (
-//     <div className="dayOrders">
-//       <div id="ordersList">
-//         {Object.keys(groupedFoodOrders).map((vendor) => (
-//           <div key={vendor} id={`${vendor}-section`}>
-//             <h2>{vendor}</h2>
-//             <hr className='orderhr' />
-//             <ul id={`orders-${vendor}`}>
-//               {groupedFoodOrders[vendor].map((foodOrder) => createFoodOrderElement(foodOrder))}
-//             </ul>
-//           </div>
-//         ))}
-//       </div>
-
-//       <div id="worthSummary">
-//         <p>Expected Sales: <span id="totalSalesExpected" className='downtotals'> Ksh.{expectedSales.toFixed(2)}</span></p>
-//         <p>Expected Commission: <span id="commissionExpected" className='downtotals'>Ksh.{expectedCommission.toFixed(2)}</span></p><br />
-//       </div>
-
-//       <div id="sales">
-//         <div id="salesTotal">
-//           <p>Total Sales: Kes. <span id="totalSales">{totalSales.toFixed(2)}</span></p>
-//           <p>Commission Due: Kes. <span id="commissionDue">{commissionDue.toFixed(2)}</span></p>
-//           <p>Total Deliveries Made: <span id="totalDeliveries">{totalDeliveries}</span></p>
-//         </div>
-//       </div>
-//     </div>
-//   );
-// };
-
-// export default UndeliveredFoodOrders;
-
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import config from '../../config';
@@ -252,85 +93,186 @@ const UndeliveredFoodOrders = ({ partner }) => {
     setTotalDeliveries(deliveriesCount);
   };
 
-  const updateFoodOrderStatus = async (orderId, vendorId, nextStatus) => {
-    try {
-      console.log(`Updating order status for orderId: ${orderId}, vendorId: ${vendorId}, to status: ${nextStatus}`);
-      await axios.patch(`${config.backendUrl}/api/updateFoodOrderStatus/${orderId}/${vendorId}`, { status: nextStatus });
-      fetchFoodOrders();
-    } catch (error) {
-      console.error('Error updating food order status:', error);
+
+// Fetch Driver Details
+const fetchDriverDetails = async (driverId) => {
+  try {
+    console.log(`Fetching driver details for driverId: ${driverId}`);
+    const response = await axios.get(`${config.backendUrl}/api/getDriverDetails/${driverId}`);
+    console.log('Driver details fetched:', response.data);
+    return response.data; // Return driver details
+  } catch (error) {
+    console.error('Error fetching driver details:', error);
+    throw error;
+  }
+};
+
+// Update Food Order Status
+const updateFoodOrderStatus = async (orderId, vendorId, nextStatus, driverId = null) => {
+  try {
+    console.log(`Updating order status for orderId: ${orderId}, vendorId: ${vendorId}, to status: ${nextStatus}`);
+
+    let driverDetails = null;
+    let pickedAt = null;
+
+    // If the next status is "On Transit", fetch driver details
+    if (nextStatus === 'On Transit' && driverId) {
+      driverDetails = await fetchDriverDetails(driverId);
+      pickedAt = new Date().toISOString(); // Add timestamp
     }
-  };
 
-  const getStatusButtons = (status, orderId, vendorId) => {
-    const statusSteps = ['Order received', 'Processed and packed', 'Dispatched', 'On Transit', 'Delivered'];
-    const currentIndex = statusSteps.indexOf(status);
-    const nextStatus = statusSteps[currentIndex + 1];
-
-    return nextStatus ? (
-      <button className='statusbutn' onClick={() => updateFoodOrderStatus(orderId, vendorId, nextStatus)}>Mark as {nextStatus}</button>
-    ) : null;
-  };
-
-  const createFoodOrderElement = (order, vendorOrder) => (
-    <div key={vendorOrder._id} className="orderDetails">
-      <p><span className='detailsTitles'>Order ID: </span> {order.orderId}</p>
-      <p><span className='detailsTitles'>Name: </span>{order.customerName}</p>
-      <p><span className='detailsTitles'>Number: </span>{order.phoneNumber}</p>
-      <p><span className='detailsTitles'>Location: </span> {order.customerLocation}</p>
-      <p><span className='detailsTitles'>Expected Delivery Time: </span> {order.expectedDeliveryTime}</p>
-      <p><span className='detailsTitles'>Foods Ordered: </span></p>
-      <ul>
-        {vendorOrder.foods.map((food) => (
-          <li key={food.foodName}>{food.foodName} - Quantity: {food.quantity}</li>
-        ))}
-      </ul>
-      <p><span className='detailsTitles'>Delivery Charges: Kes.</span>{vendorOrder.deliveryCharges}.00</p>
-      <p><span className='detailsTitles'>Total Price: Kes.</span>{vendorOrder.totalPrice}.00</p>
-      <p><span className='detailsTitles'>Status: </span><span className="order-status">{vendorOrder.status || 'undefined'}</span></p>
-      {getStatusButtons(vendorOrder.status, order.orderId, vendorOrder.vendor)}
-    </div>
-  );
-
-  const groupedFoodOrders = foodOrders.reduce((acc, order) => {
-    order.vendorOrders.forEach(vendorOrder => {
-      const key = vendorOrder.vendor;
-      if (!acc[key]) {
-        acc[key] = [];
-      }
-      acc[key].push({ order, vendorOrder });
+    // Update the vendor order status in the backend
+    await axios.patch(`${config.backendUrl}/api/updateFoodOrderStatus/${orderId}/${vendorId}`, {
+      status: nextStatus,
+      ...(driverDetails && { driverDetails }),  // Include driver details if available
+      ...(pickedAt && { pickedAt })            // Include timestamp when picked
     });
-    return acc;
-  }, {});
 
-  return (
-    <div className="dayOrders">
-      <div id="ordersList">
-        {Object.keys(groupedFoodOrders).map((vendor) => (
-          <div key={vendor} id={`${vendor}-section`}>
-            <h2>{vendor}</h2>
-            <hr className='orderhr' />
-            <ul id={`orders-${vendor}`}>
-              {groupedFoodOrders[vendor].map(({ order, vendorOrder }) => createFoodOrderElement(order, vendorOrder))}
-            </ul>
-          </div>
-        ))}
-      </div>
+    // After updating, re-fetch all orders
+    await fetchFoodOrders();
 
-      <div id="worthSummary">
-        <p>Expected Sales: <span id="totalSalesExpected" className='downtotals'> Ksh.{expectedSales.toFixed(2)}</span></p>
-        <p>Expected Commission: <span id="commissionExpected" className='downtotals'>Ksh.{expectedCommission.toFixed(2)}</span></p><br />
-      </div>
+    // Check if all vendor orders have been marked as "On Transit"
+    checkAndUpdateParentOrderStatus(orderId);
+  } catch (error) {
+    console.error('Error updating food order status:', error);
+  }
+};
 
-      <div id="sales">
-        <div id="salesTotal">
-          <p>Total Sales: Kes. <span id="totalSales">{totalSales.toFixed(2)}</span></p>
-          <p>Commission Due: Kes. <span id="commissionDue">{commissionDue.toFixed(2)}</span></p>
-          <p>Total Deliveries Made: <span id="totalDeliveries">{totalDeliveries}</span></p>
+
+const checkAndUpdateParentOrderStatus = async (orderId) => {
+  try {
+    const response = await axios.get(`${config.backendUrl}/api/getFoodOrder/${orderId}`);
+    const foodOrder = response.data;
+    console.log('Fetched food order data:', foodOrder);
+
+    // Ensure vendorOrders is defined and an array
+    if (!foodOrder || !Array.isArray(foodOrder.vendorOrders)) {
+      console.error('Invalid food order or vendorOrders not found');
+      return;
+    }
+
+    // Check if all vendor orders are marked as "On Transit"
+    const allVendorsOnTransit = foodOrder.vendorOrders.every(vendorOrder => vendorOrder.status === 'On Transit');
+
+    let newOverallStatus = 'Waiting for vendors';  // Default status
+
+    if (allVendorsOnTransit) {
+      newOverallStatus = 'On Transit';
+    } else {
+      // Determine the overall status based on the most advanced vendor status
+      for (let vendorOrder of foodOrder.vendorOrders) {
+        if (vendorOrder.status === 'Delivered') {
+          newOverallStatus = 'Delivered';
+          break;  // Delivered is the final status, no need to check further
+        } else if (vendorOrder.status === 'Processed and packed') {
+          newOverallStatus = 'Ready for pickup';
+        } else if (vendorOrder.status === 'Dispatched') {
+          newOverallStatus = 'Dispatched';
+        } else if (vendorOrder.status === 'On Transit') {
+          newOverallStatus = 'On Transit';  // This might be redundant but just to reinforce
+        }
+      }
+    }
+
+    // If the overall status needs to be updated
+    if (foodOrder.overallStatus !== newOverallStatus) {
+      await axios.patch(`${config.backendUrl}/api/updateParentFoodOrderStatus/${orderId}`, { overallStatus: newOverallStatus });
+      console.log(`Food order ${orderId} overall status updated to '${newOverallStatus}'`);
+    }
+  } catch (error) {
+    console.error('Error updating parent food order status:', error);
+  }
+};
+
+
+// Status Buttons
+const getStatusButtons = (status, orderId, vendorId, driverId) => {
+  const statusSteps = ['Order received', 'Processed and packed', 'Dispatched', 'On Transit', 'Delivered'];
+  const currentIndex = statusSteps.indexOf(status);
+  const nextStatus = statusSteps[currentIndex + 1];
+
+  return nextStatus ? (
+    <button 
+      className='statusbutn' 
+      onClick={() => updateFoodOrderStatus(orderId, vendorId, nextStatus, driverId)}>
+      Mark as {nextStatus}
+    </button>
+  ) : null;
+};
+
+// Create Food Order Element
+const createFoodOrderElement = (order, vendorOrder) => (
+  <div key={vendorOrder._id} className="orderDetails">
+    <p><span className='detailsTitles'>Order ID: </span> {order.orderId}</p>
+    <p><span className='detailsTitles'>Name: </span>{order.customerName}</p>
+    <p><span className='detailsTitles'>Number: </span>{order.phoneNumber}</p>
+    <p><span className='detailsTitles'>Location: </span> {order.customerLocation}</p>
+    <p><span className='detailsTitles'>Expected Delivery Time: </span> {order.expectedDeliveryTime}</p>
+    <p><span className='detailsTitles'>Foods Ordered: </span></p>
+    <ul>
+      {vendorOrder.foods.map((food) => (
+        <li key={food.foodName}>{food.foodName} - Quantity: {food.quantity}</li>
+      ))}
+    </ul>
+    <p><span className='detailsTitles'>Delivery Charges: Kes.</span>{vendorOrder.deliveryCharges}.00</p>
+    <p><span className='detailsTitles'>Total Price: Kes.</span>{vendorOrder.totalPrice}.00</p>
+    <p><span className='detailsTitles'>Status: </span><span className="order-status">{vendorOrder.status || 'undefined'}</span></p>
+
+    {/* Driver Details if present */}
+    {vendorOrder.driverDetails && (
+      <>
+        <p><span className='detailsTitles'>Driver Name: </span>{vendorOrder.driverDetails.name}</p>
+        <p><span className='detailsTitles'>Driver Contact: </span>{vendorOrder.driverDetails.contactNumber}</p>
+        <p><span className='detailsTitles'>Vehicle Registration: </span>{vendorOrder.driverDetails.vehicleRegistration}</p>
+        <p><span className='detailsTitles'>Picked At: </span>{new Date(vendorOrder.pickedAt).toLocaleString()}</p>
+      </>
+    )}
+
+    {/* Status Buttons */}
+    {getStatusButtons(vendorOrder.status, order.orderId, vendorOrder.vendor, order.driverId)}
+  </div>
+);
+
+// Group and Display Food Orders
+const groupedFoodOrders = foodOrders.reduce((acc, order) => {
+  order.vendorOrders.forEach(vendorOrder => {
+    const key = vendorOrder.vendor;
+    if (!acc[key]) {
+      acc[key] = [];
+    }
+    acc[key].push({ order, vendorOrder });
+  });
+  return acc;
+}, {});
+
+return (
+  <div className="dayOrders">
+    <div id="ordersList">
+      {Object.keys(groupedFoodOrders).map((vendor) => (
+        <div key={vendor} id={`${vendor}-section`}>
+          <h2>{vendor}</h2>
+          <hr className='orderhr' />
+          <ul id={`orders-${vendor}`}>
+            {groupedFoodOrders[vendor].map(({ order, vendorOrder }) => createFoodOrderElement(order, vendorOrder))}
+          </ul>
         </div>
+      ))}
+    </div>
+
+    <div id="worthSummary">
+      <p>Expected Sales: <span id="totalSalesExpected" className='downtotals'> Ksh.{expectedSales.toFixed(2)}</span></p>
+      <p>Expected Commission: <span id="commissionExpected" className='downtotals'>Ksh.{expectedCommission.toFixed(2)}</span></p><br />
+    </div>
+
+    <div id="sales">
+      <div id="salesTotal">
+        <p>Total Sales: Kes. <span id="totalSales">{totalSales.toFixed(2)}</span></p>
+        <p>Commission Due: Kes. <span id="commissionDue">{commissionDue.toFixed(2)}</span></p>
+        <p>Total Deliveries Made: <span id="totalDeliveries">{totalDeliveries}</span></p>
       </div>
     </div>
-  );
+  </div>
+);
 };
 
 export default UndeliveredFoodOrders;

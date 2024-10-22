@@ -537,7 +537,15 @@ const orderSchema = new Schema({
   
   // Overall order status
   overallStatus: { type: String, enum: ['Waiting for vendors', 'Ready for pickup', 'Dispatched', 'On Transit', 'Delivered'], default: 'Waiting for vendors' },
+  driverId: { type: String, required: false },
+  driverDetails: {
+    name: { type: String },
+    contactNumber: { type: String },
+    vehicleRegistration: { type: String }
+  },
+  pickedAt: { type: Date }
 });
+
 
 const FoodOrder = model('FoodOrder', orderSchema);
 
@@ -569,7 +577,15 @@ const vendorOrderSchema = new Schema({
     enum: ['Order received', 'Processed and packed', 'Dispatched', 'On Transit', 'Delivered'], 
     default: 'Order received' 
   },
-  processedTime: { type: Date }
+  processedTime: { type: Date },
+  driverId: { type: String, required: false },
+  driverDetails: {
+    name: { type: String },
+    contactNumber: { type: String },
+    vehicleRegistration: { type: String }
+  },
+  pickedAt: { type: Date },
+ 
 });
 
 const VendorOrder = model('VendorOrder', vendorOrderSchema);
@@ -706,74 +722,97 @@ appRouter.get('/driverDashboard/orders/readyForPickup', async (req, res) => {
   }
 });
 
-
-// PATCH route to update parent order status and dispatch it
-// Router to update the food order (parent) status
+// Update driver ID and status for a food order and its vendor orders
 appRouter.patch('/driverUpdateFoodOrderStatus/:orderId', async (req, res) => {
-  console.log('Updating food order status for:', req.params.orderId);
-  console.log('Request body:', req.body);
+  const { orderId } = req.params;
+  const { status, driverId } = req.body;
+  console.log('Request received with driverId:', driverId);
 
   try {
-      const { orderId } = req.params; // Get the parent orderId from the URL
-      const { status, driverId } = req.body; // Get the status and driverId from the request body
+    // Find and update the parent food order
+    const updatedOrder = await FoodOrder.findOneAndUpdate(
+      { orderId },  // Query to find the order by orderId
+      {
+        // Update the overallStatus and driverId separately
+        $set: {
+          'vendorOrders.$[].status': status,  // Update all vendor orders' status
+          overallStatus: status,  // Update the parent food order status
+          driverId: driverId  // Set the driverId
+        }
+      },
+      { new: true }  // Return the updated document
+    );
 
-      // Find and update the parent food order using the orderId
-      const updatedFoodOrder = await FoodOrder.findOneAndUpdate(
-          { orderId: orderId }, // Use the parent orderId in the query
-          { overallStatus: status, driverId }, // Update overallStatus and driverId
-          { new: true } // Return the updated document
-      );
+    if (!updatedOrder) {
+      return res.status(404).json({ message: 'Food order not found' });
+    }
 
-      if (!updatedFoodOrder) {
-          console.log('Food order not found for ID:', orderId);
-          return res.status(404).json({ message: 'Food order not found' });
+    console.log('Food order updated with driverId and status:', updatedOrder);
+    res.json(updatedOrder);  // Respond with the updated order
+
+  } catch (error) {
+    console.error('Error updating food order status:', error);
+    res.status(500).json({ message: 'Error updating food order status' });
+  }
+});
+
+
+appRouter.patch('/updateVendorOrderStatus/:vendorId', async (req, res) => {
+  const { vendorId } = req.params;
+  const { status } = req.body;
+
+  try {
+      const updatedVendorOrder = await VendorOrder.findByIdAndUpdate(vendorId, { status }, { new: true });
+
+      if (!updatedVendorOrder) {
+          return res.status(404).json({ message: 'Vendor order not found' });
       }
 
-      console.log('Food order updated successfully:', updatedFoodOrder);
-
-      // Optionally, update the status of vendorOrders if needed
-      updatedFoodOrder.vendorOrders.forEach(async (vendorOrder) => {
-          vendorOrder.status = status;
-          await vendorOrder.save();
-      });
-
-      res.json(updatedFoodOrder); // Respond with the updated order
+      res.status(200).json(updatedVendorOrder);
   } catch (error) {
-      console.error('Error updating food order status:', error);
-      res.status(500).json({ message: 'Error updating food order status' });
+      res.status(500).json({ message: 'Failed to update vendor order status', error });
   }
 });
-
 
 // PATCH route to update vendor-specific food orders for the given parent order
-appRouter.patch('/driverUpdateFoodOrderStatus/:foodOrderId', async (req, res) => {
+appRouter.patch('/updateVendorOrderStatus/:vendorOrderId', async (req, res) => {
   try {
-    const { foodOrderId } = req.params;
-    const { status, driverId } = req.body;
+      const { vendorOrderId } = req.params;
+      const { status } = req.body;
 
-    if (!foodOrderId || !status || !driverId) {
-      return res.status(400).json({ error: 'Missing required fields' });
-    }
+      // Update the specific vendor order's status
+      const updatedVendorOrder = await FoodOrder.updateOne(
+          { 'vendorOrders._id': vendorOrderId }, // Find the specific vendor order by ID
+          { $set: { 'vendorOrders.$.status': status } } // Update its status
+      );
 
-    // Find the specific vendor order
-    const vendorOrder = await VendorOrder.findOne({ 'foods.foodName': foodOrderId });
-    if (!vendorOrder) {
-      return res.status(404).json({ error: 'Vendor order not found' });
-    }
+      if (updatedVendorOrder.nModified === 0) {
+          return res.status(404).json({ message: 'Vendor order not found' });
+      }
 
-    // Update the food order's status
-    vendorOrder.status = status;
-    vendorOrder.driverId = driverId;
-    await vendorOrder.save();
-
-    console.log(`Food order ${foodOrderId} status updated to ${status} by driver ${driverId}`);
-
-    res.status(200).json(vendorOrder);
+      res.json({ message: 'Vendor order status updated successfully', updatedVendorOrder });
   } catch (error) {
-    console.error('Error updating food order status:', error.message);
-    res.status(500).json({ error: 'Failed to update food order status' });
+      console.error('Error updating vendor order status:', error);
+      res.status(500).json({ message: 'Internal server error' });
   }
 });
+// appRouter.get('/fetchFoodOrderByStatus/:orderId/:driverId', async (req, res) => {
+//   try {
+//       const { orderId, driverId } = req.params;
+//       const foodOrder = await FoodOrder.findOne({ orderId, driverId }).populate('vendorOrders');
+
+//       if (!foodOrder) {
+//           return res.status(404).json({ message: 'Order not found' });
+//       }
+
+//       res.status(200).json(foodOrder);
+//   } catch (error) {
+//       console.error('Error fetching food order:', error);
+//       res.status(500).json({ message: 'Internal Server Error' });
+//   }
+// });
+
+
 
 //get orders
 appRouter.get('/orders/:orderId', async (req, res) => {
@@ -862,28 +901,77 @@ appRouter.patch('/updateFoodOrderStatus/:orderId', async (req, res) => {
 });
 
 
-// Update the status of a food parent order
-appRouter.patch('/driverUpdateFoodOrderStatus/:orderId', async (req, res) => {
-  const { orderId } = req.params;
-  const { status, driverId } = req.body;
 
+// Assuming you're using Express and Mongoose
+appRouter.patch('/updateVendorOrderStatus/:vendorOrderId', async (req, res) => {
   try {
-      const updatedOrder = await FoodOrder.findOneAndUpdate(
-          { orderId },
-          { $set: { 'vendorOrders.$[].status': status, overallStatus: status, driverId: driverId } },
-          { new: true }
+      const { vendorOrderId } = req.params;
+      const { status } = req.body;
+
+      // Update the specific vendor order's status
+      const updatedVendorOrder = await FoodOrder.updateOne(
+          { 'vendorOrders._id': vendorOrderId }, // Find the specific vendor order by ID
+          { $set: { 'vendorOrders.$.status': status } } // Update its status
       );
 
-      if (!updatedOrder) {
-          return res.status(404).json({ message: 'Food order not found' });
+      if (updatedVendorOrder.nModified === 0) {
+          return res.status(404).json({ message: 'Vendor order not found' });
       }
 
-      res.json(updatedOrder);
+      res.json({ message: 'Vendor order status updated successfully', updatedVendorOrder });
   } catch (error) {
-      console.error('Error updating food order status:', error);
-      res.status(500).json({ message: 'Error updating food order status' });
+      console.error('Error updating vendor order status:', error);
+      res.status(500).json({ message: 'Internal server error' });
   }
 });
+
+appRouter.patch('/revertVendorOrderStatus/:vendorId', async (req, res) => {
+  try {
+    const { vendorId } = req.params; // Get the vendorId from the route parameters
+    const { status } = req.body;     // Get the new status from the request body
+
+    console.log(req.body);
+
+    // Find the vendor's specific order and update its status
+    const updatedVendorOrder = await VendorOrder.findByIdAndUpdate(
+      vendorId,                       // Use findByIdAndUpdate to search by _id directly
+      { status: status },             // Update the status field
+      { new: true }                   // Return the updated document
+    );
+
+    if (!updatedVendorOrder) {
+      return res.status(404).json({ message: 'Vendor order not found' }); // If no vendor order found, return 404
+    }
+
+    res.json({ message: 'Vendor order status reverted successfully', updatedVendorOrder }); // Send success response
+  } catch (error) {
+    res.status(500).json({ message: 'Error reverting vendor order status', error: error.message }); // Handle any errors
+  }
+});
+
+
+// Define the new route to fetch the fresh food order by status
+appRouter.get('/fetchFoodOrderByStatus/:orderId/:driverId', async (req, res) => {
+  const { orderId, driverId } = req.params;
+  console.log("Order ID:", orderId, "Driver ID:", driverId);
+
+  try {
+      const foodOrder = await FoodOrder.findOne({ orderId, driverId });
+      console.log("Fetched Order:", foodOrder);
+
+      if (!foodOrder) {
+          console.error(`Food order not found for Order ID: ${orderId}, Driver ID: ${driverId}`);
+          return res.status(404).json({ error: 'Fresh food order not found' });
+      }
+
+      res.json(foodOrder);
+  } catch (error) {
+      console.error('Error fetching fresh food order:', error);
+      res.status(500).json({ error: 'Failed to fetch the fresh food order' });
+  }
+});
+
+
 
 // Fetch undelivered orders
 appRouter.get('/orders/undelivered', async (req, res) => {
@@ -922,6 +1010,49 @@ appRouter.get('/foodOrders', async (req, res) => {
     res.json(foodOrders);
   } catch (error) {
     res.status(500).json({ message: 'Error fetching food orders' });
+  }
+});
+
+appRouter.get('/getFoodOrder/:orderId', async (req, res) => {
+  const { orderId } = req.params;
+  console.log(orderId);
+  try {
+    const foodOrder = await FoodOrder.findOne({ orderId }); // Ensure you're querying by the custom UUID
+    console.log(foodOrder);
+    if (!foodOrder) {
+      return res.status(404).json({ message: 'Food order not found' });
+    }
+    
+    res.json(foodOrder);
+  } catch (error) {
+    console.error('Error fetching food order:', error);
+    res.status(500).json({ message: 'Error fetching food order' });
+  }
+});
+// Update Parent Food Order Status
+appRouter.patch('/updateParentFoodOrderStatus/:orderId', async (req, res) => {
+  const { orderId } = req.params; // This is your custom order ID
+  const { overallStatus } = req.body;
+
+  try {
+    // Use findOneAndUpdate to find the order by your custom field "orderId"
+    const updatedOrder = await FoodOrder.findOneAndUpdate(
+      { orderId }, // Match the orderId field (UUID in your case)
+      { overallStatus }, 
+      { new: true } // Return the updated document
+    );
+
+    if (!updatedOrder) {
+      return res.status(404).json({ message: 'Food order not found' });
+    }
+
+    res.status(200).json({
+      message: 'Food order status updated successfully',
+      overallStatus: updatedOrder.overallStatus
+    });
+  } catch (error) {
+    console.error('Error updating parent food order status:', error);
+    res.status(500).json({ message: 'Error updating parent food order status' });
   }
 });
 
