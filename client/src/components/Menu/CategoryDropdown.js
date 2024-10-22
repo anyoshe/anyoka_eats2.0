@@ -79,7 +79,7 @@ const CategoryDropdown = ({ addToCart, searchQuery }) => {
       {modalVisible && (
         <div className="modal fade show" id="dishModal" tabIndex="-1" aria-labelledby="dishModalLabel" aria-hidden="true" style={{ display: 'block' }}>
 
-          <div className="modal-dialog modal-lg">
+          <div className="modal-dialog modal-lg" id="dishModalBody">
 
             <div className="modal-content byModalContent">
 
@@ -90,7 +90,7 @@ const CategoryDropdown = ({ addToCart, searchQuery }) => {
 
               </div>
 
-              <div className="modal-body">
+              <div className="modal-body" id='categoryModalBody'>
                 {Object.keys(dishesByRestaurant).length > 0 ? (
                   Object.keys(dishesByRestaurant).map((restaurant) => (
 

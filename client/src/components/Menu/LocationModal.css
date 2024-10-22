@@ -82,7 +82,62 @@
     transition: ease-in .2
 }
 
-@media (max-width:480px) {
+
+@media (max-width:320px){
+    .modal-dialog{
+        margin-top: 0%;
+    }
+
+    .cartModalContent{
+        width: 100vw;
+        left: 0%;
+    }
+
+    #locationModalContent{
+        left: -2.5%;
+        margin-top: 20%;
+    }
+
+    #locationModalLabel{
+        font-size: 1rem;
+    }
+
+    #locationModalBody{
+        padding: 0.2rem;
+    }
+
+    #locationFromDiv {
+        font-size: 13px;
+    }
+
+    .fromSpan{
+        font-size: 15px;
+    }
+
+    .InputBtn {
+        width: 100%;
+        padding: 0.4rem 0.8rem;
+        font-size: 0.9rem;
+    }
+
+    #customerLocation {
+        width: 100%;
+        height: 2.3em;
+        font-size: 0.9rem;
+    }
+
+    .cancel_Ok_btn {
+        padding: 0.3rem 0.8rem;
+        font-size: 0.9rem;
+    }
+
+    .landingCancel {
+        padding: 0.3rem 0.8rem;
+        font-size: 0.9rem;
+    }
+}
+
+@media (min-width: 376px) and  (max-width:480px) {
     .InputBtn {
         width: 100%;
     }

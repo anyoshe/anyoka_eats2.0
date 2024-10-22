@@ -83,8 +83,35 @@
   transition: width 0.2s ease;
 }
 
+@media (max-width: 320px){
+  .restaurant-card {
+    padding: 0.4rem 0.2rem;
+    width: 10rem;
+    text-align: center;
+  }
 
-@media (max-width: 480px) {
+  .restaurantHeading{
+    font-size: 0.8rem;
+    font-weight: 800;
+  }
+
+  .restaurantCategory {
+    margin: 2px 0;
+    font-size: 0.7rem;
+  }
+
+  .star {
+    font-size: 22px;
+  } 
+
+  .restaurantAverage{
+    margin-bottom: 0px;
+    font-size: 0.8rem;
+  }
+}
+
+
+@media (min-width: 376px) and (max-width: 480px) {
   .restaurant-card{
     padding: 0.4rem;
     width: 13rem;
