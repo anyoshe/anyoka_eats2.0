@@ -796,23 +796,6 @@ appRouter.patch('/updateVendorOrderStatus/:vendorOrderId', async (req, res) => {
       res.status(500).json({ message: 'Internal server error' });
   }
 });
-// appRouter.get('/fetchFoodOrderByStatus/:orderId/:driverId', async (req, res) => {
-//   try {
-//       const { orderId, driverId } = req.params;
-//       const foodOrder = await FoodOrder.findOne({ orderId, driverId }).populate('vendorOrders');
-
-//       if (!foodOrder) {
-//           return res.status(404).json({ message: 'Order not found' });
-//       }
-
-//       res.status(200).json(foodOrder);
-//   } catch (error) {
-//       console.error('Error fetching food order:', error);
-//       res.status(500).json({ message: 'Internal Server Error' });
-//   }
-// });
-
-
 
 //get orders
 appRouter.get('/orders/:orderId', async (req, res) => {
@@ -882,11 +865,12 @@ appRouter.patch('/updateFoodOrderStatus/:orderId/:vendorId', async (req, res) =>
 appRouter.patch('/updateFoodOrderStatus/:orderId', async (req, res) => {
   try {
     const { orderId } = req.params;
-    const { status } = req.body;
+    const { overallstatus } = req.body; // Incorrect field name
 
+    // Use correct field name from the schema
     const foodOrder = await FoodOrder.findOneAndUpdate(
       { orderId: orderId },
-      { status: status },
+      { overallStatus: overallstatus }, // Correct field name is `overallStatus`
       { new: true }
     );
 
@@ -899,6 +883,7 @@ appRouter.patch('/updateFoodOrderStatus/:orderId', async (req, res) => {
     res.status(500).json({ message: 'Error updating order status', error });
   }
 });
+
 
 
 
@@ -927,25 +912,47 @@ appRouter.patch('/updateVendorOrderStatus/:vendorOrderId', async (req, res) => {
 
 appRouter.patch('/revertVendorOrderStatus/:vendorId', async (req, res) => {
   try {
-    const { vendorId } = req.params; // Get the vendorId from the route parameters
-    const { status } = req.body;     // Get the new status from the request body
+    const { vendorId } = req.params;  // Ensure the vendor order ID is correct
+    const { status } = req.body;      // The new status to revert to
 
-    console.log(req.body);
+    // Log the request for debugging purposes
+    console.log(`Reverting vendor order ${vendorId} with status: ${status}`);
 
-    // Find the vendor's specific order and update its status
-    const updatedVendorOrder = await VendorOrder.findByIdAndUpdate(
-      vendorId,                       // Use findByIdAndUpdate to search by _id directly
-      { status: status },             // Update the status field
-      { new: true }                   // Return the updated document
-    );
+    // Log the incoming status value
+    console.log('Status in request body:', status);
 
-    if (!updatedVendorOrder) {
-      return res.status(404).json({ message: 'Vendor order not found' }); // If no vendor order found, return 404
+    // Check if the status is one of the valid enum values
+    const validStatuses = ['Order received', 'Processed and packed', 'Dispatched', 'On Transit', 'Delivered'];
+    if (!validStatuses.includes(status)) {
+      return res.status(400).json({ message: 'Invalid status value' });
     }
 
-    res.json({ message: 'Vendor order status reverted successfully', updatedVendorOrder }); // Send success response
+    // Fetch the vendor order first to ensure it exists
+    const vendorOrder = await VendorOrder.findById(vendorId).exec();
+    if (!vendorOrder) {
+      console.log(`Vendor order ${vendorId} not found`);
+      return res.status(404).json({ message: 'Vendor order not found' });
+    }
+
+    // Proceed with the update
+    const updatedVendorOrder = await VendorOrder.findByIdAndUpdate(
+      vendorId,
+      { status: status },   // Correctly update the status field
+      { new: true }         // Return the updated document
+    ).exec();
+    
+    console.log('Updated vendor order:', updatedVendorOrder);
+
+    // Check if the update was successful
+    if (!updatedVendorOrder) {
+      return res.status(404).json({ message: 'Vendor order not found after update attempt' });
+    }
+
+    // Respond with success
+    res.json({ message: 'Vendor order status reverted successfully', updatedVendorOrder });
   } catch (error) {
-    res.status(500).json({ message: 'Error reverting vendor order status', error: error.message }); // Handle any errors
+    console.error('Error reverting vendor order status:', error);
+    res.status(500).json({ message: 'Error reverting vendor order status', error: error.message });
   }
 });
 

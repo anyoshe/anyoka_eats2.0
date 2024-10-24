@@ -735,39 +735,39 @@ const Dashboard = () => {
     const handleDeclineOrder = async () => {
         try {
             let response;
-    
+
             // Stop the timer if it's running
             if (orderTimerId) clearInterval(orderTimerId);
-    
-            // Check if the selected order has vendor orders (i.e., it's a food order)
-            if (selectedOrder.vendorOrders && selectedOrder.vendorOrders.length > 0) {
+
+            // Check if the selectedOrder exists and has vendor orders (i.e., it's a food order)
+            if (selectedOrder && selectedOrder.vendorOrders && selectedOrder.vendorOrders.length > 0) {
                 console.log("Declining a food order with vendor orders.");
-    
+
                 // 1. Update the overall status of the parent food order to "Ready for pick up"
                 response = await fetch(`${config.backendUrl}/api/updateFoodOrderStatus/${selectedOrder.orderId}`, {
                     method: 'PATCH',
                     headers: {
                         'Content-Type': 'application/json',
                     },
-                    body: JSON.stringify({ status: 'Ready for pick up' }), // Revert to 'Ready for pick up'
+                    body: JSON.stringify({ overallstatus: 'Ready for pickup' }), // Use `overallstatus` for food orders
                 });
-    
+
                 if (!response.ok) {
                     throw new Error('Failed to update the overall food order status to "Ready for pick up".');
                 }
-    
+
                 console.log("Overall food order status updated to 'Ready for pick up'.");
-    
+
                 // 2. Revert each vendor order's status to "Processed and packed"
+                // In the for-loop where vendor orders are reverted
                 for (let vendorOrder of selectedOrder.vendorOrders) {
-                    const vendorId = vendorOrder?._id; // Use vendor order's unique ID
-                    console.log(`Attempting to revert status for vendor order ID: ${vendorId}`);
-                
+                    const vendorId = vendorOrder?._id;  // Ensure you are passing the correct vendor order ID
+
                     if (!vendorId) {
                         console.warn("Vendor ID is undefined! Skipping vendor order.");
-                        continue; // Skip if vendorId is missing
+                        continue;  // Skip if vendorId is missing
                     }
-                
+
                     try {
                         const vendorResponse = await fetch(`${config.backendUrl}/api/revertVendorOrderStatus/${vendorId}`, {
                             method: 'PATCH',
@@ -776,18 +776,19 @@ const Dashboard = () => {
                             },
                             body: JSON.stringify({ status: 'Processed and packed' }),
                         });
-                
+
                         if (!vendorResponse.ok) {
                             const errorDetails = await vendorResponse.json();
                             throw new Error(`Failed to revert vendor order status for vendor: ${vendorOrder.vendor}. Error: ${errorDetails.message}`);
                         }
-                
+
                         console.log(`Vendor order status reverted for vendor: ${vendorOrder.vendor}`);
                     } catch (error) {
                         console.error(`Error reverting vendor order status:`, error);
                     }
                 }
-            } else {
+
+            } else if (selectedOrder) {
                 // Handle normal orders (no vendor orders)
                 response = await fetch(`${config.backendUrl}/api/updateOrderStatus/${selectedOrder.orderId}`, {
                     method: 'PATCH',
@@ -796,14 +797,16 @@ const Dashboard = () => {
                     },
                     body: JSON.stringify({ status: 'Processed and packed' }), // Revert to 'Processed and packed'
                 });
-    
+
                 if (!response.ok) {
                     throw new Error('Failed to decline the order');
                 }
-    
+
                 console.log("Normal order status reverted to 'Processed and packed'.");
+            } else {
+                console.error('Selected order is undefined. Cannot process decline.');
             }
-    
+
             // Clear the selected order and refresh the orders list
             setSelectedOrder(null);
             fetchOrders(); // Refresh the orders list
@@ -811,7 +814,6 @@ const Dashboard = () => {
             console.error('Error declining order:', error);
         }
     };
-    
 
     const handleUpdateDriver = async () => {
         const formData = new FormData();
