@@ -1,6 +1,6 @@
 :root{
-    --green:#1ea509;
-    --orange: rgb(255,165,0);
+  --green:#1ea509;
+  --orange: rgb(255,165,0);
 }
 
 .searchBar {
@@ -140,9 +140,7 @@
 /* Large desktops and laptops */
 @media (min-width: 1200px) {
   #searchResults {
-    /* top: 25%; */
-    /* left: 30%; */
-    /* width: 40%; */
+    
   }
 
   .suggestion-item {
@@ -191,52 +189,37 @@
   }
 }
 
-/* Mobile phones */
-/* @media (max-width: 767px) {
-  .searchBar {
-    margin-top: 12%;
-  }
-
-  #searchResults {
-    top: 10%;
-    left: 10%;
-    width: 80%;
-  }
-
-  .suggestion-item {
-    grid-template-columns: 1fr;
-    gap: 20px;
-    padding: 8px 15px;
-  }
-
-  .detail-container {
-    grid-template-columns: 1fr;
-  }
-
-  .mic-icon {
-    font-size: 18px;
-    margin-right: 8px;
-  }
-
-  .mic-icon:hover {
-    font-size: 25px;
-  }
-} */
-
 @media (max-width: 320px){
   .search__container{
-    /* border: 2px solid red; */
-
     padding-top: 0.7rem;
     width: 95vw;
     height: 3rem;
-    /* margin-bottom: 0.5rem; */
     margin-top: 1rem;
   }
 }
 
+@media (min-width: 321px) and (max-width: 375px){
+  .searchBar {
+    margin-top: 1%;
+    margin-bottom: 1%;
+    width: 100%;
+  }
 
-@media (max-width: 480px)  and (min-width:376px) {
+  .search__container{
+    padding-top: 0.7rem;
+    width: 95vw;
+    height: 3rem;
+    margin-top: 1rem;
+  }
+
+  .search__input{
+    padding: 0.3rem 0.5rem;
+    text-align: center;
+    width: 450px;
+  }
+}
+
+@media (max-width: 480px) and (min-width:376px) {
   .searchBar {
     /* border: 1px solid blue; */
 

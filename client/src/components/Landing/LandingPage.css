@@ -1266,7 +1266,146 @@ animation: hoverShake 0.15s linear 3;
     }
 } 
 
+@media (min-width: 321px) and (max-width: 375px){
+    .containerDiv {
+        max-width: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-direction: column;
+        margin-right: 0px;
+        overflow: hidden;
+        /* padding: 0px; */
+    }
 
+    .headerSection {
+        height: auto; 
+        width: 100%;
+        margin-bottom: 2%;
+        border-bottom: 1px solid rgba(128, 128, 128, 0.577);
+    }
+
+    .logo-CTA {
+        flex-direction: row; 
+        align-items: center;
+        /* width: 80%; */
+        padding: 0.5rem 0.3rem;
+        width: 100%;
+    }
+
+    .land_logo {
+        margin-bottom: 0;
+    }
+
+    .landing_sign {
+        padding: 0.5rem 1rem; 
+        font-size: 0.8rem; 
+        margin-right: 0;
+    }
+
+    .headerSection{
+        margin: 0;
+    }
+
+    .slogan{
+        margin-bottom: 0;
+    }
+
+    .sloganParagraph{
+        font-size: 1.2rem;
+        margin-bottom: 0;
+        font-weight: 200;
+    }
+
+    .services {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 0px;
+        margin-bottom: 30px;
+        padding: 0rem 0.3rem;
+    }
+
+    .serviceDiv{
+        width: 8rem;
+        height: 10rem;
+        padding: 0;
+    }
+
+    .serviceImg{
+        width: 5.5rem;
+        height: 5.5rem;
+    }
+
+    .more_icon{
+        font-size: 6em;
+        margin-top: -1.2rem;
+    }
+
+    .serviceDiv p{
+        font-size: 0.8rem;
+        bottom: 1rem;
+        margin-bottom: 0;
+        width: 8rem;
+    }
+
+    .offersSection{
+        width: 100%;
+        padding: 0;
+        padding-top: 0.5rem;
+    }
+
+    .categories {
+        padding: 3px 7px;
+        font-size: 0.6rem;
+    }
+
+    .search-container{
+        width: 12em;
+    }
+
+    .search-input {
+        /* width: 50px; */
+        font-size: 0.7rem;
+        height: 1.5rem;
+        padding: 10px 10px;
+    }
+
+    .search-btn {
+        width: 2rem;
+        padding: 0.1rem;
+        height: 1.6rem;
+    }
+
+    .title-offerSearch{
+        margin-bottom: 0;
+        padding: 0;
+        padding-left: 0.5rem;
+        text-align: left;
+    }
+
+    .offerTitle{
+        font-size: 1.1rem;
+        font-weight: 700;
+        text-transform: uppercase;
+    }
+
+    .category-dispaly{
+        width: 100%;
+        padding: 0rem 0.2rem;
+    }
+
+    .offerNavContainer{
+        padding: 0rem 0.2rem;
+    }
+
+    .featuredSection {
+        width: 100%;
+        padding: 5px 5px;
+        margin-bottom: 2%;
+    }
+}
+
+/* @media (min-width: 375px) and (max-width: 480px){ */
 @media (min-width: 376px) and (max-width: 480px){
     .containerDiv {
         max-width: 100%;
