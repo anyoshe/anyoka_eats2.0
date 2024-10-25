@@ -910,47 +910,89 @@ appRouter.patch('/updateVendorOrderStatus/:vendorOrderId', async (req, res) => {
   }
 });
 
+// appRouter.patch('/revertVendorOrderStatus/:vendorId', async (req, res) => {
+//   try {
+//     const { vendorId } = req.params;  // Ensure the vendor order ID is correct
+//     const { status } = req.body;      // The new status to revert to
+
+//     // Log the request for debugging purposes
+//     console.log(`Reverting vendor order ${vendorId} with status: ${status}`);
+
+//     // Log the incoming status value
+//     console.log('Status in request body:', status);
+
+//     // Check if the status is one of the valid enum values
+//     const validStatuses = ['Order received', 'Processed and packed', 'Dispatched', 'On Transit', 'Delivered'];
+//     if (!validStatuses.includes(status)) {
+//       return res.status(400).json({ message: 'Invalid status value' });
+//     }
+
+//     // Fetch the vendor order first to ensure it exists
+//     const vendorOrder = await VendorOrder.findById(vendorId).exec();
+//     if (!vendorOrder) {
+//       console.log(`Vendor order ${vendorId} not found`);
+//       return res.status(404).json({ message: 'Vendor order not found' });
+//     }
+
+//     // Proceed with the update
+//     const updatedVendorOrder = await VendorOrder.findByIdAndUpdate(
+//       vendorId,
+//       { status: status },   // Correctly update the status field
+//       { new: true }         // Return the updated document
+//     ).exec();
+    
+//     console.log('Updated vendor order:', updatedVendorOrder);
+
+//     // Check if the update was successful
+//     if (!updatedVendorOrder) {
+//       return res.status(404).json({ message: 'Vendor order not found after update attempt' });
+//     }
+
+//     // Respond with success
+//     res.json({ message: 'Vendor order status reverted successfully', updatedVendorOrder });
+//   } catch (error) {
+//     console.error('Error reverting vendor order status:', error);
+//     res.status(500).json({ message: 'Error reverting vendor order status', error: error.message });
+//   }
+// });
 appRouter.patch('/revertVendorOrderStatus/:vendorId', async (req, res) => {
   try {
-    const { vendorId } = req.params;  // Ensure the vendor order ID is correct
+    const { vendorId } = req.params;  // vendorId refers to the ID inside vendorOrders array
     const { status } = req.body;      // The new status to revert to
 
-    // Log the request for debugging purposes
-    console.log(`Reverting vendor order ${vendorId} with status: ${status}`);
+    // Log the request details for debugging
+    console.log(`Attempting to revert status for vendor order ${vendorId} with status: ${status}`);
 
-    // Log the incoming status value
-    console.log('Status in request body:', status);
-
-    // Check if the status is one of the valid enum values
     const validStatuses = ['Order received', 'Processed and packed', 'Dispatched', 'On Transit', 'Delivered'];
     if (!validStatuses.includes(status)) {
       return res.status(400).json({ message: 'Invalid status value' });
     }
 
-    // Fetch the vendor order first to ensure it exists
-    const vendorOrder = await VendorOrder.findById(vendorId).exec();
-    if (!vendorOrder) {
-      console.log(`Vendor order ${vendorId} not found`);
+    // Find the parent order and update the vendor order within the array
+    const parentOrder = await FoodOrder.findOneAndUpdate(
+      { 'vendorOrders._id': vendorId },   // Replace ParentOrder with FoodOrder
+      {
+        $set: {
+          'vendorOrders.$.status': status,
+          'vendorOrders.$.processedTime': new Date(),
+        },
+      },
+      { new: true }  // Return the updated document
+    ).exec();
+
+    // Check if the parent order was found
+    if (!parentOrder) {
+      console.error(`Vendor order with ID ${vendorId} not found`);
       return res.status(404).json({ message: 'Vendor order not found' });
     }
 
-    // Proceed with the update
-    const updatedVendorOrder = await VendorOrder.findByIdAndUpdate(
-      vendorId,
-      { status: status },   // Correctly update the status field
-      { new: true }         // Return the updated document
-    ).exec();
-    
-    console.log('Updated vendor order:', updatedVendorOrder);
+    // Log the updated parent order for verification
+    console.log('Vendor order status successfully reverted:', parentOrder);
 
-    // Check if the update was successful
-    if (!updatedVendorOrder) {
-      return res.status(404).json({ message: 'Vendor order not found after update attempt' });
-    }
-
-    // Respond with success
-    res.json({ message: 'Vendor order status reverted successfully', updatedVendorOrder });
+    // Return success response
+    res.json({ message: 'Vendor order status reverted successfully', parentOrder });
   } catch (error) {
+    // Log the detailed error message
     console.error('Error reverting vendor order status:', error);
     res.status(500).json({ message: 'Error reverting vendor order status', error: error.message });
   }
