@@ -313,8 +313,123 @@
     margin: 10px 0;
 }
 
+@media (max-width: 320px){
+    .landing-fresh-food{
+        /* border: 5px solid green; */
 
-@media(max-width:480px){
+        align-items: start;
+        padding: 0rem 0.3rem;
+        align-items: center;
+        width: 100vw;
+    } 
+
+    .landing-fresh-foods-header{
+        left: 0;
+        top: 0;
+        right: 0;
+        height: 3rem;
+        width: 100vw;
+        padding: 2px;
+    }
+
+    .fresh_bar{
+        width: 70%;
+    }
+
+    .fresh_glass{
+          /* border: 5px solid green; */
+
+        width: 16%;
+        padding: 0.3rem;
+    }
+
+    .main-category{
+        margin-top: 18%;
+        padding: 0;
+        width: 100vw;
+        /* align-items: center; */
+    }
+
+    .fresh_page_heading{
+        font-size: 1rem;
+        font-weight: 600;
+        padding-left: 2px;
+    }
+
+    .fresh_category {
+        padding: 0rem 0rem;
+        height: 1%;
+        width: 100vw
+    }
+
+    .fresh_link {
+        padding: 0.1rem 1px;
+        border-bottom: none;
+        font-size: 0.6rem;
+        transition: ease-in 0.2s;
+        margin: 0rem 0.2rem;
+        text-align: center;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .discoverTitle{
+        font-size: 1rem;
+        margin-bottom: 1rem;
+        padding-left: 2px;
+    }
+
+    .category-grid {
+        grid-template-columns: repeat(2, 1fr);
+        column-gap: 2px;
+        row-gap: 10px;
+        padding-left: 2px;
+    }
+
+    .fresh-page-offers-section {
+        /* border: 5px solid green; */
+
+        width: 100%;
+    }
+
+    .fresh-page-offers-title {
+        font-size: 1rem;
+        font-weight: 600;
+        padding: 0.1rem 0.2rem;
+    }
+
+    .offer-page-grid {
+        grid-template-columns: repeat(2, 1fr);
+        column-gap: 0.3rem;
+        row-gap: 0.5rem;
+    }
+
+    .fresh-wholesale-title {
+        color: green;
+    }
+
+    .fresh-wholesale-para {
+        margin-top: 1%;
+        margin-bottom: 4%;
+        font-size: 1rem;
+        text-align: center;
+    }
+
+    .wholesale {
+        width: 100%;
+    }
+
+    .footer-section {
+        /* overflow: hidden;
+        background: #151414;
+        position: relative; */
+        width: 100vw;
+    }
+}
+
+
+@media (min-width: 375px) and (max-width:480px){
     .landing-fresh-food{
         /* border: 5px solid green; */
 
