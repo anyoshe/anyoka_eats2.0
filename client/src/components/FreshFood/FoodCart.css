@@ -28,6 +28,20 @@
     margin-right: 5%;
 }
 
+@media (max-width: 320px){
+    #cart2 {
+        margin-right: 2%;
+    }
+
+    #cartCount2 {
+        position: absolute;
+        top: 0%;
+        right: 0.5%;
+        font-weight: 600;
+        font-size: 16px;
+    }
+}
+
 @media (min-width: 768px) and (max-width:1023px) {
     #cart2 {
         margin-right: 3%;
