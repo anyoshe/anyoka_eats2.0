@@ -139,19 +139,29 @@
 
 
 @media (max-width:320px){
-    /* .NavBarContainer {
-        width: 100vw;
-    } */
+    #navline {
+        padding-left: 0.1rem;
+    }
 
     .category-buttons {
-        margin-left: 0rem;
-        justify-content: space-around;
         width: 100vw;
-        padding: 0rem;
+        position: fixed;
+        margin-left: 0rem;
+        display: flex;
+        justify-content: space-around;
+        width: 100%;
+        padding: 0.1rem;
+        z-index: 100;
+        background-color: white;
+        top: 2.9rem;
+    }
+
+    .dishes-to-display {
+        margin-top: 1rem;
     }
 
     .dishesSection {
-        margin-top: 3.5%;
+        margin-top: 3%;
         width: 100vw;
     }
 
@@ -160,12 +170,11 @@
         font-size: 0.6rem;
     }
 
-    .menuHeader{
-        width: 98%;
-        margin-top: 2%;
-        margin-left: 1%;
-        padding: 0.2rem 0.1rem;
-        font-weight: 600;
+    .menuHeader {
+        width: 100%;
+        text-align: left;
+        margin-left: 0%;
+        margin-bottom: 0rem;
         font-size: 0.9rem;
     }
 
@@ -180,6 +189,53 @@
         display: none;
     }
 
+}
+
+@media (min-width: 321px) and (max-width: 375px){
+    .dish-list {
+        grid-template-columns: repeat(2,1fr);
+        column-gap: 2px;
+        row-gap: 10px;
+        padding-left: 0.1rem;
+    }
+
+    .restaurantSection{
+        display: none;
+    }
+
+    .category-buttons {
+        position: fixed;
+        margin-left: 0rem;
+        display: flex;
+        justify-content: space-around;
+        width: 100%;
+        padding: 0.1rem;
+        z-index: 100;
+        background-color: white;
+        top: 2.9rem;
+    }
+
+    .dishesSection {
+        margin-top: 0.4%;
+        width: 100vw;
+    }
+
+    .switchButtons {
+        padding: 0.1rem 1rem;
+        font-size: 0.8rem;
+    }
+
+    .dishes-to-display {
+        margin-top: 1.1rem;
+    }
+    
+    .menuHeader {
+        width: 100%;
+        text-align: left;
+        margin-left: 0%;
+        margin-bottom: 0rem;
+        font-size: 0.9rem;
+    }
 }
 
 @media (min-width: 376px) and (max-width:480px){

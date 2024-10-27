@@ -161,7 +161,7 @@
 
 @media (max-width: 320px){
   .dish-card{
-    width: 9.7rem;
+    width: 100%;
   }
 
   .food-image{
@@ -189,9 +189,16 @@
     padding: 0.2rem 0.7rem;
     width: 70%;
     margin-bottom: 0rem;
+    font-size: 0.8rem;
   }
 
   .average {
+    font-size: 0.7rem;
+  }
+}
+
+@media (min-width: 321px) and (max-width: 375px){
+  .dishRestaurant {
     font-size: 0.7rem;
   }
 }
