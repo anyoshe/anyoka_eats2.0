@@ -162,12 +162,14 @@
 
 @media (max-width:320px){
     .fa-shopping-cart {
-        font-size: 16px;
+        font-size: 14px;
     }
 
     #cartCount {
         font-size: 0.8rem;
         font-weight: 500;
+        top: 13%;
+        right: 1%;
     }
 
     #itemsList{
@@ -241,6 +243,84 @@
         font-size: 0.9rem;
     }
 }  
+
+@media (min-width: 321px) and (max-width: 375px){
+    #cartCount {
+        top: 1%;
+        right: 1%;
+        font-size: 15px;
+    }
+
+    .fa-shopping-cart {
+        font-size: 16px;
+    }
+
+    .modal-dialog {
+        margin-top: 20%;
+    }
+
+    .modal-header {
+        padding: 0.7rem ;
+    }
+
+    .modal-body {
+        padding: 0.1rem 0.2rem;
+    }
+
+    .restaurantNameDiv {
+        margin-bottom: 5px;
+        font-size: 0.8rem;
+    }
+
+    .restaurantName {
+        font-size: 0.8rem;
+    }
+
+    .d-flex{
+        margin-bottom: 1px;
+        padding: 1px ;
+    }
+
+    .itemDishName {
+        grid-template-columns: 50% 50%;
+        width: 50%;
+    }
+
+    .DishDetailSpan {
+        font-size: 0.7rem;
+    }
+
+    #cartModalLabel {
+        font-size: 1rem;
+    }
+
+    .menuDishQuantity {
+        width: 0.5rem;
+        font-size: 0.8rem;
+    }
+
+    .menuDelete {
+        padding: 0.3rem 0.5rem;
+        font-size: 0.8rem;
+    }
+
+    #cartItems {
+        margin-bottom: 0.5rem;
+    }
+
+    .itemTotal {
+        font-size: 0.9rem;
+    }
+
+    #totalPrice {
+        font-size: 1rem;
+    }
+
+    .bottomBtn {
+        padding: 0.3rem 0.7rem;
+        font-size: 0.8rem;
+    }
+}
 
 
 @media (min-width: 376px) and (max-width : 480px){

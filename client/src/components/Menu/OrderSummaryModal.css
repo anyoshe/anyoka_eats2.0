@@ -70,7 +70,11 @@
 
 @media (max-width:320px){
     #sumaryModalcontent{
-        left: -2%;
+        left: -3%;
         margin-top: 2%;
     }
+}
+
+@media (min-width: 321px) and (max-width: 375px){
+
 }

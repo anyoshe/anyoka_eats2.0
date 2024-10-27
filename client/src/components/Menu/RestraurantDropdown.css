@@ -48,6 +48,12 @@
     }
 }
 
+@media (min-width: 321px) and (max-width: 375px){
+    .by_reataurant_select {
+       font-size: 0.7rem;
+    }
+}
+
 @media (min-width: 376px) and (max-width: 480px){
     .by_reataurant_select{
         border: 1px solid green;
