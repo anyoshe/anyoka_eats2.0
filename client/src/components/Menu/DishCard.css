@@ -207,10 +207,8 @@
 }
 
 /* Tablets (portrait and landscape) */
-@media (max-width: 1199px) and (min-width: 768px) {
+/* @media (max-width: 1199px) and (min-width: 768px) {
   .dish-card {
-    /* border: 5px solid red; */
-
     width: 185px;
     height: auto;
   }
@@ -266,10 +264,10 @@
   .average {
     font-size: 0.9rem;
   }
-}
+} */
 
 /* Mobile phones */
-@media (max-width: 767px) {
+/* @media (max-width: 767px) {
   .dish-card {
     width: 200px;
     height: auto;
@@ -309,12 +307,10 @@
     font-size: 0.9em;
   }
 }
+ */
 
-
-@media (max-width: 480px) {
+/* @media (max-width: 480px) {
   .dish-card{
-    /* border: 5px solid red; */
-
     width: 12.8rem;
   }
 
@@ -366,7 +362,7 @@
     font-size: 0.8rem;
   }
 }
-
+ */
 
 @media (max-width: 320px){
   .discounted-price-circle{
@@ -374,5 +370,77 @@
     font-size: 0.6rem;
     top: -1%;
     right: 0%;
+  }
+
+  .dish-image{
+    height: 7rem;
+  }
+
+  .dishName{
+    font-size: 0.7rem;
+    margin-bottom: 0rem;
+    padding: 0.2rem 0rem;
+  }
+
+  .dishPrice {
+    font-size: 0.8rem;
+  }
+
+}
+
+@media (min-width: 321px) and (max-width: 375px){
+  #dish-categories {
+    margin-top: 3.5rem;
+  }
+
+  .dish-card{
+    width: 98%;
+  }
+
+  .dish-image{
+    height: 7rem;
+  }
+
+  .discounted-price-circle{
+    padding: 0.1rem 0.1rem;
+    font-size: 0.6rem;
+    top: -9%;
+    right: 1%;
+  }
+
+  .dishName{
+    font-size: 0.7rem;
+    margin-bottom: 0rem;
+    padding: 0.2rem 0rem;
+  }
+
+  .dishPrice {
+    font-size: 0.8rem;
+  }
+
+  .original-price-offer{
+    margin-bottom: 0;
+    padding: 0.1rem;
+    font-size: 0.9rem;
+  }
+
+  .diagonal-strikethrough{
+    font-size: 0.9rem;
+  }
+
+  .dishRestaurant{
+    margin-bottom: 0.3rem;
+    font-size: 0.6rem;
+  }
+
+  .average{
+    font-size: 0.8rem;
+  }
+
+  .dishAddToCart{
+    font-size: 0.8rem;
+    padding: 0.3rem 0.5rem;
+    width: 80%;
+    margin-bottom: 0rem;
   }
 }

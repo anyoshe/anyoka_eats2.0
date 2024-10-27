@@ -137,6 +137,42 @@
     }
 }
 
+@media (min-width: 321px) and (max-width: 375px){
+    #locationModalLabel {
+        font-size: 1rem;
+    }
+
+    #locationFromDiv {
+        font-size: 13px;
+    }
+
+    .fromSpan {
+        font-size: 15px;
+    }
+
+    .InputBtn {
+        width: 100%;
+        padding: 0.4rem 0.8rem;
+        font-size: 0.9rem;
+    }
+
+    #customerLocation {
+        width: 100%;
+        margin-bottom: 0px;
+        height: 2em;
+    }
+
+    .cancel_Ok_btn {
+        padding: 0.3rem 0.8rem;
+        font-size: 0.8rem;
+    }
+
+    .landingCancel {
+        padding: 0.3rem 0.8rem;
+        font-size: 0.8rem;
+    }
+}
+
 @media (min-width: 376px) and  (max-width:480px) {
     .InputBtn {
         width: 100%;
