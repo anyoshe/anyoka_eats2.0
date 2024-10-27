@@ -374,10 +374,9 @@
         justify-content: center;
     }
 
-    .discoverTitle{
+    .discoverTitle {
+        margin-bottom: 0.6rem;
         font-size: 1rem;
-        margin-bottom: 1rem;
-        padding-left: 2px;
     }
 
     .category-grid {
@@ -426,10 +425,191 @@
         position: relative; */
         width: 100vw;
     }
+
+    .fresh_bar_input {
+        padding: 5px;
+       font-size: 0.8rem;
+    }
+
+    .fresh_glass {
+        width: 16%;
+        padding: 0.2rem;
+    }
+
+    .main-category {
+        padding: 3px;
+        width: 100vw;
+        margin-top: 15%;
+    }
+
+    .landing-fresh-food {
+        padding: 0rem 0.1rem;
+        width: 100vw;
+    }
+
+    .landing-fresh-foods-header {
+        padding: 5px;
+    }
+
+    .fresh_page_heading{
+        font-size: 1rem;
+        font-weight: 600;
+        padding-left: 2px;
+    }
+
+    .fresh_category {
+        padding: 0rem 0rem;
+        height: 1%;
+        width: 99vw;
+        margin-bottom: 0.5rem;
+    }
+
+    .fresh_link {
+        padding: 0.1rem 0px;
+        border-bottom: none;
+        font-size: 0.6rem;
+        transition: ease-in 0.2s;
+        margin: 0rem 0.2rem;
+        text-align: center;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .fresh-page-offers-section {
+        width: 100%;
+        margin-bottom: 0%;
+    }
+
+    .fresh-page-offers-title {
+        font-size: 1rem;
+        padding: 3px 5px;
+        margin-top: 1%;
+        margin-bottom: 1%;
+    }
+
+    .offer-page-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 2px;
+    }
+
+    .fresh-wholesale-title {
+        margin-top: 1%;
+        font-size: 1.2rem;
+    }
+
+    .fresh-wholesale-para {
+        font-size: 0.9rem;
+        text-align: center;
+    }
+
+    .wholesale-cta-button {
+        padding: 5px 15px;
+        font-size: 16px;
+    }
+}
+
+@media (min-width: 321px) and (max-width: 375px){
+    .fresh_bar_input {
+        padding: 5px;
+       font-size: 0.8rem;
+    }
+
+    .fresh_glass {
+        width: 16%;
+        padding: 0.2rem;
+    }
+
+    .fresh_nav_position {
+        width: 100vw;
+    }
+
+    .main-category {
+        padding: 3px;
+        width: 100vw;
+        margin-top: 11%;
+    }
+
+    .landing-fresh-food {
+        padding: 0rem 0.1rem;
+        width: 100vw;
+    }
+
+    .landing-fresh-foods-header {
+        padding: 5px;
+    }
+
+    .fresh_page_heading{
+        font-size: 1rem;
+        font-weight: 600;
+        padding-left: 2px;
+    }
+
+    .fresh_category {
+        padding: 0rem 0rem;
+        height: 1%;
+        width: 99vw;
+        margin-bottom: 0.5rem;
+    }
+
+    .fresh_link {
+        padding: 0.1rem 0px;
+        border-bottom: none;
+        font-size: 0.6rem;
+        transition: ease-in 0.2s;
+        margin: 0rem 0.2rem;
+        text-align: center;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .discoverTitle {
+        margin-bottom: 0.6rem;
+        font-size: 1rem;
+    }
+
+    .category-grid {
+        grid-template-columns: repeat(2, 1fr);
+        column-gap: 2px;
+        row-gap: 5px;
+    }
+
+    .fresh-page-offers-section {
+        width: 100%;
+        margin-bottom: 0%;
+    }
+
+    .fresh-page-offers-title {
+        font-size: 1rem;
+        padding: 3px 5px;
+        margin-top: 1%;
+        margin-bottom: 1%;
+    }
+
+    .offer-page-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 2px;
+    }
+
+    .fresh-wholesale-title {
+        margin-top: 1%;
+        font-size: 1.2rem;
+    }
+
+    .fresh-wholesale-para {
+        font-size: 0.9rem;
+        text-align: center;
+    }
+
+    .wholesale-cta-button {
+        padding: 5px 15px;
+        font-size: 16px;
+    }
 }
 
 
-@media (min-width: 375px) and (max-width:480px){
+@media (min-width: 376px) and (max-width:480px){
     .landing-fresh-food{
         /* border: 5px solid green; */
 

@@ -46,6 +46,13 @@
     #cart2 {
         margin-right: 2%;
     }
+
+    #cartCount2 {
+        top: -6%;
+        right: 1%;
+        font-size: 16px;
+        color: red;
+    }
 }
 
 @media (min-width: 768px) and (max-width:1023px) {
