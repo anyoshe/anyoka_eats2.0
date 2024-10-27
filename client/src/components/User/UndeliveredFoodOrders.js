@@ -107,6 +107,8 @@ const fetchDriverDetails = async (driverId) => {
   }
 };
 
+
+
 // Update Food Order Status
 const updateFoodOrderStatus = async (orderId, vendorId, nextStatus, driverId = null) => {
   try {
@@ -118,20 +120,21 @@ const updateFoodOrderStatus = async (orderId, vendorId, nextStatus, driverId = n
     // If the next status is "On Transit", fetch driver details
     if (nextStatus === 'On Transit' && driverId) {
       driverDetails = await fetchDriverDetails(driverId);
-      pickedAt = new Date().toISOString(); // Add timestamp
+      pickedAt = new Date().toISOString();
+      console.log(`Driver details fetched: ${JSON.stringify(driverDetails)}`);
     }
 
-    // Update the vendor order status in the backend
-    await axios.patch(`${config.backendUrl}/api/updateFoodOrderStatus/${orderId}/${vendorId}`, {
+    // Update the vendor order status in the backend, including driver details if present
+    const response = await axios.patch(`${config.backendUrl}/api/updateFoodOrderStatus/${orderId}/${vendorId}`, {
       status: nextStatus,
-      ...(driverDetails && { driverDetails }),  // Include driver details if available
-      ...(pickedAt && { pickedAt })            // Include timestamp when picked
+      ...(driverDetails && { driverDetails }),
+      ...(pickedAt && { pickedAt })
     });
 
-    // After updating, re-fetch all orders
-    await fetchFoodOrders();
+    console.log("Response from backend after status update:", response.data);
 
-    // Check if all vendor orders have been marked as "On Transit"
+    // Re-fetch all orders and check the parent order status
+    await fetchFoodOrders();
     checkAndUpdateParentOrderStatus(orderId);
   } catch (error) {
     console.error('Error updating food order status:', error);
@@ -229,7 +232,9 @@ const createFoodOrderElement = (order, vendorOrder) => (
     )}
 
     {/* Status Buttons */}
-    {getStatusButtons(vendorOrder.status, order.orderId, vendorOrder.vendor, order.driverId)}
+    {/* {getStatusButtons(vendorOrder.status, order.orderId, vendorOrder.vendor, order.driverId)} */}
+    {getStatusButtons(vendorOrder.status, order.orderId, vendorOrder._id, order.driverId)}
+
   </div>
 );
 
