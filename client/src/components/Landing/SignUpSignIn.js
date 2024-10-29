@@ -194,7 +194,7 @@ function SignUpSignIn() {
                             />
                         </div>
 
-                        <div className="infield">
+                        {/* <div className="infield">
                             <input
                                 className='input-sign'
                                 type="text"
@@ -204,7 +204,7 @@ function SignUpSignIn() {
                                 onChange={handleInputChange}
                                 required
                             />
-                        </div>
+                        </div> */}
 
                         <button className='loginBtn logphone' type="submit">Sign Up</button>
                     </form>
