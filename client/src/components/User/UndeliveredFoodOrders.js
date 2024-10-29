@@ -107,6 +107,8 @@ const fetchDriverDetails = async (driverId) => {
   }
 };
 
+
+
 // Update Food Order Status
 const updateFoodOrderStatus = async (orderId, vendorId, nextStatus, driverId = null) => {
   try {
@@ -115,23 +117,50 @@ const updateFoodOrderStatus = async (orderId, vendorId, nextStatus, driverId = n
     let driverDetails = null;
     let pickedAt = null;
 
-    // If the next status is "On Transit", fetch driver details
-    if (nextStatus === 'On Transit' && driverId) {
-      driverDetails = await fetchDriverDetails(driverId);
-      pickedAt = new Date().toISOString(); // Add timestamp
-    }
+    // // If the next status is "On Transit", fetch driver details
+    // if (nextStatus === 'On Transit' && driverId) {
+    //   driverDetails = await fetchDriverDetails(driverId);
+    //   pickedAt = new Date().toISOString();
+    //   console.log(`Driver details fetched: ${JSON.stringify(driverDetails)}`);
+    // }
 
-    // Update the vendor order status in the backend
-    await axios.patch(`${config.backendUrl}/api/updateFoodOrderStatus/${orderId}/${vendorId}`, {
-      status: nextStatus,
-      ...(driverDetails && { driverDetails }),  // Include driver details if available
-      ...(pickedAt && { pickedAt })            // Include timestamp when picked
-    });
+    // // Update the vendor order status in the backend, including driver details if present
+    // const response = await axios.patch(`${config.backendUrl}/api/updateFoodOrderStatus/${orderId}/${vendorId}`, {
+    //   status: nextStatus,
+    //   ...(driverDetails && { driverDetails }),
+    //   ...(pickedAt && { pickedAt })
+    // });
 
-    // After updating, re-fetch all orders
+    // console.log("Response from backend after status update:", response.data);
+    
+    // If the next status is "On Transit", fetch driver details and validate presence of driverDetails
+if (nextStatus === 'On Transit') {
+  if (!driverId) {
+    throw new Error("Driver ID is required to transition the order to 'On Transit'.");
+  }
+
+  driverDetails = await fetchDriverDetails(driverId);
+  pickedAt = new Date().toISOString();
+
+  if (!driverDetails) {
+    throw new Error("Failed to fetch driver details. Cannot update status to 'On Transit' without driver information.");
+  }
+
+  console.log(`Driver details fetched: ${JSON.stringify(driverDetails)}`);
+}
+
+// Update the vendor order status in the backend, including driver details if present
+const response = await axios.patch(`${config.backendUrl}/api/updateFoodOrderStatus/${orderId}/${vendorId}`, {
+  status: nextStatus,
+  driverDetails,  // Ensure driverDetails are always included for "On Transit"
+  pickedAt        // Ensure pickedAt is always included
+});
+
+console.log("Response from backend after status update:", response.data);
+
+
+    // Re-fetch all orders and check the parent order status
     await fetchFoodOrders();
-
-    // Check if all vendor orders have been marked as "On Transit"
     checkAndUpdateParentOrderStatus(orderId);
   } catch (error) {
     console.error('Error updating food order status:', error);
@@ -229,7 +258,9 @@ const createFoodOrderElement = (order, vendorOrder) => (
     )}
 
     {/* Status Buttons */}
-    {getStatusButtons(vendorOrder.status, order.orderId, vendorOrder.vendor, order.driverId)}
+    {/* {getStatusButtons(vendorOrder.status, order.orderId, vendorOrder.vendor, order.driverId)} */}
+    {getStatusButtons(vendorOrder.status, order.orderId, vendorOrder._id, order.driverId)}
+
   </div>
 );
 

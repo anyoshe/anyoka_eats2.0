@@ -498,93 +498,191 @@ const Dashboard = () => {
     };
 
 
-    const markOrderAsDelivered = async (orderId, driverId) => {
-        console.log("markOrderAsDelivered function called");
+    // const markOrderAsDelivered = async (orderId, driverId) => {
+    //     console.log("markOrderAsDelivered function called");
 
-        // Check if the order is available and in transit
-        if (!selectedOrder || selectedOrder?.status !== 'On Transit') {
-            console.log("Order is not in transit or not selected.");
-            alert('Order is not in transit, cannot mark as delivered.');
-            return false; // Indicate failure
-        }
+    //     // Check if the order is available and in transit
+    //     if (!selectedOrder || selectedOrder?.status !== 'On Transit') {
+    //         console.log("Order is not in transit or not selected.");
+    //         alert('Order is not in transit, cannot mark as delivered.');
+    //         return false; // Indicate failure
+    //     }
 
-        const payload = {
-            status: 'Delivered',
-            driverId: driverId
-        };
+    //     const payload = {
+    //         status: 'Delivered',
+    //         driverId: driverId
+    //     };
 
-        try {
-            let response;
+    //     try {
+    //         let response;
 
-            if (selectedOrder.vendorOrders && selectedOrder.vendorOrders.length > 0) {
-                // Handle vendor orders
-                console.log("Processing vendor orders for delivery.");
+    //         if (selectedOrder.vendorOrders && selectedOrder.vendorOrders.length > 0) {
+    //             // Handle vendor orders
+    //             console.log("Processing vendor orders for delivery.");
 
-                // Update the main parent order status first
-                response = await fetch(`${config.backendUrl}/api/driverUpdateFoodOrderStatus/${orderId}`, {
-                    method: 'PATCH',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify(payload)
-                });
+    //             // Update the main parent order status first
+    //             response = await fetch(`${config.backendUrl}/api/driverUpdateFoodOrderStatus/${orderId}`, {
+    //                 method: 'PATCH',
+    //                 headers: {
+    //                     'Content-Type': 'application/json',
+    //                 },
+    //                 body: JSON.stringify(payload)
+    //             });
 
-                if (!response.ok) {
-                    throw new Error('Failed to update parent food order status');
-                }
+    //             if (!response.ok) {
+    //                 throw new Error('Failed to update parent food order status');
+    //             }
 
-                // Update each vendor order's status
-                for (let vendorOrder of selectedOrder.vendorOrders) {
-                    const vendorId = vendorOrder?._id;
+    //             // Update each vendor order's status
+    //             for (let vendorOrder of selectedOrder.vendorOrders) {
+    //                 const vendorId = vendorOrder?._id;
 
-                    if (!vendorId) {
-                        console.warn("Vendor ID is undefined! Skipping vendor order.");
-                        continue;
-                    }
+    //                 if (!vendorId) {
+    //                     console.warn("Vendor ID is undefined! Skipping vendor order.");
+    //                     continue;
+    //                 }
 
-                    try {
-                        const vendorResponse = await fetch(`${config.backendUrl}/api/updateVendorOrderStatus/${vendorId}`, {
-                            method: 'PATCH',
-                            headers: {
-                                'Content-Type': 'application/json',
-                            },
-                            body: JSON.stringify({ status: 'Delivered' })
-                        });
+    //                 try {
+    //                     const vendorResponse = await fetch(`${config.backendUrl}/api/updateVendorOrderStatus/${vendorId}`, {
+    //                         method: 'PATCH',
+    //                         headers: {
+    //                             'Content-Type': 'application/json',
+    //                         },
+    //                         body: JSON.stringify({ status: 'Delivered' })
+    //                     });
 
-                        if (!vendorResponse.ok) {
-                            throw new Error(`Failed to update vendor order status for vendor: ${vendorOrder.vendor}`);
-                        }
+    //                     if (!vendorResponse.ok) {
+    //                         throw new Error(`Failed to update vendor order status for vendor: ${vendorOrder.vendor}`);
+    //                     }
 
-                        console.log(`Vendor order marked as delivered:`, await vendorResponse.json());
-                    } catch (error) {
-                        console.error(`Error marking vendor order as delivered:`, error);
-                    }
-                }
-            } else {
-                // Handle normal orders
-                response = await fetch(`${config.backendUrl}/api/driverUpdateOrderStatus/${orderId}`, {
-                    method: 'PATCH',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify(payload),
-                });
+    //                     console.log(`Vendor order marked as delivered:`, await vendorResponse.json());
+    //                 } catch (error) {
+    //                     console.error(`Error marking vendor order as delivered:`, error);
+    //                 }
+    //             }
+    //         } else {
+    //             // Handle normal orders
+    //             response = await fetch(`${config.backendUrl}/api/driverUpdateOrderStatus/${orderId}`, {
+    //                 method: 'PATCH',
+    //                 headers: {
+    //                     'Content-Type': 'application/json',
+    //                 },
+    //                 body: JSON.stringify(payload),
+    //             });
 
-                if (!response.ok) {
-                    throw new Error('Failed to update order status');
-                }
+    //             if (!response.ok) {
+    //                 throw new Error('Failed to update order status');
+    //             }
+    //         }
+
+    //         const updatedOrder = await response.json();
+    //         setSelectedOrder(updatedOrder);
+    //         alert('Order marked as delivered successfully.');
+    //         return true; // Indicate success
+    //     } catch (error) {
+    //         console.error('Error marking order as delivered:', error);
+    //         alert('Failed to mark order as delivered.');
+    //         return false; // Indicate failure
+    //     }
+    // };
+
+    let totalEarnings = 0; // Global variable to store total earnings for today
+
+// Function to update the total earnings in the dashboard
+const updateTotalEarnings = (netPay) => {
+    totalEarnings += netPay;
+    document.getElementById('totalEarnings').innerText = `Ksh ${totalEarnings}`;
+};
+
+const markOrderAsDelivered = async (orderId, driverId) => {
+    console.log("markOrderAsDelivered function called");
+
+    if (!selectedOrder || selectedOrder?.status !== 'On Transit') {
+        console.log("Order is not in transit or not selected.");
+        alert('Order is not in transit, cannot mark as delivered.');
+        return false;
+    }
+
+    const payload = {
+        status: 'Delivered',
+        driverId: driverId
+    };
+
+    try {
+        let response;
+
+        if (selectedOrder.vendorOrders && selectedOrder.vendorOrders.length > 0) {
+            console.log("Processing vendor orders for delivery.");
+            
+            response = await fetch(`${config.backendUrl}/api/driverUpdateFoodOrderStatus/${orderId}`, {
+                method: 'PATCH',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(payload)
+            });
+
+            if (!response.ok) {
+                throw new Error('Failed to update parent food order status');
             }
 
-            const updatedOrder = await response.json();
-            setSelectedOrder(updatedOrder);
-            alert('Order marked as delivered successfully.');
-            return true; // Indicate success
-        } catch (error) {
-            console.error('Error marking order as delivered:', error);
-            alert('Failed to mark order as delivered.');
-            return false; // Indicate failure
+            for (let vendorOrder of selectedOrder.vendorOrders) {
+                const vendorId = vendorOrder?._id;
+
+                if (!vendorId) {
+                    console.warn("Vendor ID is undefined! Skipping vendor order.");
+                    continue;
+                }
+
+                try {
+                    const vendorResponse = await fetch(`${config.backendUrl}/api/updateVendorOrderStatus/${vendorId}`, {
+                        method: 'PATCH',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({ status: 'Delivered' })
+                    });
+
+                    if (!vendorResponse.ok) {
+                        throw new Error(`Failed to update vendor order status for vendor: ${vendorOrder.vendor}`);
+                    }
+
+                    console.log(`Vendor order marked as delivered:`, await vendorResponse.json());
+                } catch (error) {
+                    console.error(`Error marking vendor order as delivered:`, error);
+                }
+            }
+        } else {
+            response = await fetch(`${config.backendUrl}/api/driverUpdateOrderStatus/${orderId}`, {
+                method: 'PATCH',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(payload),
+            });
+
+            if (!response.ok) {
+                throw new Error('Failed to update order status');
+            }
         }
-    };
+
+        const updatedOrder = await response.json();
+        setSelectedOrder(updatedOrder);
+
+        // Calculate net pay from the delivered order
+        const netPay = updatedOrder.deliveryCharges - (updatedOrder.deliveryCharges * 0.2);
+        
+        // Update the total earnings
+        updateTotalEarnings(netPay);
+
+        alert('Order marked as delivered successfully.');
+        return true;
+    } catch (error) {
+        console.error('Error marking order as delivered:', error);
+        alert('Failed to mark order as delivered.');
+        return false;
+    }
+};
 
     const markVendorOrderAsDelivered = async (vendorId) => {
         try {
@@ -874,6 +972,9 @@ const Dashboard = () => {
                         </div>
                         <label className="label_off on_off">Offline</label>
                     </div>
+                    <div className="total_earnings_today">
+                        <h4>Total Earnings Today: <span id="totalEarnings">Ksh 0</span></h4>
+                    </div>
 
                     <div className="driver_icon">
                         <i className="fas fa-user-circle driver_profile" onClick={handleProfileClick}></i>
@@ -981,12 +1082,12 @@ const Dashboard = () => {
                         <div className="map_div">
                             <div className="order_delivery_details">
                                 <p>Order ID: {selectedOrder.orderId}</p>
-                                <p>Restaurant: {selectedOrder.selectedRestaurant}</p>
-                                <p>Pickup Location: {selectedOrder.selectedRestaurant}</p>
+                                {/* <p>Restaurant: {selectedOrder.selectedRestaurant}</p> */}
+                                <p>Restaurant/Pickup Location: {selectedOrder.selectedRestaurant}</p>
                                 <p>Dropoff Location: {selectedOrder.customerLocation}</p>
-                                <p>Gross Delivery Charges: {selectedOrder.deliveryCharges}</p>
-                                <p>Commission: {selectedOrder.commission}</p>
-                                <p>Net Pay: {selectedOrder.netPay}</p>
+                                {/* <p>Gross Delivery Charges: {selectedOrder.deliveryCharges}</p> */}
+                                {/* <p>Commission: {selectedOrder.commission}</p> */}
+                                <p>Your Fee:  Ksh {selectedOrder.deliveryCharges - (selectedOrder.deliveryCharges * 0.2)}.00</p>
                                 <p>Expected Delivery Time: {selectedOrder.expectedDeliveryTime}</p>
                                 <p>Customer Contact: {selectedOrder.phoneNumber}</p>
                                 <p>Status: {selectedOrder.status}</p>
@@ -1011,32 +1112,42 @@ const Dashboard = () => {
                         // Display orders if no order is selected
                         orders.map((order) => (
                             <div className="order_container_div" key={order.id}>
-                                <div className="hotel_name_div">
+                                {/* <div className="hotel_name_div">
                                     <p className="order_p">Restaurant</p>
                                     <span className="order_detail_input">{order.name}</span>
-                                </div>
+                                </div> */}
                                 <div className="hotel_name_div">
-                                    <p className="order_p">Pickup Location</p>
+                                    <p className="order_p">Restaurant/Pickup Location</p>
                                     <span className="order_detail_input">{order.pickup}</span>
                                 </div>
                                 <div className="hotel_name_div">
                                     <p className="order_p">Order ID</p>
-                                    <span className="order_detail_input">{order.orderId}</span>
+                                    <span className="order_detail_input">{order.order}</span>
                                 </div>
                                 <div className="hotel_name_div">
                                     <p className="order_p">Dropoff Location</p>
                                     <span className="order_detail_input">{order.dropoff}</span>
                                 </div>
                                 <div className="hotel_name_div">
-                                    <p className="order_p">Delivery Charges</p>
-                                    <span className="order_detail_input">{order.deliveryCharges}</span>
+                                    <p className="order_p">Order Number/Vendor</p>
+                                    <div className="order_vendors">
+                                        {/* Check if vendorOrders exists to determine if it's a food order or a regular order */}
+                                        {order.vendorOrders ? (
+                                            order.vendorOrders.map((vendor, index) => (
+                                                <div key={index} className="vendor_item">
+                                                    <span className="vendor_name">{vendor.vendor}</span>
+                                                    <div className="order_numbers">
+                                                    </div>
+                                                </div>
+                                            ))
+                                        ) : (
+                                            // Display the order number if it's a regular order
+                                            <span className="order_number">{order.order}</span>
+                                        )}
+                                    </div>
                                 </div>
                                 <div className="hotel_name_div">
-                                    <p className="order_p">Commission</p>
-                                    <span className="order_detail_input">{order.commission}</span>
-                                </div>
-                                <div className="hotel_name_div">
-                                    <p className="order_p">Net Pay</p>
+                                    <p className="order_p">Your Fee</p>
                                     <span className="order_detail_input">{order.netPay}</span>
                                 </div>
                                 <div className="hotel_name_div">

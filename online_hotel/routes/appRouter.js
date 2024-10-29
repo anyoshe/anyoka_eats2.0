@@ -848,17 +848,86 @@ const updateVendorOrderStatus = async (orderId, vendorId, newStatus) => {
 };
 
 // PATCH route for updating a vendor order's status
+// appRouter.patch('/updateFoodOrderStatus/:orderId/:vendorId', async (req, res) => {
+//   try {
+//     const { orderId, vendorId } = req.params;
+//     const { status, driverDetails, pickedAt } = req.body;
+
+//     console.log(`Updating order status for orderId: ${orderId}, targeting vendorId: ${vendorId}, with status: ${status}`);
+
+//     // Fields to update within the matched vendor order
+//     const updateFields = {
+//       'vendorOrders.$[vendor].status': status,
+//       ...(pickedAt && { 'vendorOrders.$[vendor].pickedAt': pickedAt }),
+//       ...(driverDetails && { 'vendorOrders.$[vendor].driverDetails': driverDetails })
+//     };
+
+//     // Perform the update
+//     const updatedOrder = await FoodOrder.findOneAndUpdate(
+//       { orderId },
+//       { $set: updateFields },
+//       {
+//         new: true,
+//         arrayFilters: [{ 'vendor._id': vendorId }] // Targets the correct vendor entry
+//       }
+//     );
+
+//     if (!updatedOrder) {
+//       return res.status(404).json({ message: 'Order or vendor not found' });
+//     }
+
+//     console.log('Updated order status and driver details:', updatedOrder);
+//     res.json({ message: 'Order status and driver details updated successfully', updatedOrder });
+//   } catch (error) {
+//     console.error('Error updating order status and driver details:', error);
+//     res.status(500).json({ message: 'Error updating order', error: error.message });
+//   }
+// });
+
 appRouter.patch('/updateFoodOrderStatus/:orderId/:vendorId', async (req, res) => {
   try {
     const { orderId, vendorId } = req.params;
-    const { status } = req.body;
+    const { status, driverDetails, pickedAt } = req.body;
+    console.log(driverDetails, status, pickedAt, vendorId, orderId);
 
-    // Update the vendor order status
-    const updatedOrder = await updateVendorOrderStatus(orderId, vendorId, status);
+    // Check that driver details are provided if status is "On Transit"
+    if (status === 'On Transit' && !driverDetails) {
+      return res.status(400).json({ message: 'Driver details are required when status is On Transit.' });
+    }
 
-    res.json({ message: 'Order status updated successfully', updatedOrder });
+    console.log(`Updating order status for orderId: ${orderId}, vendorId: ${vendorId}, status: ${status}, driverDetails: ${JSON.stringify(driverDetails)}`);
+
+    // Define update fields based on status and additional fields
+    const updateFields = {
+      'vendorOrders.$[vendor].status': status,
+      ...(driverDetails && { 'vendorOrders.$[vendor].driverDetails': driverDetails }),
+      ...(pickedAt && { 'vendorOrders.$[vendor].pickedAt': pickedAt }),
+    };
+ console.log(updateFields);
+    // Perform the update operation with arrayFilters
+    const updateResult = await FoodOrder.updateOne(
+      { orderId },
+      { $set: updateFields },
+      {
+        arrayFilters: [{ 'vendor._id': new mongoose.Types.ObjectId(vendorId) }],  // Ensure vendorId matches ObjectId format
+      }
+    );
+
+    console.log('Update result:', updateResult); // Log update result for debugging
+
+    // Check if the update was successful
+    if (updateResult.modifiedCount === 0) {
+      return res.status(500).json({ message: 'Failed to update order status or driver details' });
+    }
+
+    // Fetch and return the updated order to confirm changes
+    const updatedOrder = await FoodOrder.findOne({ orderId });
+    console.log('Updated order status and driver details:', JSON.stringify(updatedOrder, null, 2));
+
+    res.json({ message: 'Order status and driver details updated successfully', updatedOrder });
   } catch (error) {
-    res.status(500).json({ message: 'Error updating order status', error: error.message });
+    console.error('Error updating order status and driver details:', error);
+    res.status(500).json({ message: 'Error updating order', error: error.message });
   }
 });
 
@@ -910,51 +979,6 @@ appRouter.patch('/updateVendorOrderStatus/:vendorOrderId', async (req, res) => {
   }
 });
 
-// appRouter.patch('/revertVendorOrderStatus/:vendorId', async (req, res) => {
-//   try {
-//     const { vendorId } = req.params;  // Ensure the vendor order ID is correct
-//     const { status } = req.body;      // The new status to revert to
-
-//     // Log the request for debugging purposes
-//     console.log(`Reverting vendor order ${vendorId} with status: ${status}`);
-
-//     // Log the incoming status value
-//     console.log('Status in request body:', status);
-
-//     // Check if the status is one of the valid enum values
-//     const validStatuses = ['Order received', 'Processed and packed', 'Dispatched', 'On Transit', 'Delivered'];
-//     if (!validStatuses.includes(status)) {
-//       return res.status(400).json({ message: 'Invalid status value' });
-//     }
-
-//     // Fetch the vendor order first to ensure it exists
-//     const vendorOrder = await VendorOrder.findById(vendorId).exec();
-//     if (!vendorOrder) {
-//       console.log(`Vendor order ${vendorId} not found`);
-//       return res.status(404).json({ message: 'Vendor order not found' });
-//     }
-
-//     // Proceed with the update
-//     const updatedVendorOrder = await VendorOrder.findByIdAndUpdate(
-//       vendorId,
-//       { status: status },   // Correctly update the status field
-//       { new: true }         // Return the updated document
-//     ).exec();
-    
-//     console.log('Updated vendor order:', updatedVendorOrder);
-
-//     // Check if the update was successful
-//     if (!updatedVendorOrder) {
-//       return res.status(404).json({ message: 'Vendor order not found after update attempt' });
-//     }
-
-//     // Respond with success
-//     res.json({ message: 'Vendor order status reverted successfully', updatedVendorOrder });
-//   } catch (error) {
-//     console.error('Error reverting vendor order status:', error);
-//     res.status(500).json({ message: 'Error reverting vendor order status', error: error.message });
-//   }
-// });
 appRouter.patch('/revertVendorOrderStatus/:vendorId', async (req, res) => {
   try {
     const { vendorId } = req.params;  // vendorId refers to the ID inside vendorOrders array
