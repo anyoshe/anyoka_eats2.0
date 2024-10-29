@@ -323,7 +323,7 @@
 }
 
 
-@media (min-width: 376px) and (max-width : 480px){
+@media (min-width: 376px) and (max-width : 425px){
     /* .fa-shopping-cart{
         font-size: 1rem;
         position: absolute;
@@ -332,13 +332,52 @@
     } */
 
     .modal-body{
-        padding: 5px;
+        padding: 2px;
+    }
+
+    .modal-header{
+        padding: 0.5rem;
     }
 
     #cartCount{
         font-size: 1rem; 
         right: 3%;
         top: 4%; 
+    }
+
+    .restaurantNameDiv {
+        margin-bottom: 5px;
+        font-size: 0.9rem;
+    }
+
+    .restaurantName {
+        font-size: 0.9rem;
+    }
+
+    .d-flex{
+        margin-bottom: 1px;
+        padding: 1px ;
+    }
+
+    #cartModalLabel {
+        font-size: 1rem;
+    }
+
+    .menuDelete {
+        padding: 0.3rem 0.5rem;
+        font-size: 0.8rem;
+    }
+
+    #cartItems {
+        margin-bottom: 0.5rem;
+    }
+
+    .itemTotal {
+        font-size: 0.9rem;
+    }
+
+    #totalPrice {
+        font-size: 0.9rem;
     }
 
     #cartCount2{
@@ -355,10 +394,6 @@
         
     }
 
-    .valueControllers{
-        padding: 0.3rem 1rem;
-    }
-
     .plus {
         margin-right: 0.6rem;
     }
@@ -372,11 +407,11 @@
     }
 }
 
-
-@media (min-width: 768px) and (max-width:1023px) {
+@media (min-width: 426px) and (max-width: 768px) {
     #cartCount{
-        top: 8%; 
-        right: 2%;
+        top: 1%; 
+        right: 1.9%;
+        font-size: 1rem;
     }
 
     .cartModalContent{

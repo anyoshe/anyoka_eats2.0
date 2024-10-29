@@ -373,7 +373,7 @@
   }
 
   .dish-image{
-    height: 7rem;
+    height: 6rem;
   }
 
   .dishName{
@@ -442,5 +442,46 @@
     padding: 0.3rem 0.5rem;
     width: 80%;
     margin-bottom: 0rem;
+  }
+}
+
+@media (min-width: 376px) and (max-width:425px){
+  .dish-card{
+    width: 98%;
+  }
+
+  .dish-image{
+    height: 7rem;
+  }
+
+  .dishName{
+    font-size: 0.7rem;
+    margin-bottom: 0rem;
+    padding: 0.2rem 0rem;
+  }
+
+  .dishPrice {
+    font-size: 0.8rem;
+  }
+}
+
+@media (min-width: 426px) and (max-width:768px){
+  .dish-card{
+    width: 100%;
+  }
+
+  .dish-image{
+    height: 7rem;
+  }
+
+  .dishName{
+    font-size: 0.8rem;
+    margin-bottom: 0rem;
+    padding: 0.2rem 0rem;
+  }
+
+  .dishPrice {
+    font-size: 0.9rem;
+    padding: 0.2rem 0rem;
   }
 }

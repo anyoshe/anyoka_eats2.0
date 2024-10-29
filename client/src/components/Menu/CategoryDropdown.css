@@ -77,7 +77,7 @@
   }
 }
 
-@media (min-width: 376px) and  (max-width:480px){
+@media (min-width: 376px) and  (max-width:425px){
   .restaurant-heading{
     font-size: 1rem;
   }
@@ -88,6 +88,16 @@
     grid-template-columns: repeat(2, 1fr);
     column-gap: 5px;
     row-gap: 10px;
+  }
+}
+
+@media (min-width: 426px) and (max-width: 768px){
+  .restaurant-heading {
+    font-size: 1rem;
+  }
+
+  .dishes-container {
+    grid-template-columns: repeat(4, 1fr);
 }
 }
   
