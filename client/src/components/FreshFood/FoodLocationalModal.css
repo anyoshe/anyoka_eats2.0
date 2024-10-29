@@ -41,6 +41,30 @@
     }
 }
 
+@media (min-width: 376px) and (max-width: 425px){
+    .me-2 {
+        margin-right: .3rem !important;
+    }
+
+    .menuDishQuantity {
+        width: 0.5rem;
+        font-size: 0.8rem;
+    }
+
+    .ms-2 {
+        margin-left: .3rem !important;
+    }
+
+    .ms-2 {
+        margin-left: .3rem !important;
+    }
+
+    .valueControllers {
+        padding: 0.1rem 0.5rem;
+        margin-right: 4px;
+    }
+}
+
 @media (min-width: 768px) and (max-width:1023px) {
     .foodCartlocationContent{
         width: 140%;

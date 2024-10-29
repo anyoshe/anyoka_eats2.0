@@ -222,15 +222,38 @@
   justify-content: space-around;
 } */
 
-/* Styling for screens below 700px */
-@media(max-width : 480px){
+@media(min-width : 321px) and (max-width: 375px){
   #specialOrderModal {
     margin-top: 10%;
+    width: 97%;
   }
 
   .specialModalContent{
-    width: 400px;
+    width: 355px;
     margin-left: -5.5rem;
+  }
+
+  .modalHeader{
+    padding: 0.3rem;
+  }
+
+  #specialOrderModalLabel{
+    font-size: 1rem;
+  }
+
+  .formControl{
+    font-size: 0.8rem;
+    padding: 0.1rem;
+    margin-bottom: 0rem;
+  }
+
+  .specialPin{
+    font-size: 0.8rem;
+    padding: 0.2rem 0.1rem;
+  }
+
+  .specialLabels{
+    font-size: 0.8rem;
   }
 
   .specialTriple{
@@ -240,6 +263,60 @@
 
   #specialOrderArea{
     height: 7rem;
+  }
+
+  #btnPrimary{
+    font-size: 0.8rem;
+  }
+}
+
+/* Styling for screens below 700px */
+@media(min-width : 376px) and (max-width:425px){
+  #specialOrderModal {
+    margin-top: 10%;
+    width: 100%;
+    margin-left: -3%;
+  }
+
+  .specialModalContent{
+    width: 400px;
+    margin-left: -5.5rem;
+  }
+
+  .modalHeader{
+    padding: 0.3rem;
+  }
+
+  #specialOrderModalLabel{
+    font-size: 1rem;
+  }
+
+  .formControl{
+    font-size: 0.8rem;
+    padding: 0.1rem;
+    margin-bottom: 0rem;
+  }
+
+  .specialPin{
+    font-size: 0.8rem;
+    padding: 0.2rem 0.1rem;
+  }
+
+  .specialLabels{
+    font-size: 0.8rem;
+  }
+
+  .specialTriple{
+    grid-template-columns:1fr;
+    gap: 5px;
+  }
+
+  #specialOrderArea{
+    height: 7rem;
+  }
+
+  #btnPrimary{
+    font-size: 0.8rem;
   }
 }
 
