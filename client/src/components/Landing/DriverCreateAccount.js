@@ -3,6 +3,7 @@ import axios from 'axios';
 import './SignUpSignIn.css';
 import { useNavigate } from 'react-router-dom';
 import config from '../../config';
+import { FaEye, FaEyeSlash } from 'react-icons/fa';
 
 function SignUpSignIn() {
     const [formData, setFormData] = useState({
@@ -15,7 +16,13 @@ function SignUpSignIn() {
         loginPassword: '', // For login
     });
 
+    const [showPassword, setShowPassword] = useState(false); // For showing/hiding password
+    const [showLoginPassword, setShowLoginPassword] = useState(false); // For login password field
+
     const navigate = useNavigate();
+
+    const toggleShowPassword = () => setShowPassword(prev => !prev);
+    const toggleShowLoginPassword = () => setShowLoginPassword(prev => !prev);
 
     useEffect(() => {
         // Check if a token exists and fetch the driver data
@@ -115,6 +122,7 @@ function SignUpSignIn() {
                 {/* Sign Up Section */}
                 <div className="form-container sign-up-container">
                     <form onSubmit={handleSubmitSignUp}>
+                        
                         <h1 className='createAccount'>Create Account</h1>
 
                         <div className="social-container">
@@ -180,26 +188,34 @@ function SignUpSignIn() {
                         <div className="infield">
                             <input
                                 className='input-sign'
-                                type="password"
+                                type={showPassword ? "text" : "password"}
                                 placeholder="Password"
                                 name="password"
                                 value={formData.password}
                                 onChange={handleInputChange}
                                 required
                             />
+
+                            <button type="button" onClick={toggleShowPassword} className="eye-button">
+                                {showPassword ? <FaEyeSlash /> : <FaEye />}
+                            </button>
                         </div>
 
                         {/* Confirm Password */}
                         <div className="infield">
                             <input
                                 className='input-sign'
-                                type="password"
+                                type={showPassword ? "text" : "password"}
                                 placeholder="Confirm Password"
                                 name="ConfirmPassword"
                                 value={formData.ConfirmPassword}
                                 onChange={handleInputChange}
                                 required
                             />
+                        
+                            <button type="button" onClick={toggleShowPassword} className="eye-button">
+                                {showPassword ? <FaEyeSlash /> : <FaEye />}
+                            </button>
                         </div>
 
                         <button className='loginBtn logphone' type="submit">Sign Up</button>
@@ -236,13 +252,16 @@ function SignUpSignIn() {
                         <div className="infield">
                             <input
                                 className='input-sign'
-                                type="password"
+                                type={showLoginPassword ? "text" : "password"}
                                 placeholder="Password"
                                 name="loginPassword"
                                 value={formData.loginPassword}
                                 onChange={handleInputChange}
                                 required
                             />
+                            <button type="button" onClick={toggleShowLoginPassword} className="eye-button">
+                                {showLoginPassword ? <FaEyeSlash /> : <FaEye />}
+                            </button>
                         </div>
 
                         <a href="#" className="forgot">Forgot your password?</a>
