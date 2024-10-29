@@ -181,15 +181,16 @@
   }
 
   .dishRestaurant {
-    font-size: 10px;
+    font-size: 0.7rem;
     padding: 3px 0px;
+    margin-bottom: 5px;
   }
 
   .dishAddToCart {
     padding: 0.2rem 0.7rem;
     width: 70%;
     margin-bottom: 0rem;
-    font-size: 0.8rem;
+    font-size: 0.7rem;
   }
 
   .average {
@@ -203,7 +204,7 @@
   }
 }
 
-@media (min-width: 376px) and (max-width: 480px) {
+@media (min-width: 376px) and (max-width: 425px) {
   .dish-card{
     width: 12.8rem;
   }
@@ -246,7 +247,7 @@
     padding: 0.3rem 0.9rem;
     width: 80%;
     margin-bottom: 0rem;
-    font-size: 0.9rem;
+    font-size: 0.8rem;
   }
 
   .average{
