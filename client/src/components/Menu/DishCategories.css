@@ -149,7 +149,7 @@
         margin-left: 0rem;
         display: flex;
         justify-content: space-around;
-        width: 100%;
+        /* width: 100%; */
         padding: 0.1rem;
         z-index: 100;
         background-color: white;
@@ -180,7 +180,7 @@
 
     .dish-list {
         grid-template-columns: repeat(2,1fr);
-        column-gap: 5px;
+        column-gap: 2px;
         row-gap: 10px;
         padding-left: 0.1rem;
     }
@@ -238,7 +238,7 @@
     }
 }
 
-@media (min-width: 376px) and (max-width:480px){
+@media (min-width: 376px) and (max-width:425px){
     .restaurantSection{
         display: none;
     }
@@ -264,11 +264,19 @@
         width: 100%;
         padding: 0.2rem;
         margin-left: 0rem;
+        position: fixed;
+        background: white;
+        margin-top: -1%;
+        z-index: 100;
     }
 
     .switchButtons {
         padding: 0.1rem 1.2rem;
         font-size: 0.8rem;
+    }
+
+    .dishes-to-display {
+        margin-top: 7%;
     }
 
     .menuHeader{
@@ -291,8 +299,44 @@
     }
 }
 
+@media (min-width:426px) and (max-width:768px){
+    .dish-list {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        column-gap: 10px;
+        row-gap: 20px;
+    }
 
-@media (min-width: 768px) and (max-width:1023px) {
+    .category-buttons {
+        margin-left: 0rem;
+        width: 60%;
+        justify-content: center;
+    }
+
+    .switchButtons {
+        margin: 0rem 1rem;
+        padding: 0.2rem 1.2rem;
+        font-size: 0.9rem;
+    }
+
+    .restaurantSection{
+        display: none;
+    }
+
+    .dishesSection {
+       width: 100vw;
+       display: flex;
+       flex-direction: column;
+       align-items: center;
+       justify-content: center;
+    }
+
+    .menuHeader {
+       font-size: 1rem;
+    }
+}
+
+/* @media (min-width: 768px) and (max-width:1023px) {
     .restaurantSection{
         display: none;
     }
@@ -314,11 +358,8 @@
     }
 
     .dish-list {
-        padding-left: 0.2rem;
-    }
-
-    .dish-list {
         column-gap: 5px;
         row-gap: 10px;
+        padding-left: 0.2rem;
     }
-}
+} */

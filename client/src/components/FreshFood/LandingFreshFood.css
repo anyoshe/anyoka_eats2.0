@@ -609,7 +609,7 @@
 }
 
 
-@media (min-width: 376px) and (max-width:480px){
+@media (min-width: 376px) and (max-width:425px){
     .landing-fresh-food{
         /* border: 5px solid green; */
 
@@ -628,6 +628,7 @@
         right: 0;
         height: 4rem;
         width: 100%;
+        padding: 0.2rem;
     }
 
     .fresh_bar{
@@ -640,7 +641,8 @@
     }
 
     .main-category{
-        margin-top: 19%;
+        margin-top: 18%;
+        width: 100vw;
         padding: 0;
         width: 100%;
         align-items: center;
@@ -654,7 +656,11 @@
     .fresh_category {
         padding: 0rem 0rem;
         height: 1%;
-        width: 100vw
+        width: 98vw
+    }
+
+    .fresh-list {
+        width: 100vw;
     }
 
     .fresh_link {
@@ -662,7 +668,7 @@
         border-bottom: none;
         font-size: 0.6rem;
         transition: ease-in 0.2s;
-        margin: 0rem 0.2rem;
+        margin: 0rem 0.1rem;
         text-align: center;
         display: flex;
         align-items: center;
@@ -670,7 +676,9 @@
     }
 
     .discoverTitle{
-        font-size: 1.1rem;
+        font-size: 1rem;
+        margin-bottom: 0.6rem;
+        text-decoration: underline;
     }
 
     .category-grid {
@@ -708,6 +716,21 @@
 
     .wholesale {
         width: 100%;
+    }
+
+    .fresh-wholesale-title {
+        margin-top: 1%;
+        font-size: 1.2rem;
+    }
+
+    .fresh-wholesale-para {
+        font-size: 0.9rem;
+        text-align: center;
+    }
+
+    .wholesale-cta-button {
+        padding: 5px 15px;
+        font-size: 16px;
     }
 }
 
