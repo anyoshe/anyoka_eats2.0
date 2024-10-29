@@ -195,14 +195,13 @@ const OrderSummaryModal = ({ show, handleClose, restaurantName, orderedDishes = 
       await saveOrderToDatabase(orderDetails); // Save order to the database
   
       // Send the SMS notification, but catch errors separately
-      // try {
-      //   await sendSmsNotification(data);
-      // } catch (smsError) {
-      //   console.error('Error sending SMS:', smsError);
-      //   // SMS failure should not impact the main success flow
-      // }
-      
-      handleSendReceipt();
+      try {
+        await sendSmsNotification(data);
+      } catch (smsError) {
+        console.error('Error sending SMS:', smsError);
+        // SMS failure should not impact the main success flow
+      }
+  
       alert('Payment successful! Your order is being processed.');
       clearCart();
       setShowPaymentModal(false);
@@ -216,17 +215,6 @@ const OrderSummaryModal = ({ show, handleClose, restaurantName, orderedDishes = 
     }
   };
   
-  const handleSendReceipt = async (phoneNumber, amount) => {
-    try {
-      const response = await axios.post('/api/send-receipt', { phoneNumber, amount });
-      if (response.status === 200) {
-        alert('Receipt sent successfully.');
-      }
-    } catch (error) {
-      console.error('Error sending receipt:', error);
-      alert('Failed to send receipt.');
-    }
-  };
   // Separate redirection logic into a function
   const redirectToHomePage = () => {
     // Delay redirection for 2 seconds to allow user to see the success alert

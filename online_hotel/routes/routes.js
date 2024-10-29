@@ -2551,6 +2551,32 @@ router.post('/mpesa/pay', async (req, res) => {
   }
 });
 
+// Example route to handle sending receipts
+router.post('/send-receipt', async (req, res) => {
+  try {
+    // Implement logic to send receipt here
+    const { phoneNumber, amount } = req.body;
+
+    // Example logic to send receipt via SMS or any other method
+    const receiptSent = await sendReceiptMessage(phoneNumber, amount);
+
+    // Respond with success message
+    res.status(200).json({ message: 'Receipt sent successfully' });
+  } catch (error) {
+    console.error('Error sending receipt:', error);
+    res.status(500).json({ error: 'Failed to send receipt' });
+  }
+});
+
+// // Function to send receipt
+// async function sendReceipt(phoneNumber, amount) {
+//   const message = `Thank you for your payment of KES ${amount}. Your order is being processed.`;
+//   // Logic to send SMS (you can use a service like Twilio or any other SMS gateway)
+//   await axios.post('https://sms-gateway-api/send', {
+//     to: phoneNumber,
+//     message: message
+//   });
+// }
 // Example of SMS sending route
 router.post('/sendSms', async (req, res) => {
   const { phoneNumber, message } = req.body;
@@ -2565,46 +2591,34 @@ router.post('/sendSms', async (req, res) => {
     res.status(500).json({ error: 'Failed to send SMS' });
   }
 });
+// Import Africa's Talking SDK
+const africastalking = require('africastalking')({
+  apiKey: process.env.SMSAPIKEY,  // Replace with your Africa's Talking API Key
+  username: 'sandbox' // Replace with your Africa's Talking username
+});
 
+// Access the SMS service
+const sms = africastalking.SMS;
 
 // Function to send M-Pesa payment receipt via SMS
-
-// Send SMS via TextSMS
-const { TEXTSMS_APP_TOKEN, TEXTSMS_APP_KEY, TEXTSMS_APP_NAME } = process.env;
-
-// Function to send SMS receipt
 async function sendReceipt(phoneNumber, amount) {
+  // Message to be sent to the user
   const message = `Thank you for your payment of KES ${amount}. Your order is being processed.`;
+  
+  const options = {
+      to: [phoneNumber],  // The recipient's phone number (e.g., +2547XXXXXXXX)
+      message: message,   // The receipt message
+      from: 'YourShortCodeOrSenderID' // Optional. Specify if you have a short code or sender ID
+  };
+  
   try {
-    const response = await axios.post('https://sms.textsms.co.ke/api/v1/send', {
-      to: phoneNumber,
-      message: message,
-      app_name: TEXTSMS_APP_NAME,
-    }, {
-      headers: {
-        'Authorization': `Bearer ${TEXTSMS_APP_TOKEN}`,
-        'App-Key': TEXTSMS_APP_KEY,
-        'Content-Type': 'application/json'
-      }
-    });
-    console.log('SMS Sent Successfully:', response.data);
-    return response.data;
+      // Send the SMS using Africa's Talking
+      const response = await sms.send(options);
+      console.log('SMS Sent Successfully:', response);
   } catch (error) {
-    console.error('Failed to send SMS:', error.response ? error.response.data : error.message);
-    throw new Error('Failed to send SMS');
+      console.error('Failed to send SMS:', error);
   }
 }
-
-// Route to send receipt
-router.post('/send-receipt', async (req, res) => {
-  const { phoneNumber, amount } = req.body;
-  try {
-    const response = await sendReceipt(phoneNumber, amount);
-    res.status(200).json({ message: 'Receipt sent successfully', data: response });
-  } catch (error) {
-    res.status(500).json({ error: 'Failed to send receipt' });
-  }
-});
 
 // Example use case
 async function processPaymentAndSendReceipt(paymentDetails, userPhoneNumber) {
