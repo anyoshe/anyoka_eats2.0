@@ -235,7 +235,7 @@ const vendorSchema = new mongoose.Schema({
   foodCategory: { type: String, required: true },
   averageRating: { type: Number, default: 0 },
   ratingCount: { type: Number, default: 0 },
-  _id: { type: String, required: true }
+  // _id: { type: String, required: false }
 });
 
 const Vendor = mongoose.model("Vendor", vendorSchema);
@@ -257,9 +257,14 @@ appRouter.post('/vendors', async (req, res) => {
     await newVendor.save();
     console.log('Saved Vendor:', newVendor);
     res.status(201).json(newVendor);
-  } catch (error) {
-    res.status(500).json({ message: 'Server error', error });
+  // } catch (error) {
+  //   res.status(500).json({ message: 'Server error', error });
+  // }
+   } catch (error) {
+    console.error('Error saving vendor:', error);
+    res.status(500).json({ message: 'Server error', error: error.message });
   }
+  
 });
 
 
