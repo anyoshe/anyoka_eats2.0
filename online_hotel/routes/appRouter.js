@@ -235,7 +235,6 @@ const vendorSchema = new mongoose.Schema({
   foodCategory: { type: String, required: true },
   averageRating: { type: Number, default: 0 },
   ratingCount: { type: Number, default: 0 },
-  // _id: { type: String, required: false }
 });
 
 const Vendor = mongoose.model("Vendor", vendorSchema);
@@ -529,7 +528,13 @@ const orderSchema = new Schema({
       vendorLocation: { type: String, required: true },
       totalPrice: { type: Number, required: true },
       status: { type: String, enum: ['Order received', 'Processed and packed', 'Dispatched', 'On Transit', 'Delivered'], default: 'Order received' },
-      processedTime: { type: Date } // To track when each vendor order is processed
+      processedTime: { type: Date },
+      driverDetails: {
+        name: { type: String },
+        contactNumber: { type: String },
+        vehicleRegistration: { type: String }
+      },
+      pickedAt: { type: Date }
     }
   ],
 
@@ -543,11 +548,6 @@ const orderSchema = new Schema({
   // Overall order status
   overallStatus: { type: String, enum: ['Waiting for vendors', 'Ready for pickup', 'Dispatched', 'On Transit', 'Delivered'], default: 'Waiting for vendors' },
   driverId: { type: String, required: false },
-  driverDetails: {
-    name: { type: String },
-    contactNumber: { type: String },
-    vehicleRegistration: { type: String }
-  },
   pickedAt: { type: Date }
 });
 
@@ -853,46 +853,11 @@ const updateVendorOrderStatus = async (orderId, vendorId, newStatus) => {
 };
 
 // PATCH route for updating a vendor order's status
-// appRouter.patch('/updateFoodOrderStatus/:orderId/:vendorId', async (req, res) => {
-//   try {
-//     const { orderId, vendorId } = req.params;
-//     const { status, driverDetails, pickedAt } = req.body;
-
-//     console.log(`Updating order status for orderId: ${orderId}, targeting vendorId: ${vendorId}, with status: ${status}`);
-
-//     // Fields to update within the matched vendor order
-//     const updateFields = {
-//       'vendorOrders.$[vendor].status': status,
-//       ...(pickedAt && { 'vendorOrders.$[vendor].pickedAt': pickedAt }),
-//       ...(driverDetails && { 'vendorOrders.$[vendor].driverDetails': driverDetails })
-//     };
-
-//     // Perform the update
-//     const updatedOrder = await FoodOrder.findOneAndUpdate(
-//       { orderId },
-//       { $set: updateFields },
-//       {
-//         new: true,
-//         arrayFilters: [{ 'vendor._id': vendorId }] // Targets the correct vendor entry
-//       }
-//     );
-
-//     if (!updatedOrder) {
-//       return res.status(404).json({ message: 'Order or vendor not found' });
-//     }
-
-//     console.log('Updated order status and driver details:', updatedOrder);
-//     res.json({ message: 'Order status and driver details updated successfully', updatedOrder });
-//   } catch (error) {
-//     console.error('Error updating order status and driver details:', error);
-//     res.status(500).json({ message: 'Error updating order', error: error.message });
-//   }
-// });
-
 appRouter.patch('/updateFoodOrderStatus/:orderId/:vendorId', async (req, res) => {
   try {
     const { orderId, vendorId } = req.params;
     const { status, driverDetails, pickedAt } = req.body;
+
     console.log(driverDetails, status, pickedAt, vendorId, orderId);
 
     // Check that driver details are provided if status is "On Transit"
@@ -900,25 +865,28 @@ appRouter.patch('/updateFoodOrderStatus/:orderId/:vendorId', async (req, res) =>
       return res.status(400).json({ message: 'Driver details are required when status is On Transit.' });
     }
 
-    console.log(`Updating order status for orderId: ${orderId}, vendorId: ${vendorId}, status: ${status}, driverDetails: ${JSON.stringify(driverDetails)}`);
+    console.log('Updating order status for orderId:', orderId, 'vendorId:', vendorId, 'status:', status, 'driverDetails:', JSON.stringify(driverDetails));
 
     // Define update fields based on status and additional fields
     const updateFields = {
       'vendorOrders.$[vendor].status': status,
-      ...(driverDetails && { 'vendorOrders.$[vendor].driverDetails': driverDetails }),
-      ...(pickedAt && { 'vendorOrders.$[vendor].pickedAt': pickedAt }),
+      ...(driverDetails && {'vendorOrders.$[vendor].driverDetails': driverDetails }),
+      ...(pickedAt && {'vendorOrders.$[vendor].pickedAt': pickedAt }),
     };
- console.log(updateFields);
+
+    console.log('Update fields:', updateFields);
+
     // Perform the update operation with arrayFilters
     const updateResult = await FoodOrder.updateOne(
       { orderId },
       { $set: updateFields },
       {
-        arrayFilters: [{ 'vendor._id': new mongoose.Types.ObjectId(vendorId) }],  // Ensure vendorId matches ObjectId format
+        arrayFilters: [{'vendor._id': new mongoose.Types.ObjectId(vendorId)}],
+        multi: true
       }
     );
 
-    console.log('Update result:', updateResult); // Log update result for debugging
+    console.log('Update result:', updateResult);
 
     // Check if the update was successful
     if (updateResult.modifiedCount === 0) {
@@ -935,7 +903,6 @@ appRouter.patch('/updateFoodOrderStatus/:orderId/:vendorId', async (req, res) =>
     res.status(500).json({ message: 'Error updating order', error: error.message });
   }
 });
-
 appRouter.patch('/updateFoodOrderStatus/:orderId', async (req, res) => {
   try {
     const { orderId } = req.params;
