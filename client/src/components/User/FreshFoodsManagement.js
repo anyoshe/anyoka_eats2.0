@@ -363,7 +363,12 @@ const FreshFoodsManagement = ({ partner }) => {
           })
         });
 
+        // if (!response.ok) {
+        //   throw new Error(`HTTP error! status: ${response.status}`);
+        // }
         if (!response.ok) {
+          const errorBody = await response.json();
+          console.error('Error response:', errorBody);
           throw new Error(`HTTP error! status: ${response.status}`);
         }
 
