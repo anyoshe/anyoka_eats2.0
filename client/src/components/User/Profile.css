@@ -1185,21 +1185,11 @@
     /* border: 5px solid burlywood; */
 }
 
-@media(max-width:480px){
-    .service_drop {
-        position: absolute;
-        min-width: 5rem;
-        z-index: 5;
-        top: 110%;
-        left: 30%;
+@media(max-width:320px){
+    .homeLinkUser{
+        display: none;
     }
 
-    .service_drop_link {
-        padding: 0.3rem 0.7rem;
-
-        margin-bottom: 0.4px;
-        font-size: 0.8rem;
-    }
 
     .profile_content{
         position: relative;
@@ -1207,65 +1197,59 @@
         padding: 0rem 0.2rem;
     }
 
-    .coming_div {
-        /* border: 5px solid pink; */
+    .profile_section{
+        align-items: start;
+        width: 100%;
+        margin-top: 8%;
+    } 
 
+    .coming_div {
         display: flex;
         flex-direction: column;
         width: 100%;
         height: 100%;
-        gap: 0.5rem;
+        gap: 0.3rem;
     }
-    
+
     .grid_profile_one {
         width: 100%;
     }
 
-    .account_details {
-        /* border: 1px solid green; */
-        background: rgba(128, 128, 128, 0.118);
-    }
-
-    #profileImageSection {
-        /* border: 5px solid green; */
-    }
-
     .essential_image {
-        /* border: 3px solid red; */
-
         display: flex;
         flex-direction: column;
         align-items: center;
         justify-content: center;
-        padding: 5px;
-    }
-
-    #profileImageInput {
-        /* border: 1px solid red; */
-        font-size: 0.5rem;
-    }
-
-    .profile_img_div {
-        width: 30%;
+        padding: 0.1rem;
     }
 
     .image_button {
-        /* border: 1px solid red; */
-
         gap: 0.2rem;
         margin-top: 0.1rem;
     }
 
     .profilePicBtn {
-        margin-top: 0px;
         padding: 0.2rem 0.3rem;
-        width: 25%;
+        width: 30%;
         font-size: 0.9rem;
     }
 
+    .profile_img_div {
+        width: 40%;
+        height: 55%;
+    }
+
+    #profileImageInput {
+        font-size: 0.5rem;
+    }
+
+    .editButton, .saveButton {
+        padding: 0.1rem 0.2rem;
+        font-size: 0.8rem;
+        right: 1%;
+    }
+
     .essential_details {
-        /* border: 1px solid purple; */
-        /* margin-top: 1%; */
         display: flex;
         align-items: center;
         justify-content: center;
@@ -1273,17 +1257,13 @@
     }
 
     .essential_grid {
-        width: 70%;
+        width: 75%;
     }
 
-    .essential_grid_content {
-        /* border: 1px solid red; */
-
-        /* display: grid;
-        grid-template-columns: 1fr;
-        height: -moz-fit-content;
-        height: fit-content; */
-        /* padding: 5px 10px; */
+    .editprofileButton {
+        right: 1%;
+        padding: 0.1rem 0.3rem;
+        font-size: 0.8rem;
     }
 
     .content_input {
@@ -1291,23 +1271,8 @@
         font-size: 0.8rem;
     }
 
-    .editprofileButton {
-        right: -2%;
-        padding: 0.1rem 0.3rem;
-    }
-    .editButton, .saveButton {
-        /* margin-top: 3px;
-        padding: 5px 10px;
-        border: none;
-        background: var(--orange); */
-        padding: 0.1rem 0.3rem;
-        font-size: 0.8rem;
-        right: -2%;
-    }
-
     .other_contacts_div {
-        /* border: 5px solid blue; */
-
+        background: rgba(128, 128, 128, 0.118);
         margin-top: 1%;
         text-align: center;
         position: relative;
@@ -1315,9 +1280,15 @@
     }
 
     .other_titles {
-        font-size: 0.8rem;
+        font-size: 0.9rem;
         padding: 0.1rem 0.2rem;
         margin-bottom: 0.1rem;
+    }
+
+    .error-message {
+        font-size: 0.8rem;
+        margin-bottom: 0px;
+        padding: 0.2rem 0rem;
     }
 
     .other_contact_grid {
@@ -1325,63 +1296,36 @@
         gap: 3px;
         display: flex;
         flex-direction: column;
-        /* align-items: center; */
     }
 
-    .other_contacts{
+    .other_contacts {
         display: flex;
         flex-direction: column;
         align-items: center;
     }
 
-    .other_contact_list{
-
+    .other_sub_titles{
+        width: 70%;
+        font-size: 1rem;
     }
 
-    .other_ul{
+    .other_ul {
         padding: 0px;
         margin-bottom: 0.5rem;
     }
 
     .other_li {
-        /* border: 1px solid blue; */
         margin-bottom: 1%;
-        width: 15rem;
+        width: 17rem;
     }
 
     .other_contact_phone {
-        font-size: 0.7rem;
+        font-size: 0.9rem;
         color: black;
-    }
-
-    .other_sub_titles{
-        width: 70%;
-    }
-
-    .error-message{
-        font-size: 0.7rem;
-        margin-bottom: 0px;
-        padding: 0.2rem 0rem;
     }
 
     .radioDivDiv {
         margin-top: 1%;
-    }
-
-    .other_services_list {
-        display: inline-flex;
-        gap: 0.2rem;
-        padding: 5px;
-    }
-
-    .other_service_labels {
-        font-size: 10px;
-        margin-left: 5px;
-    }
-
-    label {
-        font-size: 0.1rem;
-        font-weight: 100;
     }
 
     .other_services_list{
@@ -1395,9 +1339,17 @@
         justify-content: left;
     }
 
-    .iconHeader {
-        /* border: 5px solid green; */
+    .other_service_radio{
+        font-size: 2rem;
+    }
 
+    .other_service_labels {
+        font-size: 10px;
+        margin-left: 0px;
+    }
+
+
+    .iconHeader {
         width: 100%;
         padding: 0.9rem 0.3rem;
         display: grid;
@@ -1405,25 +1357,12 @@
     }
 
     .profile_section{
-        /* border: 5px solid green; */
-    
-        /* display: flex; */
         align-items: start;
-        /* flex-direction: column; */
         width: 100%;
-        /* padding: 20px 10px;
-        height: 100%;
-        z-index: 200; */
-        margin-top: 8%;
+        margin-top: 10%;
     } 
 
-    .orderCurrierDiv{
-        /* border: 5px solid green; */
-        /* width: 100%; */
-    }
-
     .orderButtonsDiv{
-        /* border: 5px solid red; */
         display: grid;
         grid-template-columns: 1fr 1fr 1fr;
         gap: 0.2rem;
@@ -1443,18 +1382,11 @@
         background: white;
     }
 
-
-    .orderDispalyDiv{
-        /* border: 5px solid blue; */
-    }
-
     .menu_table {
         width: 100%;
     }
 
     .h2TableTitle {
-        /* border: 5px solid red; */
-
         font-size: 1rem;
         margin-bottom: 0rem;
     }
@@ -1476,8 +1408,6 @@
 
     
     .forgotten{
-        /* border: 5px solid red; */
-
         width: 95vw;
         margin-top: 10%;
     }
@@ -1487,15 +1417,13 @@
     }
 
     .tableEditLabels{
-        /* border: 1px solid red; */
-    
         margin-left: 0rem;
         text-align: left;
     }
 
-    /* .tableBestIn{
+    .tableBestIn{
         margin-left: 0.5rem;
-    } */
+    }
 
     .func_icons {
         font-size: 1.2rem;
@@ -1528,8 +1456,6 @@
     }
 
     #chart_datas {
-        /* border: 5px solid blue; */
-
         width: 100%;
         height: fit-content;
         position: relative;
@@ -1539,8 +1465,6 @@
     }
 
     .input_wrp {
-        /* border: 1px solid red; */
-        
         display: grid;
         grid-template-columns: repeat(2, 1fr);
         gap: 0.5rem;
@@ -1549,7 +1473,6 @@
     }
 
     .column{
-        /* border: 1px solid red; */
         width: 100%;
     }
 
@@ -1600,24 +1523,11 @@
     }
 
 
-    /* From Here */
-    /* .tableRows {
-        border: 4px solid red;
-
-        width: 100%;
-        display: grid;
-        grid-template-columns: 1fr 0.5fr 1fr 0.5fr 0.4fr 1fr 0.3fr;
-        margin-top: 0.1rem;
-        margin-bottom: 0.1rem;
-    } */
-
     .foodTableRow{
         display: none;
     }
 
     .dishDiv {
-        /* border: 1px solid green; */
-
         text-align: center;
         width: 100%;
         font-size: 0.6rem;
@@ -1634,29 +1544,8 @@
         max-width: 100%;
         height: auto;
     }
-/* ################################################# */
-    /* THIS STYLES FOR THE EDIT AND DELETE BUTTON */
-    /* .dishdiv_button {
-        display: none;
-    } */
-
-    /* .dishdiv_button:focus {
-        border: 1px solid green;
-
-        position: absolute;
-        display: flex;
-        flex-direction: row;
-        justify-content: space-between;
-        align-items: center;
-        width: 3.5rem;
-        left: 85%;
-    } */
-
-    /* ############################################ */
 
     .dishdiv_button {
-        /* border: 1px solid green; */
-
         position: absolute;
         display: flex;
         flex-direction: row;
@@ -1687,8 +1576,837 @@
         font-size: 0.8rem;
         margin-right: 0.8rem;
         transition: ease-in .2s;
-    }
+    } 
+
 }
+
+@media (min-width:321px) and (max-width: 375px){
+    .service_drop {
+        position: absolute;
+        min-width: 5rem;
+        z-index: 5;
+        top: 110%;
+        left: 30%;
+    }
+
+    .service_drop_link {
+        padding: 0.3rem 0.7rem;
+
+        margin-bottom: 0.4px;
+        font-size: 0.8rem;
+    }
+
+    .profile_content{
+        position: relative;
+        width: 100%;
+        padding: 0rem 0.2rem;
+    }
+
+    .coming_div {
+        display: flex;
+        flex-direction: column;
+        width: 100%;
+        height: 100%;
+        gap: 0.5rem;
+    }
+    
+    .grid_profile_one {
+        width: 100%;
+    }
+
+    #profileImageSection {
+        /* border: 5px solid green; */
+    }
+
+    .essential_image {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        padding: 5px;
+    }
+
+    #profileImageInput {
+        font-size: 0.7rem;
+    }
+
+    .profile_img_div {
+        width: 35%;
+    }
+
+    .image_button {
+        gap: 0.2rem;
+        margin-top: 0.5rem;
+    }
+
+    .profilePicBtn {
+        margin-top: 0px;
+        padding: 0.2rem 0.3rem;
+        width: 25%;
+        font-size: 1rem;
+    }
+
+    .essential_details {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-direction: column;
+    }
+
+    .essential_grid {
+        width: 70%;
+    }
+
+    .essential_grid_content {
+        display: grid;
+        grid-template-columns: 1fr;
+        height: -moz-fit-content;
+        height: fit-content; 
+        padding: 5px 10px;
+        margin-bottom: 0.1rem; 
+    }
+
+    .content_input {
+        padding: 0.2rem;
+        font-size: 0.9rem;
+    }
+
+    .editprofileButton {
+        right: -2%;
+        padding: 0.1rem 0.3rem;
+    }
+    
+    .editButton, .saveButton {
+        padding: 0.2rem 0.3rem;
+        font-size: 0.9rem;
+        right: 1%;
+    }
+
+    .other_contacts_div {
+        background: rgba(128, 128, 128, 0.118);
+        margin-top: 1%;
+        text-align: center;
+        position: relative;
+        margin-bottom: 0.5rem;
+    }
+
+    .other_titles {
+        font-size: 0.9rem;
+        padding: 0.1rem 0.2rem;
+        margin-bottom: 0.1rem;
+    }
+
+    .other_contact_grid {
+        padding: 0rem;
+        gap: 3px;
+        display: flex;
+        flex-direction: column;
+    }
+
+    .other_contacts{
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .other_ul{
+        padding: 0px;
+        margin-bottom: 0.5rem;
+    }
+
+    .other_li {
+        margin-bottom: 1%;
+        width: 17rem;
+    }
+
+    .other_contact_phone {
+        font-size: 0.8rem;
+        color: black;
+    }
+
+    .other_sub_titles{
+        width: 70%;
+    }
+
+    .error-message{
+        font-size: 0.8rem;
+        margin-bottom: 0px;
+        padding: 0.2rem 0rem;
+    }
+
+    .radioDivDiv {
+        margin-top: 1%;
+    }
+
+    .other_service_radio {
+        font-size: 2rem;
+    }
+
+    .other_services_list {
+        display: inline-flex;
+        gap: 0.2rem;
+        padding: 5px;
+    }
+
+    .other_service_labels {
+        font-size: 10px;
+        margin-left: 0px;
+    }
+
+    label {
+        font-size: 0.1rem;
+        font-weight: 100;
+    }
+
+    .other_services_list{
+        display: grid;
+        grid-template-columns: repeat(3 ,1fr);
+        row-gap: 0.9rem;
+    }
+
+    .radio_btn_div {
+        flex-direction: column;
+        justify-content: left;
+    }
+
+    .iconHeader {
+        width: 100%;
+        padding: 0.9rem 0.3rem;
+        display: grid;
+        justify-content: left;
+    }
+
+    .profile_section{
+        align-items: start;
+        width: 100%;
+        margin-top: 10%;
+    } 
+
+    .orderButtonsDiv{
+        display: grid;
+        grid-template-columns: 1fr 1fr 1fr;
+        gap: 0.2rem;
+    }
+
+    .orderButtons{
+        font-size: 0.9rem;
+        border:  1px solid var(--green);
+        background: var(--green);
+        color: white;
+        transition: ease-in .2s;
+    }
+
+    .orderButtons:focus{
+        color: var(--orange);
+        border: 1px solid var(--orange);
+        background: white;
+    }
+
+    .menu_table {
+        width: 100%;
+    }
+
+    .h2TableTitle {
+        font-size: 1rem;
+        margin-bottom: 0rem;
+    }
+
+    #map99{
+        width: '100%'
+    }
+
+    .addRestaurantButton {
+        padding: 0.3rem 0.8rem;
+        font-size: 0.8rem;
+        margin-bottom: 1%;
+        margin-top: 15%;
+    }
+
+    .vendorLocation {
+        font-size: 0.7rem;
+    }
+
+    
+    .forgotten{
+        width: 95vw;
+        margin-top: 10%;
+    }
+
+    .locationtableEdit {
+        width: 25rem;
+    }
+
+    .tableEditLabels{
+        margin-left: 0rem;
+        text-align: left;
+    }
+
+    .tableBestIn{
+        margin-left: 0.5rem;
+    }
+
+    .func_icons {
+        font-size: 1.2rem;
+        padding: 0.2rem 0.3rem;
+    }
+
+    .restaurantSelection{
+        font-size: 0.8rem;
+    }
+
+    .choose_select{
+        padding: 0.1rem 0.3rem ;
+    }
+
+    .label_input {
+        margin-top: 3%;
+        width: 100%;
+    }
+
+    .search_menu {
+        font-size: 0.8rem;
+        height: 1.5rem;
+        padding: 0.1rem 0.4rem;
+    }
+
+    .search_menu_btn {
+        font-size: 0.8rem;
+        padding: 0.1rem 0.4rem;
+        height: 1.5rem;
+    }
+
+    #chart_datas {
+        width: 100%;
+        height: fit-content;
+        position: relative;
+        padding: 0rem;
+        margin-top: 0.1%;
+        margin-bottom: 0.5rem;
+    }
+
+    .input_wrp {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 0.5rem;
+        height: fit-content;
+        padding-left: 0.3rem;
+    }
+
+    .column{
+        width: 100%;
+    }
+
+    .addRowBtn {
+        width: auto;
+        position: absolute;
+        left: 95%;
+        font-size: 1.2rem;
+        background-color: var(--green);
+        padding: 0.1rem .2rem;
+        border-radius: 0%;
+        top: 15%;
+        left: 93%;
+    }
+
+    .form_file{
+        font-size: 0.6rem;
+    }
+
+    .column label {
+        font-size: 0.8rem;
+        font-weight: 400;
+        text-align: left;
+    }
+
+    .headerInputs{
+        width: 95%;
+        padding: 0rem 0.2rem;
+    }
+
+    .small-1-input {
+        width: 70%;
+        border: none;
+        padding-left: 0px;
+    }
+
+    .headerInputs:hover, .headerInputs:focus {
+        outline: 1px solid var(--orange);
+        padding: 0rem 0.2rem;
+    }
+
+    #headerTableRows{
+        display: none;
+    }
+
+    .addShopButton {
+        font-size: 0.8rem;
+    }
+
+
+    .foodTableRow{
+        display: none;
+    }
+
+    .dishDiv {
+        text-align: center;
+        width: 100%;
+        font-size: 0.6rem;
+        position: relative;
+        padding: 0.1rem;
+    }
+
+    .dishImagePartner {
+        width: 60px;
+        height: auto;
+    }
+
+    img {
+        max-width: 100%;
+        height: auto;
+    }
+
+    .dishdiv_button {
+        position: absolute;
+        display: flex;
+        flex-direction: row;
+        justify-content: space-between;
+        align-items: center;
+        width: 3.5rem;
+        left: 85%;
+    }
+
+    #tableEditButton{
+        padding: 0.1rem 0.2rem;
+        font-size: 0.9rem;
+        right: 0%;
+    }
+
+    #tableSaveButton{
+        font-size: 0.7rem;
+        margin-right: 0.2rem;
+    }
+
+    .deleteButton {
+        padding: 0.1rem 0.2rem;
+        font-size: 0.9rem;
+    }
+
+    .tablesSalesBtn {
+        padding: 0.2rem 0.3rem;
+        font-size: 0.8rem;
+        margin-right: 0.8rem;
+        transition: ease-in .2s;
+    } 
+}
+
+@media (min-width:376px) and (max-width: 425px){
+    .service_drop {
+        position: absolute;
+        min-width: 5rem;
+        z-index: 5;
+        top: 110%;
+        left: 30%;
+    }
+
+    .service_drop_link {
+        padding: 0.3rem 0.7rem;
+
+        margin-bottom: 0.4px;
+        font-size: 0.8rem;
+    }
+
+    .profile_content{
+        position: relative;
+        width: 100%;
+        padding: 0rem 0.2rem;
+    }
+
+    .coming_div {
+        display: flex;
+        flex-direction: column;
+        width: 100%;
+        height: 100%;
+        gap: 0.5rem;
+    }
+    
+    .grid_profile_one {
+        width: 100%;
+    }
+
+    #profileImageSection {
+        /* border: 5px solid green; */
+    }
+
+    .essential_image {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        padding: 5px;
+    }
+
+    #profileImageInput {
+        font-size: 0.7rem;
+    }
+
+    .profile_img_div {
+        width: 35%;
+    }
+
+    .image_button {
+        gap: 0.2rem;
+        margin-top: 0.5rem;
+    }
+
+    .profilePicBtn {
+        margin-top: 0px;
+        padding: 0.2rem 0.3rem;
+        width: 25%;
+        font-size: 1rem;
+    }
+
+    .essential_details {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-direction: column;
+    }
+
+    .essential_grid {
+        width: 70%;
+    }
+
+    .essential_grid_content {
+        display: grid;
+        grid-template-columns: 1fr;
+        height: -moz-fit-content;
+        height: fit-content; 
+        padding: 5px 10px;
+        margin-bottom: 0.1rem; 
+    }
+
+    .content_input {
+        padding: 0.2rem;
+        font-size: 0.9rem;
+    }
+
+    .editprofileButton {
+        right: -2%;
+        padding: 0.1rem 0.3rem;
+    }
+    
+    .editButton, .saveButton {
+        padding: 0.2rem 0.3rem;
+        font-size: 0.9rem;
+        right: 1%;
+    }
+
+    .other_contacts_div {
+        background: rgba(128, 128, 128, 0.118);
+        margin-top: 1%;
+        text-align: center;
+        position: relative;
+        margin-bottom: 0.5rem;
+    }
+
+    .other_titles {
+        font-size: 0.9rem;
+        padding: 0.1rem 0.2rem;
+        margin-bottom: 0.1rem;
+    }
+
+    .other_contact_grid {
+        padding: 0rem;
+        gap: 3px;
+        display: flex;
+        flex-direction: column;
+    }
+
+    .other_contacts{
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .other_ul{
+        padding: 0px;
+        margin-bottom: 0.5rem;
+    }
+
+    .other_li {
+        margin-bottom: 1%;
+        width: 17rem;
+    }
+
+    .other_contact_phone {
+        font-size: 0.8rem;
+        color: black;
+    }
+
+    .other_sub_titles{
+        width: 70%;
+    }
+
+    .error-message{
+        font-size: 0.8rem;
+        margin-bottom: 0px;
+        padding: 0.2rem 0rem;
+    }
+
+    .radioDivDiv {
+        margin-top: 1%;
+    }
+
+    .other_service_radio {
+        font-size: 2rem;
+    }
+
+    .other_services_list {
+        gap: 0.2rem;
+        padding: 5px;
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        row-gap: 0.9rem;
+    }
+    .other_service_labels {
+        font-size: 10px;
+        margin-left: 0px;
+    }
+
+    .radio_btn_div {
+        flex-direction: column;
+        justify-content: left;
+    }
+
+    .iconHeader {
+        width: 100%;
+        padding: 0.9rem 0.3rem;
+        display: grid;
+        justify-content: left;
+    }
+
+    .profile_section{
+        align-items: start;
+        width: 100%;
+        margin-top: 10%;
+    } 
+
+    .orderButtonsDiv{
+        display: grid;
+        grid-template-columns: 1fr 1fr 1fr;
+        gap: 0.2rem;
+    }
+
+    .orderButtons{
+        font-size: 0.9rem;
+        border:  1px solid var(--green);
+        background: var(--green);
+        color: white;
+        transition: ease-in .2s;
+    }
+
+    .orderButtons:focus{
+        color: var(--orange);
+        border: 1px solid var(--orange);
+        background: white;
+    }
+
+    .menu_table {
+        width: 100%;
+    }
+
+    .h2TableTitle {
+        font-size: 1rem;
+        margin-bottom: 0rem;
+    }
+
+    #map99{
+        width: '100%'
+    }
+
+    .addRestaurantButton {
+        padding: 0.3rem 0.8rem;
+        font-size: 0.8rem;
+        margin-bottom: 1%;
+        margin-top: 15%;
+    }
+
+    .vendorLocation {
+        font-size: 0.7rem;
+    }
+
+    
+    .forgotten{
+        width: 95vw;
+        margin-top: 10%;
+    }
+
+    .locationtableEdit {
+        width: 25rem;
+    }
+
+    .tableEditLabels{
+        margin-left: 0rem;
+        text-align: left;
+    }
+
+    .tableBestIn{
+        margin-left: 0.5rem;
+    }
+
+    .func_icons {
+        font-size: 1.2rem;
+        padding: 0.2rem 0.3rem;
+    }
+
+    .restaurantSelection{
+        font-size: 0.8rem;
+    }
+
+    .choose_select{
+        padding: 0.1rem 0.3rem ;
+    }
+
+    .label_input {
+        margin-top: 3%;
+        width: 100%;
+    }
+
+    .search_menu {
+        font-size: 0.8rem;
+        height: 1.5rem;
+        padding: 0.1rem 0.4rem;
+    }
+
+    .search_menu_btn {
+        font-size: 0.8rem;
+        padding: 0.1rem 0.4rem;
+        height: 1.5rem;
+    }
+
+    #chart_datas {
+        width: 100%;
+        height: fit-content;
+        position: relative;
+        padding: 0rem;
+        margin-top: 0.1%;
+        margin-bottom: 0.5rem;
+    }
+
+    .input_wrp {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 0.5rem;
+        height: fit-content;
+        padding-left: 0.3rem;
+    }
+
+    .column{
+        width: 100%;
+    }
+
+    .addRowBtn {
+        width: auto;
+        position: absolute;
+        left: 95%;
+        font-size: 1.2rem;
+        background-color: var(--green);
+        padding: 0.1rem .2rem;
+        border-radius: 0%;
+        top: 15%;
+        left: 93%;
+    }
+
+    .form_file{
+        font-size: 0.6rem;
+    }
+
+    .column label {
+        font-size: 0.8rem;
+        font-weight: 400;
+        text-align: left;
+    }
+
+    .headerInputs{
+        width: 95%;
+        padding: 0rem 0.2rem;
+    }
+
+    .small-1-input {
+        width: 70%;
+        border: none;
+        padding-left: 0px;
+    }
+
+    .headerInputs:hover, .headerInputs:focus {
+        outline: 1px solid var(--orange);
+        padding: 0rem 0.2rem;
+    }
+
+    #headerTableRows{
+        display: none;
+    }
+
+    .addShopButton {
+        font-size: 0.8rem;
+    }
+
+
+    .foodTableRow{
+        display: none;
+    }
+
+    .dishDiv {
+        text-align: center;
+        width: 100%;
+        font-size: 0.6rem;
+        position: relative;
+        padding: 0.1rem;
+    }
+
+    .dishImagePartner {
+        width: 60px;
+        height: auto;
+    }
+
+    img {
+        max-width: 100%;
+        height: auto;
+    }
+
+    .dishdiv_button {
+        position: absolute;
+        display: flex;
+        flex-direction: row;
+        justify-content: space-between;
+        align-items: center;
+        width: 3.5rem;
+        left: 85%;
+    }
+
+    #tableEditButton{
+        padding: 0.1rem 0.2rem;
+        font-size: 0.9rem;
+        right: 0%;
+    }
+
+    #tableSaveButton{
+        font-size: 0.7rem;
+        margin-right: 0.2rem;
+    }
+
+    .deleteButton {
+        padding: 0.1rem 0.2rem;
+        font-size: 0.9rem;
+    }
+
+    .tablesSalesBtn {
+        padding: 0.2rem 0.3rem;
+        font-size: 0.8rem;
+        margin-right: 0.8rem;
+        transition: ease-in .2s;
+    } 
+}    
 
 
 @media (min-width: 768px) and (max-width:1023px) {
