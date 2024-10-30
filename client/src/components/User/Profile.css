@@ -1934,14 +1934,20 @@
     }
 
     .other_services_list {
-        display: inline-flex;
         gap: 0.2rem;
         padding: 5px;
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        row-gap: 0.9rem;
     }
-
     .other_service_labels {
         font-size: 10px;
         margin-left: 0px;
+    }
+
+    .radio_btn_div {
+        flex-direction: column;
+        justify-content: left;
     }
 }    
 
