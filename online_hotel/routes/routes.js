@@ -2420,6 +2420,21 @@ router.get('/getDriverDetails/:driverId', async (req, res) => {
 });
 
 // Define schema for tracking daily earnings
+// const dailyEarningsSchema = new mongoose.Schema({
+//   driverId: { type: String, required: true },
+//   driverDetails: {
+//     OfficialNames: { type: String },
+//     contactNumber: { type: String },
+//     NumberPlate: { type: String }
+//   },
+//   date: { type: String, required: true },
+//   orderId: { type: String },
+//   orderNetPay: { type: Number, default: 0 }, // Store the net pay per order
+//   totalEarnings: { type: Number, default: 0 }
+// });
+
+// const DailyEarnings = mongoose.model('DailyEarnings', dailyEarningsSchema);
+
 const dailyEarningsSchema = new mongoose.Schema({
   driverId: { type: String, required: true },
   driverDetails: {
@@ -2428,13 +2443,15 @@ const dailyEarningsSchema = new mongoose.Schema({
     NumberPlate: { type: String }
   },
   date: { type: String, required: true },
-  orderId: { type: String },
-  orderNetPay: { type: Number, default: 0 }, // Store the net pay per order
+  orders: [{
+    orderId: { type: String, required: true },
+    netPay: { type: Number, required: true },
+    paidStatus: { type: String, enum: ['Paid', 'Not Paid'], default: 'Not Paid' }
+  }],
   totalEarnings: { type: Number, default: 0 }
 });
 
 const DailyEarnings = mongoose.model('DailyEarnings', dailyEarningsSchema);
-
 
 // Route to get daily earnings for a specific date
 router.get('/daily-earnings', async (req, res) => {
@@ -2460,28 +2477,72 @@ router.get('/daily-earnings', async (req, res) => {
   }
 });
 
+router.get('/get-driver-earnings', async (req, res) => {
+  const { driverId, date } = req.query;
+
+  try {
+    const earnings = await DailyEarnings.findOne({ driverId, date });
+    if (!earnings) {
+      return res.status(404).json({ message: "No earnings found for the date." });
+    }
+
+    res.json({ orders: earnings.orders, totalEarnings: earnings.totalEarnings });
+  } catch (error) {
+    console.error("Error fetching daily earnings:", error);
+    res.status(500).json({ message: "Server error" });
+  }
+});
+
+// router.post('/update-earnings', async (req, res) => {
+//   console.log("Request Body:", req.body);
+//   const { date, earnings, driverId, orderId, driverDetails, orderNetPay } = req.body;
+//   console.log(date, earnings, driverId, orderId, driverDetails, orderNetPay); // Log additional fields for debugging
+
+//   if (!driverId) {
+//     return res.status(400).json({ message: "Driver ID is required." });
+//   }
+  
+//   try {
+//     const result = await DailyEarnings.findOneAndUpdate(
+//       { driverId: driverId, date },  // Find by driverId and date to ensure unique entry per day
+//       { 
+//         $set: { 
+//           totalEarnings: earnings, 
+//           orderId, 
+//           driverDetails, 
+//           orderNetPay 
+//         }
+//       },
+//       { upsert: true, new: true }
+//     );
+//     res.json(result);
+//     console.log(result);
+//   } catch (error) {
+//     console.error("Error updating daily earnings:", error);
+//     res.status(500).json({ message: "Server error" });
+//   }
+// });
+
 router.post('/update-earnings', async (req, res) => {
   console.log("Request Body:", req.body);
-  const { date, earnings, driverId, orderId, driverDetails, orderNetPay } = req.body;
-  console.log(date, earnings, driverId, orderId, driverDetails, orderNetPay); // Log additional fields for debugging
+  const { date, driverId, driverDetails, orderId, netPay, paidStatus } = req.body;
 
   if (!driverId) {
     return res.status(400).json({ message: "Driver ID is required." });
   }
-  
+
   try {
+    // Add the new order data
     const result = await DailyEarnings.findOneAndUpdate(
-      { driverId: driverId, date },  // Find by driverId and date to ensure unique entry per day
-      { 
-        $set: { 
-          totalEarnings: earnings, 
-          orderId, 
-          driverDetails, 
-          orderNetPay 
-        }
+      { driverId: driverId, date },  // Unique per driver per day
+      {
+        $setOnInsert: { driverDetails: driverDetails, date: date },
+        $push: { orders: { orderId, netPay, paidStatus } },
+        $inc: { totalEarnings: netPay }
       },
       { upsert: true, new: true }
     );
+
     res.json(result);
     console.log(result);
   } catch (error) {
@@ -2489,7 +2550,6 @@ router.post('/update-earnings', async (req, res) => {
     res.status(500).json({ message: "Server error" });
   }
 });
-
 
 //PAYMENTS AND UPDATE ROUTES
 router.post('/updatePaidStatus', async (req, res) => {
