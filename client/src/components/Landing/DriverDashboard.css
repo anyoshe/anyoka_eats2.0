@@ -285,8 +285,6 @@
 
 
 .map_div{
-    /* border: 5px solid red; */
-
     width: 100%;
     height: 100%;
     position: relative;
@@ -307,8 +305,6 @@
 }
 
 .button_div{
-    /* border: 4px solid blue; */
-
     text-align: right;
     display: flex;
     align-items: center;
@@ -332,4 +328,613 @@
     color: var(--orange);
     cursor: pointer;
 
+}
+
+.logout_btn {
+    height: 40px;
+    width: 100px;
+    border: none;
+    background-color:red;
+    color: white;
+    font-size: 15px;
+    transition: ease-in .2s;
+    margin-top: 0.5rem;
+}
+
+.logout_btn:hover {
+    outline: 1px solid var(--orange);
+    background-color: white;
+    color: var(--orange);
+    cursor: pointer;
+}
+
+@media(max-width:320px){
+    .dial-slider_wrapper {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+        width: 100%;
+    }
+
+    .dial-slider_container {
+        padding: 0.1rem 0.1rem;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        width: 100%;
+        height: 100%;
+    }
+
+    .driver_header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        width: 100vw;
+        border-bottom: 1px solid grey;
+    }
+
+    .driver_slider {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+
+    .btn_slider {
+        width: 22px;
+        height: 22px;
+        left: 5px;
+        top: 2px;
+        border-radius: 50%;
+    }
+
+    .on_off {
+        padding: 0.2rem;
+        font-size: 0.7rem;
+    }
+
+    .toggle-switch {
+        position: relative;
+        width: 5em;
+        height: 1.6em;
+    }
+
+    .driverTotals{
+        text-align: center;
+        font-size: 0.9rem;
+        padding: 0rem;
+        margin-bottom: 0;
+    }
+
+    .driver_profile {
+        font-size: 2rem;
+    }
+
+    .profile-card-overlay {
+        top: 2.5rem;
+        width: 100%;
+        height: 100%;
+    }
+
+    .profile-cards {
+        padding: 0.5rem;
+        height: 100%;
+    }
+
+    .profile-cards .image {
+        padding: 10px;
+    }
+
+    .image-upload{
+        width: 100%;
+        text-align: center;
+    }
+
+    .profileInput{
+        font-size: 0.8rem;
+        text-align: center;
+        width: 60%;
+    }
+
+    .profile-cards .name {
+        font-size: 1.5rem;
+        margin-top: 0.5rem;
+    }
+
+    .profile-cards .location {
+        font-size: 1rem;
+    }
+
+    .profile-cards .profile_icon {
+        font-size: 1rem;
+    }
+
+    .profile-cards .Vehicle {
+        margin-top: 1.5rem;
+    }
+
+    .profile-cards .number {
+        font-size: 18px;
+    }
+
+    .profile-cards .vehicle_details {
+        font-size: 0.8rem;
+    }
+
+    .profile-cards .btn-container {
+        display: flex;
+        margin-top: 1.5rem;
+    }
+
+    .profile-cards .edit_btn {
+        height: 35px;
+        width: 140px;
+        font-size: 0.9rem;
+    }
+
+    .logout_btn {
+        height: 40px;
+        width: 100px;
+        border: none;
+        background-color:red;
+        color: white;
+        font-size: 15px;
+        transition: ease-in .2s;
+        margin-top: 0.5rem;
+    }
+
+    .driver_body {
+        width: 100%;
+        height: 100%;
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        column-gap: 2px;
+        row-gap: 2px;
+    }
+
+    .order_container_div {
+        gap: 0px;
+        width: 100%;
+        padding: 0.1rem;
+    }
+
+    .hotel_name_div {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        border-bottom: 1px solid #ddd;
+        padding-bottom: 0   rem;
+    }
+
+    .order_p {
+        margin: 0;
+        font-size: 0.8rem;
+        color: #333;
+    }
+
+    .order_vendors{
+        text-align: right;
+    }
+
+    .order_number{
+        font-size: 0.7rem;
+    }
+
+    .order_detail_input {
+        font-size: 0.7rem;
+        color: #666;
+        text-align: right;
+    }
+
+    .map_div {
+        padding-top: 0rem;
+        width: 100vw;
+    }
+
+    .order_delivery_details {
+        bottom: 0rem;
+        width: 95vw;
+        padding: 1rem 0.2rem;
+    }
+
+    .order_delivery_details p {
+        margin-bottom: 0.5rem;
+        display: flex;
+        flex-direction: row;
+        justify-content: space-between;
+    }
+}
+
+@media (min-width:321px) and (max-width:375px){
+    .dial-slider_wrapper {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+        width: 100%;
+    }
+
+    .dial-slider_container {
+        padding: 0.1rem 0.1rem;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        width: 100%;
+        height: 100%;
+    }
+
+    .driver_header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        width: 100vw;
+        border-bottom: 1px solid grey;
+    }
+
+    .driver_slider {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+
+    .btn_slider {
+        width: 22px;
+        height: 22px;
+        left: 5px;
+        top: 2px;
+        border-radius: 50%;
+    }
+
+    .on_off {
+        padding: 0.2rem;
+        font-size: 0.7rem;
+    }
+
+    .toggle-switch {
+        position: relative;
+        width: 5em;
+        height: 1.6em;
+    }
+
+    .driverTotals{
+        text-align: center;
+        font-size: 0.9rem;
+        padding: 0rem;
+        margin-bottom: 0;
+    }
+
+    .driver_profile {
+        font-size: 2rem;
+    }
+
+    .profile-card-overlay {
+        top: 2.5rem;
+        width: 100%;
+        height: 100%;
+    }
+
+    .profile-cards {
+        padding: 0.5rem;
+        height: 100%;
+    }
+
+    .profile-cards .image {
+        padding: 10px;
+    }
+
+    .image-upload{
+        width: 100%;
+        text-align: center;
+    }
+
+    .profileInput{
+        font-size: 0.8rem;
+        text-align: center;
+        width: 60%;
+    }
+
+    .profile-cards .name {
+        font-size: 1.5rem;
+        margin-top: 0.5rem;
+    }
+
+    .profile-cards .location {
+        font-size: 1rem;
+    }
+
+    .profile-cards .profile_icon {
+        font-size: 1rem;
+    }
+
+    .profile-cards .Vehicle {
+        margin-top: 1.5rem;
+    }
+
+    .profile-cards .number {
+        font-size: 18px;
+    }
+
+    .profile-cards .vehicle_details {
+        font-size: 0.8rem;
+    }
+
+    .profile-cards .btn-container {
+        display: flex;
+        margin-top: 1.5rem;
+    }
+
+    .profile-cards .edit_btn {
+        height: 35px;
+        width: 140px;
+        font-size: 0.9rem;
+    }
+
+    .logout_btn {
+        height: 40px;
+        width: 100px;
+        border: none;
+        background-color:red;
+        color: white;
+        font-size: 15px;
+        transition: ease-in .2s;
+        margin-top: 0.5rem;
+    }
+
+    .driver_body {
+        width: 100%;
+        height: 100%;
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        column-gap: 2px;
+        row-gap: 2px;
+    }
+
+    .order_container_div {
+        gap: 0px;
+        width: 100%;
+        padding: 0.1rem;
+    }
+
+    .hotel_name_div {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        border-bottom: 1px solid #ddd;
+        padding-bottom: 0   rem;
+    }
+
+    .order_p {
+        margin: 0;
+        font-size: 0.8rem;
+        color: #333;
+    }
+
+    .order_vendors{
+        text-align: right;
+    }
+
+    .order_number{
+        font-size: 0.7rem;
+    }
+
+    .order_detail_input {
+        font-size: 0.7rem;
+        color: #666;
+        text-align: right;
+    }
+
+    .map_div {
+        padding-top: 0rem;
+        width: 100vw;
+    }
+
+    .order_delivery_details {
+        bottom: 0rem;
+        width: 95vw;
+        padding: 1rem 0.2rem;
+    }
+
+    .order_delivery_details p {
+        margin-bottom: 0.5rem;
+        display: flex;
+        flex-direction: row;
+        justify-content: space-between;
+    }
+}
+
+@media (min-width:376px) and (max-width:425px){
+    .dial-slider_wrapper {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+        width: 100%;
+    }
+
+    .dial-slider_container {
+        padding: 0.1rem 0.1rem;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        width: 100%;
+        height: 100%;
+    }
+
+    .driver_header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        width: 100vw;
+        border-bottom: 1px solid grey;
+    }
+
+    .driver_slider {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+
+    .btn_slider {
+        width: 22px;
+        height: 22px;
+        left: 5px;
+        top: 2px;
+        border-radius: 50%;
+    }
+
+    .on_off {
+        padding: 0.2rem;
+        font-size: 0.7rem;
+    }
+
+    .toggle-switch {
+        position: relative;
+        width: 5em;
+        height: 1.6em;
+    }
+
+    .driverTotals{
+        text-align: center;
+        font-size: 0.9rem;
+        padding: 0rem;
+        margin-bottom: 0;
+    }
+
+    .driver_profile {
+        font-size: 2rem;
+    }
+
+    .profile-card-overlay {
+        top: 2.5rem;
+        width: 100%;
+        height: 100%;
+    }
+
+    .profile-cards {
+        padding: 0.5rem;
+        height: 100%;
+    }
+
+    .profile-cards .image {
+        padding: 10px;
+    }
+
+    .image-upload{
+        width: 100%;
+        text-align: center;
+    }
+
+    .profileInput{
+        font-size: 0.8rem;
+        text-align: center;
+        width: 60%;
+    }
+
+    .profile-cards .name {
+        font-size: 1.5rem;
+        margin-top: 0.5rem;
+    }
+
+    .profile-cards .location {
+        font-size: 1rem;
+    }
+
+    .profile-cards .profile_icon {
+        font-size: 1rem;
+    }
+
+    .profile-cards .Vehicle {
+        margin-top: 1.5rem;
+    }
+
+    .profile-cards .number {
+        font-size: 18px;
+    }
+
+    .profile-cards .vehicle_details {
+        font-size: 0.8rem;
+    }
+
+    .profile-cards .btn-container {
+        display: flex;
+        margin-top: 1.5rem;
+    }
+
+    .profile-cards .edit_btn {
+        height: 35px;
+        width: 140px;
+        font-size: 0.9rem;
+    }
+
+    .logout_btn {
+        height: 40px;
+        width: 100px;
+        border: none;
+        background-color:red;
+        color: white;
+        font-size: 15px;
+        transition: ease-in .2s;
+        margin-top: 0.5rem;
+    }
+
+    .driver_body {
+        width: 100%;
+        height: 100%;
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        column-gap: 2px;
+        row-gap: 2px;
+    }
+
+    .order_container_div {
+        gap: 0px;
+        width: 100%;
+        padding: 0.1rem;
+    }
+
+    .hotel_name_div {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        border-bottom: 1px solid #ddd;
+        padding-bottom: 0   rem;
+    }
+
+    .order_p {
+        margin: 0;
+        font-size: 0.8rem;
+        color: #333;
+    }
+
+    .order_vendors{
+        text-align: right;
+    }
+
+    .order_number{
+        font-size: 0.7rem;
+    }
+
+    .order_detail_input {
+        font-size: 0.7rem;
+        color: #666;
+        text-align: right;
+    }
+
+    .map_div {
+        padding-top: 0rem;
+        width: 100vw;
+    }
+
+    .order_delivery_details {
+        bottom: 0rem;
+        width: 95vw;
+        padding: 1rem 0.2rem;
+    }
+
+    .order_delivery_details p {
+        margin-bottom: 0.5rem;
+        display: flex;
+        flex-direction: row;
+        justify-content: space-between;
+    }
 }

@@ -14,13 +14,12 @@ const Dashboard = () => {
     const [location, setLocation] = useState('');
     const [contactNumber, setContactNumber] = useState('');
     const [vehicleType, setVehicleType] = useState('');
-    const [driverImage, setDriverImage] = useState(null); // New state for driver image
-    const [editing, setEditing] = useState(false); // State to toggle editing mode
-    const [timer, setTimer] = useState(0); // Timer state for the countdown
-    const [orderTimerId, setOrderTimerId] = useState(null); // Timer ID for clearing later
-    const [driverId, setDriverId] = useState(null); // Initialize state for driverId
-    // const [dispatchedOrders, setDispatchedOrders] = useState([]);
-    const [orderId, setOrderId] = useState(null); // State to hold orderId
+    const [driverImage, setDriverImage] = useState(null); 
+    const [editing, setEditing] = useState(false);
+    const [timer, setTimer] = useState(0); 
+    const [orderTimerId, setOrderTimerId] = useState(null);
+    const [driverId, setDriverId] = useState(null);
+    const [orderId, setOrderId] = useState(null);
     const [orderStatus, setOrderStatus] = useState('');
 
 
@@ -973,7 +972,7 @@ const markOrderAsDelivered = async (orderId, driverId) => {
                         <label className="label_off on_off">Offline</label>
                     </div>
                     <div className="total_earnings_today">
-                        <h4>Total Earnings Today: <span id="totalEarnings">Ksh 0</span></h4>
+                        <h4 className='driverTotals'>Total: <span id="totalEarnings">Ksh 0</span></h4>
                     </div>
 
                     <div className="driver_icon">
@@ -988,6 +987,7 @@ const markOrderAsDelivered = async (orderId, driverId) => {
                                             {editing && (
                                                 <>
                                                     <input
+                                                        className='profileInput'
                                                         type="file"
                                                         accept="image/*"
                                                         onChange={(e) => setDriverImage(e.target.files[0])}
@@ -1117,19 +1117,19 @@ const markOrderAsDelivered = async (orderId, driverId) => {
                                     <span className="order_detail_input">{order.name}</span>
                                 </div> */}
                                 <div className="hotel_name_div">
-                                    <p className="order_p">Restaurant/Pickup Location</p>
+                                    <p className="order_p">Pickup</p>
                                     <span className="order_detail_input">{order.pickup}</span>
                                 </div>
                                 <div className="hotel_name_div">
-                                    <p className="order_p">Order ID</p>
+                                    <p className="order_p">ID</p>
                                     <span className="order_detail_input">{order.order}</span>
                                 </div>
                                 <div className="hotel_name_div">
-                                    <p className="order_p">Dropoff Location</p>
+                                    <p className="order_p">Dropoff</p>
                                     <span className="order_detail_input">{order.dropoff}</span>
                                 </div>
                                 <div className="hotel_name_div">
-                                    <p className="order_p">Order Number/Vendor</p>
+                                    <p className="order_p">Order Number <br></br>/Vendor</p>
                                     <div className="order_vendors">
                                         {/* Check if vendorOrders exists to determine if it's a food order or a regular order */}
                                         {order.vendorOrders ? (
@@ -1151,17 +1151,17 @@ const markOrderAsDelivered = async (orderId, driverId) => {
                                     <span className="order_detail_input">{order.netPay}</span>
                                 </div>
                                 <div className="hotel_name_div">
-                                    <p className="order_p">Expected Delivery Time</p>
+                                    <p className="order_p">Time:</p>
                                     <span className="order_detail_input">{order.expectedDeliveryTime}</span>
                                 </div>
                                 <div className="hotel_name_div">
-                                    <p className="order_p">Customer Contact</p>
+                                    <p className="order_p">Contact</p>
                                     <span className="order_detail_input">{order.phoneNumber}</span>
                                 </div>
 
                                 {/* Button to accept the order */}
                                 <button className="accept_order_btn" onClick={() => handleAcceptOrder(order)}>
-                                    Accept Order
+                                    Accept
                                 </button>
                             </div>
                         ))
