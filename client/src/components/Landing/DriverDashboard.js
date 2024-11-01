@@ -23,27 +23,59 @@ const Dashboard = () => {
     const [orderStatus, setOrderStatus] = useState('');
 
 
+
+    const [isEarningsModalOpen, setEarningsModalOpen] = useState(false);
+    const [totalEarnings, setTotalEarnings] = useState(0);
     const navigate = useNavigate();
 
+    
+
+
+
+    // useEffect for setting driverId and initializing earnings
     useEffect(() => {
-        const storedDriverId = localStorage.getItem('driverId'); // Retrieve the driver ID from local storage
+        const storedDriverId = localStorage.getItem('driverId');
         if (storedDriverId) {
-            console.log('Driver ID set in local storage:', storedDriverId); // Log the driverId instead
-            setDriverId(storedDriverId); // Set driverId state
+            console.log('Driver ID set in local storage:', storedDriverId);
+            setDriverId(storedDriverId);
         } else {
             console.error('Driver ID not found in local storage');
         }
-    }, []); // This runs once on mount to get the driverId
+    }, []); // Run only once on mount
+
+    // UseEffect to initialize earnings once driverId is available
+    // useEffect(() => {
+    //     if (driverId) {
+    //         fetchDriverDetails(driverId);
+    //         fetchOrders();
+    //         fetchOrderByStatus();
+    //         initializeEarnings(driverId); // Call only when driverId is available
+    //     }
+    // }, [driverId]); // Run when driverId updates
 
     useEffect(() => {
         if (driverId) {
-            fetchDriverDetails(driverId); // Fetch driver details using the stored driver ID
-            // fetchDispatchedOrders(driverId); // Fetch dispatched orders using the stored driver ID
-            fetchOrders(); // Call fetchOrders if necessary
-            // restoreTimerState();
-            fetchOrderByStatus();
+            (async () => {
+                const driverDetails = await fetchDriverDetails(driverId);
+                if (driverDetails) {
+                    fetchOrders();
+                    fetchOrderByStatus();
+                    initializeEarnings(driverId, driverDetails); // Pass driverDetails to initialize earnings
+                }
+            })();
         }
-    }, [driverId]); // This runs whenever driverId changes
+    }, [driverId]);
+
+    const toggleEarningsModal = async () => {
+        if (!isEarningsModalOpen) {
+            // Fetch order details from the backend
+            const response = await fetch(`${config.backendUrl}/api/get-driver-earnings?driverId=${driverId}&date=${today}`);
+            const data = await response.json();
+            setOrders(data.orders);
+            setTotalEarnings(data.totalEarnings);
+        }
+        setEarningsModalOpen(!isEarningsModalOpen);
+    };
 
 
     const fetchDriverDetails = async (driverId) => {
@@ -67,6 +99,7 @@ const Dashboard = () => {
                 console.error('Driver ID is missing in the fetched data');
                 return;
             }
+
             // Construct the full driver image URL
             const driverImage = `${config.backendUrl}${data.driverImage}`;
 
@@ -81,6 +114,7 @@ const Dashboard = () => {
             console.error('Failed to fetch driver details:', error);
         }
     };
+
 
     const toggleOnlineStatus = () => {
         setIsOnline(prev => !prev);
@@ -496,192 +530,200 @@ const Dashboard = () => {
         }, 90 * 1000); // Check every 90 seconds
     };
 
+    // let totalEarnings = 0; // Cumulative daily earnings
+    const today = new Date().toLocaleDateString(); // Today's date for tracking
 
-    // const markOrderAsDelivered = async (orderId, driverId) => {
-    //     console.log("markOrderAsDelivered function called");
-
-    //     // Check if the order is available and in transit
-    //     if (!selectedOrder || selectedOrder?.status !== 'On Transit') {
-    //         console.log("Order is not in transit or not selected.");
-    //         alert('Order is not in transit, cannot mark as delivered.');
-    //         return false; // Indicate failure
-    //     }
-
-    //     const payload = {
-    //         status: 'Delivered',
-    //         driverId: driverId
-    //     };
-
-    //     try {
-    //         let response;
-
-    //         if (selectedOrder.vendorOrders && selectedOrder.vendorOrders.length > 0) {
-    //             // Handle vendor orders
-    //             console.log("Processing vendor orders for delivery.");
-
-    //             // Update the main parent order status first
-    //             response = await fetch(`${config.backendUrl}/api/driverUpdateFoodOrderStatus/${orderId}`, {
-    //                 method: 'PATCH',
-    //                 headers: {
-    //                     'Content-Type': 'application/json',
-    //                 },
-    //                 body: JSON.stringify(payload)
-    //             });
-
-    //             if (!response.ok) {
-    //                 throw new Error('Failed to update parent food order status');
-    //             }
-
-    //             // Update each vendor order's status
-    //             for (let vendorOrder of selectedOrder.vendorOrders) {
-    //                 const vendorId = vendorOrder?._id;
-
-    //                 if (!vendorId) {
-    //                     console.warn("Vendor ID is undefined! Skipping vendor order.");
-    //                     continue;
-    //                 }
-
-    //                 try {
-    //                     const vendorResponse = await fetch(`${config.backendUrl}/api/updateVendorOrderStatus/${vendorId}`, {
-    //                         method: 'PATCH',
-    //                         headers: {
-    //                             'Content-Type': 'application/json',
-    //                         },
-    //                         body: JSON.stringify({ status: 'Delivered' })
-    //                     });
-
-    //                     if (!vendorResponse.ok) {
-    //                         throw new Error(`Failed to update vendor order status for vendor: ${vendorOrder.vendor}`);
-    //                     }
-
-    //                     console.log(`Vendor order marked as delivered:`, await vendorResponse.json());
-    //                 } catch (error) {
-    //                     console.error(`Error marking vendor order as delivered:`, error);
-    //                 }
-    //             }
-    //         } else {
-    //             // Handle normal orders
-    //             response = await fetch(`${config.backendUrl}/api/driverUpdateOrderStatus/${orderId}`, {
-    //                 method: 'PATCH',
-    //                 headers: {
-    //                     'Content-Type': 'application/json',
-    //                 },
-    //                 body: JSON.stringify(payload),
-    //             });
-
-    //             if (!response.ok) {
-    //                 throw new Error('Failed to update order status');
-    //             }
-    //         }
-
-    //         const updatedOrder = await response.json();
-    //         setSelectedOrder(updatedOrder);
-    //         alert('Order marked as delivered successfully.');
-    //         return true; // Indicate success
-    //     } catch (error) {
-    //         console.error('Error marking order as delivered:', error);
-    //         alert('Failed to mark order as delivered.');
-    //         return false; // Indicate failure
-    //     }
-    // };
-
-    let totalEarnings = 0; // Global variable to store total earnings for today
-
-// Function to update the total earnings in the dashboard
-const updateTotalEarnings = (netPay) => {
-    totalEarnings += netPay;
-    document.getElementById('totalEarnings').innerText = `Ksh ${totalEarnings}`;
-};
-
-const markOrderAsDelivered = async (orderId, driverId) => {
-    console.log("markOrderAsDelivered function called");
-
-    if (!selectedOrder || selectedOrder?.status !== 'On Transit') {
-        console.log("Order is not in transit or not selected.");
-        alert('Order is not in transit, cannot mark as delivered.');
-        return false;
-    }
-
-    const payload = {
-        status: 'Delivered',
-        driverId: driverId
-    };
-
-    try {
-        let response;
-
-        if (selectedOrder.vendorOrders && selectedOrder.vendorOrders.length > 0) {
-            console.log("Processing vendor orders for delivery.");
-            
-            response = await fetch(`${config.backendUrl}/api/driverUpdateFoodOrderStatus/${orderId}`, {
-                method: 'PATCH',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify(payload)
-            });
-
-            if (!response.ok) {
-                throw new Error('Failed to update parent food order status');
-            }
-
-            for (let vendorOrder of selectedOrder.vendorOrders) {
-                const vendorId = vendorOrder?._id;
-
-                if (!vendorId) {
-                    console.warn("Vendor ID is undefined! Skipping vendor order.");
-                    continue;
-                }
-
-                try {
-                    const vendorResponse = await fetch(`${config.backendUrl}/api/updateVendorOrderStatus/${vendorId}`, {
-                        method: 'PATCH',
-                        headers: {
-                            'Content-Type': 'application/json',
-                        },
-                        body: JSON.stringify({ status: 'Delivered' })
-                    });
-
-                    if (!vendorResponse.ok) {
-                        throw new Error(`Failed to update vendor order status for vendor: ${vendorOrder.vendor}`);
-                    }
-
-                    console.log(`Vendor order marked as delivered:`, await vendorResponse.json());
-                } catch (error) {
-                    console.error(`Error marking vendor order as delivered:`, error);
-                }
-            }
-        } else {
-            response = await fetch(`${config.backendUrl}/api/driverUpdateOrderStatus/${orderId}`, {
-                method: 'PATCH',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify(payload),
-            });
-
-            if (!response.ok) {
-                throw new Error('Failed to update order status');
-            }
+    // Function to initialize or reset daily earnings, retrieving from MongoDB or localStorage
+    const initializeEarnings = async (driverId) => { // Accept driverId as a parameter
+        if (!driverId) {
+            console.error("Driver ID is undefined. Cannot fetch earnings.");
+            return; // Exit early if driverId is not valid
         }
 
-        const updatedOrder = await response.json();
-        setSelectedOrder(updatedOrder);
+        const today = new Date().toLocaleDateString(); // Today's date for tracking
 
-        // Calculate net pay from the delivered order
-        const netPay = updatedOrder.deliveryCharges - (updatedOrder.deliveryCharges * 0.2);
-        
-        // Update the total earnings
-        updateTotalEarnings(netPay);
+        try {
+            const response = await fetch(`${config.backendUrl}/api/daily-earnings?date=${today}&driverId=${driverId}`);
+            const data = await response.json();
+            console.log("Daily earnings API Response:", data);
 
-        alert('Order marked as delivered successfully.');
-        return true;
-    } catch (error) {
-        console.error('Error marking order as delivered:', error);
-        alert('Failed to mark order as delivered.');
-        return false;
-    }
-};
+            if (response.ok && data.totalEarnings !== undefined) {
+                totalEarnings = data.totalEarnings;
+                console.log("Total Earnings:", totalEarnings);
+            } else {
+                totalEarnings = 0;
+                localStorage.setItem('dailyEarnings', JSON.stringify({ date: today, earnings: totalEarnings }));
+            }
+
+            updateDashboard();
+        } catch (error) {
+            console.error("Error fetching daily earnings from the server:", error);
+        }
+    };
+
+    // Function to update total earnings for delivered orders and sync with MongoDB
+    // const updateTotalEarnings = async (netPay, driverId, orderId, driverDetails) => {
+    //     totalEarnings += netPay; // Update the total earnings
+
+    //     try {
+    //         await fetch(`${config.backendUrl}/api/update-earnings`, {
+    //             method: 'POST',
+    //             headers: { 'Content-Type': 'application/json' },
+    //             body: JSON.stringify({
+    //                 date: today,
+    //                 earnings: totalEarnings,
+    //                 driverId: driverId,
+    //                 orderId: orderId,                   // Include orderId
+    //                 driverDetails: driverDetails,        // Include driver details
+    //                 orderNetPay: netPay                  // Include net pay for this order
+    //             })
+    //         });
+    //         console.log('Earnings updated successfully for', driverId);
+    //     } catch (error) {
+    //         console.error("Error updating earnings on the server:", error);
+    //     }
+
+    //     updateDashboard(); // Refresh dashboard after updating earnings
+    // };
+
+    const updateTotalEarnings = async (netPay, driverId, orderId, driverDetails) => {
+        try {
+            // Fetch the existing record for the day
+            const today = new Date().toISOString().split('T')[0]; // Format the date to YYYY-MM-DD
+
+            const result = await fetch(`${config.backendUrl}/api/update-earnings`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    date: today,
+                    driverId: driverId,
+                    driverDetails: driverDetails,
+                    orderId: orderId,
+                    netPay: netPay,
+                    paidStatus: 'Not Paid' // New orders are defaulted as not paid
+                })
+            });
+            console.log('Earnings updated successfully for', driverId);
+        } catch (error) {
+            console.error("Error updating earnings on the server:", error);
+        }
+
+        updateDashboard(); // Refresh dashboard after updating earnings
+    };
+
+
+    // Function to display updated earnings on the dashboard
+    const updateDashboard = () => {
+        const totalEarningsElement = document.getElementById('totalEarnings');
+        if (totalEarningsElement) {
+            totalEarningsElement.innerText = `Ksh ${totalEarnings}`;
+        } else {
+            console.warn("Element with ID 'totalEarnings' not found.");
+        }
+    };
+
+    // Initialize earnings when the page loads
+    initializeEarnings(driverId);
+
+
+    const markOrderAsDelivered = async (orderId, driverId) => {
+        console.log("markOrderAsDelivered function called");
+
+        if (!driverId) {
+            console.error("Driver ID is undefined in markOrderAsDelivered");
+            return; // Exit if driverId is not defined
+        }
+
+        if (!selectedOrder || selectedOrder?.status !== 'On Transit') {
+            console.log("Order is not in transit or not selected.");
+            alert('Order is not in transit, cannot mark as delivered.');
+            return false;
+        }
+
+        const payload = {
+            status: 'Delivered',
+            driverId: driverId
+        };
+
+        try {
+            let response;
+
+            if (selectedOrder.vendorOrders && selectedOrder.vendorOrders.length > 0) {
+                console.log("Processing vendor orders for delivery.");
+
+                // Update parent order status
+                response = await fetch(`${config.backendUrl}/api/driverUpdateFoodOrderStatus/${orderId}`, {
+                    method: 'PATCH',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(payload)
+                });
+
+                if (!response.ok) {
+                    throw new Error('Failed to update parent food order status');
+                }
+
+                // Update each vendor order status
+                for (let vendorOrder of selectedOrder.vendorOrders) {
+                    const vendorId = vendorOrder?._id;
+
+                    if (!vendorId) {
+                        console.warn("Vendor ID is undefined! Skipping vendor order.");
+                        continue;
+                    }
+
+                    try {
+                        const vendorResponse = await fetch(`${config.backendUrl}/api/updateVendorOrderStatus/${vendorId}`, {
+                            method: 'PATCH',
+                            headers: {
+                                'Content-Type': 'application/json',
+                            },
+                            body: JSON.stringify({ status: 'Delivered' })
+                        });
+
+                        if (!vendorResponse.ok) {
+                            throw new Error(`Failed to update vendor order status for vendor: ${vendorOrder.vendor}`);
+                        }
+
+                        console.log(`Vendor order marked as delivered:`, await vendorResponse.json());
+                    } catch (error) {
+                        console.error(`Error marking vendor order as delivered:`, error);
+                    }
+                }
+            } else {
+                // Update single order status
+                response = await fetch(`${config.backendUrl}/api/driverUpdateOrderStatus/${orderId}`, {
+                    method: 'PATCH',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(payload),
+                });
+
+                if (!response.ok) {
+                    throw new Error('Failed to update order status');
+                }
+            }
+
+            const updatedOrder = await response.json();
+            setSelectedOrder(updatedOrder);
+
+            // Calculate net pay from the delivered order
+            const netPay = updatedOrder.deliveryCharges - (updatedOrder.deliveryCharges * 0.2); // Assuming 20% commission deduction
+            console.log(netPay);
+            // Update the total earnings
+            updateTotalEarnings(netPay, driverId, orderId, driverDetails);
+
+            alert('Order marked as delivered successfully.');
+            return true;
+        } catch (error) {
+            console.error('Error marking order as delivered:', error);
+            alert('Failed to mark order as delivered.');
+            return false;
+        }
+    };
+
 
     const markVendorOrderAsDelivered = async (vendorId) => {
         try {
@@ -971,9 +1013,11 @@ const markOrderAsDelivered = async (orderId, driverId) => {
                         </div>
                         <label className="label_off on_off">Offline</label>
                     </div>
+                 
                     <div className="total_earnings_today">
                         <h4 className='driverTotals'>Total: <span id="totalEarnings">Ksh 0</span></h4>
                     </div>
+
 
                     <div className="driver_icon">
                         <i className="fas fa-user-circle driver_profile" onClick={handleProfileClick}></i>

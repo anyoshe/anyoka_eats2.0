@@ -23,7 +23,7 @@ const cartReducer = (state, action) => {
     case ADD_TO_CART: {
       const { dishDetails } = action.payload;
       const { dishCode, dishName, dishPrice, dishCategory, restaurant, discount, discountedPrice } = dishDetails;
-      const price = discount > 0 ? discountedPrice : dishPrice * 1.2;
+      const price = discount > 0 ? discountedPrice : dishPrice * 1.1;
       const quantity = 1;
 
       const existingItem = state.items.find(item => item.dishCode === dishCode);
