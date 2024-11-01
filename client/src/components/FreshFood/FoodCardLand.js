@@ -87,11 +87,11 @@ const FoodCardLand = ({ food }) => {
       {food.discount > 0 ? (
         <div>
           <span className="fresh_original">
-            Was <span className='fresh-original-strikethrough'> Kes.{(food.foodPrice * 1.2).toFixed(2)}</span>
+            Was <span className='fresh-original-strikethrough'> Kes.{(food.foodPrice * 1.1).toFixed(2)}</span>
           </span>
         </div>
       ) : (
-        <h6 className="dishPrice dishcontent">Kes.{(food.foodPrice * 1.2).toFixed(2)}</h6>
+        <h6 className="dishPrice dishcontent">Kes.{(food.foodPrice * 1.1).toFixed(2)}</h6>
       )}
   
       <p className="dishRestaurant dishcontent">{food.vendor || 'Unknown Vendor'}</p>
