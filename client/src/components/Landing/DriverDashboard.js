@@ -996,8 +996,9 @@ const Dashboard = () => {
                     </div>
 
                     <div className="total_earnings_today">
-<<<<<<< HEAD
-                        <button onClick={toggleEarningsModal}>Total Earnings Today: Ksh <span id="totalEarnings">{totalEarnings}</span></button>
+                        <button className='driverTotals' onClick={toggleEarningsModal}>Total:<span id="totalEarnings">Ksh {totalEarnings}</span></button>
+                        {/* <h4 className='driverTotals'>Total: <span id="totalEarnings">Ksh 0</span></h4> */}
+
 
                         {isEarningsModalOpen && (
                             <div className="earnings-modal">
@@ -1029,9 +1030,6 @@ const Dashboard = () => {
                                 <button onClick={toggleEarningsModal}>Close</button>
                             </div>
                         )}
-=======
-                        <h4 className='driverTotals'>Total: <span id="totalEarnings">Ksh 0</span></h4>
->>>>>>> b391b54f1c79c45dd19b97c9bd4b994fddf98803
                     </div>
 
 
