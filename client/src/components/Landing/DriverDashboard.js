@@ -22,16 +22,9 @@ const Dashboard = () => {
     // const [dispatchedOrders, setDispatchedOrders] = useState([]);
     const [orderId, setOrderId] = useState(null); // State to hold orderId
     const [orderStatus, setOrderStatus] = useState('');
-
-
-
     const [isEarningsModalOpen, setEarningsModalOpen] = useState(false);
     const [totalEarnings, setTotalEarnings] = useState(0);
     const navigate = useNavigate();
-
-    
-
-
 
     // useEffect for setting driverId and initializing earnings
     useEffect(() => {
@@ -43,16 +36,6 @@ const Dashboard = () => {
             console.error('Driver ID not found in local storage');
         }
     }, []); // Run only once on mount
-
-    // UseEffect to initialize earnings once driverId is available
-    // useEffect(() => {
-    //     if (driverId) {
-    //         fetchDriverDetails(driverId);
-    //         fetchOrders();
-    //         fetchOrderByStatus();
-    //         initializeEarnings(driverId); // Call only when driverId is available
-    //     }
-    // }, [driverId]); // Run when driverId updates
 
     useEffect(() => {
         if (driverId) {
@@ -69,14 +52,37 @@ const Dashboard = () => {
 
     const toggleEarningsModal = async () => {
         if (!isEarningsModalOpen) {
-            // Fetch order details from the backend
-            const response = await fetch(`${config.backendUrl}/api/get-driver-earnings?driverId=${driverId}&date=${today}`);
-            const data = await response.json();
-            setOrders(data.orders);
-            setTotalEarnings(data.totalEarnings);
+            try {
+                const formattedDate = new Date().toISOString().split('T')[0]; // Format date to YYYY-MM-DD
+                const response = await fetch(`${config.backendUrl}/api/daily-earnings?driverId=${driverId}&date=${formattedDate}`);
+
+                console.log("Daily earnings API Response: ", response);
+                if (!response.ok) {
+                    const message = await response.json();
+                    console.warn("Daily earnings fetch warning: ", message);
+                    throw new Error("Failed to fetch earnings data");
+                }
+
+                let data = await response.json(); // Using 'let' if 'data' might be reassigned
+                console.log("Fetched Earnings Data:", data);
+
+                if (data.orders && data.totalEarnings !== undefined) {
+                    setOrders(data.orders);
+                    setTotalEarnings(data.totalEarnings);
+                } else {
+                    setOrders([]);
+                    setTotalEarnings(0);
+                }
+            } catch (error) {
+                console.error("Error fetching daily earnings from the server:", error);
+                setOrders([]);
+                setTotalEarnings(0);
+            }
         }
         setEarningsModalOpen(!isEarningsModalOpen);
     };
+
+
 
 
     const fetchDriverDetails = async (driverId) => {
@@ -562,31 +568,6 @@ const Dashboard = () => {
         }
     };
 
-    // Function to update total earnings for delivered orders and sync with MongoDB
-    // const updateTotalEarnings = async (netPay, driverId, orderId, driverDetails) => {
-    //     totalEarnings += netPay; // Update the total earnings
-
-    //     try {
-    //         await fetch(`${config.backendUrl}/api/update-earnings`, {
-    //             method: 'POST',
-    //             headers: { 'Content-Type': 'application/json' },
-    //             body: JSON.stringify({
-    //                 date: today,
-    //                 earnings: totalEarnings,
-    //                 driverId: driverId,
-    //                 orderId: orderId,                   // Include orderId
-    //                 driverDetails: driverDetails,        // Include driver details
-    //                 orderNetPay: netPay                  // Include net pay for this order
-    //             })
-    //         });
-    //         console.log('Earnings updated successfully for', driverId);
-    //     } catch (error) {
-    //         console.error("Error updating earnings on the server:", error);
-    //     }
-
-    //     updateDashboard(); // Refresh dashboard after updating earnings
-    // };
-
     const updateTotalEarnings = async (netPay, driverId, orderId, driverDetails) => {
         try {
             // Fetch the existing record for the day
@@ -1014,33 +995,37 @@ const Dashboard = () => {
                         </div>
                         <label className="label_off on_off">Offline</label>
                     </div>
-                 
+
                     <div className="total_earnings_today">
                         <button onClick={toggleEarningsModal}>Total Earnings Today: Ksh <span id="totalEarnings">{totalEarnings}</span></button>
 
                         {isEarningsModalOpen && (
                             <div className="earnings-modal">
                                 <h4>Earnings Details</h4>
-                                <table>
-                                    <thead>
-                                        <tr>
-                                            <th>Order ID</th>
-                                            <th>Net Pay</th>
-                                            <th>Date</th>
-                                            <th>Paid Status</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        {orders.map(order => (
-                                            <tr key={order.orderId}>
-                                                <td>{order.orderId}</td>
-                                                <td>{order.netPay}</td>
-                                                <td>{order.date}</td>
-                                                <td>{order.paidStatus}</td>
+                                {orders.length > 0 ? (
+                                    <table>
+                                        <thead>
+                                            <tr>
+                                                <th>Order ID</th>
+                                                <th>Net Pay</th>
+                                                <th>Date</th>
+                                                <th>Paid Status</th>
                                             </tr>
-                                        ))}
-                                    </tbody>
-                                </table>
+                                        </thead>
+                                        <tbody>
+                                            {orders.map(order => (
+                                                <tr key={order.orderId}>
+                                                    <td>{order.orderId}</td>
+                                                    <td>{order.netPay}</td>
+                                                    <td>{today}</td> {/* Display the date */}
+                                                    <td>{order.paidStatus}</td>
+                                                </tr>
+                                            ))}
+                                        </tbody>
+                                    </table>
+                                ) : (
+                                    <p>No earnings data available for this date.</p>
+                                )}
                                 <button onClick={toggleEarningsModal}>Close</button>
                             </div>
                         )}
@@ -1153,11 +1138,8 @@ const Dashboard = () => {
                         <div className="map_div">
                             <div className="order_delivery_details">
                                 <p>Order ID: {selectedOrder.orderId}</p>
-                                {/* <p>Restaurant: {selectedOrder.selectedRestaurant}</p> */}
                                 <p>Restaurant/Pickup Location: {selectedOrder.selectedRestaurant}</p>
                                 <p>Dropoff Location: {selectedOrder.customerLocation}</p>
-                                {/* <p>Gross Delivery Charges: {selectedOrder.deliveryCharges}</p> */}
-                                {/* <p>Commission: {selectedOrder.commission}</p> */}
                                 <p>Your Fee:  Ksh {selectedOrder.deliveryCharges - (selectedOrder.deliveryCharges * 0.2)}.00</p>
                                 <p>Expected Delivery Time: {selectedOrder.expectedDeliveryTime}</p>
                                 <p>Customer Contact: {selectedOrder.phoneNumber}</p>
@@ -1183,10 +1165,6 @@ const Dashboard = () => {
                         // Display orders if no order is selected
                         orders.map((order) => (
                             <div className="order_container_div" key={order.id}>
-                                {/* <div className="hotel_name_div">
-                                    <p className="order_p">Restaurant</p>
-                                    <span className="order_detail_input">{order.name}</span>
-                                </div> */}
                                 <div className="hotel_name_div">
                                     <p className="order_p">Restaurant/Pickup Location</p>
                                     <span className="order_detail_input">{order.pickup}</span>
