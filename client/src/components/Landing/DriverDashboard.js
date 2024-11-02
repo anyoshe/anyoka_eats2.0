@@ -14,13 +14,12 @@ const Dashboard = () => {
     const [location, setLocation] = useState('');
     const [contactNumber, setContactNumber] = useState('');
     const [vehicleType, setVehicleType] = useState('');
-    const [driverImage, setDriverImage] = useState(null); // New state for driver image
-    const [editing, setEditing] = useState(false); // State to toggle editing mode
-    const [timer, setTimer] = useState(0); // Timer state for the countdown
-    const [orderTimerId, setOrderTimerId] = useState(null); // Timer ID for clearing later
-    const [driverId, setDriverId] = useState(null); // Initialize state for driverId
-    // const [dispatchedOrders, setDispatchedOrders] = useState([]);
-    const [orderId, setOrderId] = useState(null); // State to hold orderId
+    const [driverImage, setDriverImage] = useState(null); 
+    const [editing, setEditing] = useState(false);
+    const [timer, setTimer] = useState(0); 
+    const [orderTimerId, setOrderTimerId] = useState(null);
+    const [driverId, setDriverId] = useState(null);
+    const [orderId, setOrderId] = useState(null);
     const [orderStatus, setOrderStatus] = useState('');
     const [isEarningsModalOpen, setEarningsModalOpen] = useState(false);
     const [totalEarnings, setTotalEarnings] = useState(0);
@@ -997,6 +996,7 @@ const Dashboard = () => {
                     </div>
 
                     <div className="total_earnings_today">
+<<<<<<< HEAD
                         <button onClick={toggleEarningsModal}>Total Earnings Today: Ksh <span id="totalEarnings">{totalEarnings}</span></button>
 
                         {isEarningsModalOpen && (
@@ -1029,6 +1029,9 @@ const Dashboard = () => {
                                 <button onClick={toggleEarningsModal}>Close</button>
                             </div>
                         )}
+=======
+                        <h4 className='driverTotals'>Total: <span id="totalEarnings">Ksh 0</span></h4>
+>>>>>>> b391b54f1c79c45dd19b97c9bd4b994fddf98803
                     </div>
 
 
@@ -1044,6 +1047,7 @@ const Dashboard = () => {
                                             {editing && (
                                                 <>
                                                     <input
+                                                        className='profileInput'
                                                         type="file"
                                                         accept="image/*"
                                                         onChange={(e) => setDriverImage(e.target.files[0])}
@@ -1166,19 +1170,19 @@ const Dashboard = () => {
                         orders.map((order) => (
                             <div className="order_container_div" key={order.id}>
                                 <div className="hotel_name_div">
-                                    <p className="order_p">Restaurant/Pickup Location</p>
+                                    <p className="order_p">Pickup</p>
                                     <span className="order_detail_input">{order.pickup}</span>
                                 </div>
                                 <div className="hotel_name_div">
-                                    <p className="order_p">Order ID</p>
+                                    <p className="order_p">ID</p>
                                     <span className="order_detail_input">{order.order}</span>
                                 </div>
                                 <div className="hotel_name_div">
-                                    <p className="order_p">Dropoff Location</p>
+                                    <p className="order_p">Dropoff</p>
                                     <span className="order_detail_input">{order.dropoff}</span>
                                 </div>
                                 <div className="hotel_name_div">
-                                    <p className="order_p">Order Number/Vendor</p>
+                                    <p className="order_p">Order Number <br></br>/Vendor</p>
                                     <div className="order_vendors">
                                         {/* Check if vendorOrders exists to determine if it's a food order or a regular order */}
                                         {order.vendorOrders ? (
@@ -1200,17 +1204,17 @@ const Dashboard = () => {
                                     <span className="order_detail_input">{order.netPay}</span>
                                 </div>
                                 <div className="hotel_name_div">
-                                    <p className="order_p">Expected Delivery Time</p>
+                                    <p className="order_p">Time:</p>
                                     <span className="order_detail_input">{order.expectedDeliveryTime}</span>
                                 </div>
                                 <div className="hotel_name_div">
-                                    <p className="order_p">Customer Contact</p>
+                                    <p className="order_p">Contact</p>
                                     <span className="order_detail_input">{order.phoneNumber}</span>
                                 </div>
 
                                 {/* Button to accept the order */}
                                 <button className="accept_order_btn" onClick={() => handleAcceptOrder(order)}>
-                                    Accept Order
+                                    Accept
                                 </button>
                             </div>
                         ))
