@@ -217,14 +217,14 @@ const createOrderElement = (order) => (
         <p>Expected Commission:<span id="commissionExpected" className='downtotals'>Ksh.{expectedCommission.toFixed(2)}</span></p><br />
       </div>
 
-      <div id="sales">
+      {/* <div id="sales">
         {/* <div id="salesList"></div> */}
-        <div id="salesTotal">
+        {/* <div id="salesTotal">
           <p>Total Sales:<span id="totalSales">Ksh.{totalSales.toFixed(2)}</span></p>
           <p>Commission Due:<span id="commissionDue">Ksh.{commissionDue.toFixed(2)}</span></p>
           <p>Total Deliveries Made:<span id="totalDeliveries">Ksh.{totalDeliveries}</span></p>
         </div>
-      </div>
+      </div>  */}
 
     </div>
   );
