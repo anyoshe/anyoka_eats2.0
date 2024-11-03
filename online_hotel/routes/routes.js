@@ -26,15 +26,15 @@ function authenticateToken(req, res, next) {
   console.log('Authenticating token...');
   const token = req.header('Authorization')?.split(' ')[1];
   if (!token) return res.status(401).send('Access Denied');
-  
+
   try {
-      const verified = jwt.verify(token, process.env.JWT_SECRET);
-      req.user = verified;
-      console.log('Token verified:', verified);
-      next();  // Make sure this line is executed
+    const verified = jwt.verify(token, process.env.JWT_SECRET);
+    req.user = verified;
+    console.log('Token verified:', verified);
+    next();  // Make sure this line is executed
   } catch (err) {
-      console.log('Token verification failed:', err.message);
-      res.status(400).send('Invalid Token');
+    console.log('Token verification failed:', err.message);
+    res.status(400).send('Invalid Token');
   }
 }
 
@@ -56,7 +56,7 @@ userSchema.pre('save', async function (next) {
   next();
 });
 
-const User = mongoose.model('User', userSchema); 
+const User = mongoose.model('User', userSchema);
 
 router.post('/auth/userSignup', async (req, res) => {
   // console.log(req.body);
@@ -117,7 +117,7 @@ router.get('/auth/current', async (req, res) => {
 });
 
 
- // Define the schema and model first
+// Define the schema and model first
 const partnerSchema = new mongoose.Schema({
   businessName: { type: String, required: true, unique: true },
   businessType: { type: String, required: true },
@@ -149,38 +149,38 @@ router.post('/signup', async (req, res) => {
   // Check if a partner with the same businessName or contactNumber already exists
   try {
     // console.log('Request body:', req.body);
-      const existingPartner = await Partner.findOne({
-          $or: [
-              { businessName: businessName },
-              { contactNumber: contactNumber }
-          ]
-      });
+    const existingPartner = await Partner.findOne({
+      $or: [
+        { businessName: businessName },
+        { contactNumber: contactNumber }
+      ]
+    });
 
-      if (existingPartner) {
-          return res.status(400).json('A partner with the same business name or contact number already exists.');
-      }
+    if (existingPartner) {
+      return res.status(400).json('A partner with the same business name or contact number already exists.');
+    }
 
-      // Hash the password
-      const hashedPassword = await bcrypt.hash(password, 10);
+    // Hash the password
+    const hashedPassword = await bcrypt.hash(password, 10);
 
-      // Create a new partner
-      const newPartner = new Partner({
-          businessName,
-          businessType,
-          contactNumber,
-          email,
-          location,
-          password: hashedPassword
-      });
+    // Create a new partner
+    const newPartner = new Partner({
+      businessName,
+      businessType,
+      contactNumber,
+      email,
+      location,
+      password: hashedPassword
+    });
 
-      // Save the new partner
-      await newPartner.save();
+    // Save the new partner
+    await newPartner.save();
 
-      res.status(201).json(newPartner);
-      // console.log(newPartner);
+    res.status(201).json(newPartner);
+    // console.log(newPartner);
   } catch (error) {
-      console.error('Error during partner sign-up:', error);
-      res.status(500).json('An error occurred during sign-up.');
+    console.error('Error during partner sign-up:', error);
+    res.status(500).json('An error occurred during sign-up.');
   }
 });
 
@@ -209,7 +209,7 @@ router.post('/login', async (req, res) => {
 router.get('/api/auth/google', passport.authenticate('google', { scope: ['profile', 'email'] }));
 
 // Callback route for Google to redirect to after login
-router.get('/api/auth/google/callback', 
+router.get('/api/auth/google/callback',
   passport.authenticate('google', { failureRedirect: '/' }),
   (req, res) => {
     // Successful authentication, redirect to frontend with JWT token
@@ -232,7 +232,7 @@ router.get('/partner/:contactNumber', async (req, res) => {
 router.put('/partners/:id', async (req, res) => {
   // console.log('Received update for partner partnersection:', req.params.id);
   // console.log('Request body:', req.body);
-  
+
   try {
     const partnerId = req.params.id;
     const updatedData = req.body;
@@ -243,10 +243,10 @@ router.put('/partners/:id', async (req, res) => {
       { new: true }
     );
 
-res.status(200).json({ message: 'Partner updated successfully', updatedPartner });
-} catch (error) {
+    res.status(200).json({ message: 'Partner updated successfully', updatedPartner });
+  } catch (error) {
     res.status(500).json({ message: 'Failed to update partner', error });
-}
+  }
 });
 
 
@@ -472,19 +472,19 @@ const dishSchema = new Schema({
   imageUrl: { type: String, required: false },
   quantity: { type: Number, required: true, default: 1 },
   dishPrice: { type: Number, required: true },
-  discount: { type: Number, default: 0 }, 
+  discount: { type: Number, default: 0 },
   dishCategory: { type: String, required: true },
   restaurant: { type: String, required: true },
-  subTotal: { type: Number, required: false, default: 0 },   
-  dishDescription: { type: String, required: false }, 
+  subTotal: { type: Number, required: false, default: 0 },
+  dishDescription: { type: String, required: false },
   createdAt: { type: Date, default: Date.now },
-  averageRating: { type: Number, default: 0 },  
+  averageRating: { type: Number, default: 0 },
   ratingCount: { type: Number, default: 0 },
-  discountedPrice: { type: Number, required: false, default: 0 },      
-});  
+  discountedPrice: { type: Number, required: false, default: 0 },
+});
 // Pre-save middleware to calculate the discounted price
 
- dishSchema.pre('save', function (next) {
+dishSchema.pre('save', function (next) {
   if (this.discount > 0) {
     this.discountedPrice = this.dishPrice - (this.dishPrice * this.discount / 100);
   } else {
@@ -498,7 +498,7 @@ const Dish = model("Dish", dishSchema);
 //add dish to database and restaurant
 router.post('/dishes', (req, res) => {
   // console.log('Received request to add dish:', req.body);
-  upload(req, res, async (err) => { 
+  upload(req, res, async (err) => {
     if (err) {
       console.error('Error uploading image:', err);
       return res.status(500).json({ success: false, message: 'Error uploading image', error: err });
@@ -580,8 +580,8 @@ router.put('/dishes/:dishCode', (req, res) => {
         }
       }
 
-       // Calculate the discounted price
-       if (updatedFields.dishPrice || updatedFields.discount) {
+      // Calculate the discounted price
+      if (updatedFields.dishPrice || updatedFields.discount) {
         const price = updatedFields.dishPrice * 1.2 || dishPrice * 1.2;
         const discountValue = updatedFields.discount || discount;
         updatedFields.discountedPrice = price - (price * discountValue / 100);
@@ -609,11 +609,11 @@ router.put('/dishes/:dishCode', (req, res) => {
 // route to fetch discounted dishes
 router.get('/discounted-dishes', async (req, res) => {
   try {
-      const discountedDishes = await Dish.find({ discount: { $gt: 0 } }).exec();
-      res.json({ dishes: discountedDishes });
+    const discountedDishes = await Dish.find({ discount: { $gt: 0 } }).exec();
+    res.json({ dishes: discountedDishes });
   } catch (error) {
-      console.error('Error fetching discounted dishes:', error);
-      res.status(500).json({ message: 'Error fetching discounted dishes' });
+    console.error('Error fetching discounted dishes:', error);
+    res.status(500).json({ message: 'Error fetching discounted dishes' });
   }
 });
 
@@ -815,29 +815,29 @@ router.get('/universal-search', async (req, res) => {
   const searchTerm = req.query.q;
 
   try {
-      // Searching across different collections
-      const dishes = await Dish.find({ dishName: new RegExp(searchTerm, 'i') });
-      const restaurants = await Restaurant.find({ restaurant: new RegExp(searchTerm, 'i') });
-      const categories = await Category.find({ dishCategory: new RegExp(searchTerm, 'i') });
+    // Searching across different collections
+    const dishes = await Dish.find({ dishName: new RegExp(searchTerm, 'i') });
+    const restaurants = await Restaurant.find({ restaurant: new RegExp(searchTerm, 'i') });
+    const categories = await Category.find({ dishCategory: new RegExp(searchTerm, 'i') });
 
-      // Combine results
-      const results = [
-          ...dishes.map(dish => ({ type: 'dish', name: dish.dishName, ...dish._doc })),
-          ...restaurants.map(restaurant => ({ type: 'restaurant', name: restaurant.restaurant, ...restaurant._doc })),
-          ...categories.map(category => ({ type: 'category', name: category.dishCategory, ...category._doc })),
-      ];
+    // Combine results
+    const results = [
+      ...dishes.map(dish => ({ type: 'dish', name: dish.dishName, ...dish._doc })),
+      ...restaurants.map(restaurant => ({ type: 'restaurant', name: restaurant.restaurant, ...restaurant._doc })),
+      ...categories.map(category => ({ type: 'category', name: category.dishCategory, ...category._doc })),
+    ];
 
-      res.json({ results });
+    res.json({ results });
   } catch (error) {
-      console.error(error);
-      res.status(500).json({ message: 'Error during search' });
+    console.error(error);
+    res.status(500).json({ message: 'Error during search' });
   }
 });
 
 //RESTAURANT SCHEMA AND ITS ROUTES
 const restaurantSchema = new mongoose.Schema({
   partnerId: { type: mongoose.Schema.Types.ObjectId, ref: 'Partner', required: true },
-  restaurantImgUrl: {type: String, required: false },
+  restaurantImgUrl: { type: String, required: false },
   restaurant: { type: String, required: true },
   dishCategory: { type: String, required: false },
   location: { type: String, required: true },
@@ -878,17 +878,17 @@ router.get('/restaurants/:partnerId', async (req, res) => {
 router.get('/partners/:_id/restaurants', async (req, res) => {
   try {
     const partnerId = req.params._id;
-    
+
     // Find the partner
     const partner = await Partner.findById(partnerId);
-    
+
     if (!partner) {
       return res.status(404).json({ errors: ['Partner not found'] });
     }
 
     // Get the partner's restaurants
     // const partnerRestaurants = await partner.restaurants;
-    const partnerRestaurants = await Restaurant.find({ partnerId: partner._id }).exec(); 
+    const partnerRestaurants = await Restaurant.find({ partnerId: partner._id }).exec();
 
     res.json(partnerRestaurants);
   } catch (error) {
@@ -1085,7 +1085,7 @@ router.get('/categories', async (req, res) => {
     const categories = await Dish.distinct('dishCategory');
     res.json({ categories });
   } catch (error) {
-    res.status(500).json({ error: 'Error fetching categories' }); 
+    res.status(500).json({ error: 'Error fetching categories' });
   }
 });
 
@@ -1233,7 +1233,7 @@ router.get('/orders/:orderId', async (req, res) => {
     const order = await Order.findOne({ orderId: req.params.orderId });
     if (order) {
       res.json(order);
-      
+
     } else {
       res.status(404).json({ message: 'Order not found' });
     }
@@ -1244,11 +1244,11 @@ router.get('/orders/:orderId', async (req, res) => {
 // server.js or appropriate routes file
 router.get('/driverOrders', async (req, res) => {
   try {
-      const orders = await Order.find({ status: 'Processed and packed' });
-      res.json(orders);
+    const orders = await Order.find({ status: 'Processed and packed' });
+    res.json(orders);
   } catch (error) {
-      console.error(error);
-      res.status(500).send('Server Error');
+    console.error(error);
+    res.status(500).send('Server Error');
   }
 });
 
@@ -1362,26 +1362,26 @@ router.patch('/driverUpdateOrderStatus/:orderId', async (req, res) => {
   console.log('Request body:', req.body); // Ensure driverId and status are included
 
   try {
-      const { orderId } = req.params; // Get orderId from the URL parameter
-      const { status, driverId } = req.body; // Ensure you're receiving driverId and status
+    const { orderId } = req.params; // Get orderId from the URL parameter
+    const { status, driverId } = req.body; // Ensure you're receiving driverId and status
 
-      // Find and update the order using the orderId field
-      const updatedOrder = await Order.findOneAndUpdate(
-          { orderId: orderId }, // Use the orderId field in the query
-          { status, driverId }, // Set the new status and driverId
-          { new: true } // Return the updated document
-      );
+    // Find and update the order using the orderId field
+    const updatedOrder = await Order.findOneAndUpdate(
+      { orderId: orderId }, // Use the orderId field in the query
+      { status, driverId }, // Set the new status and driverId
+      { new: true } // Return the updated document
+    );
 
-      if (!updatedOrder) {
-          console.log('Order not found for ID:', orderId); // Log if order is not found
-          return res.status(404).json({ message: 'Order not found' });
-      }
+    if (!updatedOrder) {
+      console.log('Order not found for ID:', orderId); // Log if order is not found
+      return res.status(404).json({ message: 'Order not found' });
+    }
 
-      console.log('Order updated successfully:', updatedOrder); // Log the updated order
-      res.json(updatedOrder); // Respond with the updated order
+    console.log('Order updated successfully:', updatedOrder); // Log the updated order
+    res.json(updatedOrder); // Respond with the updated order
   } catch (error) {
-      console.error('Error updating order status:', error); // Log the error
-      res.status(500).json({ message: 'Error updating order status' }); // Respond with a 500 error
+    console.error('Error updating order status:', error); // Log the error
+    res.status(500).json({ message: 'Error updating order status' }); // Respond with a 500 error
   }
 });
 
@@ -1458,19 +1458,19 @@ router.get('/fetchOrderByStatus/:orderId/:driverId', async (req, res) => {
   const { orderId, driverId } = req.params;
 
   try {
-      // Find the order by matching the order ID and driver ID
-      const order = await Order.findOne({ orderId: orderId, driverId: driverId });
+    // Find the order by matching the order ID and driver ID
+    const order = await Order.findOne({ orderId: orderId, driverId: driverId });
 
-      // If no order is found, return a 404 status with a message
-      if (!order) {
-          return res.status(404).json({ message: 'Order not found' });
-      }
+    // If no order is found, return a 404 status with a message
+    if (!order) {
+      return res.status(404).json({ message: 'Order not found' });
+    }
 
-      // Respond with the found order
-      res.json(order);
+    // Respond with the found order
+    res.json(order);
   } catch (error) {
-      console.error('Error fetching order:', error);
-      res.status(500).json({ message: 'Error fetching order' });
+    console.error('Error fetching order:', error);
+    res.status(500).json({ message: 'Error fetching order' });
   }
 });
 
@@ -1478,10 +1478,10 @@ router.get('/fetchOrderByStatus/:orderId/:driverId', async (req, res) => {
 router.get('/fetchDriverDispatchedOrders/:driverId', async (req, res) => {
   const { driverId } = req.params;
   try {
-      const dispatchedOrders = await Order.find({ driverId, status: 'Dispatched' });
-      res.json(dispatchedOrders);
+    const dispatchedOrders = await Order.find({ driverId, status: 'Dispatched' });
+    res.json(dispatchedOrders);
   } catch (error) {
-      res.status(500).json({ error: 'Error fetching dispatched orders' });
+    res.status(500).json({ error: 'Error fetching dispatched orders' });
   }
 });
 
@@ -1490,15 +1490,15 @@ router.get('/fetchOrdersByDriver/:driverId', async (req, res) => {
   const { driverId } = req.params;
 
   try {
-      const orders = await Order.find({ driverId, status: 'Dispatched' });
-      
-      if (orders.length === 0) {
-          return res.status(404).json({ message: 'No orders found for this driver' });
-      }
+    const orders = await Order.find({ driverId, status: 'Dispatched' });
 
-      res.json(orders);
+    if (orders.length === 0) {
+      return res.status(404).json({ message: 'No orders found for this driver' });
+    }
+
+    res.json(orders);
   } catch (error) {
-      res.status(500).json({ message: 'Error fetching driver\'s orders' });
+    res.status(500).json({ message: 'Error fetching driver\'s orders' });
   }
 });
 
@@ -1648,7 +1648,7 @@ router.post('/conferences', (req, res) => {
     // console.log('req.body:', req.body);
     // console.log('req.files:', JSON.stringify(req.files, null, 2));
     // console.log('req.body:', JSON.stringify(req.body, null, 2));
-    
+
     const {
       venueName, address, gpsCoordinates, seatingCapacity, layoutOptions, roomDimensions,
       avEquipment, cateringServices, wiFiAccess, airConditioning, parkingFacilities,
@@ -1687,10 +1687,10 @@ router.get('/conferences/:partnerId', async (req, res) => {
   const { partnerId } = req.params;
 
   try {
-      const conferences = await Conference.find({ partnerId });
-      res.status(200).json(conferences);
+    const conferences = await Conference.find({ partnerId });
+    res.status(200).json(conferences);
   } catch (error) {
-      res.status(500).json({ error: 'Failed to fetch conferences' });
+    res.status(500).json({ error: 'Failed to fetch conferences' });
   }
 });
 // Fetch conference by venueName
@@ -1803,14 +1803,14 @@ router.get('/conference', async (req, res) => {
 // GET route for fetching conferences
 router.get('/conferences', async (req, res) => {
   try {
-      // Fetch all conference documents from the database
-      const conferences = await Conference.find({});
-      // Send the fetched data as JSON
-      res.status(200).json(conferences);
+    // Fetch all conference documents from the database
+    const conferences = await Conference.find({});
+    // Send the fetched data as JSON
+    res.status(200).json(conferences);
   } catch (error) {
-      // Handle any errors that occur during the fetch
-      console.error('Error fetching conferences:', error);
-      res.status(500).json({ message: 'Failed to fetch conferences' });
+    // Handle any errors that occur during the fetch
+    console.error('Error fetching conferences:', error);
+    res.status(500).json({ message: 'Failed to fetch conferences' });
   }
 });
 
@@ -1832,7 +1832,7 @@ router.delete('/conferences/:id', async (req, res) => {
 
 
 //RATING SCHEMA AND ITS ROUTES
-const ratingSchema = new Schema({ 
+const ratingSchema = new Schema({
   // user_id: { type: Schema.Types.ObjectId, ref: 'User', required: true },
   item_id: { type: Schema.Types.ObjectId, required: true },
   item_type: { type: String, enum: ['Dish', 'Restaurant'], required: true },
@@ -1848,7 +1848,7 @@ module.exports = Rating;
 router.post('/rating', async (req, res) => {
   // console.log(item_id, item_type, rating);
   const { item_id, item_type, rating } = req.body;
-// console.log(item_id, item_type, rating);
+  // console.log(item_id, item_type, rating);
   try {
     // Validate input
     if (!item_id || !item_type || rating == null) {
@@ -1998,14 +1998,14 @@ router.get('/search', async (req, res) => {
   // console.log('query', req.query);
   const { query, type } = req.query;
   // console.log('query', req.query);
-  
+
   if (!query) {
     return res.status(400).json({ message: 'Query is required' });
   }
 
   try {
     let results = [];
-    
+
     if (!type || type === 'dishes') {
       results.push(...await Dish.find({ dishName: new RegExp(query, 'i') }));
     }
@@ -2026,14 +2026,14 @@ router.get('/search', async (req, res) => {
 });
 router.get('/searchA', async (req, res) => {
   const { query, type } = req.query;
-  
+
   if (!query) {
     return res.status(400).json({ message: 'Query is required' });
   }
 
   try {
     let results = [];
-    
+
     if (!type || type === 'dishes') {
       results.push(...await Dish.find({ dishName: new RegExp(query, 'i') }));
     }
@@ -2194,7 +2194,7 @@ router.post('/trackSearch', async (req, res) => {
 //DRIVER'S SCHEMA AND ROUTES
 const driverSchema = new mongoose.Schema({
   OfficialNames: { type: String, required: true },
-  IDNumber: { type: Number, required: true, unique: true},
+  IDNumber: { type: Number, required: true, unique: true },
   DriverLicenceNumber: { type: String, required: true },
   NumberPlate: { type: String, required: false },
   password: { type: String, required: true },
@@ -2202,7 +2202,7 @@ const driverSchema = new mongoose.Schema({
   location: { type: String, default: '' },
   contactNumber: { type: Number, default: 0 },
   vehicleType: { type: String, default: '' },
-  driverImage: { type: String, default:	null}
+  driverImage: { type: String, default: null }
 });
 
 // Pre-save hook to hash the password
@@ -2227,58 +2227,58 @@ const Driver = mongoose.model('Driver', driverSchema);
 
 router.get('/driver', authenticateToken, async (req, res) => {
   try {
-      const driver = await Driver.findById(req.user.id); // Assuming req.user.id is set after token authentication
-      if (!driver) {
-          return res.status(404).json({ message: 'Driver not found' });
-      }
-      res.json(driver);  // Ensure driver object is returned in JSON format
+    const driver = await Driver.findById(req.user.id); // Assuming req.user.id is set after token authentication
+    if (!driver) {
+      return res.status(404).json({ message: 'Driver not found' });
+    }
+    res.json(driver);  // Ensure driver object is returned in JSON format
   } catch (error) {
-      res.status(500).json({ error: 'Server error' });
+    res.status(500).json({ error: 'Server error' });
   }
 });
 // Backend Example - Driver Signup (Express.js)
 
 
 const generateAuthToken = (user) => {
-    const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, { expiresIn: '1h' });  // Adjust the secret and expiration as needed
-    return token;
+  const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, { expiresIn: '1h' });  // Adjust the secret and expiration as needed
+  return token;
 };
 router.post('/driverSignup', async (req, res) => {
   const { OfficialNames, IDNumber, DriverLicenceNumber, NumberPlate, password } = req.body;
 
   // Create a new driver instance using the DriverModel
   const newDriver = new Driver({
-      OfficialNames,
-      IDNumber,
-      DriverLicenceNumber,
-      NumberPlate,
-      password,
-      // MongoDB automatically generates an _id field
+    OfficialNames,
+    IDNumber,
+    DriverLicenceNumber,
+    NumberPlate,
+    password,
+    // MongoDB automatically generates an _id field
   });
 
   try {
-      await newDriver.save();
-      
-      // Generate a token after saving the driver
-      const token = generateAuthToken(newDriver); // JWT generation logic
-      
-       // Respond with the driver's ID and any other necessary data
-       res.status(201).json({
-        _id: newDriver._id,  // Ensure this is included
-        token,  // If you're returning a token as well
-          driver: {
-              // Return the MongoDB generated _id as driverId
-              driverId: newDriver._id, // Use MongoDB's generated ID
-              OfficialNames: newDriver.OfficialNames,
-              IDNumber: newDriver.IDNumber,
-              DriverLicenceNumber: newDriver.DriverLicenceNumber,
-              NumberPlate: newDriver.NumberPlate,
-              password: newDriver.password
-          },
-      });
+    await newDriver.save();
+
+    // Generate a token after saving the driver
+    const token = generateAuthToken(newDriver); // JWT generation logic
+
+    // Respond with the driver's ID and any other necessary data
+    res.status(201).json({
+      _id: newDriver._id,  // Ensure this is included
+      token,  // If you're returning a token as well
+      driver: {
+        // Return the MongoDB generated _id as driverId
+        driverId: newDriver._id, // Use MongoDB's generated ID
+        OfficialNames: newDriver.OfficialNames,
+        IDNumber: newDriver.IDNumber,
+        DriverLicenceNumber: newDriver.DriverLicenceNumber,
+        NumberPlate: newDriver.NumberPlate,
+        password: newDriver.password
+      },
+    });
   } catch (err) {
-      console.error('Error during driver signup:', err.message);
-      res.status(400).send(err.message); // Return error message
+    console.error('Error during driver signup:', err.message);
+    res.status(400).send(err.message); // Return error message
   }
 });
 
@@ -2288,63 +2288,63 @@ router.post('/driverLogin', async (req, res) => {
   console.log('Received login request:', req.body); // Log incoming request body
 
   try {
-      const { IDNumber, password } = req.body;
-      const driver = await Driver.findOne({ IDNumber });
+    const { IDNumber, password } = req.body;
+    const driver = await Driver.findOne({ IDNumber });
 
-      if (!driver) {
-          console.log('Driver not found for ID:', IDNumber);
-          return res.status(400).json({ message: 'Driver not found' });
-      }
+    if (!driver) {
+      console.log('Driver not found for ID:', IDNumber);
+      return res.status(400).json({ message: 'Driver not found' });
+    }
 
-      // Compare the password
-      const isMatch = await bcrypt.compare(password, driver.password);
-      if (!isMatch) {
-          console.log('Invalid credentials for ID:', IDNumber);
-          return res.status(400).json({ message: 'Invalid credentials' });
-      }
+    // Compare the password
+    const isMatch = await bcrypt.compare(password, driver.password);
+    if (!isMatch) {
+      console.log('Invalid credentials for ID:', IDNumber);
+      return res.status(400).json({ message: 'Invalid credentials' });
+    }
 
-      const token = jwt.sign(
-          {
-              id: driver._id,
-              role: 'driver',
-          },
-          JWT_SECRET,
-          { expiresIn: '1h' }
-      );
+    const token = jwt.sign(
+      {
+        id: driver._id,
+        role: 'driver',
+      },
+      JWT_SECRET,
+      { expiresIn: '1h' }
+    );
 
-      res.json({ token });
+    res.json({ token });
   } catch (error) {
-      console.error('Error during login:', error); // Log the error
-      res.status(500).json({ error: 'Failed to login driver' });
+    console.error('Error during login:', error); // Log the error
+    res.status(500).json({ error: 'Failed to login driver' });
   }
 });
 
 router.get('/driverDetails/:id', async (req, res) => {
   try {
-      const driverId = req.params.id; // Get driver ID from request parameters
+    const driverId = req.params.id; // Get driver ID from request parameters
 
-      // Find the driver by ID
-      const driver = await Driver.findById(driverId);
+    // Find the driver by ID
+    const driver = await Driver.findById(driverId);
 
-      if (!driver) {
-          return res.status(404).json({ message: 'Driver not found' });
-      }
+    if (!driver) {
+      return res.status(404).json({ message: 'Driver not found' });
+    }
 
-      // Return driver details including the driver ID
-      res.status(200).json({
-          OfficialNames: driver.OfficialNames,
-          IDNumber: driver.IDNumber,
-          DriverLicenceNumber: driver.DriverLicenceNumber,
-          NumberPlate: driver.NumberPlate,
-          location: driver.location,
-          contactNumber: driver.contactNumber,
-          vehicleType: driver.vehicleType,
-          driverImage: driver.driverImage,
-          _id: driver._id // Include the driver ID
-      });
+    // Return driver details including the driver ID
+    res.status(200).json({
+      OfficialNames: driver.OfficialNames,
+      IDNumber: driver.IDNumber,
+      DriverLicenceNumber: driver.DriverLicenceNumber,
+      NumberPlate: driver.NumberPlate,
+      location: driver.location,
+      contactNumber: driver.contactNumber,
+      vehicleType: driver.vehicleType,
+      driverImage: driver.driverImage,
+      _id: driver._id // Include the driver ID
+    });
   } catch (error) {
-      console.error('Error fetching driver details:', error);
-      res.status(500).json({ message: 'Server error' });
+    console.error('Error fetching driver details:', error);
+    res.status(500).json({ message: 'Server error' });
   }
 });
 
@@ -2374,66 +2374,51 @@ router.get('/getDriverDetails/:driverId', async (req, res) => {
 });
 
 
-  router.patch('/driverDetails', upload, async (req, res) => {
-    console.log("Request received:", req.body);
-    
-    const { location, contactNumber, vehicleType, driverId } = req.body; // Destructure location, contactNumber, vehicleType, and driverId from request body
-    const driverImage = req.file ? `/uploads/images/${req.file.filename}` : null; // Handle uploaded image
+router.patch('/driverDetails', upload, async (req, res) => {
+  console.log("Request received:", req.body);
 
-    // Ensure driverId is provided and valid
-    if (!driverId) {
-        return res.status(400).json({ message: 'Driver ID is required' });
+  const { location, contactNumber, vehicleType, driverId } = req.body; // Destructure location, contactNumber, vehicleType, and driverId from request body
+  const driverImage = req.file ? `/uploads/images/${req.file.filename}` : null; // Handle uploaded image
+
+  // Ensure driverId is provided and valid
+  if (!driverId) {
+    return res.status(400).json({ message: 'Driver ID is required' });
+  }
+
+  try {
+    // Build the update object dynamically
+    const updateData = { location, contactNumber, vehicleType };
+
+    // Only add driverImage if a new image was uploaded
+    if (driverImage) {
+      updateData.driverImage = driverImage;
     }
 
-    try {
-        // Build the update object dynamically
-        const updateData = { location, contactNumber, vehicleType };
+    // Find the driver by driverId and update the details
+    const updatedDriver = await Driver.findByIdAndUpdate(
+      driverId, // Use driverId from request body to find driver
+      updateData, // Update with location, vehicleType, and optionally driverImage
+      { new: true, runValidators: true } // Return updated document after validation
+    );
 
-        // Only add driverImage if a new image was uploaded
-        if (driverImage) {
-            updateData.driverImage = driverImage;
-        }
-
-        // Find the driver by driverId and update the details
-        const updatedDriver = await Driver.findByIdAndUpdate(
-            driverId, // Use driverId from request body to find driver
-            updateData, // Update with location, vehicleType, and optionally driverImage
-            { new: true, runValidators: true } // Return updated document after validation
-        );
-
-        // Handle case where driver is not found
-        if (!updatedDriver) {
-            console.log("Driver not found");
-            return res.status(404).json({ message: 'Driver not found' });
-        }
-
-        // Successfully updated the driver details
-        res.status(200).json({
-            message: 'Driver details updated successfully',
-            driver: updatedDriver
-        });
-    } catch (error) {
-        // Handle any errors during the update
-        console.error('Error updating driver details:', error);
-        res.status(500).json({ message: 'Server error' });
+    // Handle case where driver is not found
+    if (!updatedDriver) {
+      console.log("Driver not found");
+      return res.status(404).json({ message: 'Driver not found' });
     }
+
+    // Successfully updated the driver details
+    res.status(200).json({
+      message: 'Driver details updated successfully',
+      driver: updatedDriver
+    });
+  } catch (error) {
+    // Handle any errors during the update
+    console.error('Error updating driver details:', error);
+    res.status(500).json({ message: 'Server error' });
+  }
 });
 
-// Define schema for tracking daily earnings
-// const dailyEarningsSchema = new mongoose.Schema({
-//   driverId: { type: String, required: true },
-//   driverDetails: {
-//     OfficialNames: { type: String },
-//     contactNumber: { type: String },
-//     NumberPlate: { type: String }
-//   },
-//   date: { type: String, required: true },
-//   orderId: { type: String },
-//   orderNetPay: { type: Number, default: 0 }, // Store the net pay per order
-//   totalEarnings: { type: Number, default: 0 }
-// });
-
-// const DailyEarnings = mongoose.model('DailyEarnings', dailyEarningsSchema);
 
 const dailyEarningsSchema = new mongoose.Schema({
   driverId: { type: String, required: true },
@@ -2459,21 +2444,21 @@ router.get('/daily-earnings', async (req, res) => {
   console.log("Date:", date, "Driver ID:", driverId);
   console.log("Received Driver ID:", driverId); // Debugging log
   if (!driverId) {
-      return res.status(400).json({ message: "Driver ID is required." });
+    return res.status(400).json({ message: "Driver ID is required." });
   }
 
 
   try {
-      // Use driverId from the query instead of req.user.id
-      const earnings = await DailyEarnings.findOne({ driverId, date }); 
-      if (!earnings) {
-          return res.status(404).json({ message: "No earnings found for this date." });
-      }
-      res.json(earnings);
-      console.log("Earnings:", earnings);
+    // Use driverId from the query instead of req.user.id
+    const earnings = await DailyEarnings.findOne({ driverId, date });
+    if (!earnings) {
+      return res.status(404).json({ message: "No earnings found for this date." });
+    }
+    res.json(earnings);
+    console.log("Earnings:", earnings);
   } catch (error) {
-      console.error("Error retrieving daily earnings:", error);
-      res.status(500).json({ message: "Server error", error: error.message }); // Log the actual error message for debugging
+    console.error("Error retrieving daily earnings:", error);
+    res.status(500).json({ message: "Server error", error: error.message }); // Log the actual error message for debugging
   }
 });
 
@@ -2493,35 +2478,6 @@ router.get('/get-driver-earnings', async (req, res) => {
   }
 });
 
-// router.post('/update-earnings', async (req, res) => {
-//   console.log("Request Body:", req.body);
-//   const { date, earnings, driverId, orderId, driverDetails, orderNetPay } = req.body;
-//   console.log(date, earnings, driverId, orderId, driverDetails, orderNetPay); // Log additional fields for debugging
-
-//   if (!driverId) {
-//     return res.status(400).json({ message: "Driver ID is required." });
-//   }
-  
-//   try {
-//     const result = await DailyEarnings.findOneAndUpdate(
-//       { driverId: driverId, date },  // Find by driverId and date to ensure unique entry per day
-//       { 
-//         $set: { 
-//           totalEarnings: earnings, 
-//           orderId, 
-//           driverDetails, 
-//           orderNetPay 
-//         }
-//       },
-//       { upsert: true, new: true }
-//     );
-//     res.json(result);
-//     console.log(result);
-//   } catch (error) {
-//     console.error("Error updating daily earnings:", error);
-//     res.status(500).json({ message: "Server error" });
-//   }
-// });
 
 router.post('/update-earnings', async (req, res) => {
   console.log("Request Body:", req.body);
@@ -2580,8 +2536,8 @@ const consumerSecret = process.env.CONSUMER_SECRET;
 const shortcode = process.env.SHORTCODE;
 const passkey = process.env.PASSKEY;
 const ngrokUrl = process.env.NODE_ENV === 'production'
-? process.env.NGROK_URL
-: process.env.NGROK_URL_LOCAL;
+  ? process.env.NGROK_URL
+  : process.env.NGROK_URL_LOCAL;
 router.post('/mpesa/callback', (req, res) => {
   const callbackData = req.body;
   console.log('M-Pesa Callback Received:', callbackData);
@@ -2712,7 +2668,7 @@ router.post('/send-receipt', async (req, res) => {
 // Example of SMS sending route
 router.post('/sendSms', async (req, res) => {
   const { phoneNumber, message } = req.body;
- console.log(phoneNumber, message);
+  console.log(phoneNumber, message);
   // Your logic for sending SMS goes here
   try {
     // Call your SMS sending service (like Twilio or any other)
@@ -2736,19 +2692,19 @@ const sms = africastalking.SMS;
 async function sendReceipt(phoneNumber, amount) {
   // Message to be sent to the user
   const message = `Thank you for your payment of KES ${amount}. Your order is being processed.`;
-  
+
   const options = {
-      to: [phoneNumber],  // The recipient's phone number (e.g., +2547XXXXXXXX)
-      message: message,   // The receipt message
-      from: 'YourShortCodeOrSenderID' // Optional. Specify if you have a short code or sender ID
+    to: [phoneNumber],  // The recipient's phone number (e.g., +2547XXXXXXXX)
+    message: message,   // The receipt message
+    from: 'YourShortCodeOrSenderID' // Optional. Specify if you have a short code or sender ID
   };
-  
+
   try {
-      // Send the SMS using Africa's Talking
-      const response = await sms.send(options);
-      console.log('SMS Sent Successfully:', response);
+    // Send the SMS using Africa's Talking
+    const response = await sms.send(options);
+    console.log('SMS Sent Successfully:', response);
   } catch (error) {
-      console.error('Failed to send SMS:', error);
+    console.error('Failed to send SMS:', error);
   }
 }
 
@@ -2756,10 +2712,10 @@ async function sendReceipt(phoneNumber, amount) {
 async function processPaymentAndSendReceipt(paymentDetails, userPhoneNumber) {
   // Simulate successful payment processing
   const paymentSuccess = true;  // Replace with actual payment logic
-  
+
   if (paymentSuccess) {
-      // Send the receipt after successful payment
-      await sendReceipt(userPhoneNumber, paymentDetails.amount);
+    // Send the receipt after successful payment
+    await sendReceipt(userPhoneNumber, paymentDetails.amount);
   }
 }
 
@@ -2787,19 +2743,19 @@ const transporter = nodemailer.createTransport({
   service: 'gmail',
   auth: {
     user: 'anyokaeats@gmail.com',
-    pass: 'hsvu kcue lejt cmks', 
+    pass: 'hsvu kcue lejt cmks',
   },
 });
 
 // Route to handle form submission
 router.post('/send-email', (req, res) => {
-  const { email, message } = req.body; 
+  const { email, message } = req.body;
   // console.log(req.body);
 
   const mailOptions = {
     from: email,
     to: 'anyokaeats@gmail.com', // replace with your email
-    subject: 'New Contact Form Submission', 
+    subject: 'New Contact Form Submission',
     text: `Message from ${email}: ${message}`,
   };
 
@@ -2811,7 +2767,7 @@ router.post('/send-email', (req, res) => {
       // console.log('SMTP Server is ready to take our messages');
     }
     // console.log('Email sent: ' + info.response); // Log success message
-    res.status(200).send('Email sent successfully'); 
+    res.status(200).send('Email sent successfully');
   });
 });
 
