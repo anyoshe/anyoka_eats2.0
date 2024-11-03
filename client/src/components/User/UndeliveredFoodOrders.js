@@ -279,13 +279,13 @@ return (
       <p>Expected Commission: <span id="commissionExpected" className='downtotals'>Ksh.{expectedCommission.toFixed(2)}</span></p><br />
     </div>
 
-    <div id="sales">
+    {/* <div id="sales">
       <div id="salesTotal">
         <p>Total Sales: Kes. <span id="totalSales">{totalSales.toFixed(2)}</span></p>
         <p>Commission Due: Kes. <span id="commissionDue">{commissionDue.toFixed(2)}</span></p>
         <p>Total Deliveries Made: <span id="totalDeliveries">{totalDeliveries}</span></p>
       </div>
-    </div>
+    </div> */}
   </div>
 );
 };
