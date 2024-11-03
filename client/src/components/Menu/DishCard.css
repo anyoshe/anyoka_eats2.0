@@ -173,43 +173,13 @@
   text-align: center;
 }
 
-/* MEDIA QUERIES */
-/* Large desktops and laptops *
-@media (min-width: 1200px) {
-  .dish-card {
-    width: 300px;
-    height: auto;
-  }
 
-  .dish-image {
-    height: 250px;
-  }
-
-  .dishName {
-    font-size: 20px;
-  }
-
-  .dishPrice {
-    font-size: 20px;
-  }
-
-  .dishRestaurant {
-    font-size: 16px;
-  }
-
-  .dishAddToCart {
-    padding: 10px 20px;
-  }
-
-  .rating .star {
-    font-size: 20px;
-  }
-}
 
 /* Tablets (portrait and landscape) */
-/* @media (max-width: 1199px) and (min-width: 768px) {
+@media (min-width: 769px) and (max-width: 1024px) {
   .dish-card {
-    width: 185px;
+    /* width: 185px; */
+    width: 100%;
     height: auto;
   }
 
@@ -264,7 +234,7 @@
   .average {
     font-size: 0.9rem;
   }
-} */
+}
 
 /* Mobile phones */
 /* @media (max-width: 767px) {

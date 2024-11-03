@@ -12,6 +12,7 @@
     padding: 0;
     box-sizing: border-box;
 }
+/* @media(min-width:1025px) and (max-width:1440px){ */
 
 .containerDiv{
     /* border: 5px solid red; */
@@ -673,7 +674,7 @@ animation: hoverShake 0.15s linear 3;
     font-size: 18px;
     font-weight: 350;
 }
-
+/* } */
 
 /* MEDIA QUERIES */
 @media (max-width: 320px){
@@ -1743,13 +1744,19 @@ animation: hoverShake 0.15s linear 3;
 
 }
 
-/* @media (min-width: 769px) and (max-width:1023px) {
+@media (min-width: 769px) and (max-width:1024px) {
     .containerDiv {
+        width: 100vw;
+        min-height: 100vh;
+    }
     
+    .logo-CTA {
+        padding: 10px 0.5rem;
+        width: 100vw;
     }
 
-    .logo-CTA {
-        padding: 10px 0rem;
+    .landing_sign {
+        margin-right: 0cm;
     }
 
     .headerSection {
@@ -1761,42 +1768,42 @@ animation: hoverShake 0.15s linear 3;
     }
 
     .search__input {
-        width: 550px;
+        width: 55em;
+        font-size: 0.9rem;
     }
 
     .services {
-        grid-template-columns: repeat(3, 1fr);
-        row-gap: 5px;
-        column-gap: 3px;
-        margin-bottom: 10px;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 5px;
     }
 
     .serviceDiv {
         height: 200px;
         width: 190px;
-        padding: 20px 30px;
+        padding: 15px 5px;
     }
 
     .serviceImg {
-        width: 150px;
-        height: 150px;
+        width: 140px;
+        height: 140px;
         margin-bottom: 5px;
         background: var(--orange);
         top: 5px;
     }
 
+    .more_icon{
+        font-size: 9em;
+        margin-top: -1.2rem;
+    }
+
     .serviceDiv p {
-        font-size: 1rem;
+        font-size: 1.1rem;
         padding: 0px;
     }
 
     .offersSection {
         width: 100%;
-        padding: 2px 0.2rem;
-    }
-
-    .title-offerSearch {
-
+        padding: 2px 0.5rem;
     }
 
     .offerTitle {
@@ -1806,21 +1813,33 @@ animation: hoverShake 0.15s linear 3;
 
     .categories {
         padding: 5px 9px;
-        font-size: 0.9rem;
+        font-size: 1rem;
     }
 
-    .search-container {
+    /* .search-container {
         width: 20em;
+    } */
+
+    .search-btn {
+        width: 2.1rem;
+    }
+
+    .search-btn svg{
+        font-size: 1.3rem;
     }
 
     .search-input {
-        height: 30px;
-        padding: 0.5rem;
-        padding: 10px 10px;
+        height: 35px;
+        padding: 0.2rem;
+        font-size: 1rem;
     }
 
     .search-input:hover,.search-input:focus{
         box-shadow: rgba(0, 0, 0, 0.35) 0px 5px 15px;
+    }
+
+    .offers-container {
+        margin-top: 1.5rem;
     }
 
     .offerDisplay {
@@ -1831,11 +1850,12 @@ animation: hoverShake 0.15s linear 3;
 
     .featuredSection {
         width: 100%;
-        padding: 2px 0.2rem;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        flex-direction: column;
+        padding: 1rem 1rem;
+        min-height: fit-content;
+    }
+
+    .FeaturedDiv {
+        margin-bottom: 1.5%;
     }
 
     .FeaturedHeading {
@@ -1851,9 +1871,9 @@ animation: hoverShake 0.15s linear 3;
 
     .DishCards {
         display: grid;
-        grid-template-columns: repeat(2, 1fr);
+        grid-template-columns: repeat(4, 1fr);
         justify-content: center;
-        gap: 15px;
+        gap: 5px;
     }
 
     .join_team_section {
@@ -1861,6 +1881,10 @@ animation: hoverShake 0.15s linear 3;
         height: fit-content;
         padding: 10px 5px;
         margin-bottom: 3%;
+    }
+
+    .paragraph_div {
+        width: 70%;
     }
 
     .join_team_grid_div {
@@ -1899,4 +1923,4 @@ animation: hoverShake 0.15s linear 3;
     .aboutUs_paragraph {
         font-size: 1rem;
     }
-} */
+} 

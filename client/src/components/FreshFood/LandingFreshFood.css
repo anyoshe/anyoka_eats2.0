@@ -611,15 +611,13 @@
 
 @media (min-width: 376px) and (max-width:425px){
     .landing-fresh-food{
-        /* border: 5px solid green; */
-
         align-items: start;
         padding: 0rem 0.3rem;
         align-items: center;
     } 
 
     .fresh_nav_position{
-        /* border: 5px solid green; */
+       
     }
 
     .landing-fresh-foods-header{
@@ -735,9 +733,9 @@
 }
 
 
-@media (min-width: 768px) and (max-width:1023px) {
+@media (min-width: 769px) and (max-width: 1024px) {
     .main-category{
-        margin-top: 8%;
+        margin-top: 5%;
         width: 100%;
         padding: 10px;
     }
@@ -783,5 +781,6 @@
         grid-template-columns: repeat(4, 1fr);
         row-gap: 15px;
         column-gap: 5px;
+        padding: 0rem 0.2rem;
     }
 }
