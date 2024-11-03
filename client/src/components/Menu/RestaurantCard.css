@@ -135,3 +135,28 @@
     font-size: 0.8rem;
   }
 }
+
+@media (min-width: 769px) and (max-width: 1024px) {
+  .restaurant-card {
+    padding: 5px 0.2rem;
+    margin-bottom: 5px;
+    width: 100%;
+  }
+
+  .restaurantHeading {
+    font-size: 0.9rem;
+  }
+
+  .restaurantCategory {
+    margin: 4px 0;
+    font-size: 0.8rem;
+  }
+
+  .star {
+    font-size: 1.6rem;
+  }
+
+  .restaurantAverage{
+    font-size: 0.8rem;
+  }
+}

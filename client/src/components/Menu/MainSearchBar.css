@@ -133,7 +133,27 @@
     margin-right: 0.1rem;
     padding: 0.2rem;
   }
-}  
+} 
+
+@media(min-width:769px) and (max-width:1024px){
+  .input-group {
+    width: 90%;
+  }
+
+  .by_btn {
+    font-size: 0.9rem;
+    margin-right: 0.5rem;
+    padding: 0.3rem;
+  }
+
+  .by_btn:hover {
+    background: white;
+    color: var(--orange);
+    padding: 0.2rem;
+    margin-right: 0.5rem;
+}
+
+}
 
 /* @media (max-width : 480px){
   .search-bar-container{

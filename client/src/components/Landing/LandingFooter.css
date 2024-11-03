@@ -540,6 +540,10 @@
     padding-top: 2%;
   }
 
+  .footer-content {
+    padding: 0px 2%;
+}
+
   .footer-logo-text {
     text-align: left;
   }
@@ -550,8 +554,8 @@
 
   .social_icon {
     display: grid;
-    grid-template-columns: repeat(5, 1fr);
-    gap: 4.5rem;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 2rem;
     margin-top: 1.5rem;
   }
 
@@ -563,6 +567,10 @@
 
   .footer_contactUs_heading {
     font-size: 1.2rem;
+  }
+
+  .contact_form {
+   padding: 0.1rem;
   }
 
   .your_email {

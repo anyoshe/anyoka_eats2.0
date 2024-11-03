@@ -320,22 +320,7 @@
   }
 }
 
-
-/* @media (max-width: 700px) {
-  .specialOrderModal {
-    width: 100%;
-    margin-left: 0;
-    font-size: 12px;
-  }
-
-  .hero-background {
-    height: 300px;
-    background-size: contain;
-  } 
-} */
-
-
-@media (min-width: 768px) and (max-width:1023px) {
+@media (min-width: 768px) and (max-width:1024px) {
   .specialModalContent{
     width: 700px;
     margin-left: -10rem;
@@ -362,7 +347,7 @@
   }
 
   #specialOrderModal {
-    margin-top: 8%;
+    margin-top: 6%;
     height: 95vh;
     display: flex;
     align-items: center;
