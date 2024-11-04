@@ -21,6 +21,8 @@ const { type } = require("os");
 require('dotenv').config();
 const nodemailer = require('nodemailer');
 const JWT_SECRET = process.env.JWT_SECRET;
+const RESET_PASSWORD_SECRET = process.env.RESET_PASSWORD_SECRET;
+const RESET_PASSWORD_EXPIRY = process.env.RESET_PASSWORD_EXPIRY;
 
 function authenticateToken(req, res, next) {
   console.log('Authenticating token...');
@@ -2284,6 +2286,40 @@ router.post('/driverSignup', async (req, res) => {
 
 
 // Driver Login Route (routes/routes.js or appRouter.js)
+// router.post('/driverLogin', async (req, res) => {
+//   console.log('Received login request:', req.body); // Log incoming request body
+
+//   try {
+//     const { IDNumber, password } = req.body;
+//     const driver = await Driver.findOne({ IDNumber });
+
+//     if (!driver) {
+//       console.log('Driver not found for ID:', IDNumber);
+//       return res.status(400).json({ message: 'Driver not found' });
+//     }
+
+//     // Compare the password
+//     const isMatch = await bcrypt.compare(password, driver.password);
+//     if (!isMatch) {
+//       console.log('Invalid credentials for ID:', IDNumber);
+//       return res.status(400).json({ message: 'Invalid credentials' });
+//     }
+
+//     const token = jwt.sign(
+//       {
+//         id: driver._id,
+//         role: 'driver',
+//       },
+//       JWT_SECRET,
+//       { expiresIn: '1h' }
+//     );
+
+//     res.json({ token });
+//   } catch (error) {
+//     console.error('Error during login:', error); // Log the error
+//     res.status(500).json({ error: 'Failed to login driver' });
+//   }
+// });
 router.post('/driverLogin', async (req, res) => {
   console.log('Received login request:', req.body); // Log incoming request body
 
@@ -2296,8 +2332,14 @@ router.post('/driverLogin', async (req, res) => {
       return res.status(400).json({ message: 'Driver not found' });
     }
 
+    // Log stored password and input password
+    console.log('Stored hashed password:', driver.password);
+    console.log('Password being compared:', password);
+
     // Compare the password
     const isMatch = await bcrypt.compare(password, driver.password);
+    console.log('Password match result:', isMatch);
+    
     if (!isMatch) {
       console.log('Invalid credentials for ID:', IDNumber);
       return res.status(400).json({ message: 'Invalid credentials' });
@@ -2769,6 +2811,152 @@ router.post('/send-email', (req, res) => {
     // console.log('Email sent: ' + info.response); // Log success message
     res.status(200).send('Email sent successfully');
   });
+});
+
+// DRIVER FORGOT PASSWORD ROUTES
+
+router.post('/driverForgotPassword', async (req, res) => {
+  const { email, idNumber } = req.body; // Assuming you send both email and IDNumber from the frontend
+  console.log(email, idNumber); // For debugging
+
+  try {
+      // Find driver by IDNumber
+      const driver = await Driver.findOne({ IDNumber: idNumber }); // Find driver by both email and IDNumber
+      if (!driver) {
+          return res.status(404).json({ message: 'Driver with this email and IDNumber does not exist.' });
+      }
+     console.log(driver)
+     console.log(driver._id)
+      // Generate a reset token with driver ID
+      const resetToken = jwt.sign({ driverId: driver._id, idNumber: driver.IDNumber}, RESET_PASSWORD_SECRET, { expiresIn: RESET_PASSWORD_EXPIRY });
+
+      // Construct the reset link
+      const resetLink = `${process.env.FRONTEND_URL}/reset-password?token=${resetToken}`; // Ensure using backticks for string interpolation
+
+      // Send email
+      await transporter.sendMail({
+          from: process.env.EMAIL_USER,
+          to: email,
+          subject: 'Password Reset Request',
+          html: `<p>Click the link below to reset your password:</p><a href="${resetLink}">Reset Password</a>`, // Use backticks for HTML template
+      });
+
+      res.json({ message: 'Password reset email sent. Please check your inbox.' });
+  } catch (error) {
+      console.error('Error sending password reset email:', error);
+      res.status(500).json({ message: 'Error sending password reset email. Please try again.' });
+  }
+});
+
+
+// Password reset route
+router.post('/reset-password', async (req, res) => {
+  const { token, newPassword, idNumber } = req.body;
+  console.log(req.body);
+
+  try {
+    // Verify the token
+    const decoded = jwt.verify(token, RESET_PASSWORD_SECRET);
+    const driverId = decoded.driverId;
+    console.log("Decoded Driver ID:", driverId);
+
+    // Find driver by ID and verify ID number
+    const driver = await Driver.findById(driverId);
+    if (!driver || driver.IDNumber !== Number(idNumber)) {
+      return res.status(403).json({ message: 'Invalid ID number. Please try again.' });
+    }
+
+    // Hash the new password outside of the pre-save hook
+    const salt = await bcrypt.genSalt(10);
+    const hashedPassword = await bcrypt.hash(newPassword, salt);
+
+    // Update the password directly in the database
+    await Driver.findByIdAndUpdate(driverId, { password: hashedPassword });
+
+    res.json({ message: 'Password has been reset successfully' });
+  } catch (err) {
+    if (err.name === 'TokenExpiredError') {
+      return res.status(400).json({ message: 'Reset token has expired. Please request a new one.' });
+    }
+    console.error(err);
+    res.status(500).json({ message: 'Server error' });
+  }
+});
+
+
+// PARTNER FORGOT PASSWORD ROUTES
+
+router.post('/recover-password', async (req, res) => {
+  const { email, contactNumber } = req.body;
+  console.log(req.body);
+
+  try {
+      // Find the partner by email and contact number
+      const partner = await Partner.findOne({ contactNumber });
+      if (!partner) {
+          return res.status(404).json({ message: 'Partner not found with this email and contact number.' });
+      }
+
+      console.log(partner);
+
+      // Generate a reset token with partner ID
+      const resetToken = jwt.sign(
+          { partnerId: partner._id, contactNumber: partner.contactNumber }, 
+          RESET_PASSWORD_SECRET, 
+          { expiresIn: RESET_PASSWORD_EXPIRY }
+      );
+
+      // Construct the reset link
+      const resetLink = `${process.env.FRONTEND_URL}/reset-partner-password?token=${resetToken}`; // Ensure using backticks for string interpolation
+
+      
+
+      // Send email with reset link
+      await transporter.sendMail({
+          from: process.env.EMAIL_USER,
+          to: email,
+          subject: 'Password Reset Request',
+          html: `<p>You requested a password reset. Click the link below to reset your password:</p><a href="${resetLink}">Reset Password</a>`, // Use HTML for better formatting
+      });
+
+      res.status(200).json({ message: 'Password reset email sent. Please check your inbox.' });
+  } catch (error) {
+      console.error('Error in password recovery:', error);
+      res.status(500).json({ message: 'Internal server error' });
+  }
+});
+
+
+router.post('/reset-partner-password', async (req, res) => {
+  const { token, newPassword } = req.body;
+
+  try {
+      // Verify the token
+      const decoded = jwt.verify(token, RESET_PASSWORD_SECRET);
+      const { partnerId } = decoded;
+
+      // Find the partner by ID
+      const partner = await Partner.findById(partnerId);
+      if (!partner) {
+          return res.status(404).json({ message: 'Partner not found.' });
+      }
+
+      // Hash the new password
+      const salt = await bcrypt.genSalt(10);
+      const hashedPassword = await bcrypt.hash(newPassword, salt);
+
+      // Update the partner's password
+      partner.password = hashedPassword; // Store the hashed password
+      await partner.save();
+
+      res.status(200).json({ message: 'Password has been reset successfully.' });
+  } catch (error) {
+      if (error.name === 'TokenExpiredError') {
+          return res.status(400).json({ message: 'Reset token has expired. Please request a new one.' });
+      }
+      console.error('Error resetting password:', error);
+      res.status(500).json({ message: 'Failed to reset password. Please try again.' });
+  }
 });
 
 module.exports = router;

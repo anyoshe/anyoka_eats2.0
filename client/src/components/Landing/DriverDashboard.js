@@ -3,6 +3,7 @@ import './DriverDashboard.css';
 import '@fortawesome/fontawesome-free/css/all.min.css';
 import config from '../../config';
 import { useNavigate } from 'react-router-dom';
+import EarningsDashboard from './EarningsDashboard';
 
 
 const Dashboard = () => {
@@ -994,12 +995,9 @@ const Dashboard = () => {
                         </div>
                         <label className="label_off on_off">Offline</label>
                     </div>
-
-                    <div className="total_earnings_today">
+                     {/* <EarningsDashboard /> */}
+                     <div className="total_earnings_today">
                         <button className='driverTotals' onClick={toggleEarningsModal}>Total:<span id="totalEarnings">Ksh {totalEarnings}</span></button>
-                        {/* <h4 className='driverTotals'>Total: <span id="totalEarnings">Ksh 0</span></h4> */}
-
-
                         {isEarningsModalOpen && (
                             <div className="earnings-modal">
                                 <h4>Earnings Details</h4>
@@ -1030,7 +1028,7 @@ const Dashboard = () => {
                                 <button onClick={toggleEarningsModal}>Close</button>
                             </div>
                         )}
-                    </div>
+                    </div> 
 
 
                     <div className="driver_icon">
