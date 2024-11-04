@@ -419,3 +419,14 @@
         margin-left: -20%;
     }
 }
+
+@media(min-width:1025px) and (max-width:1440px){
+    #cartCount {
+        position: absolute;
+        top: 4%;
+        right: 4.4%;
+        font-weight: 600;
+        font-size: 18px;
+        color: red;
+    }
+}

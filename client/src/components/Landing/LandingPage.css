@@ -32,12 +32,6 @@
     border-bottom: 1px solid rgba(128, 128, 128, 0.577);
 }
 
-/* .logo-CTA{
-    z-index: 5000;
-    background: var(--orange);
-    width: 100%;
-} */
-
 .logo-CTA{
     position: fixed;
     display: flex;
@@ -198,10 +192,6 @@
     transition: ease-in .2s;
 }
 
-/* #disabled:hover{
-    cursor: pointer;
-} */
-
 .serviceDiv p{
     font-weight: 700;
     font-size: 17px;
@@ -230,41 +220,24 @@
     width: 90%;
     padding: 2px 20px;
     height: 100%; 
-    /* border-bottom: 1px solid rgba(128, 128, 128, 0.577); */
     margin-bottom: 3%;
 }
 
 .title-offerSearch{
-    /* display: flex;  
-    flex-direction: row;
-    justify-content: space-between;
-    align-items: center; */
     text-align: left;
     width: 100%;
     margin-bottom: 10px;
 }
 
 .search-container{
-    /* border: 1px solid red; */
-
-    /* background: #fff;
-    height: 30px;
-    border-radius: 30px;
-    padding: 10px 20px; */
     display: flex;
     justify-content: center;
     align-items: center;
     cursor: pointer;
     transition: 0.8s;
-    /* box-shadow:  4px 4px 6px 0 rgba(255,255,255,.3), -4px -4px 6px 0 rgba(116, 125, 136, .2),inset -4px -4px 6px 0 rgba(255,255,255,.2),inset 4px 4px 6px 0 rgba(0, 0, 0, .2); */
     position: relative;
     width: 30em;
 }
-
-/* .search-container:focus > .search-input{
-    width: 400px;
-    cursor: pointer;
-} */
 
 .search-input{
     width: 400px;
@@ -273,7 +246,6 @@
     outline: 1px solid var(--green);
     background: #fff;
     height: 30px;
-    /* border-radius: 30px; */
     padding: 0.5rem;
     padding: 10px 20px;
     transition: ease-in 0.2s;
@@ -285,27 +257,7 @@
     cursor: pointer;
 }
 
-/* .search-container .search-input{
-    background: transparent;
-    border: none;
-    outline:none;
-    width: 0px;
-    font-weight: 500;
-    font-size: 16px;
-    transition: 0.8s;
-} */
-
-/* .search-container .search-btn .fas{
-    color: #5cbdbb;
-} */
-
-/* .search-container:hover{
-animation: hoverShake 0.15s linear 3;
-} */
-
 .search-btn{
-    /* border: 1px solid red; */
-
     width: 2rem;
     padding: 0.5rem;
     display: flex;
@@ -323,27 +275,19 @@ animation: hoverShake 0.15s linear 3;
 }
 
 .search-results{
-    /* border: 1px solid red; */
-
     z-index: 100;
     position: absolute;
     top: 100%;
     width: 100%;
-    /* background: var(--green); */
 }
 
 .search-result-item{
 
     background: var(--green);
     color: white;
-    /* margin-bottom: 2rem; */
     padding: 0.5rem ;
     border-bottom: 1px solid white;
     width: 100%;
-    /* display: flex;
-    align-items: center;
-    justify-content: center;
-    flex-direction: row; */
 }
 
 .search-result-item:hover{
@@ -355,8 +299,6 @@ animation: hoverShake 0.15s linear 3;
 }
 
 .search-result-item-a{
-    /* border: 5px solid blue; */
-
     width: 100%;
     color: white;
 }
@@ -381,7 +323,6 @@ animation: hoverShake 0.15s linear 3;
     align-items: center;
     justify-content: space-between;
     align-items: center;
-    /* border-bottom: 1px solid; */
 }
 
 .offerTitle{
@@ -420,7 +361,6 @@ animation: hoverShake 0.15s linear 3;
     font-size: 15px;
     font-style: normal;
     font-weight: 600;
-    /* border-radius: 5px; */
     border: none;
     outline: 1px solid rgba(128, 128, 128, 0.519);
     background: var(--green);
@@ -544,8 +484,6 @@ animation: hoverShake 0.15s linear 3;
 }
 
 .join_team_grid_div{
-    /* border: 1px solid red; */
-
     display: grid;
     justify-items: center;
     grid-template-columns: repeat(2,1fr);
@@ -668,8 +606,7 @@ animation: hoverShake 0.15s linear 3;
     text-align: justify;
     font-size: 18px;
     font-weight: 350;
-}
-/* } */
+} 
 
 /* MEDIA QUERIES */
 @media (max-width: 320px){
@@ -1918,13 +1855,13 @@ animation: hoverShake 0.15s linear 3;
 
 @media(min-width:1025px) and (max-width:1440px){
     .containerDiv {
-        width: 100vw;
+        max-width: 100vw;
         min-height: 100vh;
     }
     
     .logo-CTA {
         padding: 10px 0.5rem;
-        width: 100vw;
+        /* width: 100vw; */
     }
 
     .landing_sign {
@@ -1950,14 +1887,14 @@ animation: hoverShake 0.15s linear 3;
     }
 
     .serviceDiv {
-        height: 200px;
-        width: 200px;
+        height: 185px;
+        width: 185px;
         padding: 0px;
     }
 
     .serviceImg {
-        width: 155px;
-        height: 155px;
+        width: 140px;
+        height: 140px;
         margin-bottom: 5px;
         background: var(--orange);
         top: 5px;
@@ -1969,14 +1906,14 @@ animation: hoverShake 0.15s linear 3;
     }
 
     .serviceDiv p {
-        font-size: 1.1rem;
+        font-size: 1rem;
         padding: 0px;
         width: 250px;
         margin-bottom: 0.3rem;
     }
 
     .offersSection {
-        width: 100%;
+        /* width: 100vw; */
         padding: 2px 0.5rem;
     }
 
@@ -2019,7 +1956,7 @@ animation: hoverShake 0.15s linear 3;
     }
 
     .featuredSection {
-        width: 100%;
+        /* width: 100%; */
         padding: 1rem 1rem;
         min-height: fit-content;
     }
@@ -2047,7 +1984,7 @@ animation: hoverShake 0.15s linear 3;
     }
 
     .join_team_section {
-        width: 100%;
+        width: 90%;
         height: fit-content;
         padding: 10px 5px;
         margin-bottom: 3%;
@@ -2072,7 +2009,7 @@ animation: hoverShake 0.15s linear 3;
     }
 
     .about_us_section {
-        width: 100%;
+        width: 90%;
         height: fit-content;
     }
 
@@ -2092,5 +2029,9 @@ animation: hoverShake 0.15s linear 3;
 
     .aboutUs_paragraph {
         font-size: 1rem;
+    }
+
+    .testimonials {
+        width: 90%;
     }
 }
