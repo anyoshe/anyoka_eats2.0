@@ -75,6 +75,9 @@
     }
 }
 
-@media (min-width: 321px) and (max-width: 375px){
-
+@media (min-width: 1024px) and (max-width: 1440px){
+    #sumaryModalcontent{
+        left: -3%;
+        margin-top: -6%;
+    }
 }

@@ -32,6 +32,7 @@
         padding: 0.3rem 0.5rem;
         margin-right: 4px;
     }
+
     .me-2 {
         margin-right: .3rem !important;
     }
@@ -65,10 +66,25 @@
     }
 }
 
-@media (min-width: 768px) and (max-width:1023px) {
+@media (min-width: 768px) and (max-width:1024px) {
     .foodCartlocationContent{
         width: 140%;
         margin-left: -20%;
         height: 600px;
+    }
+}
+
+
+@media (min-width: 1025px) and (max-width: 1440px) {
+    .freshfoodDalog {
+        margin-top: 2%;
+    }
+
+    #food_location_modal{
+        height: 400px;
+    }
+
+    #mapContainer{
+        height: 310px;
     }
 }

@@ -455,3 +455,24 @@
     padding: 0.2rem 0rem;
   }
 }
+
+@media(min-width:1025px) and (max-width:1440px){
+  .dish-card{
+    width: 100%;
+  }
+
+  .dish-image{
+    height: 7rem;
+  }
+
+  .dishName{
+    font-size: 0.8rem;
+    margin-bottom: 0rem;
+    padding: 0.2rem 0rem;
+  }
+
+  .dishPrice {
+    font-size: 0.9rem;
+    padding: 0.2rem 0rem;
+  }
+}

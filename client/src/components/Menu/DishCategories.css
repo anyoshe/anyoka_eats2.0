@@ -13,31 +13,24 @@
 }
 
 #dish-categories{
-    /* border: 5px solid pink; */
     display: grid;
     grid-template-columns: 75% 25%;
-    /* height: 100vh; */
-    /* gap: 10px; */
     position: relative;
     min-height: fit-content;
     width: 100%;
 }
 
 .dishesSection{
-    /* border: 5px solid green; */
-
     margin-top: 0.4%;
     width: 100%;
     position: relative;
 }
 
 .dishes-to-display{
-    /* border: 5px solid blue; */
+   
 }
 
 .category-buttons{
-    /* border: 5px solid red; */
-    
     margin-left: 2rem;
     display: flex;
     justify-content: space-between;
@@ -357,12 +350,57 @@
     }
 
     .restaurantSection {
-        padding-top: 2.5rem;
+        padding-top: 0rem;
     }
 
     .popularHotelDiv {
         position: fixed;
         right: 0.5%;
+        height: 90vh;
+        display: flex;
+        align-items: center;
+        flex-direction: column;
+        margin: 0px;
+    }
+}
+
+@media(min-width:1025px) and (max-width:1440px){
+    .category-buttons {
+        margin-top: -0.2rem;
+        margin-left: 0rem;
+        width: 77%;
+        position: fixed;
+        background: white;
+        z-index: 100;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .switchButtons {
+        border-radius: 0%;
+        margin: 0 3rem;
+    }
+
+    .menuHeader {
+        margin-left: 1%;
+        margin-bottom: 0;
+    }
+    
+    .restaurantSection {
+        padding-top: 0rem;
+    }
+
+    .dish-list {
+        column-gap: 5px;
+        row-gap: 10px;
+        padding-left: 0.2rem;
+        grid-template-columns: repeat(5, 1fr);
+        padding-left: 0.5rem;
+    }
+
+    .popularHotelDiv {
+        position: fixed;
+        right: 1.2%;
         height: 90vh;
         display: flex;
         align-items: center;
