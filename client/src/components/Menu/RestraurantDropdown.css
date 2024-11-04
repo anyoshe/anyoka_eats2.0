@@ -76,3 +76,21 @@
         font-size: 0.8rem;
     }
 }
+
+@media (min-width: 769px) and (max-width: 1024px) {
+    #dishesModalContent {
+        grid-template-columns: repeat(4, 1fr);
+        column-gap: 5px;
+        row-gap: 10px;
+    }
+}
+
+@media (min-width: 1025px) and (max-width: 1440px){
+    #dishesModalContent {
+        grid-template-columns: repeat(4, 1fr);
+    }
+
+    .byModalContent{
+        margin-top: -5%;
+    }
+}
