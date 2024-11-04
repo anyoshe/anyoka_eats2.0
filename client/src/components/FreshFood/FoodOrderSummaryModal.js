@@ -6,6 +6,7 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap/dist/js/bootstrap.bundle.min';
 import { right } from '@popperjs/core';
 import { v4 as uuidv4 } from 'uuid';
+import "./FoodOrderSummaryModal.css";
 
 const googleApiKey = process.env.REACT_APP_GOOGLE_API_KEY;
 
@@ -406,7 +407,7 @@ const generateUniqueOrderId = () => {
   return (
     <>
       <div className={`modal fade ${show ? 'show' : ''}`} id="orderSummaryModal" tabIndex="-1" aria-labelledby="orderSummaryModalLabel" aria-hidden="true" style={{ display: show ? 'block' : 'none' }}>
-        <div className="modal-dialog modal-lg">
+        <div className="modal-dialog modal-lg foodSummarySummary">
           <div className="modal-content">
             <div className="modal-header">
               <h5 className="modal-title" id="orderSummaryModalLabel">Order Summary</h5>

@@ -8,7 +8,6 @@
 #specialOrderModal {
   background-color: rgb(0, 0, 0, 0.7);
   width: 100%;
-  /* margin-left: 0px; */
   margin-top: 5%;
   height: 95vh;
   display: flex;
@@ -16,29 +15,19 @@
   justify-content: center;
 }
 
-/* Center the modal vertically and horizontally */
 .special-modal-dialog{
-  /* border: 5px solid green; */
-
   width: 50%;
   margin-top: 2%;
   margin-left: 25%;
 }
 
 .modalContent{
-  /* border: 5px solid red; */
-
   width: 100%;
   background: white;
   padding: 10px 5px;
-  /* margin-top: 5%; */
 }
 
-/* MODAL HEADER  */
 .modalHeader{
-  /* border: 1px solid green; */
-  
-  /* background-color: var(--green); */
   border-bottom: 1px solid #dee2e6;
   display: flex;
   justify-content: space-between;
@@ -54,7 +43,6 @@
   text-decoration: underline;
 }
 
-/* Styling for the close button */
 .specialClose {
   padding: 5px 10px;
   border: none;
@@ -75,16 +63,12 @@
   font-size: 18px;
 }
 
-/* MODAL BODY */
 .modalBody{
-  /* border: 1px solid red; */
   width: 100%;
   padding: 0px;
 }
 
 #specialOrderForm{
-  /* border: 1px solid red; */
-
   width: 100%;
   padding-top: 5px;
 }
@@ -109,10 +93,7 @@
   padding: 5px;
 }
 
-/* Styling for the form elements */
 .formGroup {
-  /* border: 1px solid green; */
-
   margin-bottom: 15px;
   padding-bottom: 0px;
   display: flex;
@@ -125,7 +106,6 @@
 }
 
 .specialLabels{
-  /* border: 1px dotted red; */
   text-align: left;
   margin-bottom: 2px;
   font-size: 17px;
@@ -148,8 +128,6 @@
 }
 
 .locationBtns{
-  /* border: 1px dotted red; */
-
   width: 100%;
   display: grid;
   grid-template-columns: repeat(2, 1fr);
@@ -157,8 +135,6 @@
 }
 
 .formControl {
-  /* border: 1px solid salmon; */
-
   font-size: 16px;
   border-radius: 0px;
   border: none;
@@ -174,16 +150,6 @@
 .specialTripleInputs{
   padding: 5px;
 }
-
-/* #specialDetails{
-  border: 1px solid red;
-  width: 100%;
-  border-radius: 0px;
-} */
-
-/* .specialCloseBtn{
-  text-align: right;
-} */
 
 #btnPrimary {
   background: var(--green);
@@ -209,18 +175,12 @@
   margin-bottom: 10px;
 }
 
-/* Hide the map initially */
 #map {
   height: 150px;
   width: 100%;
   margin-top: 10px;
   display: none;
 }
-
-/* .specialOrderDouble{
-  display: flex;
-  justify-content: space-around;
-} */
 
 @media(min-width : 321px) and (max-width: 375px){
   #specialOrderModal {
@@ -270,7 +230,6 @@
   }
 }
 
-/* Styling for screens below 700px */
 @media(min-width : 376px) and (max-width:425px){
   #specialOrderModal {
     margin-top: 10%;
@@ -320,22 +279,7 @@
   }
 }
 
-
-/* @media (max-width: 700px) {
-  .specialOrderModal {
-    width: 100%;
-    margin-left: 0;
-    font-size: 12px;
-  }
-
-  .hero-background {
-    height: 300px;
-    background-size: contain;
-  } 
-} */
-
-
-@media (min-width: 768px) and (max-width:1023px) {
+@media (min-width: 768px) and (max-width:1024px) {
   .specialModalContent{
     width: 700px;
     margin-left: -10rem;
@@ -344,10 +288,6 @@
   .specialTriple{
     grid-template-columns:1fr;
     gap: 5px;
-  }
-
-  .special_times{
-    /* width: 5rem; */
   }
 
   #specialOrderArea{
@@ -362,11 +302,22 @@
   }
 
   #specialOrderModal {
-    margin-top: 8%;
+    margin-top: 6%;
     height: 95vh;
     display: flex;
     align-items: center;
     justify-content: center;
   }
-  
+}
+
+@media (min-width: 1025px) and (max-width: 1440px) {
+  .special-modal-dialog {
+    width: 60em;
+    margin-left: 10rem;
+    margin-top: 1rem;
+  }
+
+  #specialOrderArea{
+    height: 150px;
+  }
 }

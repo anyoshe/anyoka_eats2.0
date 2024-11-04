@@ -241,11 +241,11 @@ const FoodLocationModal = ({ show, handleClose, vendors = [], orderedFoods = [] 
               <button type="button" className="btn-close" data-bs-dismiss="modal" aria-label="Close" onClick={handleClose}></button>
               
             </div>
-              <div className="modal-body" style={{ maxHeight: 'calc(100vh - 210px)', overflowY: 'auto' }}>
+              <div className="modal-body" id='food_location_modal' style={{ maxHeight: 'calc(100vh - 210px)', overflowY: 'auto' }}>
 
               <div><strong>Vendor Location:</strong> {vendorCoords ? `${vendorCoords.lat}, ${vendorCoords.lng}` : 'Fetching...'}</div>
 
-              <div id="mapContainer" style={{ height: '400px' }}></div>
+              <div id="mapContainer"></div>
               <input type="text" id="customerLocation" className="form-control mt-3" placeholder="Delivery Location" readOnly />
             </div>
             <button className="btn btn-primary mt-3" onClick={handlePinMyLocation}>Pin My Location</button>
