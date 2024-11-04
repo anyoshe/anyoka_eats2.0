@@ -15,7 +15,9 @@ function SignUpSignIn() {
         ConfirmPassword: '',
         loginPassword: '', // For login
     });
-
+    const [resetEmail, setResetEmail] = useState('');
+    const [idNumber, setIdNumber] = useState('');
+    const [isForgotPasswordModalOpen, setIsForgotPasswordModalOpen] = useState(false);
     const [showPassword, setShowPassword] = useState(false); // For showing/hiding password
     const [showLoginPassword, setShowLoginPassword] = useState(false); // For login password field
 
@@ -42,7 +44,7 @@ function SignUpSignIn() {
         }
     }, [navigate]);
 
-    // Function to update form data on input change
+//     // Function to update form data on input change
     const handleInputChange = (event) => {
         const { name, value } = event.target;
         setFormData((prevFormData) => ({
@@ -107,6 +109,27 @@ function SignUpSignIn() {
         }
     };
     
+    // const handleForgotPasswordSubmit = async () => {
+    //     try {
+    //         await axios.post(`${config.backendUrl}/api/driverForgotPassword`, { email: resetEmail });
+    //         alert("Password reset email sent. Please check your inbox.");
+    //         setIsForgotPasswordModalOpen(false);
+    //     } catch (error) {
+    //         console.error('Error sending reset email:', error);
+    //         alert("Error sending password reset email. Please try again.");
+    //     }
+    // };
+    
+    const handleForgotPasswordSubmit = async () => {
+        try {
+            await axios.post(`${config.backendUrl}/api/driverForgotPassword`, { email: resetEmail, idNumber });
+            alert("Password reset email sent. Please check your inbox.");
+            setIsForgotPasswordModalOpen(false);
+        } catch (error) {
+            console.error('Error sending reset email:', error);
+            alert("Error sending password reset email. Please try again.");
+        }
+    };
     
     // Function to toggle the form panel
     const handleToggle = () => {
@@ -224,19 +247,19 @@ function SignUpSignIn() {
 
                 {/* Sign In Section */}
                 <div className="form-container sign-in-container">
-                    <form onSubmit={handleSubmitSignIn}>
+                     <form onSubmit={handleSubmitSignIn}>
                         <h1 className='logIn_h1'>Log in</h1>
 
                         <div className="social-container">
                             <a href="#" className="log_social_icons"><i className="fab fa-facebook-f"></i></a>
-                            <a href="#" className="log_social_icons"><i className="fab fa-google-plus-g"></i></a>
+                             <a href="#" className="log_social_icons"><i className="fab fa-google-plus-g"></i></a>
                             <a href="#" className="log_social_icons"><i className="fab fa-linkedin-in"></i></a>
                         </div>
 
                         <span>or use your account</span>
 
                         {/* ID Number */}
-                        <div className="infield">
+                         <div className="infield">
                             <input
                                 className='input-sign'
                                 type="number"
@@ -264,11 +287,57 @@ function SignUpSignIn() {
                             </button>
                         </div>
 
-                        <a href="#" className="forgot">Forgot your password?</a>
+                       
+                        <a href="#" className="forgot" onClick={() => setIsForgotPasswordModalOpen(true)}>
+                             Forgot your password?
+                        </a>
 
                         <button className='loginBtn' type="submit">Log In</button>
                     </form>
                 </div>
+
+                {/* {isForgotPasswordModalOpen && (
+                <div className="modal">
+                    <div className="modal-content">
+                        <h2>Reset Password</h2>
+                        <p>Enter your email to receive password reset instructions:</p>
+                        <input
+                            type="email"
+                            placeholder="Enter your email"
+                            value={resetEmail}
+                            onChange={(e) => setResetEmail(e.target.value)}
+                            required
+                        />
+                        <button onClick={handleForgotPasswordSubmit}>Submit</button>
+                        <button onClick={() => setIsForgotPasswordModalOpen(false)}>Close</button>
+                    </div>
+                </div>
+            )} */}
+
+{isForgotPasswordModalOpen && (
+            <div className="modal">
+                <div className="modal-content">
+                    <h2>Reset Password</h2>
+                    <p>Enter your email and ID Number to receive password reset instructions:</p>
+                    <input
+                        type="email"
+                        placeholder="Enter your email"
+                        value={resetEmail}
+                        onChange={(e) => setResetEmail(e.target.value)}
+                        required
+                    />
+                    <input
+                        type="number"
+                        placeholder="Enter your ID Number"
+                        value={idNumber} // Use the IDNumber state
+                        onChange={(e) => setIdNumber(e.target.value)} // Update state on change
+                        required
+                    />
+                    <button onClick={handleForgotPasswordSubmit}>Submit</button>
+                    <button onClick={() => setIsForgotPasswordModalOpen(false)}>Close</button>
+                </div>
+            </div>
+        )}
 
                 {/* Overlay Messages */}
                 <div className="overlay-container" id="overlayCon">

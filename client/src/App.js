@@ -18,20 +18,24 @@ import { PartnerProvider } from './contexts/PartnerContext';
 import DishCategories from './components/Menu/DishCategories';
 import InstallPrompt from './components/Header/InstallPrompt';
 import { DriverProvider } from './contexts/DriverContext';
+import ResetPassword from './components/Landing/ResetPassword';
+import ResetPartnerPassword from './components/Landing/ResetPartnerPassword';
 function App() {
     return (
-        
-    
+
+
         <Router>
             <PartnerProvider>
                 <CartProvider>
-                <FreshFoodCartProvider>
-                {/* <NavBar /> */}
-                <Routes>
-                    <Route path="/" element={<LandingPage />} />
-                    <Route path="/sign-up-sign-in" element={<SignUpSignIn />} />
-                    {/* Move the DriverProvider inside the Route elements */}
-                    <Route path="/DriverDashboard" element={
+                    <FreshFoodCartProvider>
+                        {/* <NavBar /> */}
+                        <Routes>
+                            <Route path="/" element={<LandingPage />} />
+                            <Route path="/sign-up-sign-in" element={<SignUpSignIn />} />
+                            <Route path="/reset-password" element={<ResetPassword />} />
+                            <Route path="/reset-partner-password" element={<ResetPartnerPassword />} />
+                            {/* Move the DriverProvider inside the Route elements */}
+                            <Route path="/DriverDashboard" element={
                                 <DriverProvider>
                                     <DriverDashboard />
                                 </DriverProvider>
@@ -41,31 +45,31 @@ function App() {
                                     <DriverCreateAccount />
                                 </DriverProvider>
                             } />
-                    <Route path="/dashboard" element={<UserProfileDashBoard />} />
-                    <Route path="/menu" element={
-                        <CartProvider>
-                            <MenuPage />
-                        </CartProvider>
-                    } />
-                    <Route path="/offers" element={<MenuPage />} />
-                    <Route path="/featured" element={<MenuPage />} />
-                    <Route path='/outside-catering' element={<OutsideCateringLandingPage />} />
-                    <Route path="/user" element={<UserProfileDashBoard />} />
-                    <Route path="/conferences" element={<ConferenceLandingPage />} />
-                    <Route path="/conferenceList" element={<ConferenceList />} />
-                    <Route path="/freshfood" element={
-                        <FreshFoodCartProvider>
-                            <LandingFreshFood />
-                        </FreshFoodCartProvider>
-                    } />
-                    <Route path="/discounts" element={<LandingFreshFood />} />
-                    
-                </Routes>
-                </FreshFoodCartProvider>
+                            <Route path="/dashboard" element={<UserProfileDashBoard />} />
+                            <Route path="/menu" element={
+                                <CartProvider>
+                                    <MenuPage />
+                                </CartProvider>
+                            } />
+                            <Route path="/offers" element={<MenuPage />} />
+                            <Route path="/featured" element={<MenuPage />} />
+                            <Route path='/outside-catering' element={<OutsideCateringLandingPage />} />
+                            <Route path="/user" element={<UserProfileDashBoard />} />
+                            <Route path="/conferences" element={<ConferenceLandingPage />} />
+                            <Route path="/conferenceList" element={<ConferenceList />} />
+                            <Route path="/freshfood" element={
+                                <FreshFoodCartProvider>
+                                    <LandingFreshFood />
+                                </FreshFoodCartProvider>
+                            } />
+                            <Route path="/discounts" element={<LandingFreshFood />} />
+
+                        </Routes>
+                    </FreshFoodCartProvider>
                 </CartProvider>
             </PartnerProvider>
         </Router>
-        
+
     );
 }
 

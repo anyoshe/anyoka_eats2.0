@@ -5,6 +5,8 @@
 // import { useNavigate } from 'react-router-dom';
 // import { PartnerContext } from '../../contexts/PartnerContext';
 // import config from '../../config';
+// import { FaEye, FaEyeSlash } from 'react-icons/fa';
+
 
 // function SignUpSignIn() {
 //     const [formData, setFormData] = useState({
@@ -17,6 +19,9 @@
 //         userName: '', // For login
 //         loginPassword: '', // For login
 //     });
+
+//     const [showPassword, setShowPassword] = useState(false);
+//     const [showLoginPassword, setShowLoginPassword] = useState(false);
 
 //     const navigate = useNavigate();
 //     const { setPartner } = useContext(PartnerContext);
@@ -99,6 +104,8 @@
 //     const handleToggle = () => {
 //         document.getElementById('container').classList.toggle('right-panel-active');
 //     };
+//     const togglePasswordVisibility = () => setShowPassword(!showPassword);
+//     const toggleLoginPasswordVisibility = () => setShowLoginPassword(!showLoginPassword);
 
 //     return (
 //         <div className='authForm'>
@@ -159,7 +166,7 @@
 //                             />
 //                         </div>
 
-//                         {/* <div className="infield">
+//                         <div className="infield">
 //                             <input
 //                                 className='input-sign'
 //                                 type="email"
@@ -168,9 +175,9 @@
 //                                 value={formData.email}
 //                                 onChange={handleInputChange}
 //                             />
-//                         </div> */}
-                        
-//                         {/* <div className="infield">
+//                         </div>
+
+//                         <div className="infield">
 //                             <input
 //                                 className='input-sign'
 //                                 type="text"
@@ -180,31 +187,22 @@
 //                                 onChange={handleInputChange}
 //                                 required
 //                             />
-//                         </div> */}
-                        
+//                         </div>
+
 //                         <div className="infield">
 //                             <input
 //                                 className='input-sign'
-//                                 type="password"
+//                                 type={showPassword ? "text" : "password"}
 //                                 placeholder="Password"
 //                                 name="password"
 //                                 value={formData.password}
 //                                 onChange={handleInputChange}
 //                                 required
 //                             />
+//                             <span onClick={togglePasswordVisibility}>
+//                                  {showPassword ? <FaEyeSlash /> : <FaEye />}
+//                             </span>
 //                         </div>
-
-//                         {/* <div className="infield">
-//                             <input
-//                                 className='input-sign'
-//                                 type="text"
-//                                 placeholder="Confirm Password"
-//                                 name="ConfirmPassword"
-//                                 value={formData.location}
-//                                 onChange={handleInputChange}
-//                                 required
-//                             />
-//                         </div> */}
 
 //                         <button className='loginBtn logphone' type="submit">Sign Up</button>
 //                     </form>
@@ -249,13 +247,16 @@
 //                         <div className="infield">
 //                             <input
 //                                 className='input-sign'
-//                                 type="password"
+//                                 type={showLoginPassword ? "text" : "password"}
 //                                 placeholder="Password"
 //                                 name="loginPassword"
 //                                 value={formData.loginPassword}
 //                                 onChange={handleInputChange}
 //                                 required
 //                             />
+//                             <span onClick={toggleLoginPasswordVisibility}>
+//                                 {showLoginPassword ? <FaEyeSlash /> : <FaEye />}
+//                             </span>
 //                         </div>
 
 //                         <a href="#" className="forgot">Forgot your password ?</a>
@@ -307,33 +308,38 @@ function SignUpSignIn() {
         userName: '', // For login
         loginPassword: '', // For login
     });
+
     const [showPassword, setShowPassword] = useState(false);
     const [showLoginPassword, setShowLoginPassword] = useState(false);
+    const [modalVisible, setModalVisible] = useState(false);
 
     const navigate = useNavigate();
     const { setPartner } = useContext(PartnerContext);
 
     useEffect(() => {
+        // Check if a token exists and fetch the partner data
         const token = localStorage.getItem('authToken');
         if (token) {
             axios.get(`${config.backendUrl}/api/partner`, {
                 headers: { 'Authorization': `Bearer ${token}` }
             })
-            .then(response => {
-                setPartner(response.data);
-                navigate('/dashboard');
-            })
-            .catch(error => {
-                console.error('Error fetching partner data:', error);
-            });
+                .then(response => {
+                    setPartner(response.data);
+                    navigate('/dashboard');
+                })
+                .catch(error => {
+                    console.error('Error fetching partner data:', error);
+                });
         }
     }, [navigate, setPartner]);
 
+    // Function to update form data on input change
     const handleInputChange = (event) => {
         const { name, value } = event.target;
         setFormData({ ...formData, [name]: value });
     };
 
+    // Function to handle sign-up submission
     const handleSubmitSignUp = async (event) => {
         event.preventDefault();
         try {
@@ -346,7 +352,8 @@ function SignUpSignIn() {
                 password: formData.password,
             });
 
-            setPartner(response.data);
+            const partnerData = response.data;
+            setPartner(partnerData);
             alert("Sign up Successful, Welcome!");
             navigate('/dashboard');
         } catch (error) {
@@ -355,6 +362,7 @@ function SignUpSignIn() {
         }
     };
 
+    // Function to handle sign-in submission
     const handleSubmitSignIn = async (event) => {
         event.preventDefault();
         try {
@@ -366,6 +374,7 @@ function SignUpSignIn() {
             const token = loginResponse.data.token;
             if (token) {
                 localStorage.setItem('authToken', token);
+
                 const partnerResponse = await axios.get(`${config.backendUrl}/api/partner`, {
                     headers: { 'Authorization': `Bearer ${token}` }
                 });
@@ -381,6 +390,24 @@ function SignUpSignIn() {
         }
     };
 
+    // Function to handle password recovery
+    const handlePasswordRecovery = async (event) => {
+        event.preventDefault();
+        try {
+            const response = await axios.post(`${config.backendUrl}/api/recover-password`, {
+                email: formData.email,
+                contactNumber: formData.contactNumber,
+            });
+
+            alert("Password recovery link sent to your email!");
+            setModalVisible(false);
+        } catch (error) {
+            console.error('Error in password recovery:', error);
+            alert("An error occurred. Please try again.");
+        }
+    };
+
+    // Function to toggle the form panel
     const handleToggle = () => {
         document.getElementById('container').classList.toggle('right-panel-active');
     };
@@ -391,16 +418,24 @@ function SignUpSignIn() {
     return (
         <div className='authForm'>
             <img src="https://i.imgur.com/wcGWHvx.png" className="square" alt="" />
+
             <div className="container" id="container">
 
                 {/* Sign Up Section */}
                 <div className="form-container sign-up-container">
                     <form onSubmit={handleSubmitSignUp}>
                         <h1 className='createAccount'>Create Account</h1>
+
+                        <div className="social-container">
+                            <a href="#" className="log_social_icons" ><i className="fab fa-facebook-f"></i></a>
+                            <a href="#" className="log_social_icons"><i className="fab fa-google-plus-g"></i></a>
+                            <a href="#" className="log_social_icons"><i className="fab fa-linkedin-in"></i></a>
+                        </div>
+
                         <span>or use your email for registration</span>
 
                         <div className="infield">
-                            <input 
+                            <input
                                 className='input-sign'
                                 type="text"
                                 placeholder="User Name"
@@ -438,6 +473,29 @@ function SignUpSignIn() {
                         <div className="infield">
                             <input
                                 className='input-sign'
+                                type="email"
+                                placeholder="Email"
+                                name="email"
+                                value={formData.email}
+                                onChange={handleInputChange}
+                            />
+                        </div>
+
+                        <div className="infield">
+                            <input
+                                className='input-sign'
+                                type="text"
+                                placeholder="Business Location"
+                                name="location"
+                                value={formData.location}
+                                onChange={handleInputChange}
+                                required
+                            />
+                        </div>
+
+                        <div className="infield">
+                            <input
+                                className='input-sign'
                                 type={showPassword ? "text" : "password"}
                                 placeholder="Password"
                                 name="password"
@@ -458,7 +516,25 @@ function SignUpSignIn() {
                 <div className="form-container sign-in-container">
                     <form onSubmit={handleSubmitSignIn}>
                         <h1 className='logIn_h1'>Log in</h1>
+
+                        <div className="social-container">
+                            <a href="#" className="log_social_icons"><i className="fab fa-facebook-f"></i></a>
+                            <a href="#" className="log_social_icons"><i className="fab fa-google-plus-g"></i></a>
+                            <a href="#" className="log_social_icons"><i className="fab fa-linkedin-in"></i></a>
+                        </div>
+
                         <span>or use your account</span>
+
+                        <div className="infield">
+                            <input
+                                className='input-sign'
+                                type="text"
+                                placeholder="User Name"
+                                name="businessName"
+                                value={formData.businessName}
+                                onChange={handleInputChange}
+                            />
+                        </div>
 
                         <div className="infield">
                             <input
@@ -487,7 +563,8 @@ function SignUpSignIn() {
                             </span>
                         </div>
 
-                        <a href="#" className="forgot">Forgot your password ?</a>
+                        <a href="#" className="forgot" onClick={() => setModalVisible(true)}>Forgot your password?</a>
+
                         <button className='loginBtn' type="submit">Log In</button>
                     </form>
                 </div>
@@ -495,20 +572,54 @@ function SignUpSignIn() {
                 {/* Overlay Messages */}
                 <div className="overlay-container" id="overlayCon">
                     <div className="overlay">
+
                         <div className="overlay-panel overlay-left">
                             <h1>Welcome Back!</h1>
-                            <p>To keep connected with us please login with your Account info</p>
+                            <p>To keep connected with us please login with your personal info</p>
+                            {/* <button className="ghost" id="signIn" onClick={handleToggle}>Log In</button> */}
                             <button className="signBtn btnScaled loginBtn" onClick={handleToggle}>Log In</button>
                         </div>
 
                         <div className="overlay-panel overlay-right">
                             <h1>Hello, Friend!</h1>
-                            <p>Enter your Account details and start journey with us</p>
+                            <p>Enter your personal details and start your journey with us</p>
+                            {/* <button className="ghost" id="signUp" onClick={handleToggle}>Sign Up</button> */}
                             <button id="signUpBtn" className="signBtn btnScaled loginBtn" onClick={handleToggle}>Sign Up</button>
                         </div>
                     </div>
                 </div>
             </div>
+
+            {/* Password Recovery Modal */}
+            {modalVisible && (
+                <div className="modal">
+                    <div className="modal-content">
+                        <span className="close" onClick={() => setModalVisible(false)}>&times;</span>
+                        <h2>Password Recovery</h2>
+                        <form onSubmit={handlePasswordRecovery}>
+                            <input
+                                className='input-sign'
+                                type="email"
+                                placeholder="Enter your email"
+                                name="email"
+                                value={formData.email}
+                                onChange={handleInputChange}
+                                required
+                            />
+                            <input
+                                className='input-sign'
+                                type="text"
+                                placeholder="Enter your contact number"
+                                name="contactNumber"
+                                value={formData.contactNumber}
+                                onChange={handleInputChange}
+                                required
+                            />
+                            <button className='loginBtn' type="submit">Send Recovery Link</button>
+                        </form>
+                    </div>
+                </div>
+            )}
         </div>
     );
 }
