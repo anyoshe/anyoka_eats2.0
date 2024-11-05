@@ -1278,22 +1278,44 @@ router.get('/orders/delivered', async (req, res) => {
 });
 
 //WORKINGS AFTER MPESA PAYMENT HAS BEEN DONE
+// router.post('/paidOrder', async (req, res) => {
+//   // console.log('Received order data:', req.body);
+//   // console.log('OrderDetails');
+//   try {
+//     const orderDetails = req.body;
+
+//     // Ensure unique order ID
+//     orderDetails.orderId = uuidv4();
+
+//     // Set initial status
+//     orderDetails.status = 'Order received';
+
+//     // Save order to database
+//     await saveOrder(orderDetails);
+
+//     res.status(200).json({ message: 'Order saved successfully' });
+//   } catch (error) {
+//     console.error('Error saving order:', error);
+//     res.status(500).json({ error: 'Failed to save order' });
+//   }
+// });
+
 router.post('/paidOrder', async (req, res) => {
-  // console.log('Received order data:', req.body);
-  // console.log('OrderDetails');
   try {
     const orderDetails = req.body;
 
-    // Ensure unique order ID
+    // Generate a unique order ID
     orderDetails.orderId = uuidv4();
-
-    // Set initial status
     orderDetails.status = 'Order received';
 
     // Save order to database
-    await saveOrder(orderDetails);
+    const savedOrder = await saveOrder(orderDetails);
 
-    res.status(200).json({ message: 'Order saved successfully' });
+    // Return order ID in the response
+    res.status(200).json({
+      message: 'Order saved successfully',
+      orderId: savedOrder.orderId // Send back the orderId
+    });
   } catch (error) {
     console.error('Error saving order:', error);
     res.status(500).json({ error: 'Failed to save order' });
@@ -1326,8 +1348,12 @@ async function saveOrder(orderDetails) {
     order.customerName = orderDetails.customerName;
   }
 
+  // try {
+  //   await order.save();
   try {
-    await order.save();
+    const savedOrder = await order.save();
+    return savedOrder; // Return the saved order to access its fields
+    
     // console.log('Order saved successfully');
   } catch (error) {
     console.error('Error saving order:', error);
@@ -2682,21 +2708,21 @@ router.post('/mpesa/pay', async (req, res) => {
 });
 
 // Example route to handle sending receipts
-router.post('/send-receipt', async (req, res) => {
-  try {
-    // Implement logic to send receipt here
-    const { phoneNumber, amount } = req.body;
+// router.post('/send-receipt', async (req, res) => {
+//   try {
+//     // Implement logic to send receipt here
+//     const { phoneNumber, amount } = req.body;
 
-    // Example logic to send receipt via SMS or any other method
-    const receiptSent = await sendReceiptMessage(phoneNumber, amount);
+//     // Example logic to send receipt via SMS or any other method
+//     const receiptSent = await sendReceiptMessage(phoneNumber, amount);
 
-    // Respond with success message
-    res.status(200).json({ message: 'Receipt sent successfully' });
-  } catch (error) {
-    console.error('Error sending receipt:', error);
-    res.status(500).json({ error: 'Failed to send receipt' });
-  }
-});
+//     // Respond with success message
+//     res.status(200).json({ message: 'Receipt sent successfully' });
+//   } catch (error) {
+//     console.error('Error sending receipt:', error);
+//     res.status(500).json({ error: 'Failed to send receipt' });
+//   }
+// });
 
 // // Function to send receipt
 // async function sendReceipt(phoneNumber, amount) {
@@ -2708,63 +2734,63 @@ router.post('/send-receipt', async (req, res) => {
 //   });
 // }
 // Example of SMS sending route
-router.post('/sendSms', async (req, res) => {
-  const { phoneNumber, message } = req.body;
-  console.log(phoneNumber, message);
-  // Your logic for sending SMS goes here
-  try {
-    // Call your SMS sending service (like Twilio or any other)
-    const smsResponse = await sendSmsService(phoneNumber, message);
-    res.status(200).json(smsResponse);
-  } catch (error) {
-    console.error('Error sending SMS:', error);
-    res.status(500).json({ error: 'Failed to send SMS' });
-  }
-});
-// Import Africa's Talking SDK
-const africastalking = require('africastalking')({
-  apiKey: process.env.SMSAPIKEY,  // Replace with your Africa's Talking API Key
-  username: 'sandbox' // Replace with your Africa's Talking username
-});
+// router.post('/sendSms', async (req, res) => {
+//   const { phoneNumber, message } = req.body;
+//   console.log(phoneNumber, message);
+//   // Your logic for sending SMS goes here
+//   try {
+//     // Call your SMS sending service (like Twilio or any other)
+//     const smsResponse = await sendSmsService(phoneNumber, message);
+//     res.status(200).json(smsResponse);
+//   } catch (error) {
+//     console.error('Error sending SMS:', error);
+//     res.status(500).json({ error: 'Failed to send SMS' });
+//   }
+// });
+// // Import Africa's Talking SDK
+// const africastalking = require('africastalking')({
+//   apiKey: process.env.SMSAPIKEY,  // Replace with your Africa's Talking API Key
+//   username: 'sandbox' // Replace with your Africa's Talking username
+// });
 
-// Access the SMS service
-const sms = africastalking.SMS;
+// // Access the SMS service
+// const sms = africastalking.SMS;
 
-// Function to send M-Pesa payment receipt via SMS
-async function sendReceipt(phoneNumber, amount) {
-  // Message to be sent to the user
-  const message = `Thank you for your payment of KES ${amount}. Your order is being processed.`;
+// // Function to send M-Pesa payment receipt via SMS
+// async function sendReceipt(phoneNumber, amount) {
+//   // Message to be sent to the user
+//   const message = `Thank you for your payment of KES ${amount}. Your order is being processed.`;
 
-  const options = {
-    to: [phoneNumber],  // The recipient's phone number (e.g., +2547XXXXXXXX)
-    message: message,   // The receipt message
-    from: 'YourShortCodeOrSenderID' // Optional. Specify if you have a short code or sender ID
-  };
+//   const options = {
+//     to: [phoneNumber],  // The recipient's phone number (e.g., +2547XXXXXXXX)
+//     message: message,   // The receipt message
+//     from: 'YourShortCodeOrSenderID' // Optional. Specify if you have a short code or sender ID
+//   };
 
-  try {
-    // Send the SMS using Africa's Talking
-    const response = await sms.send(options);
-    console.log('SMS Sent Successfully:', response);
-  } catch (error) {
-    console.error('Failed to send SMS:', error);
-  }
-}
+//   try {
+//     // Send the SMS using Africa's Talking
+//     const response = await sms.send(options);
+//     console.log('SMS Sent Successfully:', response);
+//   } catch (error) {
+//     console.error('Failed to send SMS:', error);
+//   }
+// }
 
 // Example use case
-async function processPaymentAndSendReceipt(paymentDetails, userPhoneNumber) {
-  // Simulate successful payment processing
-  const paymentSuccess = true;  // Replace with actual payment logic
+// async function processPaymentAndSendReceipt(paymentDetails, userPhoneNumber) {
+//   // Simulate successful payment processing
+//   const paymentSuccess = true;  // Replace with actual payment logic
 
-  if (paymentSuccess) {
-    // Send the receipt after successful payment
-    await sendReceipt(userPhoneNumber, paymentDetails.amount);
-  }
-}
+//   if (paymentSuccess) {
+//     // Send the receipt after successful payment
+//     await sendReceipt(userPhoneNumber, paymentDetails.amount);
+//   }
+// }
 
-// Example test case
-const paymentDetails = { amount: 500 };
-const userPhoneNumber = "+2547XXXXXXXX";  // Replace with the user's phone number
-processPaymentAndSendReceipt(paymentDetails, userPhoneNumber);
+// // Example test case
+// const paymentDetails = { amount: 500 };
+// const userPhoneNumber = "+2547XXXXXXXX";  // Replace with the user's phone number
+// processPaymentAndSendReceipt(paymentDetails, userPhoneNumber);
 
 
 // TESTMONIALS SECTION 
@@ -2957,6 +2983,35 @@ router.post('/reset-partner-password', async (req, res) => {
       console.error('Error resetting password:', error);
       res.status(500).json({ message: 'Failed to reset password. Please try again.' });
   }
+});
+
+// ORDER CONFIRMATION FOR ORDERS
+
+// Route to handle order confirmation email
+router.post('/sendConfirmationEmail', (req, res) => {
+
+  const {
+    to, // Customer email
+    subject, // Subject from frontend
+    body // HTML body from frontend
+  } = req.body;
+  console.log('Received order details:', req.body);
+  const mailOptions = {
+    from: 'anyokaeats@gmail.com',
+    to: to, // Customer email provided in the frontend request
+    subject: subject,
+    html: body, // Using the HTML content provided in the frontend request
+  };
+
+  transporter.sendMail(mailOptions, (error, info) => {
+    if (error) {
+      console.error('Error sending email:', error); // Log the error details
+      return res.status(500).json({ error: 'Failed to send email' });
+    } else {
+      console.log('Order confirmation email sent:', info.response); // Log success message
+      return res.status(200).json({ message: 'Email sent successfully' });
+    }
+  });
 });
 
 module.exports = router;
