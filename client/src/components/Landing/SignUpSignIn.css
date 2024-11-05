@@ -5,13 +5,6 @@
     --orange: rgb(255,165,0);
 }
 
-
-/* font-size: 20px;
-    font-weight: 800;
-    font-style: normal;
-    color: var(--green);
-    text-decoration: underline; */
-
 * {
   padding: 0px;
   margin: 0px;
@@ -19,8 +12,6 @@
 }
 
 .authForm{
-  /* border: 5px solid black; */
-
   background: #f6f5f7;
   place-content: center; 
   font-family: 'Poppins', sans-serif;
@@ -111,6 +102,7 @@ span {
   background-color: #f3f3f3;
   border: none;
   outline: none;
+  position: relative;
 }
 
 /* .signInMode{ */
@@ -136,6 +128,7 @@ input:focus ~ label {
 } */
 
 .forgot {
+  margin-top: 2rem;
   padding-bottom: 3px;
   border-bottom: 2px solid var(--orange); 
   color: var(--green);
@@ -287,6 +280,29 @@ input:focus ~ label {
   animation: show 0.6s;
 }
 
+.driverHead{
+  text-align: center;
+}
+
+.diverResetInput{
+  text-align: center;
+  margin-bottom: 0.2rem;
+  padding: 0.5rem ;
+}
+
+.driverResetButton{
+  text-align: right;
+  margin-top: 0.5rem;
+}
+
+.driverResetBtn{
+  padding: 0.2rem 0.5rem;
+  margin-right: 0.2rem;
+  border: none;
+  background: var(--green);
+  color: white;
+}
+
 @keyframes show {
   0%, 50% {
     opacity: 0;
@@ -347,76 +363,6 @@ btnScaled {
   transform: translate(-50%, -50%);
 }
 
-/* @media (max-width: 480px) {
-  .authForm{
-    border: 5px solid red;
-    background: red;
-    display: flex;
-    align-items: center;
-  }
-
-  .big-circle{
-    width: 10%;
-    height: 15%;
-    bottom: 90%;
-    right: 80%;
-  }
-
-  .square{
-    height: 20%;
-    left: 50%;
-  }
-
-  .container{
-    width: 98%;
-    height: 90%;
-    padding: 0;
-    margin: 0;
-  }
-
-  .form-container{
-    border: 5px solid salmon;
-
-    width: 100%;
-    padding: 0rem 0.5rem;
-  }
-
-  form{
-    padding: 0rem 0.5rem;
-  }
-
-  .overlay-container{
-    border: 5px solid blue;
-
-    height: 20%;
-    width: 100%;
-    top: 80%;
-    left: 0%;
-    right: 0%;
-  }
-
-  .overlay {
-    flex-direction: column;
-    transform: none; 
-  }
-
-  .overlay-panel{
-    border: 5px solid green;
-
-    padding: 0.5rem;
-    width: 40%;
-  } 
-
-  .overlay-left {
-      order: 2;
-  }
-
-  .overlay-right {
-      order: 1; 
-  }
-} */
-
-
 /* Media Queries for Screens 480px and Below */
 @media screen and (max-width: 480px) {
   /* the parent div of react  */
@@ -461,15 +407,6 @@ btnScaled {
     height: 85%;
   }
 
-  .social-container {
-    /* margin: 10px 0;  */
-  }
-/* 
-  .log_social_icons {
-    height: 30px; 
-    width: 30px; 
-  } */
-
   .input-sign {
     padding: 10px; 
     font-size: 0.9rem; 
@@ -492,7 +429,6 @@ btnScaled {
   }
 
   .overlay {
-    /* position: fixed; */
     width: 160%; 
     left: 0%; 
     height: 50%;
@@ -554,25 +490,6 @@ btnScaled {
   .right-panel-active .sign-up-container {
     transform: translateX(0);
   }
-
-  /* .big-circle {
-    width: 50%; 
-    height: 50%;
-    bottom: 50%; 
-    right: 50%; 
-    transform: translate(-25%, 25%); 
-  } */
-
-  /* .inner-circle {
-    width: 80%; 
-    height: 80%; 
-  } */
-
-  /* .square {
-    height: 30%; 
-    left: 50%; 
-    transform: translateX(-50%);
-  } */
 }
 
 @media only screen and (min-width: 768px) and (max-width: 1024px) {
@@ -595,8 +512,6 @@ btnScaled {
   }
 
   .form-container {
-    /* border:5px solid red; */
-
     width: 60%;
     height: 100%;
     padding: 0px;
@@ -608,11 +523,6 @@ btnScaled {
 
   .createAccount{
     margin-bottom: 0rem;
-    /* font-size: 1.5rem; */
-  }
-
-  .social-container {
-    /* margin: 8px 0px; */
   }
 
   .infield {
@@ -650,6 +560,7 @@ btnScaled {
 }
 
 
+
 /* see password icon */
 
 .infield {
@@ -659,7 +570,6 @@ btnScaled {
 .eye-button {
   position: absolute;
   right: 10px;
-  /* top: 50%; */
   transform: translateY(-50%);
   background: none;
   border: none;
@@ -668,7 +578,7 @@ btnScaled {
 
 
 /* Modal styles  */
-.modal {
+/* .modal {
   display: flex;
   justify-content: center;
   align-items: center;
@@ -690,7 +600,7 @@ btnScaled {
   width: 90%;
   max-width: 500px;
   border-radius: 10px;
-}
+} */
 
 .close {
   color: #aaa;
@@ -704,4 +614,52 @@ btnScaled {
   color: black;
   text-decoration: none;
   cursor: pointer;
+}
+
+@media(max-width: 320px){
+  #blockSee{
+    position: absolute;
+    right: 1rem;
+    top: 17.5rem;
+  }
+
+  #signBlockEye{
+    position: absolute;
+    right: 1rem;
+    top: 0.7rem;
+  }
+}
+
+@media (min-width:321px) and(max-width: 375px){
+  #blockSee{
+    position: absolute;
+    right: 10rem;
+    top: 17.5rem;
+    text-align: center;
+  }
+
+  #signBlockEye{
+    position: absolute;
+    right: 1rem;
+    top: 0.7rem;
+  }
+}
+
+
+@media (min-width:1025px) and (max-width: 1440px){
+  /* .input-sign{
+    position: relative;
+  } */
+
+  #blockSee{
+    position: absolute;
+    bottom: 0.9rem;
+    left: 21rem;
+  }
+
+  #signBlockEye{
+    position: absolute;
+    right: 1rem;
+    top: 0.7rem;
+  }
 }

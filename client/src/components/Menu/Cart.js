@@ -54,7 +54,6 @@ const Cart = () => {
           <div className="modal-content cartModalContent">
             <div className="modal-header">
               <h5 className="modal-title" id="cartModalLabel">My Order</h5>
-              {/* <button type="button" className="btn-close" data-bs-dismiss="modal" aria-label="Close" onClick={closeCartModal}></button> */}
             </div>
 
             <div className="modal-body" id='cart-modal-body'>

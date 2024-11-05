@@ -112,10 +112,8 @@ const DishCategories = () => {
             {view === 'all' && (
               <div className='allDishDiv menuDivs'>
                 <h5 className='menuHeader'>All Dishes</h5>
+                
                 <ul id="all-dishes" className="dish-list">
-                  {/* {dishes.map(dish => (
-                    <DishCard key={dish.dishCode} dish={dish} addToCart={() => {}} />
-                  ))} */}
                 {availableDishes.length > 0 ? (
                   availableDishes.map(dish => (
                     <DishCard key={dish.dishCode} dish={dish} addToCart={() => { }} />

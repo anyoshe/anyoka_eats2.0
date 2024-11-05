@@ -3,6 +3,7 @@ import axios from 'axios';
 // import { useLocation } from 'react-router-dom';
 import { useNavigate, useLocation } from 'react-router-dom';
 import config from '../../config';
+import "./Reset.css"
 
 const ResetPartnerPassword = () => {
     const [newPassword, setNewPassword] = useState('');

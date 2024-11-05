@@ -113,8 +113,11 @@ const handleSubmit = async (event) => {
           </div>
 
           <div className="column_contactus column_footer">
+
             <h3 className="footer_contactUs_heading">Email Us</h3>
+
             <form onSubmit={handleSubmit} className="contact_form">
+
               <input 
               type="email" 
               name='email'
@@ -123,7 +126,8 @@ const handleSubmit = async (event) => {
                 required 
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                />
+              />
+
               <textarea
               name="message" 
               placeholder="Your Message" 
@@ -132,7 +136,9 @@ const handleSubmit = async (event) => {
               value={message}
               onChange={(e) => setMessage(e.target.value)}
               ></textarea>
-            <button type="submit" className="contact_form_btn">Let's Talk</button>
+
+              <button type="submit" className="contact_form_btn">Let's Talk</button>
+
             </form>
           </div>
         </div>

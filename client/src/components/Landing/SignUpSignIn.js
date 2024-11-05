@@ -503,10 +503,12 @@ function SignUpSignIn() {
                                 onChange={handleInputChange}
                                 required
                             />
-                            <span onClick={togglePasswordVisibility}>
-                                {showPassword ? <FaEyeSlash /> : <FaEye />}
-                            </span>
                         </div>
+                            <span onClick={togglePasswordVisibility} id='signBlockEye'>
+                                {showPassword ? <i class="fas fa-eye-slash"></i>
+                                : <i class="fas fa-eye"></i>
+                            }
+                            </span>
 
                         <button className='loginBtn logphone' type="submit">Sign Up</button>
                     </form>
@@ -558,10 +560,11 @@ function SignUpSignIn() {
                                 onChange={handleInputChange}
                                 required
                             />
+                        </div>  
                             <span onClick={toggleLoginPasswordVisibility}>
-                                {showLoginPassword ? <FaEyeSlash /> : <FaEye />}
+                                {showLoginPassword ? <i class="fas fa-eye-slash" id='blockSee'></i>
+                                : <i class="fas fa-eye"></i>}
                             </span>
-                        </div>
 
                         <a href="#" className="forgot" onClick={() => setModalVisible(true)}>Forgot your password?</a>
 
@@ -594,12 +597,13 @@ function SignUpSignIn() {
             {modalVisible && (
                 <div className="modal">
                     <div className="modal-content">
-                        <span className="close" onClick={() => setModalVisible(false)}>&times;</span>
-                        <h2>Password Recovery</h2>
+                        <span className="close" id='forgetClose' onClick={() => setModalVisible(false)}>&times;</span>
+                        <h2 id='forgetHeading' >Password Recovery</h2>
                         <form onSubmit={handlePasswordRecovery}>
                             <input
                                 className='input-sign'
                                 type="email"
+                                id='forgetEmail'
                                 placeholder="Enter your email"
                                 name="email"
                                 value={formData.email}
@@ -609,6 +613,7 @@ function SignUpSignIn() {
                             <input
                                 className='input-sign'
                                 type="text"
+                                 id='forgetNumber'
                                 placeholder="Enter your contact number"
                                 name="contactNumber"
                                 value={formData.contactNumber}
