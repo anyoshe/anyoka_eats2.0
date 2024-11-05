@@ -503,10 +503,12 @@ function SignUpSignIn() {
                                 onChange={handleInputChange}
                                 required
                             />
-                            <span onClick={togglePasswordVisibility} id='signBlockEye'>
-                                {showPassword ? <FaEyeSlash /> : <FaEye />}
-                            </span>
                         </div>
+                            <span onClick={togglePasswordVisibility} id='signBlockEye'>
+                                {showPassword ? <i class="fas fa-eye-slash"></i>
+                                : <i class="fas fa-eye"></i>
+                            }
+                            </span>
 
                         <button className='loginBtn logphone' type="submit">Sign Up</button>
                     </form>
@@ -558,10 +560,11 @@ function SignUpSignIn() {
                                 onChange={handleInputChange}
                                 required
                             />
-                            <span onClick={toggleLoginPasswordVisibility}       id='blockSee'>
-                                {showLoginPassword ? <FaEyeSlash /> : <FaEye />}
-                            </span>
                         </div>  
+                            <span onClick={toggleLoginPasswordVisibility}>
+                                {showLoginPassword ? <i class="fas fa-eye-slash" id='blockSee'></i>
+                                : <i class="fas fa-eye"></i>}
+                            </span>
 
                         <a href="#" className="forgot" onClick={() => setModalVisible(true)}>Forgot your password?</a>
 

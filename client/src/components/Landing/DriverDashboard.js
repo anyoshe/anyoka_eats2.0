@@ -3,7 +3,7 @@ import './DriverDashboard.css';
 import '@fortawesome/fontawesome-free/css/all.min.css';
 import config from '../../config';
 import { useNavigate } from 'react-router-dom';
-import EarningsDashboard from './EarningsDashboard';
+
 
 
 const Dashboard = () => {
