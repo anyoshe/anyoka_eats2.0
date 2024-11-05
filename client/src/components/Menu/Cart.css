@@ -6,11 +6,8 @@
 }
 
 #cartModal{
-    /* border: 1px solid red; */
-
     height: 100vh;
     width: 100%;
-    /* margin-top: 4%; */
 }
 
 #cartModalLabel{
@@ -21,13 +18,8 @@
     text-decoration: underline;
 }
 
-/* #cart2{
-    margin-right: 5%;
-} */
-
 #cartItems{
     padding-left: 0px;
-    /* background: red; */
 }
 
 .restaurantNameDiv{
@@ -40,8 +32,6 @@
 }
 
 .itemDishName{
-    /* border: 1px solid red; */
-
     display: grid;
     grid-template-columns: 50% 50%;
     width: 50%;
@@ -77,8 +67,6 @@
 }
 
 .menuDishQuantity{
-    /* border: 1px solid red; */
-
     width: 1rem;
     text-align: center;
     font-size: 1rem;
@@ -428,5 +416,9 @@
         font-weight: 600;
         font-size: 18px;
         color: red;
+    }
+
+    .cartModalContent{
+        width: 150%;
     }
 }
