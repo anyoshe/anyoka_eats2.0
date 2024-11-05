@@ -1,0 +1,17 @@
+#forgetClose{
+    text-align: right;
+}
+
+#forgetHeading{
+    text-align: center;
+    font-size: 1.2rem;
+    margin-top: -0.5rem;
+}
+
+#forgetEmail{
+    margin-bottom: 0.5rem;
+}
+
+#forgetNumber{
+    margin-bottom: 0.5rem;
+}
