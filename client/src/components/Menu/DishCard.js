@@ -82,13 +82,13 @@ const DishCard = ({ dish }) => {
       {dish.discount > 0 ? (
 
         <span className="original-price-offer">
-          Was <span className='diagonal-strikethrough linePrice'>Ksh {(dish.dishPrice * 1.1).toFixed(2)}</span>
+          Was <span className='diagonal-strikethrough linePrice'>Ksh {(dish.dishPrice * 1).toFixed(2)}</span>
         </span>
 
 
       ) : (
         <p className='dishPrice dishContent'>
-          Ksh {(dish.dishPrice * 1.1).toFixed(2)}
+          Ksh {(dish.dishPrice * 1).toFixed(2)}
         </p>
       )}
   
