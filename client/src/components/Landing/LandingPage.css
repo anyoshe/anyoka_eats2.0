@@ -1991,13 +1991,13 @@
     }
 
     .paragraph_div {
-        width: 60%;
+        width: 50%;
     }
 
     .join_team_grid_div {
         grid-template-columns: repeat(2,1fr);
         gap: 10px;
-        width: 90%;
+        width: 80%;
     }
 
     /* .video-Ad{

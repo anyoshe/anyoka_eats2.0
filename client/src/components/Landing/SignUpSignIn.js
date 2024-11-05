@@ -503,7 +503,7 @@ function SignUpSignIn() {
                                 onChange={handleInputChange}
                                 required
                             />
-                            <span onClick={togglePasswordVisibility}>
+                            <span onClick={togglePasswordVisibility} id='signBlockEye'>
                                 {showPassword ? <FaEyeSlash /> : <FaEye />}
                             </span>
                         </div>
@@ -558,10 +558,10 @@ function SignUpSignIn() {
                                 onChange={handleInputChange}
                                 required
                             />
-                            <span onClick={toggleLoginPasswordVisibility} className='blockSee'>
+                            <span onClick={toggleLoginPasswordVisibility}       id='blockSee'>
                                 {showLoginPassword ? <FaEyeSlash /> : <FaEye />}
                             </span>
-                        </div>
+                        </div>  
 
                         <a href="#" className="forgot" onClick={() => setModalVisible(true)}>Forgot your password?</a>
 
@@ -594,12 +594,13 @@ function SignUpSignIn() {
             {modalVisible && (
                 <div className="modal">
                     <div className="modal-content">
-                        <span className="close" onClick={() => setModalVisible(false)}>&times;</span>
-                        <h2>Password Recovery</h2>
+                        <span className="close" id='forgetClose' onClick={() => setModalVisible(false)}>&times;</span>
+                        <h2 id='forgetHeading' >Password Recovery</h2>
                         <form onSubmit={handlePasswordRecovery}>
                             <input
                                 className='input-sign'
                                 type="email"
+                                id='forgetEmail'
                                 placeholder="Enter your email"
                                 name="email"
                                 value={formData.email}
@@ -609,6 +610,7 @@ function SignUpSignIn() {
                             <input
                                 className='input-sign'
                                 type="text"
+                                 id='forgetNumber'
                                 placeholder="Enter your contact number"
                                 name="contactNumber"
                                 value={formData.contactNumber}
