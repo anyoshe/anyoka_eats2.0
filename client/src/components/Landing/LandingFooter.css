@@ -323,18 +323,25 @@
   }
 }
 
+@media (min-width: 1025px) and (max-width: 1440px) {
+  .footer-content {
+    padding: 0px 2%;
+  }
+
+  .row_two {
+    display: grid;
+    grid-template-columns: 1.1fr 0.5fr 1fr;
+    gap: 0.5%;
+    padding-bottom: 1rem;
+  }
+
+  .contact_form {
+    padding: 0px;
+  }
+}
 
 /* MEDIA QUERIES */
 @media (max-width: 1024px) and (max-width: 768px) {
-  /* .top_header_div {
-    grid-template-columns: 1fr; 
-    text-align: center;
-  } */
-/* 
-  .footer-logo img {
-    max-width: 120px; 
-  } */
-
   .footer_logo_head {
     font-size: 3em; 
   }
@@ -404,11 +411,6 @@
     overflow-y: hidden;
     height: fit-content;
   }
-
-  /* .car,.bike {
-    width: 20%;
-    height: 20%; 
-  } */
 
   .row_two {
     margin: 0;
@@ -521,16 +523,9 @@
     width: 35px;
     height: 35px;
   }
-
-  /* .car, .bike {
-    width: 15%;  
-    height: 15%;
-  } */
 }
 
-
-/* @media (min-width:768px){ */
-  @media (min-width: 768px) and (max-width: 1024px) {
+@media (min-width: 768px) and (max-width: 1024px) {
   .top_header_div {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
@@ -542,7 +537,7 @@
 
   .footer-content {
     padding: 0px 2%;
-}
+  }
 
   .footer-logo-text {
     text-align: left;
@@ -550,7 +545,7 @@
 
   .footer-social-icon {
     border:none;
-}
+  }
 
   .social_icon {
     display: grid;

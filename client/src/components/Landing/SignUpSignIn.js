@@ -558,7 +558,7 @@ function SignUpSignIn() {
                                 onChange={handleInputChange}
                                 required
                             />
-                            <span onClick={toggleLoginPasswordVisibility}>
+                            <span onClick={toggleLoginPasswordVisibility} className='blockSee'>
                                 {showLoginPassword ? <FaEyeSlash /> : <FaEye />}
                             </span>
                         </div>
