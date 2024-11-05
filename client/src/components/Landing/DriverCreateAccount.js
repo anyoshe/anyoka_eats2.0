@@ -317,11 +317,12 @@ function SignUpSignIn() {
 {isForgotPasswordModalOpen && (
             <div className="modal">
                 <div className="modal-content">
-                    <h2>Reset Password</h2>
-                    <p>Enter your email and ID Number to receive password reset instructions:</p>
+                    <h2 className='driverHead'>Reset Password</h2>
+                    <p className='diverMessage'>Enter your email and ID Number to receive password reset instructions:</p>
                     <input
                         type="email"
                         placeholder="Enter your email"
+                        className='diverResetInput'
                         value={resetEmail}
                         onChange={(e) => setResetEmail(e.target.value)}
                         required
@@ -329,12 +330,15 @@ function SignUpSignIn() {
                     <input
                         type="number"
                         placeholder="Enter your ID Number"
+                        className='diverResetInput'
                         value={idNumber} // Use the IDNumber state
                         onChange={(e) => setIdNumber(e.target.value)} // Update state on change
                         required
                     />
-                    <button onClick={handleForgotPasswordSubmit}>Submit</button>
-                    <button onClick={() => setIsForgotPasswordModalOpen(false)}>Close</button>
+                   <div className='driverResetButton'> 
+                    <button onClick={handleForgotPasswordSubmit} className='driverResetBtn'>Submit</button>
+                    <button onClick={() => setIsForgotPasswordModalOpen(false)} className='driverResetBtn'>Close</button>
+                   </div>
                 </div>
             </div>
         )}

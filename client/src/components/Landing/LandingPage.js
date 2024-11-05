@@ -147,16 +147,6 @@ const LandingPage = () => {
                 </div>
             </div>
             <section className="headerSection">
-                {/* logo */}
-                {/* <div className="logo-CTA">
-                    <div className="logoDiv">
-                        <h2 className="land_logo">Anyoka Eats</h2>
-                    </div>
-
-                    <div className="signCta_div">
-                        <Link to="/sign-up-sign-in" className="landing_sign">Log In</Link>
-                    </div>
-                </div> */}
 
                 {/* searchBar & services */}
                 <div className="services-serchBar">
@@ -395,32 +385,20 @@ const LandingPage = () => {
                             </Link>
                         </div>
 
-                        {/* <div className="join_team_choices">
-                            <h3 className="join_title">User</h3>
-
-                            <p className="join_explanation">Sign up and order food together with other services of your choice</p>
-
-                            <div className="join_team_image_div">
-                                <img src={userPersonImg} alt="User Person" className="join_img" />
-                            </div>
-
-                            <button className="signup">Sign Up</button>
-                        </div> */}
+                        {/* <div className="join_team_choices video-Ad"></div> */}
 
                         <div className="join_team_choices">
                             <h3 className="join_title">Deliver Person</h3>
 
-                            {/* <!-- <p className="join_explanation">Deliver food orders for people and earn</p> --> */}
                             <p className="join_explanation">Do you have a job.Fulfill delivery orders for customers and earn per trip</p>
-                            {/* <!-- IMAGE DIV AND IMAGE --> */}
+    
                             <div className="join_team_image_div">
                                 <img src={deliveryParsonImg} alt="Delivery Person" className="join_img" />
 
                             </div>
 
-                            {/* <!-- SIGN UP BUTTON --> */}
                             <Link to="/driverCreateAccount" >
-                                <button className="signup" >Sign Up</button>
+                                <button className="signup" >Sign Up/In</button>
                             </Link>
                         </div>
                     </div>
@@ -434,15 +412,6 @@ const LandingPage = () => {
                     </div>
 
                     <div className="about_us_content">
-
-                        {/* <div className="aboutUs_img_div aboutUs_img_div1">
-                            <img src={profileImg} alt="Founder's Picture" className="about_us_img" />
-                        </div> */}
-
-                        {/* <div className="aboutUs_img_div aboutUs_img_div2">
-                            <img src={profileImg2} alt="Co-founder's Picture" className="about_us_img" />
-                        </div> */}
-
                         <p className="aboutUs_paragraph">At Anyoka Eats, our mission is to transform the dining experience with a seamless, innovative online restaurant platform. Founded by a passionate team dedicated to enhancing food discovery and ordering, we combine cutting-edge technology with a love for great food.
 
                             Our platform brings together a diverse range of restaurants and cuisines, allowing users to effortlessly browse, order, and enjoy their favorite dishes. With features like real-time order tracking, personalized recommendations, and a user-friendly interface, we strive to make every meal memorable.
