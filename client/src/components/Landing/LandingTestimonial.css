@@ -122,12 +122,6 @@
   font-weight: 400;
 }
 
-@media screen and (max-width: 500px) {
-  .slide-box {
-      padding: 0 55px;
-    }
-}
-
 /* For Mobile Phones (Portrait & Landscape) */
 @media only screen and (max-width: 600px) {
   .testimonials {
@@ -266,9 +260,10 @@
 }
 
 /* For Desktops */
-@media only screen and (min-width: 1025px) {
+@media (min-width: 1025px) and (max-width: 1440px) {
   .testimonials {
     padding: 2rem 0px;
+    height: 95vh;
   }
 
   .testimonial_title {
@@ -291,10 +286,12 @@
   .slider {
     flex-direction: row;
     gap: 30px;
+    height: 100%;
   }
 
   .slide-box {
-    width: 60%;
+    width: 50%;
+    height: 400px;
   }
 
   .slide-box img {
@@ -302,15 +299,15 @@
   }
 
   .comment {
-    font-size: 1rem;
-    padding: 1.2rem;
+    font-size: 0.9rem;
+    padding: 0.5rem;
+    width: 15rem;
+    height: fit-content;
   }
 }
 
 @media (max-width: 480px) {
   .testimonials{
-    /* border: 1px solid red; */
-
     padding: 0px 0px;
   }
 
@@ -327,8 +324,6 @@
   }
 
   .slider{
-    /* border: 5px solid green; */
-
     flex-direction: row;
     gap: 0.5rem;
     margin: 0.2rem;

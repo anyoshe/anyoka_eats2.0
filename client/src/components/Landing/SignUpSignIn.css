@@ -5,13 +5,6 @@
     --orange: rgb(255,165,0);
 }
 
-
-/* font-size: 20px;
-    font-weight: 800;
-    font-style: normal;
-    color: var(--green);
-    text-decoration: underline; */
-
 * {
   padding: 0px;
   margin: 0px;
@@ -19,8 +12,6 @@
 }
 
 .authForm{
-  /* border: 5px solid black; */
-
   background: #f6f5f7;
   place-content: center; 
   font-family: 'Poppins', sans-serif;
@@ -461,15 +452,6 @@ btnScaled {
     height: 85%;
   }
 
-  .social-container {
-    /* margin: 10px 0;  */
-  }
-/* 
-  .log_social_icons {
-    height: 30px; 
-    width: 30px; 
-  } */
-
   .input-sign {
     padding: 10px; 
     font-size: 0.9rem; 
@@ -492,7 +474,6 @@ btnScaled {
   }
 
   .overlay {
-    /* position: fixed; */
     width: 160%; 
     left: 0%; 
     height: 50%;
@@ -554,25 +535,6 @@ btnScaled {
   .right-panel-active .sign-up-container {
     transform: translateX(0);
   }
-
-  /* .big-circle {
-    width: 50%; 
-    height: 50%;
-    bottom: 50%; 
-    right: 50%; 
-    transform: translate(-25%, 25%); 
-  } */
-
-  /* .inner-circle {
-    width: 80%; 
-    height: 80%; 
-  } */
-
-  /* .square {
-    height: 30%; 
-    left: 50%; 
-    transform: translateX(-50%);
-  } */
 }
 
 @media only screen and (min-width: 768px) and (max-width: 1024px) {
@@ -595,8 +557,6 @@ btnScaled {
   }
 
   .form-container {
-    /* border:5px solid red; */
-
     width: 60%;
     height: 100%;
     padding: 0px;
@@ -608,11 +568,6 @@ btnScaled {
 
   .createAccount{
     margin-bottom: 0rem;
-    /* font-size: 1.5rem; */
-  }
-
-  .social-container {
-    /* margin: 8px 0px; */
   }
 
   .infield {
@@ -648,6 +603,7 @@ btnScaled {
     font-size: 0.7rem;
   }
 }
+
 
 
 /* see password icon */
@@ -704,4 +660,17 @@ btnScaled {
   color: black;
   text-decoration: none;
   cursor: pointer;
+}
+
+
+@media (min-width:1025px) and (max-width: 1440px){
+  .input-sign{
+    position: relative;
+  }
+
+  .blockSee{
+    position: absolute;
+    left: 10rem;
+    top: 0;
+  }
 }

@@ -537,7 +537,7 @@
     background: var(--green);
     font-size: 18px;
     margin-bottom: 5px;
-    width: 7rem;
+    width: 9rem;
     transition: 0.2s ease-in;
 }
 
@@ -1918,8 +1918,8 @@
     }
 
     .offerTitle {
-        font-size: 1.9rem;
-        margin-bottom: 0rem;
+        font-size: 1.5rem;
+        margin-bottom: 1rem;
     }
 
     .categories {
@@ -1966,8 +1966,8 @@
     }
 
     .FeaturedHeading {
-        font-size: 1.6rem;
-        margin-bottom: 0rem;
+        font-size: 1.2rem;
+        margin-bottom: 1.5rem;
     }
 
     .featured {
@@ -1984,28 +1984,36 @@
     }
 
     .join_team_section {
-        width: 90%;
+        width: 70%;
         height: fit-content;
         padding: 10px 5px;
         margin-bottom: 3%;
     }
 
     .paragraph_div {
-        width: 70%;
+        width: 60%;
     }
 
     .join_team_grid_div {
+        grid-template-columns: repeat(2,1fr);
         gap: 10px;
-        width: 85%;
+        width: 90%;
     }
 
+    /* .video-Ad{
+        height: 4rem;
+        align-items: center;
+        justify-content: center;
+    } */
+
     .join_team_image_div {
-        width: 250px;
-        height: 250px;
+        width: 200px;
+        height: 200px;
     }
+
     .join_img {
-        width: 250px;
-        height: 250px;
+        width: 200px;
+        height: 200px;
     }
 
     .about_us_section {
