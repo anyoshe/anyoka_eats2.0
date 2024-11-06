@@ -17,6 +17,7 @@ const multer = require('multer');
 const path = require('path');
 const axios = require('axios');
 require('dotenv').config();
+const nodemailer = require('nodemailer');
 
 // FOOD SCHEMA AND ITS ROUTES
 const foodSchema = new Schema({
@@ -595,6 +596,31 @@ const vendorOrderSchema = new Schema({
 
 const VendorOrder = model('VendorOrder', vendorOrderSchema);
 
+appRouter.post('/check-order-exists', async (req, res) => {
+  console.log('Received request to check if is an existing order')
+  try {
+    const { phoneNumber, expectedDeliveryTime } = req.body;
+    const existingOrder = await FoodOrder.findOne({
+      phoneNumber,
+      expectedDeliveryTime,
+      paid: true,
+      delivered: false
+    });
+
+    if (existingOrder) {
+      return res.status(200).json({ order: existingOrder });
+    } else {
+      // Return 200 with a message when no order is found
+      return res.status(200).json({ order: null, message: 'No existing order found' });
+    }
+  } catch (error) {
+    console.error('Error checking existing order:', error);
+    res.status(500).json({ error: 'Failed to check existing order' });
+  }
+});
+
+
+
 appRouter.post('/paidFoodOrder', async (req, res) => {
   console.log('Received order data:', req.body);
   console.log('Received order data (stringified):', JSON.stringify(req.body, null, 2));
@@ -1058,6 +1084,23 @@ appRouter.get('/foodOrders', async (req, res) => {
   }
 });
 
+
+// Route to fetch a food order by order ID
+appRouter.get('/foodorders/:orderId', async (req, res) => {
+  try {
+    const { orderId } = req.params;
+    const foodOrder = await FoodOrder.findOne({ orderId });
+
+    if (!foodOrder) {
+      return res.status(404).json({ error: 'Food order not found' });
+    }
+
+    res.json(foodOrder);
+  } catch (error) {
+    console.error('Error fetching food order:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
 appRouter.get('/getFoodOrder/:orderId', async (req, res) => {
   const { orderId } = req.params;
   console.log(orderId);
@@ -1101,6 +1144,39 @@ appRouter.patch('/updateParentFoodOrderStatus/:orderId', async (req, res) => {
   }
 });
 
+
+
+
+const transporter = nodemailer.createTransport({
+  service: 'gmail',
+  auth: {
+    user: 'anyokaeats@gmail.com',
+    pass: 'hsvu kcue lejt cmks',
+  },
+});
+
+appRouter.post('/sendFoodOrderConfirmationEmail', (req, res) => {
+  const { to, subject, body } = req.body;
+  
+  console.log('Sending confirmation email to:', to);
+
+  const mailOptions = {
+    from: 'anyokaeats@gmail.com',
+    to: to,
+    subject: subject,
+    html: body,
+  };
+
+  transporter.sendMail(mailOptions, (error, info) => {
+    if (error) {
+      console.error('Error sending email:', error);
+      return res.status(500).json({ error: 'Failed to send email' });
+    } else {
+      console.log('Email sent successfully:', info.response);
+      return res.status(200).json({ message: 'Email sent successfully' });
+    }
+  });
+});
 
 
 

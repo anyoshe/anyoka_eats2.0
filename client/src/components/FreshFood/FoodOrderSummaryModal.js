@@ -65,6 +65,13 @@ const OrderSummaryModal = ({
   const [distanceToPinned, setDistanceToPinned] = useState(0);
   const [deliveryCharges, setDeliveryCharges] = useState(0);
   const [grandTotal, setGrandTotal] = useState(0);
+  const [customerEmail, setCustomerEmail] = useState('');
+
+  // Handle email input change
+  const handleCustomerEmailChange = (e) => {
+    setCustomerEmail(e.target.value);
+  };
+
 
   const foodOrdersByVendor = orderedFoods.reduce((acc, food) => {
     const vendorName = food.vendor;  // Assuming food.vendorName or food.vendorId references the vendor.
@@ -254,106 +261,195 @@ const OrderSummaryModal = ({
   };
 
 
-const saveOrderToDatabase = async (foodOrderDetails) => {
-  const maxRetries = 5; // Maximum number of retry attempts
-  let attempts = 0;
-  let orderSaved = false;
+  const saveOrderToDatabase = async (foodOrderDetails) => {
+    const maxRetries = 5; // Maximum number of retry attempts
+    let attempts = 0;
+    let orderSaved = false;
 
-  // Create a unique parent order ID
-  const parentOrderId = generateUniqueOrderId(); // Implement this function to generate a unique ID
+    // If order is already saved, return early
+    if (orderSaved) return;
 
-  // Create the base order object
-  const orderToSave = {
-    orderId: parentOrderId,
-    phoneNumber: foodOrderDetails.phoneNumber,
-    customerLocation: foodOrderDetails.customerLocation,
-    expectedDeliveryTime: foodOrderDetails.expectedDeliveryTime,
-    totalPrice: 0, // This will be calculated below
-    deliveryCharges,
-    vendorOrders: [], // Will populate with vendor-specific orders
-    createdAt: new Date(),
-    delivered: false,
-    paid: true, // Assuming payment is successful
-  };
+    // Create a unique parent order ID
+    const parentOrderId = generateUniqueOrderId(); // Implement this function to generate a unique ID
 
-  // Calculate vendor orders and total price
-  for (const [vendor, vendorFoods] of Object.entries(foodOrdersByVendor)) {
-    console.log('Food orders by vendor:', foodOrdersByVendor);
-
-    const vendorFoodsPrice = vendorFoods.foods.reduce((total, food) => total + food.price * food.quantity, 0);
-
-    if (!vendorFoods.foods || vendorFoods.foods.length === 0) {
-      console.error(`No foods found for vendor: ${vendor}`);
-      continue; // Skip this vendor if no foods are found
-    }
-// Here we convert lat/lng to a string format
-const vendorLocationString = `${vendorLocation.lat}, ${vendorLocation.lng}`;
-
-    const vendorOrder = {
-
-      vendor: vendor, 
-      foods: vendorFoods.foods.map(food => ({
-        foodCode: food.foodCode,
-        foodName: food.foodName,
-        quantity: food.quantity,
-        price: food.price,
-      })),
-      vendorLocation: vendorLocationString,
-      totalPrice: vendorFoodsPrice,
-      status: 'Order received',
-      processedTime: null, // Will be set later when processing starts
+    // Ensure customerEmail is set correctly
+    const customerEmail = foodOrderDetails.email;
+    // Create the base order object
+    const orderToSave = {
+      orderId: parentOrderId,
+      phoneNumber: foodOrderDetails.phoneNumber,
+      email: customerEmail,
+      customerLocation: foodOrderDetails.customerLocation,
+      expectedDeliveryTime: foodOrderDetails.expectedDeliveryTime,
+      totalPrice: 0, // This will be calculated below
+      deliveryCharges,
+      vendorOrders: [], // Will populate with vendor-specific orders
+      createdAt: new Date(),
+      delivered: false,
+      paid: true, // Assuming payment is successful
     };
 
-    console.log('Vendor order being created:', vendorOrder);
+    // Check if an order already exists
+    const existingOrder = await checkExistingOrder(orderToSave);
 
-    orderToSave.vendorOrders.push(vendorOrder);
-    orderToSave.totalPrice += vendorOrder.totalPrice; // Aggregate total price
-  }
+    if (existingOrder) {
+      console.log('Existing order found:', existingOrder.orderId);
+      return; // Return early if an existing order is found
+    }
+    // Calculate vendor orders and total price
+    for (const [vendor, vendorFoods] of Object.entries(foodOrdersByVendor)) {
+      console.log('Food orders by vendor:', foodOrdersByVendor);
 
-  console.log('Order to Save:', JSON.stringify(orderToSave, null, 2)); // Debugging line
-  console.log('Final order to save:', orderToSave);
+      const vendorFoodsPrice = vendorFoods.foods.reduce((total, food) => total + food.price * food.quantity, 0);
 
-  while (attempts < maxRetries && !orderSaved) {
+      if (!vendorFoods.foods || vendorFoods.foods.length === 0) {
+        console.error(`No foods found for vendor: ${vendor}`);
+        continue; // Skip this vendor if no foods are found
+      }
+      // Here we convert lat/lng to a string format
+      const vendorLocationString = `${vendorLocation.lat}, ${vendorLocation.lng}`;
+
+      const vendorOrder = {
+
+        vendor: vendor,
+        foods: vendorFoods.foods.map(food => ({
+          foodCode: food.foodCode,
+          foodName: food.foodName,
+          quantity: food.quantity,
+          price: food.price,
+        })),
+        vendorLocation: vendorLocationString,
+        totalPrice: vendorFoodsPrice,
+        status: 'Order received',
+        processedTime: null, // Will be set later when processing starts
+      };
+
+      console.log('Vendor order being created:', vendorOrder);
+
+      orderToSave.vendorOrders.push(vendorOrder);
+      orderToSave.totalPrice += vendorOrder.totalPrice; // Aggregate total price
+    }
+    console.log('Final calculated totalPrice:', orderToSave.totalPrice); // Add this line
+
+    // Add delivery charges to total price for the grand total
+    const grandTotal = orderToSave.totalPrice + deliveryCharges;
+    console.log('Grand Total:', grandTotal);
+
+    console.log('Order to Save:', JSON.stringify(orderToSave, null, 2)); // Debugging line
+    console.log('Final order to save:', orderToSave);
+
+    while (attempts < maxRetries && !orderSaved) {
+      try {
+        console.log('Sending orderToSave to database:', orderToSave);
+
+        const response = await fetch(`${config.backendUrl}/api/paidFoodOrder`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(orderToSave),
+        });
+
+        if (response.ok) {
+          const data = await response.json();
+          console.log('Order saved successfully:', data);
+          orderSaved = true;  // Set the flag to avoid further retries
+          alert('Order received successfully! Your order will be processed and dispatched as soon as possible.');
+          // Add this line to send the email
+          console.log('Parent Order ID:', parentOrderId);
+          console.log('Order to Save:', JSON.stringify(orderToSave, null, 2)); // Debugging line
+          await sendFoodOrderConfirmationEmail(parentOrderId, grandTotal);
+          break;  // Exit retry loop on success
+
+
+        } else {
+          const error = await response.json();
+          console.error('Error saving order:', error);
+          alert('Error saving order: ' + (error.message || 'An unknown error occurred.'));
+          attempts++;
+        }
+      } catch (error) {
+        console.error('Error saving order:', error);
+        const errorMessage = error.message || 'Network error. Please check your connection and try again.';
+        alert('Error saving order: ' + errorMessage);
+        attempts++;
+      }
+    }
+
+    if (!orderSaved && attempts >= maxRetries) {
+      alert('Failed to save the order after multiple attempts. Please try again later.');
+    }
+  };
+
+
+  // Function to generate a unique order ID
+  const generateUniqueOrderId = () => {
+    return uuidv4(); // Generate a random UUID
+  };
+
+  async function checkExistingOrder(orderData) {
     try {
-      console.log('Sending orderToSave to database:', orderToSave);
-
-      const response = await fetch(`${config.backendUrl}/api/paidFoodOrder`, {
+      const response = await fetch(`${config.backendUrl}/api/check-order-exists`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify(orderToSave),
+        body: JSON.stringify(orderData),
       });
 
       if (response.ok) {
         const data = await response.json();
-        console.log('Order saved successfully:', data);
-        alert('Order received successfully! Your order will be processed and dispatched as soon as possible.');
-        orderSaved = true;
+        return data.order ? data.order : null; // Return `null` if no order is found
       } else {
-        const error = await response.json();
-        console.error('Error saving order:', error);
-        alert('Error saving order: ' + (error.message || 'An unknown error occurred.'));
-        attempts++;
+        console.error('Error checking existing order:', response.statusText);
+        return null; // Return `null` to signify no existing order without throwing
       }
     } catch (error) {
-      console.error('Error saving order:', error);
-      const errorMessage = error.message || 'Network error. Please check your connection and try again.';
-      alert('Error saving order: ' + errorMessage);
-      attempts++;
+      console.error('Error checking existing order:', error);
+      throw error;
     }
   }
 
-  if (!orderSaved && attempts >= maxRetries) {
-    alert('Failed to save the order after multiple attempts. Please try again later.');
-  }
-};
+  const sendFoodOrderConfirmationEmail = async (orderId, grandTotal) => {
+    console.log('Sending confirmation email...');
 
+    console.log('Sending confirmation email with Order ID:', orderId);
 
-// Function to generate a unique order ID
-const generateUniqueOrderId = () => {
-  return uuidv4(); // Generate a random UUID
-};
+    if (!orderId || grandTotal === undefined || isNaN(grandTotal)) {
+      console.error('Error: Order ID or grandTotal is missing or invalid in sendFoodOrderConfirmationEmail.');
+      alert('Error: Order ID or total price is not available for the confirmation email.');
+      return;
+    }
+
+    const emailDetails = {
+      to: customerEmail,
+      subject: `Food Order Confirmation - ${orderId}`,
+      body: `
+      <p>Dear Customer,</p>
+      <p>Thank you for placing an order.</p>
+      <p>Your order has been successfully placed.</p>
+      <p><strong>Order Number:</strong> ${orderId}</p>
+      <p><strong>Total Amount:</strong> KSH ${grandTotal.toFixed(2)}</p>
+      <p>Track your food order with the order number above if you need assistance.</p>
+      <p>Thank you for choosing our service!</p>
+    `,
+    };
+
+    try {
+      const response = await axios.post(`${config.backendUrl}/api/sendFoodOrderConfirmationEmail`, emailDetails, {
+        headers: { 'Content-Type': 'application/json' },
+      });
+
+      if (response.status === 200) {
+        console.log('Food order confirmation email sent successfully:', response.data);
+      } else {
+        console.error('Failed to send food order confirmation email:', response.data);
+      }
+    } catch (error) {
+      console.error('Error sending food order confirmation email:', error);
+      alert('There was an issue sending the food order confirmation email. Please check your network and try again.');
+    }
+  };
 
 
   const clearCart = () => {
@@ -423,6 +519,19 @@ const generateUniqueOrderId = () => {
                   value={contactNumber}
                   onChange={handleContactNumberChange}
                   placeholder="Enter your contact number"
+                  required
+                />
+              </div>
+
+              <div className="form-group my-3">
+                <label htmlFor="customerEmail">Email Address</label>
+                <input
+                  type="email"
+                  className="form-control"
+                  id="customerEmail"
+                  value={customerEmail}
+                  onChange={handleCustomerEmailChange} // New handler for email input
+                  placeholder="Enter your email address"
                   required
                 />
               </div>
