@@ -201,7 +201,7 @@
 .profile-cards .image {
     outline: 1px solid var(--orange);
     background: var(--orange);
-    padding: 20px;
+    padding: 10px;
     display: flex;
     flex-direction: column;
     justify-content: center;
@@ -211,8 +211,8 @@
 }
 
 .driverDasboardPic{
-    height: 70%;
-    width: 70%;
+    height: 50%;
+    width: 50%;
 }
 
 .profile-cards .image img {
@@ -225,9 +225,9 @@
 }
 
 .profile-cards .name {
-    font-size: 2rem;
+    font-size: 1.2rem;
     font-weight: bold;
-    margin-top: 1rem;
+    margin-top: 0.5rem;
 }
 
 .profile-cards .location {
