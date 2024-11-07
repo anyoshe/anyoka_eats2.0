@@ -60,7 +60,7 @@ h1 {
 }
 
 .social-container {
-  margin: 20px 0px; 
+  margin: 15px 0px; 
 }
 
 
@@ -92,7 +92,7 @@ span {
 
 .infield {
   position: relative;
-  margin: 8px 0px; 
+  margin: 6px 0px; 
   width: 100%;
 }
 
@@ -103,6 +103,7 @@ span {
   border: none;
   outline: none;
   position: relative;
+  font-size: 0.9rem;
 }
 
 /* .signInMode{ */
@@ -361,6 +362,12 @@ btnScaled {
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
+}
+
+.driverReset{
+  width: 30em;
+  padding: 0.5rem;
+  margin: 0rem 0.2rem;
 }
 
 /* Media Queries for Screens 480px and Below */
@@ -659,7 +666,7 @@ btnScaled {
 
   #signBlockEye{
     position: absolute;
-    right: 1rem;
-    top: 0.7rem;
+    right: 6.5rem;
+    bottom: 12.5rem;
   }
 }
