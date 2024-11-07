@@ -210,6 +210,11 @@
     cursor: pointer;
 }
 
+/* .driverDasboardPic{
+    height: 70%;
+    width: 70%;
+} */
+
 .profile-cards .image img {
     outline: 1px solid var(--orange);
     transition: all 0.5s;
@@ -222,7 +227,7 @@
 .profile-cards .name {
     font-size: 2rem;
     font-weight: bold;
-    margin-top: 3rem;
+    margin-top: 1rem;
 }
 
 .profile-cards .location {
@@ -242,7 +247,7 @@
     flex-direction: row;
     justify-content: space-around;
     align-items: center;
-    margin-top: 2rem;
+    margin-top: 1rem;
 }
 
 .profile-cards .number {
@@ -262,7 +267,7 @@
 
 .profile-cards .btn-container {
     display: flex;
-    margin-top: 2rem;
+    margin-top: 0.5rem;
 }
 
 .profile-cards .edit_btn {

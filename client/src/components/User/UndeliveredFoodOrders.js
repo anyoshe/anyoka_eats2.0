@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import config from '../../config';
+import './undeliveredFood.css'
 
 const UndeliveredFoodOrders = ({ partner }) => {
   const [foodOrders, setFoodOrders] = useState([]);
@@ -264,10 +265,10 @@ return (
   <div className="dayOrders">
     <div id="ordersList">
       {Object.keys(groupedFoodOrders).map((vendor) => (
-        <div key={vendor} id={`${vendor}-section`}>
+        <div key={vendor} id={`${vendor}-section`} className='vendor-section-orders'>
           <h2>{vendor}</h2>
           <hr className='orderhr' />
-          <ul id={`orders-${vendor}`}>
+          <ul id={`orders-${vendor}`} className='OrdeersGrid'>
             {groupedFoodOrders[vendor].map(({ order, vendorOrder }) => createFoodOrderElement(order, vendorOrder))}
           </ul>
         </div>
@@ -278,14 +279,6 @@ return (
       <p>Expected Sales: <span id="totalSalesExpected" className='downtotals'> Ksh.{expectedSales.toFixed(2)}</span></p>
       <p>Expected Commission: <span id="commissionExpected" className='downtotals'>Ksh.{expectedCommission.toFixed(2)}</span></p><br />
     </div>
-
-    {/* <div id="sales">
-      <div id="salesTotal">
-        <p>Total Sales: Kes. <span id="totalSales">{totalSales.toFixed(2)}</span></p>
-        <p>Commission Due: Kes. <span id="commissionDue">{commissionDue.toFixed(2)}</span></p>
-        <p>Total Deliveries Made: <span id="totalDeliveries">{totalDeliveries}</span></p>
-      </div>
-    </div> */}
   </div>
 );
 };

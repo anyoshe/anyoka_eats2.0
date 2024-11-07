@@ -33,7 +33,11 @@
 }
 
 .useMylocation{
-    margin-top: 10px;
+    margin-top: 5px;
+}
+
+.foodModalHeader{
+    padding: 0.5rem 1rem;
 }
 
 .InputBtn{
@@ -42,7 +46,7 @@
     margin-bottom: 0px;
     background: var(--green);
     color: white;
-    padding: 0.5rem 1rem;
+    padding: 0.4rem 1rem;
 }
 
 .InputBtn:hover{
@@ -53,10 +57,13 @@
 
 
 #customerLocation{
-    margin-top: 0.3rem;
+    margin-top: 0.2rem;
     width: 90%;
     margin-bottom: 0px;
-    height: 3em;
+    height: 2em;
+    font-size: 1rem;
+    padding-top: 0.3rem;
+    padding-bottom: 0.3rem;
     cursor: pointer;
 }
 
@@ -64,7 +71,7 @@
     color: white;
     background: var(--green);
     border: none;
-    padding: 0.5rem 1rem;
+    padding: 0.3rem 1rem;
     transition: ease-in .2s;
 }
 
@@ -78,7 +85,7 @@
     color: white;
     background: var(--green);
     border: none;
-    padding: 0.5rem 1rem;
+    padding: 0.3rem 1rem;
     transition: ease-in .2
 }
 

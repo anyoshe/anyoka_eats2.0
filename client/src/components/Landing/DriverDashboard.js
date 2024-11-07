@@ -1038,7 +1038,7 @@ const Dashboard = () => {
                             <div className={`profile-card-overlay ${showProfileCard ? 'show' : ''}`}>
                                 <div className="profile-cards">
                                     <div className="image">
-                                        {driverImage && <img src={driverImage} alt="Driver" />}
+                                        {driverImage && <img src={driverImage} alt="Driver" className='driverDasboardPic'/>}
                                         <div className="image-upload">
                                             {editing && (
                                                 <>
