@@ -45,7 +45,7 @@ const handleSubmit = async (event) => {
 
           <h3 className="top_header_divs_headers">Location</h3>
 
-          <p className="top_header_divs_para">1450 - 2000 Malindi, Maweni</p>
+          <p className="top_header_divs_para">Malindi,Kenya</p>
         </div>
 
         <div className="top_header_divs">
@@ -53,7 +53,7 @@ const handleSubmit = async (event) => {
 
           <h3 className="top_header_divs_headers">Phone</h3>
 
-          <p className="top_header_divs_para">0798765432</p>
+          <p className="top_header_divs_para">0706251573</p>
         </div>
 
         <div className="top_header_divs">
