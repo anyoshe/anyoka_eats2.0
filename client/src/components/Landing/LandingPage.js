@@ -18,6 +18,8 @@ import FoodCardLand from '../FreshFood/FoodCardLand';
 import DishCardLand from '../Menu/DishCardLand';
 import InstallPrompt from '../Header/InstallPrompt';
 
+// import videoAd from './client/src/assets/images/8477856-hd_1080_1920_24fps.mp4.crdownload';
+
 
 
 
@@ -385,7 +387,16 @@ const LandingPage = () => {
                             </Link>
                         </div>
 
-                        {/* <div className="join_team_choices video-Ad"></div> */}
+                        <div className="join_team_choices" id='video-Ad'>
+                            <video 
+                                // src={videoAd}
+                                type="video/mp4"
+                                autoPlay 
+                                loop
+                                muted
+                                playsInline
+                            />
+                        </div>
 
                         <div className="join_team_choices">
                             <h3 className="join_title">Deliver Person</h3>

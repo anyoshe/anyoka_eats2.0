@@ -486,9 +486,16 @@
 .join_team_grid_div{
     display: grid;
     justify-items: center;
-    grid-template-columns: repeat(2,1fr);
-    gap: 40px;
-    width: 60%;
+    /* grid-template-columns: repeat(2,1fr); */
+    grid-template-columns: repeat(3,1fr);
+    /* gap: 40px; */
+    gap: 10px;
+    /* width: 60%; */
+    width: 90%;
+}
+
+#video-Ad{
+    background: none;
 }
 
 .join_team_choices{
