@@ -20,6 +20,7 @@ import InstallPrompt from './components/Header/InstallPrompt';
 import { DriverProvider } from './contexts/DriverContext';
 import ResetPassword from './components/Landing/ResetPassword';
 import ResetPartnerPassword from './components/Landing/ResetPartnerPassword';
+import UserPage from './components/User/UserPage';
 function App() {
     return (
 
@@ -53,6 +54,7 @@ function App() {
                             } />
                             <Route path="/offers" element={<MenuPage />} />
                             <Route path="/featured" element={<MenuPage />} />
+                            <Route path="/superuserdashboard" element={<UserPage />} />
                             <Route path='/outside-catering' element={<OutsideCateringLandingPage />} />
                             <Route path="/user" element={<UserProfileDashBoard />} />
                             <Route path="/conferences" element={<ConferenceLandingPage />} />

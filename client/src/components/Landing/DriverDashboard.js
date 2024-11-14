@@ -15,15 +15,17 @@ const Dashboard = () => {
     const [location, setLocation] = useState('');
     const [contactNumber, setContactNumber] = useState('');
     const [vehicleType, setVehicleType] = useState('');
-    const [driverImage, setDriverImage] = useState(null); 
+    const [driverImage, setDriverImage] = useState(null);
     const [editing, setEditing] = useState(false);
-    const [timer, setTimer] = useState(0); 
+    const [timer, setTimer] = useState(0);
     const [orderTimerId, setOrderTimerId] = useState(null);
     const [driverId, setDriverId] = useState(null);
     const [orderId, setOrderId] = useState(null);
     const [orderStatus, setOrderStatus] = useState('');
-    const [isEarningsModalOpen, setEarningsModalOpen] = useState(false);
+    const [isEarningsModalOpen, setIsEarningsModalOpen] = useState(false);
     const [totalEarnings, setTotalEarnings] = useState(0);
+    const today = new Date().toISOString().split('T')[0];
+    const formattedDate = new Date().toISOString().split('T')[0]; // Format date as YYYY-MM-DD
     const navigate = useNavigate();
 
     // useEffect for setting driverId and initializing earnings
@@ -49,40 +51,6 @@ const Dashboard = () => {
             })();
         }
     }, [driverId]);
-
-    const toggleEarningsModal = async () => {
-        if (!isEarningsModalOpen) {
-            try {
-                const formattedDate = new Date().toISOString().split('T')[0]; // Format date to YYYY-MM-DD
-                const response = await fetch(`${config.backendUrl}/api/daily-earnings?driverId=${driverId}&date=${formattedDate}`);
-
-                console.log("Daily earnings API Response: ", response);
-                if (!response.ok) {
-                    const message = await response.json();
-                    console.warn("Daily earnings fetch warning: ", message);
-                    throw new Error("Failed to fetch earnings data");
-                }
-
-                let data = await response.json(); // Using 'let' if 'data' might be reassigned
-                console.log("Fetched Earnings Data:", data);
-
-                if (data.orders && data.totalEarnings !== undefined) {
-                    setOrders(data.orders);
-                    setTotalEarnings(data.totalEarnings);
-                } else {
-                    setOrders([]);
-                    setTotalEarnings(0);
-                }
-            } catch (error) {
-                console.error("Error fetching daily earnings from the server:", error);
-                setOrders([]);
-                setTotalEarnings(0);
-            }
-        }
-        setEarningsModalOpen(!isEarningsModalOpen);
-    };
-
-
 
 
     const fetchDriverDetails = async (driverId) => {
@@ -126,6 +94,150 @@ const Dashboard = () => {
     const toggleOnlineStatus = () => {
         setIsOnline(prev => !prev);
     };
+
+    const handleUpdateDriver = async () => {
+        const formData = new FormData();
+        formData.append('location', location);
+        formData.append('contactNumber', contactNumber);
+        formData.append('vehicleType', vehicleType);
+
+        if (driverImage) {
+            formData.append('image', driverImage); // Include the image if available
+        }
+
+        // Check if driverDetails is set and contains the _id
+        if (driverDetails && driverDetails._id) {
+            formData.append('driverId', driverDetails._id); // Ensure _id exists before appending
+            console.log('Driver ID:', driverDetails._id); // Log the driver ID to ensure it's set
+        } else {
+            console.error('Driver ID is undefined. Cannot update driver details.');
+            return; // Stop execution if driverId is not available
+        }
+
+        try {
+            const response = await fetch(`${config.backendUrl}/api/driverDetails`, {
+                method: 'PATCH', // Use PATCH for updating
+                body: formData,
+            });
+
+            if (response.ok) {
+                const updatedDriver = await response.json();
+                setDriverDetails(updatedDriver); // Update driver details after successful patch
+                setShowProfileCard(false); // Close profile card after updating
+                setEditing(false); // Reset editing mode
+            } else {
+                console.error('Failed to update driver details');
+            }
+        } catch (error) {
+            console.error('Error updating driver details:', error);
+        }
+    };
+
+
+
+    const handleLogout = () => {
+        localStorage.removeItem('authToken');
+        // localStorage.removeItem('driverId');
+
+        navigate('/');
+    };
+
+    // Function to initialize or reset daily earnings, retrieving from MongoDB or localStorage
+    const initializeEarnings = async (driverId) => { // Accept driverId as a parameter
+        if (!driverId) {
+            console.error("Driver ID is undefined. Cannot fetch earnings."); 
+            return; // Exit early if driverId is not valid
+        }
+
+
+        const today = new Date().toISOString().split('T')[0]; // Format the date to YYYY-MM-DD for consistency
+
+        try {
+            const response = await fetch(`${config.backendUrl}/api/daily-earnings?date=${today}&driverId=${driverId}`);
+            const data = await response.json();
+            console.log("Daily earnings API Response:", data);
+
+            if (response.ok && data.totalEarnings !== undefined) {
+                setTotalEarnings(data.totalEarnings);
+                console.log("Total Earnings:", totalEarnings);
+                localStorage.setItem('dailyEarnings', JSON.stringify({ date: today, earnings: data.totalEarnings }));
+            } else {
+                setTotalEarnings(0);
+                // localStorage.setItem('dailyEarnings', JSON.stringify({ date: today, earnings: totalEarnings }));
+            }
+
+            // updateDashboard();
+        } catch (error) {
+            console.error("Error fetching daily earnings from the server:", error);
+        }
+    };
+    
+    const fetchEarningsData = async () => {
+       
+        try {
+            const response = await fetch(`${config.backendUrl}/api/daily-earnings?driverId=${driverId}&date=${formattedDate}`);
+            const data = await response.json();
+            console.log("Daily earnings API Response:", data);
+
+            // Check if the API returned data in the expected format
+            if (response.ok && data && Array.isArray(data.orders)) {
+                setOrders(data.orders); // Set the fetched orders
+                setTotalEarnings(data.totalEarnings || 0); // Set total earnings
+                localStorage.setItem('dailyEarnings', JSON.stringify({ date: formattedDate, earnings: data.totalEarnings }));
+            } else {
+                setOrders([]); // Fallback to empty array
+                // setTotalEarnings(0); // Fallback to 0 earnings
+                console.error('Data format error or no earnings found.');
+            }
+        } catch (error) {
+            console.error("Error fetching daily earnings from the server:", error);
+            setOrders([]); // Fallback to empty array
+            // setTotalEarnings(0); // Fallback to 0 earnings
+        }
+    };
+
+    useEffect(() => {
+
+        if (isEarningsModalOpen) {
+            fetchEarningsData();
+        }
+    }, [driverId, isEarningsModalOpen]); // Re-fetch if driverId changes
+
+    const toggleEarningsModal = () => {
+        setIsEarningsModalOpen(!isEarningsModalOpen);
+    };
+    // Function to update the total earnings for the driver
+    const updateTotalEarnings = async (netPay, driverId, orderId, driverDetails) => {
+
+        // Fetch the existing record for the day
+        const today = new Date().toISOString().split('T')[0]; // Format the date to YYYY-MM-DD
+
+        try {
+            const result = await fetch(`${config.backendUrl}/api/update-earnings`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    date: today,
+                    driverId: driverId,
+                    driverDetails: driverDetails,
+                    orderId: orderId,
+                    netPay: netPay,
+                    paidStatus: 'Not Paid' // New orders are defaulted as not paid
+                })
+            });
+            console.log('Earnings updated successfully for', driverId);
+        } catch (error) {
+            console.error("Error updating earnings on the server:", error);
+        }
+        initializeEarnings(driverId); // Refresh earnings after updating
+        // updateDashboard(); // Refresh dashboard after updating earnings
+    };
+
+    // Initialize earnings when the page loads
+    useEffect(() => {
+        initializeEarnings(driverId);
+    }, [driverId]);
+
 
     const handleProfileClick = () => {
         setShowProfileCard(prev => !prev);
@@ -519,9 +631,9 @@ const Dashboard = () => {
 
                     // Call mark as delivered based on order type
                     if (isFoodOrder) {
-                        markVendorOrderAsDelivered(order); // Call function for food orders
+                        markVendorOrderAsDelivered(order.orderId, driverId); // Call function for food orders
                     } else {
-                        markOrderAsDelivered(order); // Call function for regular orders
+                        markOrderAsDelivered(order.orderId, driverId); // Call function for regular orders
                     }
                 };
 
@@ -536,77 +648,6 @@ const Dashboard = () => {
             }
         }, 90 * 1000); // Check every 90 seconds
     };
-
-    // let totalEarnings = 0; // Cumulative daily earnings
-    const today = new Date().toLocaleDateString(); // Today's date for tracking
-
-    // Function to initialize or reset daily earnings, retrieving from MongoDB or localStorage
-    const initializeEarnings = async (driverId) => { // Accept driverId as a parameter
-        if (!driverId) {
-            console.error("Driver ID is undefined. Cannot fetch earnings.");
-            return; // Exit early if driverId is not valid
-        }
-
-        const today = new Date().toLocaleDateString(); // Today's date for tracking
-
-        try {
-            const response = await fetch(`${config.backendUrl}/api/daily-earnings?date=${today}&driverId=${driverId}`);
-            const data = await response.json();
-            console.log("Daily earnings API Response:", data);
-
-            if (response.ok && data.totalEarnings !== undefined) {
-                totalEarnings = data.totalEarnings;
-                console.log("Total Earnings:", totalEarnings);
-            } else {
-                totalEarnings = 0;
-                localStorage.setItem('dailyEarnings', JSON.stringify({ date: today, earnings: totalEarnings }));
-            }
-
-            updateDashboard();
-        } catch (error) {
-            console.error("Error fetching daily earnings from the server:", error);
-        }
-    };
-
-    const updateTotalEarnings = async (netPay, driverId, orderId, driverDetails) => {
-        try {
-            // Fetch the existing record for the day
-            const today = new Date().toISOString().split('T')[0]; // Format the date to YYYY-MM-DD
-
-            const result = await fetch(`${config.backendUrl}/api/update-earnings`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    date: today,
-                    driverId: driverId,
-                    driverDetails: driverDetails,
-                    orderId: orderId,
-                    netPay: netPay,
-                    paidStatus: 'Not Paid' // New orders are defaulted as not paid
-                })
-            });
-            console.log('Earnings updated successfully for', driverId);
-        } catch (error) {
-            console.error("Error updating earnings on the server:", error);
-        }
-
-        updateDashboard(); // Refresh dashboard after updating earnings
-    };
-
-
-    // Function to display updated earnings on the dashboard
-    const updateDashboard = () => {
-        const totalEarningsElement = document.getElementById('totalEarnings');
-        if (totalEarningsElement) {
-            totalEarningsElement.innerText = `Ksh ${totalEarnings}`;
-        } else {
-            console.warn("Element with ID 'totalEarnings' not found.");
-        }
-    };
-
-    // Initialize earnings when the page loads
-    initializeEarnings(driverId);
-
 
     const markOrderAsDelivered = async (orderId, driverId) => {
         console.log("markOrderAsDelivered function called");
@@ -936,53 +977,6 @@ const Dashboard = () => {
         }
     };
 
-    const handleUpdateDriver = async () => {
-        const formData = new FormData();
-        formData.append('location', location);
-        formData.append('contactNumber', contactNumber);
-        formData.append('vehicleType', vehicleType);
-
-        if (driverImage) {
-            formData.append('image', driverImage); // Include the image if available
-        }
-
-        // Check if driverDetails is set and contains the _id
-        if (driverDetails && driverDetails._id) {
-            formData.append('driverId', driverDetails._id); // Ensure _id exists before appending
-            console.log('Driver ID:', driverDetails._id); // Log the driver ID to ensure it's set
-        } else {
-            console.error('Driver ID is undefined. Cannot update driver details.');
-            return; // Stop execution if driverId is not available
-        }
-
-        try {
-            const response = await fetch(`${config.backendUrl}/api/driverDetails`, {
-                method: 'PATCH', // Use PATCH for updating
-                body: formData,
-            });
-
-            if (response.ok) {
-                const updatedDriver = await response.json();
-                setDriverDetails(updatedDriver); // Update driver details after successful patch
-                setShowProfileCard(false); // Close profile card after updating
-                setEditing(false); // Reset editing mode
-            } else {
-                console.error('Failed to update driver details');
-            }
-        } catch (error) {
-            console.error('Error updating driver details:', error);
-        }
-    };
-
-
-
-    const handleLogout = () => {
-        localStorage.removeItem('authToken');
-        // localStorage.removeItem('driverId');
-
-        navigate('/');
-    };
-
 
     return (
         <div className="dial-slider_wrapper">
@@ -995,41 +989,50 @@ const Dashboard = () => {
                         </div>
                         <label className="label_off on_off">Offline</label>
                     </div>
-                     {/* <EarningsDashboard /> */}
-                     <div className="total_earnings_today">
-                        <button className='driverTotals' onClick={toggleEarningsModal}>Total:<span id="totalEarnings">Ksh {totalEarnings}</span></button>
+                    
+                    <div className="total_earnings_today">
+                        {/* <button onClick={toggleEarningsModal}>Toggle Earnings Modal</button> */}
+                        <button className="driverTotals btn-driver" onClick={toggleEarningsModal}>
+                            Total: <span id="totalEarnings">Ksh {totalEarnings}</span>
+                        </button>
                         {isEarningsModalOpen && (
+                             <div className="earnings-modal-overlay">
                             <div className="earnings-modal">
                                 <h4>Earnings Details</h4>
                                 {orders.length > 0 ? (
-                                    <table>
-                                        <thead>
-                                            <tr>
-                                                <th>Order ID</th>
-                                                <th>Net Pay</th>
-                                                <th>Date</th>
-                                                <th>Paid Status</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            {orders.map(order => (
-                                                <tr key={order.orderId}>
-                                                    <td>{order.orderId}</td>
-                                                    <td>{order.netPay}</td>
-                                                    <td>{today}</td> {/* Display the date */}
-                                                    <td>{order.paidStatus}</td>
+                                    <>
+                                        <table className='driver-table'>
+                                            <thead>
+                                                <tr>
+                                                    <th>Order ID</th>
+                                                    <th>Net Pay</th>
+                                                    <th>Date</th>
+                                                    <th>Paid Status</th>
                                                 </tr>
-                                            ))}
-                                        </tbody>
-                                    </table>
+                                            </thead>
+                                            <tbody>
+                                                {orders.map((order) => (
+                                                    <tr key={order.orderId}>
+                                                        <td>{order.orderId}</td>
+                                                        <td>{order.netPay}</td>
+                                                        <td>{formattedDate}</td> {/* Display the date */}
+                                                        <td>{order.paidStatus}</td>
+                                                    </tr>
+                                                ))}
+                                            </tbody>
+                                        </table>
+                                        <div className="total-earnings">
+                                            <strong>Total Earnings: Ksh.{totalEarnings.toFixed(2)}</strong>
+                                        </div>
+                                    </>
                                 ) : (
                                     <p>No earnings data available for this date.</p>
                                 )}
-                                <button onClick={toggleEarningsModal}>Close</button>
+                                <button className='btn-driver' onClick={toggleEarningsModal}>Close</button>
+                            </div>
                             </div>
                         )}
-                    </div> 
-
+                    </div>
 
                     <div className="driver_icon">
                         <i className="fas fa-user-circle driver_profile" onClick={handleProfileClick}></i>
