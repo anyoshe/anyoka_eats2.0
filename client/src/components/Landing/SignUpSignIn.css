@@ -60,7 +60,7 @@ h1 {
 }
 
 .social-container {
-  margin: 20px 0px; 
+  margin: 15px 0px; 
 }
 
 
@@ -92,7 +92,7 @@ span {
 
 .infield {
   position: relative;
-  margin: 8px 0px; 
+  margin: 6px 0px; 
   width: 100%;
 }
 
@@ -103,6 +103,7 @@ span {
   border: none;
   outline: none;
   position: relative;
+  font-size: 0.9rem;
 }
 
 /* .signInMode{ */
@@ -363,6 +364,12 @@ btnScaled {
   transform: translate(-50%, -50%);
 }
 
+.driverReset{
+  width: 30em;
+  padding: 0.5rem;
+  margin: 0rem 0.2rem;
+}
+
 /* Media Queries for Screens 480px and Below */
 @media screen and (max-width: 480px) {
   /* the parent div of react  */
@@ -463,16 +470,12 @@ btnScaled {
   }
 
   .overlay-left {
-    /* border: 5px solid pink; */
-    /* margin-left: 4rem; */
     transform: translateX(-80%);
     padding: 0rem; 
     right: 55%;
-    /* width: 100%; */
   }
 
   .overlay-right {
-    /* border: 5px solid green; */
     transform: translateX(-65%); 
     padding: 0rem;
     margin-left: 4rem;
@@ -576,32 +579,6 @@ btnScaled {
   cursor: pointer;
 }
 
-
-/* Modal styles  */
-/* .modal {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  position: fixed;
-  z-index: 999;
-  left: 0;
-  top: 0;
-  width: 100%;
-  height: 100%;
-  overflow: auto;
-  background-color: rgba(0, 0, 0, 0.8);
-}
-
-.modal-content {
-  background-color: #fefefe;
-  margin: auto;
-  padding: 20px;
-  border: 1px solid #888;
-  width: 90%;
-  max-width: 500px;
-  border-radius: 10px;
-} */
-
 .close {
   color: #aaa;
   float: right;
@@ -657,9 +634,9 @@ btnScaled {
     left: 21rem;
   }
 
-  #signBlockEye{
+  /* #signBlockEye{
     position: absolute;
-    right: 1rem;
-    top: 0.7rem;
-  }
+    right: 6.5rem;
+    bottom: 12.5rem;
+  } */
 }

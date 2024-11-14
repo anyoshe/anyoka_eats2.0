@@ -317,14 +317,14 @@ function SignUpSignIn() {
                         <div className="overlay-panel overlay-left">
                             <h1>Welcome Back!</h1>
                             <p>To keep connected with us please login with your personal info</p>
-                            {/* <button className="ghost" id="signIn" onClick={handleToggle}>Log In</button> */}
+
                             <button className="signBtn btnScaled loginBtn" onClick={handleToggle}>Log In</button>
+                            
                         </div>
 
                         <div className="overlay-panel overlay-right">
                             <h1>Hello, Friend!</h1>
                             <p>Enter your personal details and start your journey with us</p>
-                            {/* <button className="ghost" id="signUp" onClick={handleToggle}>Sign Up</button> */}
                             <button id="signUpBtn" className="signBtn btnScaled loginBtn" onClick={handleToggle}>Sign Up</button>
                         </div>
                     </div>
@@ -334,9 +334,11 @@ function SignUpSignIn() {
             {/* Password Recovery Modal */}
             {modalVisible && (
                 <div className="modal">
-                    <div className="modal-content">
+                    <div className="modal-content patnerRecovery">
                         <span className="close" id='forgetClose' onClick={() => setModalVisible(false)}>&times;</span>
+
                         <h2 id='forgetHeading' >Password Recovery</h2>
+
                         <form onSubmit={handlePasswordRecovery}>
                             <input
                                 className='input-sign'

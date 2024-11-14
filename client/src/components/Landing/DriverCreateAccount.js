@@ -316,9 +316,12 @@ function SignUpSignIn() {
 
 {isForgotPasswordModalOpen && (
             <div className="modal">
-                <div className="modal-content">
+                <div className="modal-content driverReset">
+
                     <h2 className='driverHead'>Reset Password</h2>
+
                     <p className='diverMessage'>Enter your email and ID Number to receive password reset instructions:</p>
+
                     <input
                         type="email"
                         placeholder="Enter your email"
