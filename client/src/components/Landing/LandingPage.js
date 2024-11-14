@@ -32,6 +32,7 @@ import userPersonImg from '../../assets/images/userPerson.png';
 import deliveryParsonImg from '../../assets/images/deliveryPerason.png';
 import profileImg from '../../assets/images/Eliud.jpg';
 import profileImg2 from '../../assets/images/mzeepassport.JPG';
+import videoAd from '../../assets/7218655-hd_1080_1920_25fps.mp4';
 
 
 const LandingPage = () => {
@@ -212,7 +213,7 @@ const LandingPage = () => {
                             <Link to={'freshfood'}>
                                 <div id="freshFoodService" className="serviceDiv">
                                     <img src={freshFoodImg} alt="Fresh Foods" className="serviceImg" />
-                                    <p>Fresh Foods</p>
+                                    <p>Fresh Groceries/Sokoni</p>
                                 </div>
                             </Link>
                         </div>
@@ -385,7 +386,17 @@ const LandingPage = () => {
                             </Link>
                         </div>
 
-                        {/* <div className="join_team_choices video-Ad"></div> */}
+                        <div className="join_team_choices video-Ad" id='video-Ad'>
+                            <iframe
+                            src={videoAd}
+                            type="video/mp4"
+                            autoPlay
+                            loop
+                            muted
+                            playsInline
+                            id='video-Ad-video'
+                            />
+                        </div>
 
                         <div className="join_team_choices">
                             <h3 className="join_title">Deliver Person</h3>
