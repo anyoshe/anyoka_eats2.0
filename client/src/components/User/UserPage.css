@@ -195,16 +195,12 @@ label {
   justify-content: center;
 }
 
-#ordersList ul {
-  /* border: 5px dotted green; */
-
+/* #ordersList ul {
   list-style: numbers;
   text-align: left; 
-}
+} */
 
 #ordersList p {
-  /* border: 5px solid green; */
-
   text-align: left;
   margin-bottom: 0.3rem;
   font-size: 0.9rem;
@@ -238,12 +234,12 @@ label {
   color: var(--green);
 }
 
-[id^="orders-"] {
+/* [id^="orders-"] {
   display: flex;
   flex-direction: row;
   flex-wrap: wrap;
   justify-content: space-evenly;
-}
+} */
 
 
 div[id$="-section"] h2 {
@@ -783,8 +779,6 @@ table th {
   }
   
   #ordersList ul {
-    /* border: 1px solid red; */
-
     padding-left: 0rem;
     align-items: left;
   }

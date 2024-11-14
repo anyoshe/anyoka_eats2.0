@@ -232,7 +232,7 @@ const LocationModal = ({ show, handleClose, restaurantName, orderedDishes = [] }
       <div className={`modal fade ${show ? 'show' : ''}`} id="locationModal" tabIndex="-1" aria-labelledby="locationModalLabel" aria-hidden="true" style={{ display: show ? 'block' : 'none' }}>
         <div className="modal-dialog modal-lg">
           <div className="modal-content cartModalContent" id='locationModalContent'>
-            <div className="modal-header">
+            <div className="modal-header foodModalHeader">
               <h5 className="modal-title" id="locationModalLabel">Pin Your Delivery Location</h5>
             </div>
 
