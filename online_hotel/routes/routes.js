@@ -129,7 +129,8 @@ const partnerSchema = new mongoose.Schema({
   password: { type: String, required: true },
   googleId: { type: String, required: false },
   profileImage: { type: String, required: false },
-  contact: { type: mongoose.Schema.Types.ObjectId, ref: 'Contact' }
+  contact: { type: mongoose.Schema.Types.ObjectId, ref: 'Contact' },
+  role: { type: String, enum: ['admin', 'partner'], default: 'partner' }
 });
 
 const Partner = mongoose.model('Partner', partnerSchema);
@@ -165,6 +166,10 @@ router.post('/signup', async (req, res) => {
     // Hash the password
     const hashedPassword = await bcrypt.hash(password, 10);
 
+    // Set role based on email
+    const role = (email === "anyokaeats@gmail.com") ? 'admin' : 'partner';
+
+
     // Create a new partner
     const newPartner = new Partner({
       businessName,
@@ -172,7 +177,8 @@ router.post('/signup', async (req, res) => {
       contactNumber,
       email,
       location,
-      password: hashedPassword
+      password: hashedPassword,
+      role
     });
 
     // Save the new partner
@@ -197,11 +203,16 @@ router.post('/login', async (req, res) => {
     const validPassword = await bcrypt.compare(password, partner.password);
     if (!validPassword) return res.status(400).send('Invalid Credentials.');
 
-    // Generate a JWT token
-    const token = jwt.sign({ _id: partner._id }, process.env.JWT_SECRET, { expiresIn: '1h' });
+    // // Generate a JWT token
+    // const token = jwt.sign({ _id: partner._id }, process.env.JWT_SECRET, { expiresIn: '1h' });
 
-    // Send the token and partner details to the client
-    res.json({ token, partner });
+    // // Send the token and partner details to the client
+    // res.json({ token, partner });
+     // Generate a JWT token
+     const token = jwt.sign({ _id: partner._id, role: partner.role }, process.env.JWT_SECRET, { expiresIn: '1h' });
+
+     // Send the token, role, and partner details to the client
+     res.json({ token, partner, role: partner.role });
   } catch (err) {
     res.status(500).send(err.message);
   }
@@ -2310,42 +2321,6 @@ router.post('/driverSignup', async (req, res) => {
   }
 });
 
-
-// Driver Login Route (routes/routes.js or appRouter.js)
-// router.post('/driverLogin', async (req, res) => {
-//   console.log('Received login request:', req.body); // Log incoming request body
-
-//   try {
-//     const { IDNumber, password } = req.body;
-//     const driver = await Driver.findOne({ IDNumber });
-
-//     if (!driver) {
-//       console.log('Driver not found for ID:', IDNumber);
-//       return res.status(400).json({ message: 'Driver not found' });
-//     }
-
-//     // Compare the password
-//     const isMatch = await bcrypt.compare(password, driver.password);
-//     if (!isMatch) {
-//       console.log('Invalid credentials for ID:', IDNumber);
-//       return res.status(400).json({ message: 'Invalid credentials' });
-//     }
-
-//     const token = jwt.sign(
-//       {
-//         id: driver._id,
-//         role: 'driver',
-//       },
-//       JWT_SECRET,
-//       { expiresIn: '1h' }
-//     );
-
-//     res.json({ token });
-//   } catch (error) {
-//     console.error('Error during login:', error); // Log the error
-//     res.status(500).json({ error: 'Failed to login driver' });
-//   }
-// });
 router.post('/driverLogin', async (req, res) => {
   console.log('Received login request:', req.body); // Log incoming request body
 
@@ -2575,6 +2550,23 @@ router.post('/update-earnings', async (req, res) => {
   }
 });
 
+/// GET all driver earnings
+router.get('/driverEarnings', async (req, res) => {
+  try {
+    const earningsData = await DailyEarnings.find();
+    
+    // If no earnings found
+    if (!earningsData || earningsData.length === 0) {
+      return res.status(404).json({ message: 'No earnings found' });
+    }
+    
+    // Send the earnings data as the response
+    res.status(200).json(earningsData);
+  } catch (error) {
+    console.error('Error fetching driver earnings:', error);
+    res.status(500).json({ message: 'Internal server error' });
+  }
+});
 //PAYMENTS AND UPDATE ROUTES
 router.post('/updatePaidStatus', async (req, res) => {
   // console.log('Received updatePaidStatus request');
