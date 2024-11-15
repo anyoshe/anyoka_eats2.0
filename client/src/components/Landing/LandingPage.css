@@ -1128,7 +1128,8 @@
     }
 
     .join_team_grid_div {
-        gap: 10px;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 7px;
         width: 100%;
     }
 
@@ -1627,6 +1628,12 @@
         gap: 15px;
     }
 
+    #video-Ad {
+        background: none;
+        border: none;
+    }
+
+
     .join_team_section {
         width: 100%;
         height: fit-content;
@@ -1832,6 +1839,11 @@
         grid-template-columns: repeat(3,1fr);
         gap: 10px;
         width: 85%;
+    }
+
+    #video-Ad {
+        background: none;
+        border: none;
     }
 
     .join_team_image_div {
