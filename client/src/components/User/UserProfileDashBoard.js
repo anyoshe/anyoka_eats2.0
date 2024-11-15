@@ -21,10 +21,6 @@ import Logout from '../Landing/LogOut';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faHome } from '@fortawesome/free-solid-svg-icons'
 
-// const Orders = () => <div>Orders Content Here</div>;
-// const Sales = () => <div>Sales Content Here</div>;
-// const Logout = () => <div>Log Out Content Here</div>;
-
 const UserProfileDashBoard = () => {
   const { partner, setPartner } = useContext(PartnerContext);
   const [dropdownOpen, setDropdownOpen] = useState(false);

@@ -138,8 +138,7 @@ const LandingPage = () => {
 
     return (
         <div className="containerDiv">
-            {/* <NavBar/> */}
-            {/* header section - logo, searchBar, signIn & logIn, slogan, services */}
+            
             <div className="logo-CTA">
                 <div className="logoDiv">
                     <h2 className="land_logo">Anyoka Eats</h2>
@@ -215,7 +214,7 @@ const LandingPage = () => {
                             <Link to={'freshfood'}>
                                 <div id="freshFoodService" className="serviceDiv">
                                     <img src={freshFoodImg} alt="Fresh Foods" className="serviceImg" />
-                                    <p>Fresh Groceries/Sokoni</p>
+                                    <p>Groceries</p>
                                 </div>
                             </Link>
                         </div>
@@ -388,7 +387,7 @@ const LandingPage = () => {
                             </Link>
                         </div>
 
-                        <div className="join_team_choices video-Ad" id='video-Ad'>
+                        <div className="join_team_choices" id='video-Ad'>
                             <iframe
                             src={videoAd}
                             type="video/mp4"

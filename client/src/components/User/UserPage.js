@@ -4,7 +4,7 @@ import AllDeliveredOrders from './AllDeliveredOrders';
 import AllUndeliveredFoodOrders from './AllUndeliveredFoodOrders';
 import AllDeliveredFoodOrders from './AllDeliveredFoodOrders';
 import DriverEarnings from './DriverEarnings';
-import './UserPage.css';
+import './userAdmin.css';
 
 const UserPage = () => {
   // State to keep track of the active component
@@ -29,22 +29,24 @@ const UserPage = () => {
   };
 
   return (
-    <div>
+    <div className='userCover'>
       <nav className="navs">
         <div className="navs-container">
-          <div className="logo">
+          {/* <div className="logo">
             <img src="../assets/online Chefs (1).png" width="85" height="55" alt="Logo" />
+          </div> */}
+          <div className="logo">
+           Anyoka Eats
           </div>
-          <div className="Kitchen">
-            <h3>OUR KITCHEN</h3>
-          </div>
-          <a href="./../customer/index.html">Go Home</a>
-          <div className="toggle-button">
+
+          <a href="/" className="homeLink">Home</a>
+
+          {/* <div className="toggle-button">
             <span></span>
             <span></span>
             <span></span>
-          </div>
-        </div>
+          </div>*/}
+        </div> 
       </nav>
 
       {/* Tabbed Buttons */}
@@ -53,32 +55,37 @@ const UserPage = () => {
           onClick={() => setActiveTab('AllDeliveredOrders')}
           className={activeTab === 'AllDeliveredOrders' ? 'active' : ''}
         >
-          All Delivered Orders
+          Delivered Meals
         </button>
+
         <button 
           onClick={() => setActiveTab('AllUndeliveredOrders')}
           className={activeTab === 'AllUndeliveredOrders' ? 'active' : ''}
         >
-          All Undelivered Orders
+          Undelivered Meals        
         </button>
+
         <button 
           onClick={() => setActiveTab('AllUndeliveredFoodOrders')}
           className={activeTab === 'AllUndeliveredFoodOrders' ? 'active' : ''}
         >
-          Undelivered Food Orders
+          Undelivered Groceries
         </button>
+
         <button 
           onClick={() => setActiveTab('AllDeliveredFoodOrders')}
           className={activeTab === 'AllDeliveredFoodOrders' ? 'active' : ''}
         >
-          Delivered Food Orders
+          Delivered Groceries
         </button>
+
         <button 
           onClick={() => setActiveTab('DriverEarnings')}
           className={activeTab === 'DriverEarnings' ? 'active' : ''}
         >
           Driver Earnings
         </button>
+
       </div>
 
       {/* Render Active Component */}
