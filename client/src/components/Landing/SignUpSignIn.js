@@ -33,8 +33,17 @@ function SignUpSignIn() {
                 headers: { 'Authorization': `Bearer ${token}` }
             })
                 .then(response => {
-                    setPartner(response.data);
-                    navigate('/dashboard');
+                    const partnerData = response.data;
+                    setPartner(partnerData);
+                    // setPartner(response.data);
+                    // navigate('/dashboard');
+                    // Redirect based on role
+                    if (partnerData.role === 'admin') {
+                        navigate('/superuserdashboard');
+                    } else {
+                        navigate('/dashboard');
+                    }
+                // })
                 })
                 .catch(error => {
                     console.error('Error fetching partner data:', error);
@@ -52,6 +61,8 @@ function SignUpSignIn() {
     const handleSubmitSignUp = async (event) => {
         event.preventDefault();
         try {
+            const role = formData.email === 'anyokaeats@gmail.com' ? 'admin' : 'partner';
+
             const response = await axios.post(`${config.backendUrl}/api/signup`, {
                 businessName: formData.businessName,
                 businessType: formData.businessType,
@@ -59,12 +70,22 @@ function SignUpSignIn() {
                 email: formData.email,
                 location: formData.location,
                 password: formData.password,
+                role
             });
 
             const partnerData = response.data;
             setPartner(partnerData);
-            alert("Sign up Successful, Welcome!");
-            navigate('/dashboard');
+            // alert("Sign up Successful, Welcome!");
+            // navigate('/dashboard');
+
+            // Redirect based on role
+            if (partnerData.role === 'admin') {
+                alert("Admin Sign up Successful, Welcome!");
+                navigate('/superuserdashboard');
+            } else {
+                alert("Sign up Successful, Welcome!");
+                navigate('/dashboard');
+            }
         } catch (error) {
             console.error('Error signing up:', error);
             alert(error.response?.data || "An unexpected error occurred. Please try again.");
@@ -80,7 +101,8 @@ function SignUpSignIn() {
                 password: formData.loginPassword,
             });
 
-            const token = loginResponse.data.token;
+            // const token = loginResponse.data.token;
+            const { token, role } = loginResponse.data;
             if (token) {
                 localStorage.setItem('authToken', token);
 
@@ -88,8 +110,15 @@ function SignUpSignIn() {
                     headers: { 'Authorization': `Bearer ${token}` }
                 });
 
-                setPartner(partnerResponse.data);
-                navigate('/dashboard');
+                const partnerData = partnerResponse.data;
+                setPartner(partnerData);
+                // navigate('/dashboard');
+                // Redirect based on role
+                if (partnerData.role === 'admin') {
+                    navigate('/superuserdashboard');
+                } else {
+                    navigate('/dashboard');
+                }
             } else {
                 throw new Error('Token not received');
             }

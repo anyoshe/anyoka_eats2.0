@@ -943,3 +943,77 @@
         justify-content: space-between;
     }
 }
+
+
+/* //Modal of driver earnings */
+/* Ensure the modal is on top of the page */
+.earnings-modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.5); /* Semi-transparent background */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000; /* Ensure it's above other content */
+}
+
+/* Style for the modal box */
+.earnings-modal {
+    background-color: white;
+    padding: 20px;
+    width: 80%;
+    max-width: 600px;
+    border-radius: 8px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+}
+
+/* Style the button that opens the modal */
+/* .driverTotals {
+    padding: 10px 15px;
+    background-color: #28a745;
+    color: white;
+    font-size: 16px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+} */
+
+/* .driverTotals:hover {
+    background-color: #218838;
+} */
+
+/* Style for the table inside the modal */
+.driver-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 15px;
+}
+
+.driver-table th, .driver-table td {
+    padding: 10px;
+    text-align: left;
+    border-bottom: 1px solid #ddd;
+}
+
+.driver-table th {
+    background-color: #f4f4f4;
+}
+
+/* Style for the close button */
+.btn-driver {
+    padding: 10px 15px;
+    background-color: #dc3545;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    margin-top: 15px;
+}
+
+.btn-driver:hover {
+    background-color: #c82333;
+}
