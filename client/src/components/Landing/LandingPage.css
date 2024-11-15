@@ -841,6 +841,10 @@
         width: 100%;
     }
 
+    #video-Ad{
+        display: none;
+    }
+
     .join_team_choices {
         text-align: center;
         border: none;
@@ -1126,6 +1130,10 @@
     .join_team_grid_div {
         gap: 10px;
         width: 100%;
+    }
+
+    #video-Ad{
+        display: none;
     }
 
     .join_title {
@@ -1431,6 +1439,10 @@
         width: 100%;
     }
 
+    #video-Ad{
+        display: none;
+    }
+
     .join_team_choices {
         text-align: center;
         border: none;
@@ -1623,6 +1635,7 @@
     }
 
     .join_team_grid_div {
+        grid-template-columns: repeat(3,1fr);
         gap: 10px;
         width: 85%;
     }
@@ -1816,6 +1829,7 @@
     }
 
     .join_team_grid_div {
+        grid-template-columns: repeat(3,1fr);
         gap: 10px;
         width: 85%;
     }
