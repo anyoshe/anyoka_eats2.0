@@ -1,0 +1,864 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@100;200;300;400;500;600;700;800;900&display=swap');
+
+:root{
+    --green:rgb(30, 165, 9);
+    --orange: rgb(255,165,0);
+    --transition-short: all .2s ease-in-out;
+}
+
+* {
+  padding: 0px;
+  margin: 0px;
+  box-sizing: border-box;
+  font-family: 'Poppins',sans-serif;
+}
+
+h4 {
+  text-align: center;
+  font-size: 17px;
+  padding: 5px;
+  font-weight: 800;
+  color: red;
+}
+
+.page-content {
+  margin: 0 auto;
+  padding: 0 20px;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-evenly;
+  height: 90%;
+  
+}
+
+.dishControl {
+  display: flex;
+  flex-direction: column;
+  float: left;
+  justify-content: space-evenly;
+  align-content: space-evenly;
+
+  width: 20%;
+  overflow-y: scroll;
+  
+}
+
+.allDishes button {
+  border: none;
+  padding: 5px;
+  width: 30%;
+  font-size: 17px;
+  border-radius: 10px;
+  cursor: pointer;
+  margin: 10px;
+}
+
+#addDishForm,
+#updateDishForm {
+  display: flex;
+  flex-direction: column;
+
+  align-items: center;
+}
+
+#submitButton {
+  border: none;
+  background-color: red;
+  color: white;
+  padding: 5px;
+  width: 40%;
+  font-size: 15px;
+  border-radius: 10px;
+  cursor: pointer;
+  margin: 10px;
+  font-weight: 700;
+  box-shadow: 0 4px 6px 0;
+}
+
+.input {
+  width: 80%;
+  padding: 6px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  margin-top: 3px;
+  margin-bottom: 3px;
+}
+label {
+  font-size: 15px;
+  font-weight: bold;
+  text-align: center;
+}
+.updateDish {
+  background-color: wheat;
+  padding: 5px;
+  width: 50%;
+  justify-content: space-evenly;
+  align-content: center;
+  align-items: center;
+  border-radius: 15px;
+  margin: 10px;
+  box-shadow: 0 6px 8px 0;
+}
+
+#allDishesContainer {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+}
+.allDishes {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-evenly;
+  justify-content: center;
+  align-content: center;
+  align-items: center;
+  margin-top: 10px;
+  border-radius: 15px;
+  resize: vertical;
+  width: 100%;
+  margin-left: 20px;
+}
+.dishItem {
+  height: 12em;
+  width: 12em;
+  
+  margin: 10px;
+  padding: 10px;
+  box-shadow: 0 6px 8px 0;
+}
+.deleSearch {
+  padding: 5px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-evenly;
+  align-content: center;
+  align-items: center;
+  border-radius: 15px;
+}
+
+.searchDish,
+.dishDetails {
+  text-align: center;
+  margin: 5px;
+}
+
+.deleSearch button {
+  align-items: center;
+  align-content: center;
+  border: none;
+  background-color: #ed0800;
+  padding: 10px;
+  width: 100%;
+  font-size: 15px;
+  border-radius: 10px;
+  cursor: pointer;
+  margin-top: 10px;
+  font-weight: 700;
+  color: whitesmoke;
+}
+
+.deleSearch input {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  margin-top: 3px;
+  margin-bottom: 3px;
+}
+
+.orderControl {
+  border: 1px solid #666;
+  width: 100%;
+  overflow-y: scroll;
+  overflow-x: hidden;
+  margin-bottom: 0.5em;
+}
+
+.dayOrders {
+  /* border: 5px solid blue; */
+
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+}
+
+#ordersList {
+  /* border: 5px solid red; */
+
+  display: flex;
+  flex-direction: column;
+
+  justify-content: space-evenly;
+  border-radius: 15px;
+  width: 100%;
+  font-size: 12px;
+  justify-content: center;
+}
+
+/* #ordersList ul {
+  list-style: numbers;
+  text-align: left; 
+} */
+
+#ordersList p {
+  text-align: left;
+  margin-bottom: 0.3rem;
+  font-size: 0.9rem;
+}
+
+#ordersList div {
+  border: 1px solid grey;
+  
+  margin: 5px;
+  justify-content: center;
+  text-align: center;
+  padding: 0.5rem 0.4rem;
+  border-radius: 5px;
+}
+
+#ordersList li{
+  font-size: 0.8rem;
+}
+
+#orderDetails {
+  border: 2px dotted red;
+
+  width: 100%;
+  /* border-radius: 15px; */
+  /* box-shadow: 0 1px 2px 0; */
+}
+
+.detailsTitles{
+  font-weight: 600;
+  font-size: 1rem;
+  color: var(--green);
+}
+
+/* [id^="orders-"] {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  justify-content: space-evenly;
+} */
+
+
+div[id$="-section"] h2 {
+  color: #ed0800;
+  text-transform: uppercase;
+  font-size: 17px;
+  text-align: center;
+}
+
+div[id$="-section"] {
+  /* border: 5px solid blue; */
+
+  /* display: flex;
+  flex-direction: column;
+  justify-content: space-between; */
+}
+
+.orderh2Divs{
+  /* border: 5px solid blue; */
+
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.orderh2title{
+
+}
+
+.orderhr{
+  margin: 0rem;
+}
+
+
+.unorderdOrderList{
+  /* border: 5px solid blue; */
+  display: flex;
+  flex-wrap: wrap;
+}
+
+#orderDetails button {
+  width: 50%;
+  border: none;
+  justify-content: left;
+  align-content: center;
+  align-items: center;
+  cursor: pointer;
+  padding: 5px;
+  margin: 5px;
+  border-radius: 5px;
+  box-shadow: 0 1px 2px 0;
+  background-color: #ED0800;
+  color: white;
+}
+
+#orderDetails button:hover {
+  background-color: rgb(243, 15, 45);
+}
+
+.statusbutn{
+  width: 50%;
+  border: none;
+  cursor: pointer;
+  padding: 5px;
+  background-color: var(--green);
+  color: white;
+  transition: ease-in .2s;
+  font-size: 1rem;
+}
+
+.statusbutn:hover {
+  background-color: white;
+  color: var(--orange);
+  outline: 1px solid var(--orange);
+}
+
+
+
+
+
+
+
+
+
+
+
+#dishContainer div {
+
+  margin: 5px;
+  width: 13em;
+  padding: 5px;
+  text-align: center;
+  box-shadow: 0 2px 4px 0;
+  font-size: 15px;
+}
+
+#dishContainer {
+  display: flex;
+  flex-wrap: wrap;
+  width: 100%;
+}
+
+#ordersList button {
+  /* width: 80%; */
+  border: none;
+  /* justify-content: center;
+  align-content: center;
+  align-items: center; */
+  
+}
+
+  .order-status-btn {
+  background-color: #007bff; 
+  color: white; 
+  padding: 5px; 
+  border: none; 
+  cursor: pointer;
+  font-size: 12px; 
+  border-radius: 5px; 
+} 
+
+.order-status-btn:hover {
+  background-color: #0056b3; 
+}
+.hidden {
+  display: none;
+}
+  
+#closeModalBtn,
+#closeUpdateModalBtn {
+  font-size: 20px;
+  float: right;
+  cursor: pointer;
+  color: #aaa;
+  padding: 1px 4px;
+  border: 1px solid #ccc;
+}
+
+#closeModalBtn:hover,
+#closeModalBtn:focus,
+#closeUpdateModalBtn:hover,
+#closeUpdateModalBtn:focus {
+  color: white;
+  text-decoration: none;
+  cursor: pointer;
+  background-color: #ed0800;
+}
+
+.search-bar {
+  flex-grow: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.search-bar input {
+  padding: 5px;
+  border-radius: 5px;
+  border: 1px solid #ccc;
+  margin-right: 5px;
+  width: 50%;
+}
+#searchType {
+  padding: 4px;
+  border-radius: 5px;
+  
+  margin-right: 5px;
+}
+
+.search-bar button {
+  padding: 5px 10px;
+  background-color: red;
+  color: #fff;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.search-bar button:hover {
+  background-color: #005a9e;
+}
+
+.navbar {
+  background-color: #333;
+  color: #fff;
+  padding: 10px 0;
+  z-index: 0;
+  top: 2;
+  position: sticky;
+}
+
+.navbar-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 20px;
+}
+
+.logo {
+  font-size: 24px;
+  margin: 10px;
+}
+
+.nav-links,
+.navbar-container li {
+  list-style-type: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+}
+
+.nav-links li {
+  margin-right: 20px;
+}
+
+.nav-links li a {
+  text-decoration: none;
+  color: #fff;
+}
+
+.toggle-button {
+  display: none;
+  flex-direction: column;
+  cursor: pointer;
+}
+
+.toggle-button span {
+  height: 2px;
+  width: 25px;
+  background-color: #fff;
+  margin: 4px 0;
+}
+
+.navs {
+  width: 100vw;
+  box-shadow: 0 4px 6px 0;
+}
+
+.navs-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin:  0px 20px;
+  top: 0;
+  margin-top: 0;
+  height: 4.5em;
+}
+
+.navs-container a {
+  text-decoration: none;
+  color: red;
+  font-size: 20px;
+  font-weight: 700;
+}
+
+.navs-container a:hover {
+  text-decoration: none;
+  background-color: red;
+  color: white;
+  padding: 3px;
+  border-radius: 5px;
+}
+
+.navbar-container li a {
+  list-style: none;
+  color: white;
+  font-size: 20px;
+  text-decoration: none;
+}
+
+.userCover{
+    width: 100vw;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+.tab-buttons{
+    width: 90%;
+    display: grid;
+    grid-template-columns: repeat(5,0.5fr);
+    gap: 0.6rem;
+    margin: 1rem 0.2rem;
+}
+
+.tab-buttons button{
+    padding: 0.2rem;
+    background-color: var(--green);
+    color: white;
+    border: none;
+}
+
+
+#updateModalBtn,
+#openModalBtn {
+  margin: 10px;
+  padding: 10px;
+  border-radius: 10px;
+  cursor: pointer;
+  font-weight: 700;
+  width: 90%;
+  background-color: #ed0800;
+  color: whitesmoke;
+}
+
+
+#worthSummary {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
+  background-color: whitesmoke;
+  box-shadow: 0 2px 2px 0;
+  position: sticky;
+  z-index: 1;
+  width: 100%;
+}
+
+#worthSummary p {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--green);
+  margin: 5px auto;
+}
+
+.downtotals{
+  font-size: 1.1rem;
+  font-weight: 500;
+  color: var(--orange);
+  padding-left: 0.3rem;
+}
+
+#sales{
+  /* border: 5px solid red; */
+  position: relative;
+  width: 100%;
+}
+
+#salesTotals{
+  /* border: 5px solid red; */
+
+  /* position: relative;
+  width: 100%; */
+} 
+
+#salesTotal {
+  display: flex;
+  font-size: 20px;
+  font-weight: 700;
+  background-color:var(--orange);
+  justify-content: space-around;
+  padding: 5px 30px;
+  bottom: 0;
+  /* position: fixed; */
+  z-index: 1;
+  width: inherit;
+  left: 0;
+  right: 0;
+}
+
+#salesTotal p{
+  color: white;
+  font-size: 17px;
+}
+
+#salesTotal p i{
+  color: var(--green);
+}
+
+.sameTotal{
+  font-size: 25px;
+}
+
+.salesOrders{
+  /* border: 5px solid red; */
+
+  width: 100%;
+  height: 100%;
+  /* position: relative; */
+}
+
+#fetchSalesButton{
+  padding: 5px 10px;
+  border: none;
+  background: var(--orange);
+  color: white;
+  transition: ease-in .2s;
+}
+
+#fetchSalesButton:hover,#fetchSalesButton:focus{
+  cursor: pointer;
+  outline: 1px solid var(--orange);
+  background: white;
+  color: var(--orange);
+}
+
+#salesList {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-evenly;
+  margin-bottom: 4em;
+}
+
+#salesList p,
+h3 {
+  font-size: 15px;
+  text-align: center;
+  font-weight: bold;
+}
+
+#salesList li {
+  text-align: center;
+  list-style: none;
+}
+
+#salesList button {
+  width: 60%;
+  cursor: pointer;
+  color: whitesmoke;
+  padding: 5px;
+  margin-top: 5px; 
+  border-radius: 15px;
+  background-color: #ED0800;
+  margin-left: 20%; 
+}
+
+#salesList .sales-item {
+  margin-top: 10px;
+  width: 15em;
+  border: 1px solid #666;
+  justify-content: center;
+  justify-items: center;
+  align-content: center;
+  vertical-align: auto;
+  padding: 10px;
+}
+
+#salesList h3 span {
+  text-transform: capitalize;
+}
+
+
+#loadingIndicator {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 50px;
+  height: 50px;
+  border: 5px solid rgba(0, 0, 0, 0.1);
+  border-radius: 50%;
+  border-top-color: #333;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  to {
+      transform: rotate(360deg);
+  }
+}
+table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+table th, table td {
+  border: 1px solid #ddd;
+  padding: 8px;
+  text-align: left;
+}
+
+table tr:nth-child(even) {
+  background-color: #f2f2f2;
+}
+
+table tr:hover {
+  background-color: #ddd;
+}
+
+table th {
+  padding-top: 12px;
+  padding-bottom: 12px;
+  background-color: #4CAF50;
+  color: white;
+}
+
+.foodList {
+
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
+  justify-content: space-around;
+  border: 1px solid rgba(0, 0, 0, 0.5);
+  width: 80%;
+}
+.foodList img {
+  width: 5%;
+  height: 5%;
+  object-fit: cover;
+}
+
+@media(max-width:320px){
+
+}
+
+
+@media(max-width:480px){
+  .dayOrders{
+    /* border: 5px dotted blue; */
+
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+  }
+
+  .orderDetails{
+    border: 1px solid red;
+  }
+
+  .orderDetails p{
+    /* border: 1px solid red; */
+
+    margin-bottom: 0.4rem;
+  }
+
+  #ordersList {
+    display: flex;
+    margin-top: 0px;
+    border-radius: 0px;
+    width: 100%;
+    font-size: 12px;
+    justify-content: center;
+  }
+
+  .orderh2title{
+    font-size: 0.1rem;
+  }
+
+  div[id$="-section"] h2 {
+    font-size: 0.9rem;
+    margin-bottom: 0rem;
+  }
+
+  #ordersList ul {
+    display: grid;
+    gap: 0.2rem;
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .orderhr{
+    margin: 0.3rem 0rem;
+  }
+  
+  #ordersList ul {
+    padding-left: 0rem;
+    align-items: left;
+  }
+
+  #ordersList ul ul{
+    /* border: 1px solid red; */
+    display: grid;
+    grid-template-columns: 1fr;
+    padding-left: 0rem;
+    align-items: left;
+    list-style: none;
+  }
+
+  #ordersList li {
+    text-align: left;
+  }
+  
+  #ordersList p {
+    text-align: left;
+    font-size: 0.8rem;
+  }
+  
+  #ordersList div {
+    
+    margin: 5px;
+    justify-content: center;
+    text-align: left;
+    padding: 5px;
+  }
+
+  .statusbutn{
+    width: 100%;
+
+    font-size: 0.8rem;
+  }
+
+  table th {
+    padding: 0.2rem 0.1rem;
+    background-color: #4CAF50;
+    color: white;
+    font-size: 0.8rem;
+    font-weight: 400;
+  }
+
+  #salesTotal{
+    padding: 0.2rem 0.3rem;
+  }
+
+  #salesTotal p {
+    font-size: 0.8rem;
+    margin-bottom: 0rem;
+  }
+
+  .sameTotal {
+    font-size: 1rem;
+  }
+}
+
+@media (min-width:1025) and (max-width:1440px){
+
+}
