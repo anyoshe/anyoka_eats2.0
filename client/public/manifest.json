@@ -1,12 +1,12 @@
 
 {
-  "short_name": "AnyokaEatsApp",
+  "short_name": "Anyoka Eats",
   "name": "Anyoka Eats",
-  "description": "Food ordering platform",
+  "description": "Anyoka eats is a Kenyan online web app.It has several services at the convort of they location. ",
   "icons": [
     {
       "src": "AnyokaEats Logo fav 2.png",
-      "sizes": "80x80 45x45 35x35 30x30",
+      "sizes": "100x100 45x45 35x35 30x30",
       "type": "image/png"
     },
     {
