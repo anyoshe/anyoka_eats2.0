@@ -5,27 +5,27 @@
   "description": "Food ordering platform",
   "icons": [
     {
-      "src": "AnyokaEats Logo.png",
-      "sizes": "70x70 40x40 30x30 20x20",
-      "type": "image/x-icon"
+      "src": "AnyokaEats Logo fav 2.png",
+      "sizes": "80x80 45x45 35x35 30x30",
+      "type": "image/png"
     },
     {
-      "src": "AnyokaEats Logo fav.png",
+      "src": "AnyokaEats Logo fav 2.png",
       "type": "image/png",
       "sizes": "1000x1000"
     },
     {
-      "src": "AnyokaEats Logo fav.png",
+      "src": "AnyokaEats Logo fav 2.png",
       "type": "image/png",
       "sizes": "512x512"
     },
     {
-      "src": "AnyokaEats Logo fav.png",
+      "src": "AnyokaEats Logo fav 2.png",
       "type": "image/png",
       "sizes": "180x180"
     },
     {
-      "src": "AnyokaEats Logo fav.png",
+      "src": "AnyokaEats Logo fav 2.png",
       "type": "image/png",
       "sizes": "1024x1024"
     }
