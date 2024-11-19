@@ -7,7 +7,8 @@
     {
       "src": "AnyokaEats Logo remover.png",
       "sizes": "100x100 45x45 35x35 30x30",
-      "type": "image/png"
+      "type": "image/png",
+      "background_color": "rgb(255,165,0)"
     },
     {
       "src": "AnyokaEats Logo remover.png",
