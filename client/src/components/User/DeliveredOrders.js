@@ -46,7 +46,7 @@ const DeliveredOrders = ({ partner }) => {
       );
   
       setOrders(partnerOrders);
-      setFilteredOrders(partnerOrders); // Set filtered orders initially
+      setFilteredOrders(partnerOrders); 
       calculateTotals(partnerOrders);
     } catch (error) {
       console.error('Error fetching orders:', error);
@@ -89,8 +89,8 @@ const DeliveredOrders = ({ partner }) => {
       <td>{order.createdAt.split('T')[0]}</td>
       <td>{order.selectedRestaurant}</td>
       <td>Kes.{order.totalPrice}.00</td>
-      <td>{order.driverDetails ? order.driverDetails.name : 'N/A'}</td>
-      <td>{order.driverDetails ? order.driverDetails.contactNumber : 'N/A'}</td>
+      {/* <td>{order.driverDetails ? order.driverDetails.name : 'N/A'}</td> */}
+      {/* <td>{order.driverDetails ? order.driverDetails.contactNumber : 'N/A'}</td> */}
     </tr>
   );
 
@@ -104,8 +104,8 @@ const DeliveredOrders = ({ partner }) => {
         <table>
           <thead>
             <tr>
-              <th>Sales Number</th>
-              <th>Dish Code</th>
+              {/* <th>Sales Number</th> */}
+              {/* <th>Dish Code</th> */}
               <th>
                 Date
                 <select id="dateFilter" value={filterDate} onChange={handleDateFilterChange}>
@@ -121,8 +121,8 @@ const DeliveredOrders = ({ partner }) => {
                 </select>
               </th>
               <th>Sales Amount</th>
-              <th>Driver Name</th>
-              <th>Driver Contact</th>
+              {/* <th>Driver Name</th> */}
+              {/* <th>Driver Contact</th> */}
             </tr>
           </thead>
           <tbody id="salesBody">

@@ -87,12 +87,12 @@ const DeliveredFoodOrders = ({ partner }) => {
     foodOrder.vendorOrders.map(vendorOrder => (
       <tr key={`${foodOrder.orderId}-${vendorOrder._id}`} className="salesDetails">
         <td>{foodOrder.orderId}</td>
-        <td>{vendorOrder.foods.map(food => food.foodCode).join(", ")}</td>
+        {/* <td>{vendorOrder.foods.map(food => food.foodCode).join(", ")}</td> */}
         <td>{foodOrder.createdAt.split('T')[0]}</td>
         <td>{vendorOrder.vendor}</td>
         <td>Kes.{vendorOrder.totalPrice}.00</td>
-        <td>{vendorOrder.driverDetails ? vendorOrder.driverDetails.name : 'N/A'}</td>
-        <td>{vendorOrder.driverDetails ? vendorOrder.driverDetails.contactNumber : 'N/A'}</td>
+        {/* <td>{vendorOrder.driverDetails ? vendorOrder.driverDetails.name : 'N/A'}</td>
+        <td>{vendorOrder.driverDetails ? vendorOrder.driverDetails.contactNumber : 'N/A'}</td> */}
       </tr>
     ))
   );
