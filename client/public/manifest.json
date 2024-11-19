@@ -1,3 +1,4 @@
+
 {
   "short_name": "AnyokaEatsApp",
   "name": "Anyoka Eats",
@@ -5,13 +6,13 @@
   "icons": [
     {
       "src": "favicon.ico",
-      "sizes": "75x75 40x40 35x35 20x20",
+      "sizes": "70x70 40x40 30x30 20x20",
       "type": "image/x-icon"
     },
     {
       "src": "AnyokaEats Logo.png",
       "type": "image/png",
-      "sizes": "500x500"
+      "sizes": "1000x1000"
     },
     {
       "src": "AnyokaEats Logo.png",
