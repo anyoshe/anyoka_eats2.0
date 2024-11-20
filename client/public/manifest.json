@@ -5,49 +5,29 @@
   "description": "Anyoka eats is a Kenyan online web app.It has several services at the convort of they location. ",
   "icons": [
     {
-<<<<<<< HEAD
       "src": "anyokaeats Final Logo.png",
-=======
-      "src": "AnyokaLogoResize.png",
->>>>>>> 7dc7bf4592100bbb457971899645c3a045e787c6
       "sizes": "100x100 45x45 35x35 30x30",
       "type": "image/png",
       "background_color": "rgb(255,165,0)",
       "purpose": "maskable"
     },
     {
-<<<<<<< HEAD
       "src": "anyokaeats Final Logo.png",
-=======
-      "src": "AnyokaLogoResize.png",
->>>>>>> 7dc7bf4592100bbb457971899645c3a045e787c6
       "type": "image/png",
       "sizes": "900x900"
     },
     {
-<<<<<<< HEAD
       "src": "anyokaeats Final Logo.png",
-=======
-      "src": "AnyokaLogoResize.png",
->>>>>>> 7dc7bf4592100bbb457971899645c3a045e787c6
       "type": "image/png",
       "sizes": "512x512"
     },
     {
-<<<<<<< HEAD
       "src": "anyokaeats Final Logo.png",
-=======
-      "src": "AnyokaLogoResize.png",
->>>>>>> 7dc7bf4592100bbb457971899645c3a045e787c6
       "type": "image/png",
       "sizes": "180x180"
     },
     {
-<<<<<<< HEAD
       "src": "anyokaeats Final Logo.png",
-=======
-      "src": "AnyokaLogoResize.png",
->>>>>>> 7dc7bf4592100bbb457971899645c3a045e787c6
       "type": "image/png",
       "sizes": "1024x1024"
     }
