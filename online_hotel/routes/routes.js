@@ -2684,7 +2684,7 @@ router.post('/mpesa/pay', async (req, res) => {
     console.log('Payment Data:', paymentData);
 
     // Initiate payment 
-    const paymentResponse = await axios.post(' https://api.safaricom.co.ke/mpesa/stkpush/v1/processrequest', paymentData, {
+    const paymentResponse = await axios.post('https://api.safaricom.co.ke/mpesa/stkpush/v1/processrequest', paymentData, {
       headers: {
         'Authorization': `Bearer ${access_token}`,
         'Content-Type': 'application/json'
