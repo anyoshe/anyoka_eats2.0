@@ -228,38 +228,59 @@ const OrderSummaryModal = ({
     }
   };
 
+  // const initiateMpesaPayment = async (phoneNumber, amount) => {
+  //   try {
+  //     const response = await axios.post(`${config.backendUrl}/api/mpesa/pay`, {
+  //       phoneNumber,
+  //       amount
+  //     }, {
+  //       headers: {
+  //         'Content-Type': 'application/json'
+  //       }
+  //     });
+  //     if (response.status === 200) {
+  //       const data = response.data;
+  //       if (data.ResponseCode === '0') {
+  //         alert(data.CustomerMessage);
+  //         return data;
+  //       } else {
+  //         console.error('Payment failed:', data.ResponseDescription);
+  //         alert('Payment failed. Please try again.');
+  //         return null;
+  //       }
+  //     } else {
+  //       console.error('Failed to initiate payment:', response.statusText);
+  //       alert('Error initiating M-Pesa payment. Please try again.');
+  //       return null;
+  //     }
+  //   } catch (error) {
+  //     console.error('Error initiating M-Pesa payment:', error);
+  //     alert('Error initiating M-Pesa payment. Please try again.');
+  //     return null;
+  //   }
+  // };
+
   const initiateMpesaPayment = async (phoneNumber, amount) => {
     try {
       const response = await axios.post(`${config.backendUrl}/api/mpesa/pay`, {
         phoneNumber,
         amount
-      }, {
-        headers: {
-          'Content-Type': 'application/json'
-        }
       });
-      if (response.status === 200) {
-        const data = response.data;
-        if (data.ResponseCode === '0') {
-          alert(data.CustomerMessage);
-          return data;
-        } else {
-          console.error('Payment failed:', data.ResponseDescription);
-          alert('Payment failed. Please try again.');
-          return null;
-        }
+  
+      if (response.data.CheckoutRequestID) {
+        alert('Payment initiated. Await confirmation.');
+        return response.data;
       } else {
-        console.error('Failed to initiate payment:', response.statusText);
-        alert('Error initiating M-Pesa payment. Please try again.');
+        alert('Payment initiation failed.');
         return null;
       }
     } catch (error) {
-      console.error('Error initiating M-Pesa payment:', error);
-      alert('Error initiating M-Pesa payment. Please try again.');
+      console.error('Error initiating payment:', error);
+      alert('Error initiating payment. Please try again.');
       return null;
     }
   };
-
+  
 
   const saveOrderToDatabase = async (foodOrderDetails) => {
     const maxRetries = 5; // Maximum number of retry attempts
