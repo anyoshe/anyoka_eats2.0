@@ -2652,8 +2652,7 @@ router.post('/mpesa/pay', async (req, res) => {
     console.log('Generated timestamp:', timestamp);
 
     // Fetch access token 
-    // const authResponse = await axios.get('https://api.safaricom.co.ke/oauth/v1/generate?grant_type=client_credentials', {
-      const authResponse = await axios.get('https://api.safaricom.co.ke/oauth/v1/generate', {
+    const authResponse = await axios.get('https://api.safaricom.co.ke/oauth/v1/generate?grant_type=client_credentials', {
       headers: {
         'Authorization': `Basic ${Buffer.from(`${consumerKey}:${consumerSecret}`).toString('base64')}`
       }
