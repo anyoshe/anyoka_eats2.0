@@ -152,84 +152,85 @@ const OrderSummaryModal = ({
     }
   };
 
-  const handlePayment = async (method) => {
-    try {
-      if (method === 'mpesa') {
-        const paymentPhoneNumber = prompt('Enter your M-Pesa phone number (format: 254712345678):', '254');
-        if (!paymentPhoneNumber || !/^254\d{9}$/.test(paymentPhoneNumber)) {
-          alert('Please enter a valid phone number.');
-          return;
-        }
+  // const handlePayment = async (method) => {
+  //   try {
+  //     if (method === 'mpesa') {
+  //       const paymentPhoneNumber = prompt('Enter your M-Pesa phone number (format: 254712345678):', '254');
+  //       if (!paymentPhoneNumber || !/^254\d{9}$/.test(paymentPhoneNumber)) {
+  //         alert('Please enter a valid phone number.');
+  //         return;
+  //       }
 
-        let amount;
-        let validAmount = false;
-        while (!validAmount) {
-          amount = prompt('Enter the amount to pay:', grandTotal);
-          if (isNaN(amount) || amount <= 0 || amount.includes('.') || !Number.isInteger(Number(amount))) {
-            alert('Please enter a valid whole number.');
-          } else {
-            validAmount = true;
-          }
-        }
+  //       let amount;
+  //       let validAmount = false;
+  //       while (!validAmount) {
+  //         amount = prompt('Enter the amount to pay:', grandTotal);
+  //         if (isNaN(amount) || amount <= 0 || amount.includes('.') || !Number.isInteger(Number(amount))) {
+  //           alert('Please enter a valid whole number.');
+  //         } else {
+  //           validAmount = true;
+  //         }
+  //       }
 
-        const response = await initiateMpesaPayment(paymentPhoneNumber, amount);
-        if (response && response.ResponseCode === '0') {
-          alert('Payment successful!');
-          setShowPaymentModal(false);
+  //       const response = await initiateMpesaPayment(paymentPhoneNumber, amount);
+  //       if (response && response.ResponseCode === '0') {
+  //         alert('Payment successful!');
+  //         setShowPaymentModal(false);
 
-          const address = await getReadableAddress(pinnedLocation.lat, pinnedLocation.lng);
+  //         const address = await getReadableAddress(pinnedLocation.lat, pinnedLocation.lng);
 
-          if (isSingleVendor) {
-            const [vendor] = Object.keys(foodOrdersByVendor);
-            const vendorFoodsPrice = foodOrdersByVendor[vendor].foods.reduce((total, food) => total + food.price * food.quantity, 0);
+  //         if (isSingleVendor) {
+  //           const [vendor] = Object.keys(foodOrdersByVendor);
+  //           const vendorFoodsPrice = foodOrdersByVendor[vendor].foods.reduce((total, food) => total + food.price * food.quantity, 0);
 
-            const foodOrderDetails = {
-              phoneNumber: contactNumber,
-              selectedVendor: vendor,
-              customerLocation: address,
-              expectedDeliveryTime: selectedTime,
-              foods: foodOrdersByVendor[vendor].foods,
-              deliveryCharges,
-              totalPrice: vendorFoodsPrice + deliveryCharges,
-            };
+  //           const foodOrderDetails = {
+  //             phoneNumber: contactNumber,
+  //             selectedVendor: vendor,
+  //             customerLocation: address,
+  //             expectedDeliveryTime: selectedTime,
+  //             foods: foodOrdersByVendor[vendor].foods,
+  //             deliveryCharges,
+  //             totalPrice: vendorFoodsPrice + deliveryCharges,
+  //           };
 
-            await saveOrderToDatabase(foodOrderDetails);
-          } else {
-            for (const [vendor, vendorFoods] of Object.entries(foodOrdersByVendor)) {
-              const vendorFoodsPrice = vendorFoods.foods.reduce((total, food) => total + food.price * food.quantity, 0);
+  //           await saveOrderToDatabase(foodOrderDetails);
+  //         } else {
+  //           for (const [vendor, vendorFoods] of Object.entries(foodOrdersByVendor)) {
+  //             const vendorFoodsPrice = vendorFoods.foods.reduce((total, food) => total + food.price * food.quantity, 0);
 
-              const foodOrderDetails = {
-                phoneNumber: contactNumber,
-                selectedVendor: vendor,
-                customerLocation: address,
-                expectedDeliveryTime: selectedTime,
-                foods: vendorFoods.foods,
-                deliveryCharges,  // You can adjust this for each vendor if needed
-                totalPrice: vendorFoodsPrice + deliveryCharges,
-              };
+  //             const foodOrderDetails = {
+  //               phoneNumber: contactNumber,
+  //               selectedVendor: vendor,
+  //               customerLocation: address,
+  //               expectedDeliveryTime: selectedTime,
+  //               foods: vendorFoods.foods,
+  //               deliveryCharges,  // You can adjust this for each vendor if needed
+  //               totalPrice: vendorFoodsPrice + deliveryCharges,
+  //             };
 
-              await saveOrderToDatabase(foodOrderDetails);
-            }
-          }
+  //             await saveOrderToDatabase(foodOrderDetails);
+  //           }
+  //         }
 
-          clearCart();
-          setTimeout(() => {
-            window.location.href = '/';
-          }, 2000);
-        } else {
-          handlePaymentFailure();
-        }
-      } else {
-        console.error('Unsupported payment method.');
-      }
-    } catch (error) {
-      console.error('Error in handlePayment:', error);
-      alert('An error occurred while processing the payment.');
-    }
-  };
+  //         clearCart();
+  //         setTimeout(() => {
+  //           window.location.href = '/';
+  //         }, 2000);
+  //       } else {
+  //         handlePaymentFailure();
+  //       }
+  //     } else {
+  //       console.error('Unsupported payment method.');
+  //     }
+  //   } catch (error) {
+  //     console.error('Error in handlePayment:', error);
+  //     alert('An error occurred while processing the payment.');
+  //   }
+  // };
 
   // const initiateMpesaPayment = async (phoneNumber, amount) => {
   //   try {
+  //     // Step 1: Initiate payment
   //     const response = await axios.post(`${config.backendUrl}/api/mpesa/pay`, {
   //       phoneNumber,
   //       amount
@@ -238,11 +239,16 @@ const OrderSummaryModal = ({
   //         'Content-Type': 'application/json'
   //       }
   //     });
+  
   //     if (response.status === 200) {
   //       const data = response.data;
+  
   //       if (data.ResponseCode === '0') {
   //         alert(data.CustomerMessage);
-  //         return data;
+  
+  //         // Step 2: Wait for payment confirmation
+  //         const paymentResult = await waitForPaymentConfirmation(data.CheckoutRequestID);
+  //         return paymentResult; // Return the payment result
   //       } else {
   //         console.error('Payment failed:', data.ResponseDescription);
   //         alert('Payment failed. Please try again.');
@@ -259,27 +265,162 @@ const OrderSummaryModal = ({
   //     return null;
   //   }
   // };
-
-  const initiateMpesaPayment = async (phoneNumber, amount) => {
-    try {
-      const response = await axios.post(`${config.backendUrl}/api/mpesa/pay`, {
-        phoneNumber,
-        amount
-      });
   
-      if (response.data.CheckoutRequestID) {
-        alert('Payment initiated. Await confirmation.');
-        return response.data;
+  const handlePayment = async (method) => {
+    try {
+      if (method === 'mpesa') {
+        // Step 1: Prompt for M-Pesa phone number
+        const paymentPhoneNumber = prompt('Enter your M-Pesa phone number (format: 254712345678):', '254');
+        if (!paymentPhoneNumber || !/^254\d{9}$/.test(paymentPhoneNumber)) {
+          alert('Please enter a valid phone number.');
+          return;
+        }
+  
+        // Step 2: Prompt for payment amount
+        let amount;
+        let validAmount = false;
+        while (!validAmount) {
+          amount = prompt('Enter the amount to pay:', grandTotal);
+          if (isNaN(amount) || amount <= 0 || amount.includes('.') || !Number.isInteger(Number(amount))) {
+            alert('Please enter a valid whole number.');
+          } else {
+            validAmount = true;
+          }
+        }
+  
+        // Step 3: Initiate payment and wait for confirmation
+        const paymentResponse = await initiateMpesaPayment(paymentPhoneNumber, amount);
+  
+        // If payment was successful, proceed with order processing
+        if (paymentResponse && paymentResponse.success) {
+          alert('Payment successful!');
+          setShowPaymentModal(false);
+  
+          // Retrieve readable address
+          const address = await getReadableAddress(pinnedLocation.lat, pinnedLocation.lng);
+  
+          // Process orders
+          if (isSingleVendor) {
+            const [vendor] = Object.keys(foodOrdersByVendor);
+            const vendorFoodsPrice = foodOrdersByVendor[vendor].foods.reduce(
+              (total, food) => total + food.price * food.quantity,
+              0
+            );
+  
+            const foodOrderDetails = {
+              phoneNumber: contactNumber,
+              selectedVendor: vendor,
+              customerLocation: address,
+              expectedDeliveryTime: selectedTime,
+              foods: foodOrdersByVendor[vendor].foods,
+              deliveryCharges,
+              totalPrice: vendorFoodsPrice + deliveryCharges,
+            };
+  
+            await saveOrderToDatabase(foodOrderDetails);
+          } else {
+            for (const [vendor, vendorFoods] of Object.entries(foodOrdersByVendor)) {
+              const vendorFoodsPrice = vendorFoods.foods.reduce(
+                (total, food) => total + food.price * food.quantity,
+                0
+              );
+  
+              const foodOrderDetails = {
+                phoneNumber: contactNumber,
+                selectedVendor: vendor,
+                customerLocation: address,
+                expectedDeliveryTime: selectedTime,
+                foods: vendorFoods.foods,
+                deliveryCharges, // Adjust for each vendor if needed
+                totalPrice: vendorFoodsPrice + deliveryCharges,
+              };
+  
+              await saveOrderToDatabase(foodOrderDetails);
+            }
+          }
+  
+          // Clear the cart and redirect
+          clearCart();
+          setTimeout(() => {
+            window.location.href = '/';
+          }, 2000);
+        } else {
+          alert('Payment failed or was canceled. Please try again.');
+        }
       } else {
-        alert('Payment initiation failed.');
-        return null;
+        console.error('Unsupported payment method.');
       }
     } catch (error) {
-      console.error('Error initiating payment:', error);
-      alert('Error initiating payment. Please try again.');
-      return null;
+      console.error('Error in handlePayment:', error);
+      alert('An error occurred while processing the payment.');
     }
   };
+  
+  const initiateMpesaPayment = async (phoneNumber, amount) => {
+    try {
+      // Step 1: Initiate M-Pesa payment
+      const response = await axios.post(
+        `${config.backendUrl}/api/mpesa/pay`,
+        { phoneNumber, amount },
+        { headers: { 'Content-Type': 'application/json' } }
+      );
+  
+      if (response.status === 200) {
+        const data = response.data;
+  
+        if (data.ResponseCode === '0') {
+          alert("Payment Process initiated, Please Enter your Pin. After Payment confirmation SMS has been recieved on your Phone Press OK to continue");
+  
+          // Step 2: Wait for payment confirmation
+          const paymentResult = await waitForPaymentConfirmation(data.CheckoutRequestID);
+          return paymentResult; // Return the result of payment confirmation
+        } else {
+          alert('Payment initiation failed. Please try again.');
+          return { success: false, message: data.ResponseDescription };
+        }
+      } else {
+        alert('Error initiating M-Pesa payment.');
+        return { success: false, message: 'Failed to initiate payment.' };
+      }
+    } catch (error) {
+      console.error('Error initiating M-Pesa payment:', error);
+      alert('Error initiating M-Pesa payment. Please try again.');
+      return { success: false, message: 'Network error.' };
+    }
+  };
+  
+  const waitForPaymentConfirmation = async (checkoutRequestID) => {
+    const maxRetries = 10; // Maximum retries
+    const retryInterval = 5000; // Retry interval in milliseconds
+  
+    for (let attempt = 0; attempt < maxRetries; attempt++) {
+      try {
+        const statusResponse = await axios.post(
+          `${config.backendUrl}/api/mpesa/status`,
+          { CheckoutRequestID: checkoutRequestID },
+          { headers: { 'Content-Type': 'application/json' } }
+        );
+  
+        const statusData = statusResponse.data;
+  
+        if (statusData.ResultCode === '0') {
+          return { success: true, message: statusData.ResultDesc };
+        } else if (statusData.ResultCode === '1032') {
+          return { success: false, message: 'Payment canceled by user.' };
+        } else if (statusData.ResultCode === '1') {
+          return { success: false, message: 'Payment failed.' };
+        }
+  
+        // If payment is pending, wait and retry
+        await new Promise((resolve) => setTimeout(resolve, retryInterval));
+      } catch (error) {
+        console.error('Error checking payment status:', error);
+      }
+    }
+  
+    return { success: false, message: 'Payment confirmation timed out.' };
+  };
+  
   
 
   const saveOrderToDatabase = async (foodOrderDetails) => {
