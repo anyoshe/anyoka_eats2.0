@@ -2609,7 +2609,8 @@ const PendingOrderSchema = new mongoose.Schema({
   createdAt: { type: Date, default: Date.now }
 });
 
-module.exports = mongoose.model('PendingOrder', PendingOrderSchema);
+const PendingOrder = mongoose.model('PendingOrder', PendingOrderSchema);
+
 
 // router.post('/mpesa/callback', (req, res) => {
 //   const callbackData = req.body;
