@@ -2598,32 +2598,45 @@ const passkey = process.env.PASSKEY;
 const ngrokUrl = process.env.NODE_ENV === 'production'
   ? process.env.NGROK_URL
   : process.env.NGROK_URL_LOCAL;
-router.post('/mpesa/callback', (req, res) => {
-  const callbackData = req.body;
-  console.log('M-Pesa Callback Received:', callbackData);
 
-  // Your logic to handle the callback data goes here...
-  // Extract relevant information from the callback data
-  const { Body, ResultCode, ResultDesc } = callbackData;
 
-  // Log the callback data for debugging or auditing
-  console.log('Callback Body:', Body);
-  console.log('Result Code:', ResultCode);
-  console.log('Result Description:', ResultDesc);
-
-  // Example: Process the callback based on ResultCode
-  if (ResultCode === 0) {
-    // Successful transaction
-    // Update your database, notify user, etc.
-    console.log('Payment successful. Update database...');
-  } else {
-    // Failed transaction
-    // Handle failure scenario
-    console.log('Payment failed:', ResultDesc);
-  }
-  // Respond with a success status to acknowledge receipt
-  res.sendStatus(200);
+const PendingOrderSchema = new mongoose.Schema({
+  phoneNumber: String,
+  amount: Number,
+  CheckoutRequestID: String,
+  orderDetails: Object, // Save order details here if needed
+  status: { type: String, default: 'Pending' },
+  createdAt: { type: Date, default: Date.now }
 });
+
+module.exports = mongoose.model('PendingOrder', PendingOrderSchema);
+
+// router.post('/mpesa/callback', (req, res) => {
+//   const callbackData = req.body;
+//   console.log('M-Pesa Callback Received:', callbackData);
+
+//   // Your logic to handle the callback data goes here...
+//   // Extract relevant information from the callback data
+//   const { Body, ResultCode, ResultDesc } = callbackData;
+
+//   // Log the callback data for debugging or auditing
+//   console.log('Callback Body:', Body);
+//   console.log('Result Code:', ResultCode);
+//   console.log('Result Description:', ResultDesc);
+
+//   // Example: Process the callback based on ResultCode
+//   if (ResultCode === 0) {
+//     // Successful transaction
+//     // Update your database, notify user, etc.
+//     console.log('Payment successful. Update database...');
+//   } else {
+//     // Failed transaction
+//     // Handle failure scenario
+//     console.log('Payment failed:', ResultDesc);
+//   }
+//   // Respond with a success status to acknowledge receipt
+//   res.sendStatus(200);
+// });
 
 
 
@@ -2643,15 +2656,70 @@ const generateTimestamp = () => {
 
 
 
+// router.post('/mpesa/pay', async (req, res) => {
+//   const { phoneNumber, amount } = req.body;
+//   console.log('Received payment request:', { phoneNumber, amount });
+
+//   try {
+//     const timestamp = generateTimestamp();
+//     console.log('Generated timestamp:', timestamp);
+
+//     // Fetch access token 
+//     const authResponse = await axios.get('https://api.safaricom.co.ke/oauth/v1/generate?grant_type=client_credentials', {
+//       headers: {
+//         'Authorization': `Basic ${Buffer.from(`${consumerKey}:${consumerSecret}`).toString('base64')}`
+//       }
+//     });
+
+//     const { access_token } = authResponse.data;
+//     if (!access_token) {
+//       throw new Error('Failed to fetch access token');
+//     }
+
+//     console.log('Access Token:', access_token);
+
+//     // Generate password and payment data
+//     const password = Buffer.from(`${shortcode}${passkey}${timestamp}`).toString('base64');
+//     const paymentData = {
+//       BusinessShortCode: shortcode,
+//       Password: password,
+//       Timestamp: timestamp,
+//       TransactionType: 'CustomerPayBillOnline',
+//       Amount: amount,
+//       PartyA: phoneNumber,
+//       PartyB: shortcode,
+//       PhoneNumber: phoneNumber,
+//       CallBackURL: `${ngrokUrl}/mpesa/callback`,
+//       AccountReference: 'Test123',
+//       TransactionDesc: 'Test Payment'
+//     };
+
+//     console.log('Payment Data:', paymentData);
+
+//     // Initiate payment 
+//     const paymentResponse = await axios.post('https://api.safaricom.co.ke/mpesa/stkpush/v1/processrequest', paymentData, {
+//       headers: {
+//         'Authorization': `Bearer ${access_token}`,
+//         'Content-Type': 'application/json'
+//       }
+//     });
+
+//     console.log('Payment Response:', paymentResponse.data);
+//     res.json(paymentResponse.data);
+//   } catch (error) {
+//     console.error('Error initiating M-Pesa payment:', error.response ? error.response.data : error.message);
+//     res.status(500).json({ error: 'Failed to initiate payment', details: error.message });
+//   }
+// });
+
 router.post('/mpesa/pay', async (req, res) => {
   const { phoneNumber, amount } = req.body;
   console.log('Received payment request:', { phoneNumber, amount });
 
   try {
     const timestamp = generateTimestamp();
-    console.log('Generated timestamp:', timestamp);
 
-    // Fetch access token 
+    // Fetch access token
     const authResponse = await axios.get('https://api.safaricom.co.ke/oauth/v1/generate?grant_type=client_credentials', {
       headers: {
         'Authorization': `Basic ${Buffer.from(`${consumerKey}:${consumerSecret}`).toString('base64')}`
@@ -2663,9 +2731,6 @@ router.post('/mpesa/pay', async (req, res) => {
       throw new Error('Failed to fetch access token');
     }
 
-    console.log('Access Token:', access_token);
-
-    // Generate password and payment data
     const password = Buffer.from(`${shortcode}${passkey}${timestamp}`).toString('base64');
     const paymentData = {
       BusinessShortCode: shortcode,
@@ -2677,13 +2742,11 @@ router.post('/mpesa/pay', async (req, res) => {
       PartyB: shortcode,
       PhoneNumber: phoneNumber,
       CallBackURL: `${ngrokUrl}/mpesa/callback`,
-      AccountReference: 'Test123',
-      TransactionDesc: 'Test Payment'
+      AccountReference: 'OrderPayment',
+      TransactionDesc: 'Payment for Order'
     };
 
-    console.log('Payment Data:', paymentData);
-
-    // Initiate payment 
+    // Initiate payment
     const paymentResponse = await axios.post('https://api.safaricom.co.ke/mpesa/stkpush/v1/processrequest', paymentData, {
       headers: {
         'Authorization': `Bearer ${access_token}`,
@@ -2691,14 +2754,89 @@ router.post('/mpesa/pay', async (req, res) => {
       }
     });
 
-    console.log('Payment Response:', paymentResponse.data);
-    res.json(paymentResponse.data);
+    const { CheckoutRequestID } = paymentResponse.data;
+
+    if (!CheckoutRequestID) {
+      throw new Error('Failed to get CheckoutRequestID');
+    }
+
+    // Save the payment initiation details temporarily in the database
+    await savePendingOrder({ phoneNumber, amount, CheckoutRequestID });
+
+    res.json({ message: 'Payment initiated successfully. Await confirmation.', CheckoutRequestID });
   } catch (error) {
     console.error('Error initiating M-Pesa payment:', error.response ? error.response.data : error.message);
     res.status(500).json({ error: 'Failed to initiate payment', details: error.message });
   }
 });
 
+// Helper to save a pending order
+const savePendingOrder = async ({ phoneNumber, amount, CheckoutRequestID }) => {
+  try {
+    await PendingOrder.create({
+      phoneNumber,
+      amount,
+      CheckoutRequestID,
+      createdAt: new Date(),
+      status: 'Pending'
+    });
+  } catch (error) {
+    console.error('Error saving pending order:', error);
+  }
+};
+
+router.post('/mpesa/callback', async (req, res) => {
+  const callbackData = req.body;
+  console.log('M-Pesa Callback Received:', callbackData);
+
+  try {
+    const { Body } = callbackData;
+    const { stkCallback } = Body;
+    const { CheckoutRequestID, ResultCode, ResultDesc, CallbackMetadata } = stkCallback;
+
+    console.log('Callback Data:', stkCallback);
+
+    if (ResultCode === 0) {
+      // Payment successful
+      const amount = CallbackMetadata.Item.find(item => item.Name === 'Amount').Value;
+      const phoneNumber = CallbackMetadata.Item.find(item => item.Name === 'PhoneNumber').Value;
+
+      console.log('Payment successful for:', { phoneNumber, amount, CheckoutRequestID });
+
+      // Move order from pendingOrders to orders
+      const pendingOrder = await PendingOrder.findOne({ CheckoutRequestID });
+
+      if (!pendingOrder) {
+        console.error('Pending order not found for CheckoutRequestID:', CheckoutRequestID);
+        return res.status(404).json({ error: 'Pending order not found.' });
+      }
+
+      const { orderDetails } = pendingOrder;
+
+      const savedOrder = await Order.create({
+        ...orderDetails,
+        status: 'Paid',
+        createdAt: new Date()
+      });
+
+      // Notify the customer via email
+      await sendFoodOrderConfirmationEmail(savedOrder._id, savedOrder.totalPrice);
+
+      // Clean up pending order
+      await PendingOrder.deleteOne({ CheckoutRequestID });
+
+      console.log('Order moved to orders successfully.');
+      res.sendStatus(200);
+    } else {
+      // Payment failed
+      console.error('Payment failed:', ResultDesc);
+      res.sendStatus(200); // Acknowledge receipt
+    }
+  } catch (error) {
+    console.error('Error handling M-Pesa callback:', error);
+    res.status(500).json({ error: 'Error processing payment callback.' });
+  }
+});
 
 
 // TESTMONIALS SECTION 
