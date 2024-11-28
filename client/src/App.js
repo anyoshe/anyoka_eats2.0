@@ -21,6 +21,8 @@ import { DriverProvider } from './contexts/DriverContext';
 import ResetPassword from './components/Landing/ResetPassword';
 import ResetPartnerPassword from './components/Landing/ResetPartnerPassword';
 import UserPage from './components/User/UserPage';
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 function App() {
     return (
 
@@ -30,6 +32,7 @@ function App() {
                 <CartProvider>
                     <FreshFoodCartProvider>
                         {/* <NavBar /> */}
+                        <ToastContainer />
                         <Routes>
                             <Route path="/" element={<LandingPage />} />
                             <Route path="/sign-up-sign-in" element={<SignUpSignIn />} />

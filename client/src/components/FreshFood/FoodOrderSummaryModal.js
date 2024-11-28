@@ -7,6 +7,7 @@ import 'bootstrap/dist/js/bootstrap.bundle.min';
 import { right } from '@popperjs/core';
 import { v4 as uuidv4 } from 'uuid';
 import "./FoodOrderSummaryModal.css";
+import { toast } from 'react-toastify';
 
 const googleApiKey = process.env.REACT_APP_GOOGLE_API_KEY;
 
@@ -152,120 +153,7 @@ const OrderSummaryModal = ({
     }
   };
 
-  // const handlePayment = async (method) => {
-  //   try {
-  //     if (method === 'mpesa') {
-  //       const paymentPhoneNumber = prompt('Enter your M-Pesa phone number (format: 254712345678):', '254');
-  //       if (!paymentPhoneNumber || !/^254\d{9}$/.test(paymentPhoneNumber)) {
-  //         alert('Please enter a valid phone number.');
-  //         return;
-  //       }
 
-  //       let amount;
-  //       let validAmount = false;
-  //       while (!validAmount) {
-  //         amount = prompt('Enter the amount to pay:', grandTotal);
-  //         if (isNaN(amount) || amount <= 0 || amount.includes('.') || !Number.isInteger(Number(amount))) {
-  //           alert('Please enter a valid whole number.');
-  //         } else {
-  //           validAmount = true;
-  //         }
-  //       }
-
-  //       const response = await initiateMpesaPayment(paymentPhoneNumber, amount);
-  //       if (response && response.ResponseCode === '0') {
-  //         alert('Payment successful!');
-  //         setShowPaymentModal(false);
-
-  //         const address = await getReadableAddress(pinnedLocation.lat, pinnedLocation.lng);
-
-  //         if (isSingleVendor) {
-  //           const [vendor] = Object.keys(foodOrdersByVendor);
-  //           const vendorFoodsPrice = foodOrdersByVendor[vendor].foods.reduce((total, food) => total + food.price * food.quantity, 0);
-
-  //           const foodOrderDetails = {
-  //             phoneNumber: contactNumber,
-  //             selectedVendor: vendor,
-  //             customerLocation: address,
-  //             expectedDeliveryTime: selectedTime,
-  //             foods: foodOrdersByVendor[vendor].foods,
-  //             deliveryCharges,
-  //             totalPrice: vendorFoodsPrice + deliveryCharges,
-  //           };
-
-  //           await saveOrderToDatabase(foodOrderDetails);
-  //         } else {
-  //           for (const [vendor, vendorFoods] of Object.entries(foodOrdersByVendor)) {
-  //             const vendorFoodsPrice = vendorFoods.foods.reduce((total, food) => total + food.price * food.quantity, 0);
-
-  //             const foodOrderDetails = {
-  //               phoneNumber: contactNumber,
-  //               selectedVendor: vendor,
-  //               customerLocation: address,
-  //               expectedDeliveryTime: selectedTime,
-  //               foods: vendorFoods.foods,
-  //               deliveryCharges,  // You can adjust this for each vendor if needed
-  //               totalPrice: vendorFoodsPrice + deliveryCharges,
-  //             };
-
-  //             await saveOrderToDatabase(foodOrderDetails);
-  //           }
-  //         }
-
-  //         clearCart();
-  //         setTimeout(() => {
-  //           window.location.href = '/';
-  //         }, 2000);
-  //       } else {
-  //         handlePaymentFailure();
-  //       }
-  //     } else {
-  //       console.error('Unsupported payment method.');
-  //     }
-  //   } catch (error) {
-  //     console.error('Error in handlePayment:', error);
-  //     alert('An error occurred while processing the payment.');
-  //   }
-  // };
-
-  // const initiateMpesaPayment = async (phoneNumber, amount) => {
-  //   try {
-  //     // Step 1: Initiate payment
-  //     const response = await axios.post(`${config.backendUrl}/api/mpesa/pay`, {
-  //       phoneNumber,
-  //       amount
-  //     }, {
-  //       headers: {
-  //         'Content-Type': 'application/json'
-  //       }
-  //     });
-  
-  //     if (response.status === 200) {
-  //       const data = response.data;
-  
-  //       if (data.ResponseCode === '0') {
-  //         alert(data.CustomerMessage);
-  
-  //         // Step 2: Wait for payment confirmation
-  //         const paymentResult = await waitForPaymentConfirmation(data.CheckoutRequestID);
-  //         return paymentResult; // Return the payment result
-  //       } else {
-  //         console.error('Payment failed:', data.ResponseDescription);
-  //         alert('Payment failed. Please try again.');
-  //         return null;
-  //       }
-  //     } else {
-  //       console.error('Failed to initiate payment:', response.statusText);
-  //       alert('Error initiating M-Pesa payment. Please try again.');
-  //       return null;
-  //     }
-  //   } catch (error) {
-  //     console.error('Error initiating M-Pesa payment:', error);
-  //     alert('Error initiating M-Pesa payment. Please try again.');
-  //     return null;
-  //   }
-  // };
-  
   const handlePayment = async (method) => {
     try {
       if (method === 'mpesa') {
@@ -275,7 +163,7 @@ const OrderSummaryModal = ({
           alert('Please enter a valid phone number.');
           return;
         }
-  
+
         // Step 2: Prompt for payment amount
         let amount;
         let validAmount = false;
@@ -287,26 +175,24 @@ const OrderSummaryModal = ({
             validAmount = true;
           }
         }
-  
-        // Step 3: Initiate payment and wait for confirmation
+
+        // Step 3: Initiate payment and wait for confirmation      
         const paymentResponse = await initiateMpesaPayment(paymentPhoneNumber, amount);
-  
-        // If payment was successful, proceed with order processing
+
         if (paymentResponse && paymentResponse.success) {
-          alert('Payment successful!');
-          setShowPaymentModal(false);
-  
+          alert('Payment successful! Proceeding with your order...');
+
           // Retrieve readable address
           const address = await getReadableAddress(pinnedLocation.lat, pinnedLocation.lng);
-  
-          // Process orders
+
+          // Process orders (based on single/multiple vendors)
           if (isSingleVendor) {
             const [vendor] = Object.keys(foodOrdersByVendor);
             const vendorFoodsPrice = foodOrdersByVendor[vendor].foods.reduce(
               (total, food) => total + food.price * food.quantity,
               0
             );
-  
+
             const foodOrderDetails = {
               phoneNumber: contactNumber,
               selectedVendor: vendor,
@@ -316,7 +202,7 @@ const OrderSummaryModal = ({
               deliveryCharges,
               totalPrice: vendorFoodsPrice + deliveryCharges,
             };
-  
+
             await saveOrderToDatabase(foodOrderDetails);
           } else {
             for (const [vendor, vendorFoods] of Object.entries(foodOrdersByVendor)) {
@@ -324,21 +210,21 @@ const OrderSummaryModal = ({
                 (total, food) => total + food.price * food.quantity,
                 0
               );
-  
+
               const foodOrderDetails = {
                 phoneNumber: contactNumber,
                 selectedVendor: vendor,
                 customerLocation: address,
                 expectedDeliveryTime: selectedTime,
                 foods: vendorFoods.foods,
-                deliveryCharges, // Adjust for each vendor if needed
+                deliveryCharges,
                 totalPrice: vendorFoodsPrice + deliveryCharges,
               };
-  
+
               await saveOrderToDatabase(foodOrderDetails);
             }
           }
-  
+
           // Clear the cart and redirect
           clearCart();
           setTimeout(() => {
@@ -348,14 +234,14 @@ const OrderSummaryModal = ({
           alert('Payment failed or was canceled. Please try again.');
         }
       } else {
-        console.error('Unsupported payment method.');
+        alert('Unsupported payment method.');
       }
     } catch (error) {
       console.error('Error in handlePayment:', error);
       alert('An error occurred while processing the payment.');
     }
   };
-  
+
   const initiateMpesaPayment = async (phoneNumber, amount) => {
     try {
       // Step 1: Initiate M-Pesa payment
@@ -364,16 +250,23 @@ const OrderSummaryModal = ({
         { phoneNumber, amount },
         { headers: { 'Content-Type': 'application/json' } }
       );
-  
+
       if (response.status === 200) {
         const data = response.data;
-  
+
         if (data.ResponseCode === '0') {
-          alert("Payment Process initiated, Please Enter your Pin. After Payment confirmation SMS has been recieved on your Phone Press OK to continue");
-  
+          alert('Payment process initiated. Check your phone to complete payment. Click OK after payment is confirmed.');
+
           // Step 2: Wait for payment confirmation
           const paymentResult = await waitForPaymentConfirmation(data.CheckoutRequestID);
-          return paymentResult; // Return the result of payment confirmation
+
+          if (paymentResult.success) {
+            alert('Payment confirmed!');
+          } else {
+            alert(paymentResult.message);
+          }
+
+          return paymentResult;
         } else {
           alert('Payment initiation failed. Please try again.');
           return { success: false, message: data.ResponseDescription };
@@ -384,15 +277,15 @@ const OrderSummaryModal = ({
       }
     } catch (error) {
       console.error('Error initiating M-Pesa payment:', error);
-      alert('Error initiating M-Pesa payment. Please try again.');
+      alert('Network error. Please try again.');
       return { success: false, message: 'Network error.' };
     }
   };
-  
+
   const waitForPaymentConfirmation = async (checkoutRequestID) => {
     const maxRetries = 10; // Maximum retries
     const retryInterval = 5000; // Retry interval in milliseconds
-  
+
     for (let attempt = 0; attempt < maxRetries; attempt++) {
       try {
         const statusResponse = await axios.post(
@@ -400,9 +293,9 @@ const OrderSummaryModal = ({
           { CheckoutRequestID: checkoutRequestID },
           { headers: { 'Content-Type': 'application/json' } }
         );
-  
+
         const statusData = statusResponse.data;
-  
+
         if (statusData.ResultCode === '0') {
           return { success: true, message: statusData.ResultDesc };
         } else if (statusData.ResultCode === '1032') {
@@ -410,18 +303,18 @@ const OrderSummaryModal = ({
         } else if (statusData.ResultCode === '1') {
           return { success: false, message: 'Payment failed.' };
         }
-  
+
         // If payment is pending, wait and retry
         await new Promise((resolve) => setTimeout(resolve, retryInterval));
       } catch (error) {
         console.error('Error checking payment status:', error);
       }
     }
-  
+
+    // Timeout if no confirmation after retries
     return { success: false, message: 'Payment confirmation timed out.' };
   };
-  
-  
+
 
   const saveOrderToDatabase = async (foodOrderDetails) => {
     const maxRetries = 5; // Maximum number of retry attempts
