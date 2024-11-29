@@ -164,18 +164,27 @@ const OrderSummaryModal = ({
           return;
         }
 
+        // // Step 2: Prompt for payment amount
+        // let amount;
+        // let validAmount = false;
+        // while (!validAmount) {
+        //   amount = prompt('Enter the amount to pay:', grandTotal);
+        //   if (isNaN(amount) || amount <= 0 || amount.includes('.') || !Number.isInteger(Number(amount))) {
+        //     alert('Please enter a valid whole number.');
+        //   } else {
+        //     validAmount = true;
+        //   }
+        // }
+        
         // Step 2: Prompt for payment amount
-        let amount;
-        let validAmount = false;
-        while (!validAmount) {
-          amount = prompt('Enter the amount to pay:', grandTotal);
-          if (isNaN(amount) || amount <= 0 || amount.includes('.') || !Number.isInteger(Number(amount))) {
-            alert('Please enter a valid whole number.');
-          } else {
-            validAmount = true;
+          let amount;
+          let validAmount = false;
+          while (!validAmount) {
+            // Round grandTotal to the nearest whole number and display it
+            amount = Math.round(grandTotal);
+            alert(`The Total Bill amount to Pay is ${amount}. Please Click OK to Proceed for Payment.`);
+            validAmount = true; // Exit the loop since the amount is fixed
           }
-        }
-
         // Step 3: Initiate payment and wait for confirmation      
         const paymentResponse = await initiateMpesaPayment(paymentPhoneNumber, amount);
 
