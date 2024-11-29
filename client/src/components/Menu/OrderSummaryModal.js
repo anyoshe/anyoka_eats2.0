@@ -131,13 +131,24 @@ const OrderSummaryModal = ({ show, handleClose, restaurantName, orderedDishes = 
             return;
           }
 
-          // Step 2: Prompt for amount
-          const amount = prompt('Enter the amount to pay:', grandTotal);
-          if (isNaN(amount) || amount <= 0) {
-            alert('Please enter a valid amount.');
-            return;
+          // // Step 2: Prompt for amount
+          // const amount = prompt('Enter the amount to pay:', grandTotal);
+          // if (isNaN(amount) || amount <= 0) {
+          //   alert('Please enter a valid amount.');
+          //   return;
+          // }
+          // Step 2: Calculate and confirm the payment amount
+          const amount = Math.round(grandTotal); // Automatically round to the nearest whole number
+          alert(`The Total Bill amount to Pay is ${amount}. Please Click OK to Proceed for Payment.`);
+
+          // Proceed with further logic
+          if (amount <= 0 || isNaN(amount)) {
+            alert('Error: Invalid payment amount.');
+            return; // Exit early if an unexpected issue arises
           }
 
+          // Continue with payment processing
+          console.log(`Proceeding with payment of ${amount}`);
           // Step 3: Initiate payment and wait for confirmation
           const paymentResponse = await initiateMpesaPayment(paymentPhoneNumber, amount);
           if (paymentResponse && paymentResponse.success) {
