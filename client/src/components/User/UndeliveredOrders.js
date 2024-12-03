@@ -73,9 +73,9 @@ const UndeliveredOrders = ({ partner }) => {
     });
   
     setExpectedSales(expectedSalesTotal);
-    setExpectedCommission(expectedSalesTotal * 0.1); // 10% margin
+    setExpectedCommission(expectedSalesTotal * 0.05); // 10% margin
     setTotalSales(deliveredSalesTotal);
-    setCommissionDue(deliveredSalesTotal * 0.1); // 10% margin
+    setCommissionDue(deliveredSalesTotal * 0.05); // 10% margin
     setTotalDeliveries(deliveriesCount);
   };
   
