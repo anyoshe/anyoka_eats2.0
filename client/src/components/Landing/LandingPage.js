@@ -350,7 +350,7 @@ const LandingPage = () => {
                     <div className="featuredFood featured">
                         {getTopRatedDishes().length > 0 ? (
                             getTopRatedDishes().map(dish => (
-                                <DishCardLand key={dish.dishCode} dish={dish} source="featured" />
+                                <DishCard key={dish.dishCode} dish={dish} source="featured" />
                             ))
                         ) : (
                             <p>No featured dishes available at the moment. Please check back later.</p>

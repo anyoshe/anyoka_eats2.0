@@ -63,10 +63,11 @@ const UndeliveredOrders = ({ partner }) => {
     let deliveriesCount = 0;
   
     orders.forEach(order => {
+      const netTotal = order.totalPrice - order.deliveryCharges; // Exclude delivery charges
       if (order.status !== 'Delivered') {
-        expectedSalesTotal += order.totalPrice;
+        expectedSalesTotal += netTotal;
       } else {
-        deliveredSalesTotal += order.totalPrice;
+        deliveredSalesTotal += netTotal;
         deliveriesCount += 1;
       }
     });
