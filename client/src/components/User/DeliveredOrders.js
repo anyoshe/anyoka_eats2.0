@@ -54,7 +54,8 @@ const DeliveredOrders = ({ partner }) => {
   };
 
   const calculateTotals = (orders) => {
-    const totalSales = orders.reduce((acc, order) => acc + order.totalPrice, 0);
+    // const totalSales = orders.reduce((acc, order) => acc + order.totalPrice, 0);
+    const totalSales = orders.reduce((acc, order) => acc + (order.totalPrice - order.deliveryCharges), 0);
     const commissionDue = totalSales * 0.1;
     const totalDeliveries = orders.length;
 
@@ -88,7 +89,8 @@ const DeliveredOrders = ({ partner }) => {
       <td>{order.dishes.map(dish => dish.dishCode).join(", ")}</td>
       <td>{order.createdAt.split('T')[0]}</td>
       <td>{order.selectedRestaurant}</td>
-      <td>Kes.{order.totalPrice}.00</td>
+      {/* <td>Kes.{order.totalPrice}.00</td> */}
+      <td>Kes.{order.totalPrice - order.deliveryCharges}.00</td>
       {/* <td>{order.driverDetails ? order.driverDetails.name : 'N/A'}</td> */}
       {/* <td>{order.driverDetails ? order.driverDetails.contactNumber : 'N/A'}</td> */}
     </tr>
