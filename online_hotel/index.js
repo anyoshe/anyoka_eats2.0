@@ -93,6 +93,47 @@ app.use((req, res, next) => {
   next();
 });
 
+
+// Require the http and socket.io modules
+const http = require('http');
+const { Server } = require('socket.io');
+
+// Wrap the Express app with the HTTP server
+const server = http.createServer(app);
+
+// Initialize Socket.IO
+const io = new Server(server, {
+  cors: {
+    origin: '*', // Adjust this for production (e.g., your frontend URL)
+    methods: ['GET', 'POST'],
+  },
+});
+
+// Track connected partners
+const connectedPartners = {};
+
+// Socket.IO connection handler
+io.on('connection', (socket) => {
+  console.log('A user connected:', socket.id);
+
+  // Partner registers their ID
+  socket.on('registerPartner', (partnerId) => {
+    connectedPartners[partnerId] = socket.id; // Map partner ID to the socket ID
+    console.log(`Partner registered: ${partnerId}`);
+  });
+
+  // Handle partner disconnect
+  socket.on('disconnect', () => {
+    const partnerId = Object.keys(connectedPartners).find(key => connectedPartners[key] === socket.id);
+    if (partnerId) {
+      delete connectedPartners[partnerId];
+      console.log(`Partner disconnected: ${partnerId}`);
+    }
+  });
+});
+
+// Export the io object for use in your routes
+module.exports = io;
 // Database Connection Events
 database.on('error', (error) => {
   console.log(error);
