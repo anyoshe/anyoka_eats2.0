@@ -84,13 +84,12 @@ const DeliveredOrders = ({ partner }) => {
 
   const createSalesElement = (order) => (
     <tr key={order.orderId} id={`sale-${order.orderId}`} className="salesDetails">
-      <td>{order.orderId}</td>
-      {/* <td>{order.dishCode}</td> */}
-      <td>{order.dishes.map(dish => dish.dishCode).join(", ")}</td>
+      {/* <td>{order.orderId}</td> */}
       <td>{order.createdAt.split('T')[0]}</td>
-      <td>{order.selectedRestaurant}</td>
-      {/* <td>Kes.{order.totalPrice}.00</td> */}
-      <td>Kes.{order.totalPrice - order.deliveryCharges}.00</td>
+      <td className='tableRes'>{order.selectedRestaurant}</td>
+      <td>Kes.{order.totalPrice}.00</td>
+      <td className='saleCode'>{order.dishes.map(dish => dish.dishCode).join(", ")}</td>
+      {/* <td>{order.dishCode}</td> */}
       {/* <td>{order.driverDetails ? order.driverDetails.name : 'N/A'}</td> */}
       {/* <td>{order.driverDetails ? order.driverDetails.contactNumber : 'N/A'}</td> */}
     </tr>
@@ -107,22 +106,22 @@ const DeliveredOrders = ({ partner }) => {
           <thead>
             <tr>
               {/* <th>Sales Number</th> */}
-              {/* <th>Dish Code</th> */}
-              <th>
+              <th className='saleTh saleDate'>
                 Date
                 <select id="dateFilter" value={filterDate} onChange={handleDateFilterChange}>
                   <option value="">All Dates</option>
                   {uniqueDates.map(date => <option key={date} value={date}>{date}</option>)}
                 </select>
               </th>
-              <th>
+              <th className='saleTh'>
                 Restaurant
                 <select id="restaurantFilter" value={filterRestaurant} onChange={handleRestaurantFilterChange}>
-                  <option value="">All Restaurants</option>
+                  <option value="" className='saleOption'>All Restaurants</option>
                   {uniqueRestaurants.map(restaurant => <option key={restaurant} value={restaurant}>{restaurant}</option>)}
                 </select>
               </th>
-              <th>Sales Amount</th>
+              <th className='saleTh'>Sales Amount</th>
+              <th className='saleTh saleCode'>Dish Code</th>
               {/* <th>Driver Name</th> */}
               {/* <th>Driver Contact</th> */}
             </tr>
