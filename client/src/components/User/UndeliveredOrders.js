@@ -63,18 +63,19 @@ const UndeliveredOrders = ({ partner }) => {
     let deliveriesCount = 0;
   
     orders.forEach(order => {
+      const netTotal = order.totalPrice - order.deliveryCharges; // Exclude delivery charges
       if (order.status !== 'Delivered') {
-        expectedSalesTotal += order.totalPrice;
+        expectedSalesTotal += netTotal;
       } else {
-        deliveredSalesTotal += order.totalPrice;
+        deliveredSalesTotal += netTotal;
         deliveriesCount += 1;
       }
     });
   
     setExpectedSales(expectedSalesTotal);
-    setExpectedCommission(expectedSalesTotal * 0.1); // 10% margin
+    setExpectedCommission(expectedSalesTotal * 0.05); // 10% margin
     setTotalSales(deliveredSalesTotal);
-    setCommissionDue(deliveredSalesTotal * 0.1); // 10% margin
+    setCommissionDue(deliveredSalesTotal * 0.05); // 10% margin
     setTotalDeliveries(deliveriesCount);
   };
   

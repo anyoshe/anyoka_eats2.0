@@ -54,8 +54,9 @@ const DeliveredOrders = ({ partner }) => {
   };
 
   const calculateTotals = (orders) => {
-    const totalSales = orders.reduce((acc, order) => acc + order.totalPrice, 0);
-    const commissionDue = totalSales * 0.1;
+    // const totalSales = orders.reduce((acc, order) => acc + order.totalPrice, 0);
+    const totalSales = orders.reduce((acc, order) => acc + (order.totalPrice - order.deliveryCharges), 0);
+    const commissionDue = totalSales * 0.05;
     const totalDeliveries = orders.length;
 
     setTotalSales(totalSales);

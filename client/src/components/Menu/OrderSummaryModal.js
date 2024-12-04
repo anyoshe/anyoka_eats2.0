@@ -74,25 +74,25 @@ const OrderSummaryModal = ({ show, handleClose, restaurantName, orderedDishes = 
 
   const handleConfirmOrder = () => {
 
-      // Check if contact number is provided or the user has signed in with WhatsApp
-      if (!contactNumber) {
-        alert('Please enter your contact number or sign in with WhatsApp.');
-        return; // Prevent further execution
-      }
-      if (!selectedTime) {
-        alert('Please select a delivery time.');
-        return; // Prevent further execution
-      }
+    // Check if contact number is provided or the user has signed in with WhatsApp
+    if (!contactNumber) {
+      alert('Please enter your contact number or sign in with WhatsApp.');
+      return; // Prevent further execution
+    }
+    if (!selectedTime) {
+      alert('Please select a delivery time.');
+      return; // Prevent further execution
+    }
     setShowPaymentModal(true);
   };
 
   const getReadableAddress = async (latitude, longitude) => {
     const url = `https://maps.googleapis.com/maps/api/geocode/json?latlng=${latitude},${longitude}&key=${googleApiKey}`;
-  
+
     try {
       const response = await fetch(url);
       const data = await response.json();
-  
+
       if (data.status === 'OK') {
         const address = data.results[0].formatted_address;
         return address;
@@ -106,266 +106,210 @@ const OrderSummaryModal = ({ show, handleClose, restaurantName, orderedDishes = 
     }
   };
 
-  
+
 
   // Handler for email change
   const handleEmailChange = (event) => {
     setCustomerEmail(event.target.value);
   };
 
+
   const handlePayment = async (method) => {
     switch (method) {
       case 'visa':
         console.log('Processing Visa Card payment...');
+        // Visa payment logic can be added here
         break;
+
       case 'mpesa':
         console.log('Processing M-Pesa payment...');
         try {
+          // Step 1: Prompt for phone number
           const paymentPhoneNumber = prompt('Enter your M-Pesa phone number (format: 254712345678):', '254');
           if (!paymentPhoneNumber || !/^254\d{9}$/.test(paymentPhoneNumber)) {
             alert('Please enter a valid phone number in the format 254712345678.');
             return;
           }
-          const amount = prompt('Enter the amount to pay:', grandTotal);
-          if (isNaN(amount) || amount <= 0) {
-            alert('Please enter a valid amount.');
-            return;
+
+          // // Step 2: Prompt for amount
+          // const amount = prompt('Enter the amount to pay:', grandTotal);
+          // if (isNaN(amount) || amount <= 0) {
+          //   alert('Please enter a valid amount.');
+          //   return;
+          // }
+          // Step 2: Calculate and confirm the payment amount
+          const amount = Math.round(grandTotal); // Automatically round to the nearest whole number
+          alert(`The Total Bill amount to Pay is ${amount}. Please Click OK to Proceed for Payment.`);
+
+          // Proceed with further logic
+          if (amount <= 0 || isNaN(amount)) {
+            alert('Error: Invalid payment amount.');
+            return; // Exit early if an unexpected issue arises
           }
-          const response = await initiateMpesaPayment(paymentPhoneNumber, amount);
-          if (response && response.ResponseCode === '0') {
-            // Success is already handled inside initiateMpesaPayment
-            return; // Ensure early return on success
+
+          // Continue with payment processing
+          console.log(`Proceeding with payment of ${amount}`);
+          // Step 3: Initiate payment and wait for confirmation
+          const paymentResponse = await initiateMpesaPayment(paymentPhoneNumber, amount);
+          if (paymentResponse && paymentResponse.success) {
+            // Payment confirmed, proceed with success handling logic
+            alert('Payment successful! Proceeding with your order...');
+            // Step 4: Handle order details and notifications
+            const address = await getReadableAddress(pinnedLocation.lat, pinnedLocation.lng);
+
+            const orderDetails = {
+              phoneNumber: contactNumber,
+              email: customerEmail,
+              selectedRestaurant: restaurantName,
+              customerLocation: address,
+              expectedDeliveryTime: selectedTime,
+              dishes: orderedDishes,
+              deliveryCharges: deliveryCharges,
+              totalPrice: grandTotal,
+            };
+
+            const savedOrderData = await saveOrderToDatabase(orderDetails);
+
+            try {
+              await sendEmailNotification({
+                ...orderDetails,
+                orderId: savedOrderData.orderId, // Include the orderId from backend
+              });
+            } catch (emailError) {
+              console.error('Error sending email:', emailError);
+            }
+
+
+
+            // Clear cart, close modal, and redirect
+            clearCart();
+            setShowPaymentModal(false);
+            redirectToHomePage();
           } else {
-            handlePaymentFailure();
+            // Payment not confirmed
+            alert(paymentResponse.message || 'Payment not confirmed. Please try again.');
           }
         } catch (error) {
           console.error('M-Pesa payment error:', error);
           alert('Error initiating M-Pesa payment. Please try again.');
-          handlePaymentFailure();
         }
         break;
+
       default:
         console.error('Unsupported payment method.');
         return;
     }
   };
-  
 
   const initiateMpesaPayment = async (phoneNumber, amount) => {
     try {
       const response = await axios.post(`${config.backendUrl}/api/mpesa/pay`, {
         phoneNumber,
-        amount
+        amount,
       }, {
-        headers: {
-          'Content-Type': 'application/json'
-        }
+        headers: { 'Content-Type': 'application/json' },
       });
+
       if (response.status === 200) {
         const data = response.data;
         if (data.ResponseCode === '0') {
-          alert(data.CustomerMessage);
-          await handlePaymentSuccess(data); // Handle success
-          return data; // Ensure it returns after success
+          alert('Payment initiated. Please complete it on your phone. Click OK after payment is confirmed.');
+
+          // Wait for payment confirmation
+          const paymentResult = await waitForPaymentConfirmation(data.CheckoutRequestID);
+
+          if (paymentResult.success) {
+            alert('Payment confirmed!');
+          } else {
+            alert(paymentResult.message);
+          }
+
+          return paymentResult;
         } else {
-          console.error('Payment failed:', data.ResponseDescription);
-          alert('Payment failed. Please try again.');
-          handlePaymentFailure(); // Handle failure
-          return null;
+          alert('Payment initiation failed. Please try again.');
+          return { success: false, message: data.ResponseDescription };
         }
       } else {
-        console.error('Failed to initiate payment:', response.statusText);
-        alert('Error initiating M-Pesa payment. Please try again.');
-        return null;
+        alert('Error initiating M-Pesa payment.');
+        return { success: false, message: 'Failed to initiate payment.' };
       }
     } catch (error) {
       console.error('Error initiating M-Pesa payment:', error);
-      alert('Error initiating M-Pesa payment. Please try again.');
-      return null;
+      alert('Network error. Please try again.');
+      return { success: false, message: 'Network error.' };
     }
   };
-  
-  // const handlePaymentSuccess = async (data) => {
-  //   try {
-  //     const address = await getReadableAddress(pinnedLocation.lat, pinnedLocation.lng);
-  
-  //     // Save the order to the database first
-  //     const orderDetails = {
-  //       phoneNumber: contactNumber,
-  //       selectedRestaurant: restaurantName,
-  //       customerLocation: address,
-  //       expectedDeliveryTime: selectedTime,
-  //       dishes: orderedDishes,
-  //       deliveryCharges: deliveryCharges,
-  //       totalPrice: grandTotal,
-  //     };
-  
-  //     await saveOrderToDatabase(orderDetails); // Save order to the database
-  
-  //     // Send the SMS notification, but catch errors separately
-  //     try {
-  //       await sendSmsNotification(data);
-  //     } catch (smsError) {
-  //       console.error('Error sending SMS:', smsError);
-  //       // SMS failure should not impact the main success flow
-  //     }
-  
-  //     alert('Payment successful! Your order is being processed.');
-  //     clearCart();
-  //     setShowPaymentModal(false);
-  
-  //     // Redirect after successful order processing
-  //     redirectToHomePage();
-  
-  //   } catch (error) {
-  //     console.error('Error during payment success process:', error);
-  //     alert('There was an issue processing your order. Please try again.');
-  //   }
-  // };
-  
-  // // Separate redirection logic into a function
-  // const redirectToHomePage = () => {
-  //   // Delay redirection for 2 seconds to allow user to see the success alert
-  //   setTimeout(() => {
-  //     window.location.href = '/';
-  //   }, 2000);
-  // };
-  
-  // const saveOrderToDatabase = async (orderDetails) => {
-  //   try {
 
-  //   console.log('Sending orderDetails to database:', orderDetails);
+  const waitForPaymentConfirmation = async (checkoutRequestID) => {
+    const maxRetries = 10;
+    const retryInterval = 5000;
 
-  //     // Send the updated orderDetails to the backend
-  //     const response = await fetch(`${config.backendUrl}/api/paidOrder`, {
-  //       method: 'POST',
-  //       headers: {
-  //         'Content-Type': 'application/json',
-  //       },
-  //       body: JSON.stringify(orderDetails)
-  //     });
+    for (let attempt = 0; attempt < maxRetries; attempt++) {
+      try {
+        const statusResponse = await axios.post(`${config.backendUrl}/api/mpesa/status`, {
+          CheckoutRequestID: checkoutRequestID,
+        }, {
+          headers: { 'Content-Type': 'application/json' },
+        });
 
-  //     if (response.ok) {
-  //       const data = await response.json(); 
-  //       console.log('Order saved successfully:', data);
-  //       alert('Order recieved successfully! Your order will be processed and dispatched as soon as possible.');
-      
-  //     } else {
-  //       const error = await response.json();
-  //       console.error('Error saving order:', error);
-  //       alert('Error encountered in recieving your order: ' + error.message);
-  //     }
-  //   } catch (error) {
-  //     console.error('Error saving order:', error);
-  //     alert('Error recieving your order. Please try again.');
-  //   }
-  // };
+        const statusData = statusResponse.data;
 
-  // const sendSmsNotification = async (paymentData) => {
-  //   const smsDetails = {
-  //     phoneNumber: contactNumber,
-  //     message: `Your payment of KSH ${grandTotal.toFixed(2)} was successful! Your order will be delivered to ${pinnedLocation} by ${selectedTime}.`,
-  //   };
-    
-  //   try {
-  //     const response = await axios.post(`${config.backendUrl}/api/sendSms`, smsDetails, {
-  //       headers: {
-  //         'Content-Type': 'application/json',
-  //       },
-  //     });
-      
-  //     if (response.status === 200) {
-  //       console.log('SMS sent successfully:', response.data);
-  //     } else {
-  //       console.error('Failed to send SMS:', response.data);
-  //     }
-  //   } catch (error) {
-  //     console.error('Error sending SMS:', error);
-  //     alert('There was an issue sending the SMS notification. Please check your network and try again.');
-  //   }
-  // };
-
-  const handlePaymentSuccess = async (data) => {
-    try {
-        const address = await getReadableAddress(pinnedLocation.lat, pinnedLocation.lng);
-
-        // Prepare order details with email included
-        const orderDetails = {
-            phoneNumber: contactNumber,
-            email: customerEmail, // Include email here
-            selectedRestaurant: restaurantName,
-            customerLocation: address,
-            expectedDeliveryTime: selectedTime,
-            dishes: orderedDishes,
-            deliveryCharges: deliveryCharges,
-            totalPrice: grandTotal,
-        };
-
-        // Save the order to the database
-        const savedOrderData = await saveOrderToDatabase(orderDetails);
-
-        // Send the email notification with the order ID
-        try {
-            await sendEmailNotification({
-                ...orderDetails,
-                orderId: savedOrderData.orderId // Include the orderId from the backend
-            });
-        } catch (emailError) {
-            console.error('Error sending email:', emailError);
+        if (statusData.ResultCode === '0') {
+          return { success: true, message: statusData.ResultDesc };
+        } else if (statusData.ResultCode === '1032') {
+          return { success: false, message: 'Payment canceled by user.' };
+        } else if (statusData.ResultCode === '1') {
+          return { success: false, message: 'Payment failed. Please try again.' };
         }
 
-        alert('Payment successful! Your order is being processed.');
-        clearCart();
-        setShowPaymentModal(false);
-        redirectToHomePage();
-
-    } catch (error) {
-        console.error('Error during payment success process:', error);
-        alert('There was an issue processing your order. Please try again.');
+        await new Promise((resolve) => setTimeout(resolve, retryInterval));
+      } catch (error) {
+        console.error('Error checking payment status:', error);
+      }
     }
-};
 
-//  Separate redirection logic into a function
+    return { success: false, message: 'Payment confirmation timed out. Please try again.' };
+  };
+
   const redirectToHomePage = () => {
-    // Delay redirection for 2 seconds to allow user to see the success alert
     setTimeout(() => {
       window.location.href = '/';
     }, 2000);
   };
-  
 
-// Update saveOrderToDatabase to retrieve the orderId from the backend response
-const saveOrderToDatabase = async (orderDetails) => {
+
+  // Update saveOrderToDatabase to retrieve the orderId from the backend response
+  const saveOrderToDatabase = async (orderDetails) => {
     try {
-        const response = await fetch(`${config.backendUrl}/api/paidOrder`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(orderDetails)
-        });
+      const response = await fetch(`${config.backendUrl}/api/paidOrder`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(orderDetails)
+      });
 
-        if (response.ok) {
-            const data = await response.json(); // Contains { message, orderId }
-            console.log('Order saved successfully:', data);
-            alert('Order received successfully! Your order will be processed and dispatched as soon as possible.');
-            return data; // Return the data including orderId
-        } else {
-            const error = await response.json();
-            console.error('Error saving order:', error);
-            alert('Error encountered in receiving your order: ' + error.message);
-        }
-    } catch (error) {
+      if (response.ok) {
+        const data = await response.json(); // Contains { message, orderId }
+        console.log('Order saved successfully:', data);
+        alert('Order received successfully! Your order will be processed and dispatched as soon as possible.');
+        return data; // Return the data including orderId
+      } else {
+        const error = await response.json();
         console.error('Error saving order:', error);
-        alert('Error receiving your order. Please try again.');
+        alert('Error encountered in receiving your order: ' + error.message);
+      }
+    } catch (error) {
+      console.error('Error saving order:', error);
+      alert('Error receiving your order. Please try again.');
     }
-};
+  };
 
-// Updated sendEmailNotification to include orderId
-const sendEmailNotification = async (orderDetails) => {
-  console.log(orderDetails); 
+  // Updated sendEmailNotification to include orderId
+  const sendEmailNotification = async (orderDetails) => {
+    console.log(orderDetails);
     const emailDetails = {
-        to: customerEmail,
-        subject: `Order Confirmation - ${orderDetails.orderId}`,
-        body: `
+      to: customerEmail,
+      subject: `Order Confirmation - ${orderDetails.orderId}`,
+      body: `
             <p>Dear Customer,</p>
             <p>Thank you for your order from ${orderDetails.selectedRestaurant}.</p>
             <p>Your order has been successfully placed and will be delivered to ${orderDetails.customerLocation} by ${orderDetails.expectedDeliveryTime}.</p>
@@ -377,20 +321,20 @@ const sendEmailNotification = async (orderDetails) => {
     };
 
     try {
-        const response = await axios.post(`${config.backendUrl}/api/sendConfirmationEmail`, emailDetails, {
-            headers: { 'Content-Type': 'application/json' },
-        });
+      const response = await axios.post(`${config.backendUrl}/api/sendConfirmationEmail`, emailDetails, {
+        headers: { 'Content-Type': 'application/json' },
+      });
 
-        if (response.status === 200) {
-            console.log('Email sent successfully:', response.data);
-        } else {
-            console.error('Failed to send email:', response.data);
-        }
+      if (response.status === 200) {
+        console.log('Email sent successfully:', response.data);
+      } else {
+        console.error('Failed to send email:', response.data);
+      }
     } catch (error) {
-        console.error('Error sending email:', error);
-        alert('There was an issue sending the email notification. Please check your network and try again.');
+      console.error('Error sending email:', error);
+      alert('There was an issue sending the email notification. Please check your network and try again.');
     }
-};
+  };
 
   const clearCart = () => {
     const cartItemsElement = document.getElementById('cartItems');
@@ -404,7 +348,7 @@ const sendEmailNotification = async (orderDetails) => {
     if (totalPriceElement) totalPriceElement.textContent = 'KES 0.00';
     if (cartCountElement) cartCountElement.textContent = '0';
   };
-  
+
 
   const handlePaymentFailure = () => {
     const retry = window.confirm('Payment transfer failed! Would you like to try again?');
@@ -417,18 +361,18 @@ const sendEmailNotification = async (orderDetails) => {
         saveOrderForLater();
       } else {
         alert('Order has been canceled. Your cart will remain saved.');
-        
+
       }
 
       setShowPaymentModal(false);
-    } 
-    
+    }
+
     setTimeout(() => {
-          window.location.href = '/';
-        }, 2000);
+      window.location.href = '/';
+    }, 2000);
   };
   const saveOrderForLater = () => {
-    const address =  getReadableAddress(pinnedLocation.lat, pinnedLocation.lng);
+    const address = getReadableAddress(pinnedLocation.lat, pinnedLocation.lng);
     const orderDetails = {
       phoneNumber: contactNumber,
       selectedRestaurant: restaurantName,
@@ -441,7 +385,7 @@ const sendEmailNotification = async (orderDetails) => {
     localStorage.setItem('savedOrder', JSON.stringify(orderDetails));
   };
 
-  
+
 
   return (
     <>
@@ -464,7 +408,7 @@ const sendEmailNotification = async (orderDetails) => {
                   required
                 />
               </div>
-            
+
               <div className="form-group my-3">
                 <label htmlFor="email" className='summary'>Your Email</label>
                 <input
@@ -496,7 +440,7 @@ const sendEmailNotification = async (orderDetails) => {
                     <div>
 
                       <h6 className="my-0">{dish.dishName}</h6>
-                      
+
                       {/* <small className="text-muted">{dish.dishDescription}</small> */}
                     </div>
                     <span className="text-muted">{dish.quantity} x KSH {dish.price.toFixed(2)}</span>
