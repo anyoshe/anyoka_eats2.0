@@ -20,6 +20,10 @@ const axios = require('axios');
 const { type } = require("os");
 require('dotenv').config();
 const nodemailer = require('nodemailer');
+// const io = require('socket.io')(server);
+const io = require('../index');
+
+
 const JWT_SECRET = process.env.JWT_SECRET;
 const RESET_PASSWORD_SECRET = process.env.RESET_PASSWORD_SECRET;
 const RESET_PASSWORD_EXPIRY = process.env.RESET_PASSWORD_EXPIRY;
@@ -1321,7 +1325,33 @@ router.post('/paidOrder', async (req, res) => {
 
     // Save order to database
     const savedOrder = await saveOrder(orderDetails);
+ 
+    // Fetch the restaurant and partner details
+    const restaurant = await Restaurant.findOne({ restaurant: orderDetails.selectedRestaurant }).populate('partnerId');
 
+    if (!restaurant) {
+      return res.status(404).json({ error: 'Restaurant not found' });
+    }
+
+    // // Notify the partner
+    // if (restaurant.partnerId) {
+    //   io.to(restaurant.partnerId.toString()).emit('newOrder', {
+    //     message: 'You have a new order!',
+    //     orderId: savedOrder.orderId,
+    //     details: orderDetails,
+    //   });
+    // }
+
+     // Notify the partner
+     if (restaurant.partnerId && connectedPartners[restaurant.partnerId.toString()]) {
+      const partnerSocketId = connectedPartners[restaurant.partnerId.toString()];
+      io.to(partnerSocketId).emit('newOrder', {
+        message: 'You have a new order!',
+        orderId: savedOrder.orderId,
+        details: orderDetails,
+      });
+      console.log(`Notification sent to partner: ${restaurant.partnerId}`);
+    }
     // Return order ID in the response
     res.status(200).json({
       message: 'Order saved successfully',
