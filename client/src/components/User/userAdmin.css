@@ -749,11 +749,69 @@ table th {
 }
 
 @media(max-width:320px){
+  .saleTh {
+    padding: 5px;
+    font-size: 0.7rem;
+    width: 2rem;
+  }
 
+  .saleDate{
+    width: 2rem;
+  }
+
+  table th, table td {
+    padding: 5px;
+    font-size: 0.8rem;
+  }
+
+  .saleOption{
+    font-size: 0.7rem;
+    width: 2rem;
+  }
+
+  .tableRes{
+    width: 1rem;
+    font-size: 0.7rem;
+  }
+
+  .saleCode{
+    width: 2.5rem;
+  }
 }
 
 
 @media(max-width:480px){
+  .saleTh {
+    padding: 5px;
+    font-size: 0.7rem;
+    width: 2rem;
+  }
+
+  .saleDate{
+    width: 2rem;
+  }
+
+  table th, table td {
+    padding: 5px;
+    font-size: 0.7rem;
+  }
+
+  .saleOption{
+    font-size: 0.7rem;
+    width: 2rem;
+  }
+
+  .tableRes{
+    width: 1rem;
+    font-size: 0.7rem;
+  }
+
+  .saleCode{
+    width: 2.5rem;
+  }
+
+
+
   .dayOrders{
     /* border: 5px dotted blue; */
 
