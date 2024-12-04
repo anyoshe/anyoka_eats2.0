@@ -208,11 +208,11 @@ router.post('/login', async (req, res) => {
 
     // // Send the token and partner details to the client
     // res.json({ token, partner });
-     // Generate a JWT token
-     const token = jwt.sign({ _id: partner._id, role: partner.role }, process.env.JWT_SECRET, { expiresIn: '1h' });
+    // Generate a JWT token
+    const token = jwt.sign({ _id: partner._id, role: partner.role }, process.env.JWT_SECRET, { expiresIn: '1h' });
 
-     // Send the token, role, and partner details to the client
-     res.json({ token, partner, role: partner.role });
+    // Send the token, role, and partner details to the client
+    res.json({ token, partner, role: partner.role });
   } catch (err) {
     res.status(500).send(err.message);
   }
@@ -1364,7 +1364,7 @@ async function saveOrder(orderDetails) {
   try {
     const savedOrder = await order.save();
     return savedOrder; // Return the saved order to access its fields
-    
+
     // console.log('Order saved successfully');
   } catch (error) {
     console.error('Error saving order:', error);
@@ -2340,7 +2340,7 @@ router.post('/driverLogin', async (req, res) => {
     // Compare the password
     const isMatch = await bcrypt.compare(password, driver.password);
     console.log('Password match result:', isMatch);
-    
+
     if (!isMatch) {
       console.log('Invalid credentials for ID:', IDNumber);
       return res.status(400).json({ message: 'Invalid credentials' });
@@ -2554,12 +2554,12 @@ router.post('/update-earnings', async (req, res) => {
 router.get('/driverEarnings', async (req, res) => {
   try {
     const earningsData = await DailyEarnings.find();
-    
+
     // If no earnings found
     if (!earningsData || earningsData.length === 0) {
       return res.status(404).json({ message: 'No earnings found' });
     }
-    
+
     // Send the earnings data as the response
     res.status(200).json(earningsData);
   } catch (error) {
@@ -2651,8 +2651,8 @@ router.post('/mpesa/pay', async (req, res) => {
     const timestamp = generateTimestamp();
     console.log('Generated timestamp:', timestamp);
 
-    // Fetch access token
-    const authResponse = await axios.get('https://sandbox.safaricom.co.ke/oauth/v1/generate?grant_type=client_credentials', {
+    // Fetch access token 
+    const authResponse = await axios.get('https://api.safaricom.co.ke/oauth/v1/generate?grant_type=client_credentials', {
       headers: {
         'Authorization': `Basic ${Buffer.from(`${consumerKey}:${consumerSecret}`).toString('base64')}`
       }
@@ -2677,14 +2677,14 @@ router.post('/mpesa/pay', async (req, res) => {
       PartyB: shortcode,
       PhoneNumber: phoneNumber,
       CallBackURL: `${ngrokUrl}/mpesa/callback`,
-      AccountReference: 'Test123',
-      TransactionDesc: 'Test Payment'
+      AccountReference: 4148059,
+      TransactionDesc: 'Order Payment'
     };
 
     console.log('Payment Data:', paymentData);
 
-    // Initiate payment
-    const paymentResponse = await axios.post('https://sandbox.safaricom.co.ke/mpesa/stkpush/v1/processrequest', paymentData, {
+    // Initiate payment 
+    const paymentResponse = await axios.post('https://api.safaricom.co.ke/mpesa/stkpush/v1/processrequest', paymentData, {
       headers: {
         'Authorization': `Bearer ${access_token}`,
         'Content-Type': 'application/json'
@@ -2699,90 +2699,48 @@ router.post('/mpesa/pay', async (req, res) => {
   }
 });
 
-// Example route to handle sending receipts
-// router.post('/send-receipt', async (req, res) => {
-//   try {
-//     // Implement logic to send receipt here
-//     const { phoneNumber, amount } = req.body;
+router.post('/mpesa/status', async (req, res) => {
+  const { CheckoutRequestID } = req.body; // The ID from the payment initiation response
+  console.log('Checking payment status for:', CheckoutRequestID);
 
-//     // Example logic to send receipt via SMS or any other method
-//     const receiptSent = await sendReceiptMessage(phoneNumber, amount);
+  try {
+    // Fetch access token
+    const authResponse = await axios.get('https://api.safaricom.co.ke/oauth/v1/generate?grant_type=client_credentials', {
+      headers: {
+        'Authorization': `Basic ${Buffer.from(`${consumerKey}:${consumerSecret}`).toString('base64')}`
+      }
+    });
 
-//     // Respond with success message
-//     res.status(200).json({ message: 'Receipt sent successfully' });
-//   } catch (error) {
-//     console.error('Error sending receipt:', error);
-//     res.status(500).json({ error: 'Failed to send receipt' });
-//   }
-// });
+    const { access_token } = authResponse.data;
+    if (!access_token) {
+      throw new Error('Failed to fetch access token');
+    }
 
-// // Function to send receipt
-// async function sendReceipt(phoneNumber, amount) {
-//   const message = `Thank you for your payment of KES ${amount}. Your order is being processed.`;
-//   // Logic to send SMS (you can use a service like Twilio or any other SMS gateway)
-//   await axios.post('https://sms-gateway-api/send', {
-//     to: phoneNumber,
-//     message: message
-//   });
-// }
-// Example of SMS sending route
-// router.post('/sendSms', async (req, res) => {
-//   const { phoneNumber, message } = req.body;
-//   console.log(phoneNumber, message);
-//   // Your logic for sending SMS goes here
-//   try {
-//     // Call your SMS sending service (like Twilio or any other)
-//     const smsResponse = await sendSmsService(phoneNumber, message);
-//     res.status(200).json(smsResponse);
-//   } catch (error) {
-//     console.error('Error sending SMS:', error);
-//     res.status(500).json({ error: 'Failed to send SMS' });
-//   }
-// });
-// // Import Africa's Talking SDK
-// const africastalking = require('africastalking')({
-//   apiKey: process.env.SMSAPIKEY,  // Replace with your Africa's Talking API Key
-//   username: 'sandbox' // Replace with your Africa's Talking username
-// });
+    console.log('Access Token:', access_token);
 
-// // Access the SMS service
-// const sms = africastalking.SMS;
+    // Payment status request data
+    const statusRequestData = {
+      BusinessShortCode: shortcode,
+      Password: Buffer.from(`${shortcode}${passkey}${generateTimestamp()}`).toString('base64'),
+      Timestamp: generateTimestamp(),
+      CheckoutRequestID: CheckoutRequestID
+    };
 
-// // Function to send M-Pesa payment receipt via SMS
-// async function sendReceipt(phoneNumber, amount) {
-//   // Message to be sent to the user
-//   const message = `Thank you for your payment of KES ${amount}. Your order is being processed.`;
+    // Query payment status
+    const statusResponse = await axios.post('https://api.safaricom.co.ke/mpesa/stkpushquery/v1/query', statusRequestData, {
+      headers: {
+        'Authorization': `Bearer ${access_token}`,
+        'Content-Type': 'application/json'
+      }
+    });
 
-//   const options = {
-//     to: [phoneNumber],  // The recipient's phone number (e.g., +2547XXXXXXXX)
-//     message: message,   // The receipt message
-//     from: 'YourShortCodeOrSenderID' // Optional. Specify if you have a short code or sender ID
-//   };
-
-//   try {
-//     // Send the SMS using Africa's Talking
-//     const response = await sms.send(options);
-//     console.log('SMS Sent Successfully:', response);
-//   } catch (error) {
-//     console.error('Failed to send SMS:', error);
-//   }
-// }
-
-// Example use case
-// async function processPaymentAndSendReceipt(paymentDetails, userPhoneNumber) {
-//   // Simulate successful payment processing
-//   const paymentSuccess = true;  // Replace with actual payment logic
-
-//   if (paymentSuccess) {
-//     // Send the receipt after successful payment
-//     await sendReceipt(userPhoneNumber, paymentDetails.amount);
-//   }
-// }
-
-// // Example test case
-// const paymentDetails = { amount: 500 };
-// const userPhoneNumber = "+2547XXXXXXXX";  // Replace with the user's phone number
-// processPaymentAndSendReceipt(paymentDetails, userPhoneNumber);
+    console.log('Payment Status Response:', statusResponse.data);
+    res.json(statusResponse.data);
+  } catch (error) {
+    console.error('Error checking payment status:', error.response ? error.response.data : error.message);
+    res.status(500).json({ error: 'Failed to check payment status', details: error.message });
+  }
+});
 
 
 // TESTMONIALS SECTION 
@@ -2838,31 +2796,31 @@ router.post('/driverForgotPassword', async (req, res) => {
   console.log(email, idNumber); // For debugging
 
   try {
-      // Find driver by IDNumber
-      const driver = await Driver.findOne({ IDNumber: idNumber }); // Find driver by both email and IDNumber
-      if (!driver) {
-          return res.status(404).json({ message: 'Driver with this email and IDNumber does not exist.' });
-      }
-     console.log(driver)
-     console.log(driver._id)
-      // Generate a reset token with driver ID
-      const resetToken = jwt.sign({ driverId: driver._id, idNumber: driver.IDNumber}, RESET_PASSWORD_SECRET, { expiresIn: RESET_PASSWORD_EXPIRY });
+    // Find driver by IDNumber
+    const driver = await Driver.findOne({ IDNumber: idNumber }); // Find driver by both email and IDNumber
+    if (!driver) {
+      return res.status(404).json({ message: 'Driver with this email and IDNumber does not exist.' });
+    }
+    console.log(driver)
+    console.log(driver._id)
+    // Generate a reset token with driver ID
+    const resetToken = jwt.sign({ driverId: driver._id, idNumber: driver.IDNumber }, RESET_PASSWORD_SECRET, { expiresIn: RESET_PASSWORD_EXPIRY });
 
-      // Construct the reset link
-      const resetLink = `${process.env.FRONTEND_URL}/reset-password?token=${resetToken}`; // Ensure using backticks for string interpolation
+    // Construct the reset link
+    const resetLink = `${process.env.FRONTEND_URL}/reset-password?token=${resetToken}`; // Ensure using backticks for string interpolation
 
-      // Send email
-      await transporter.sendMail({
-          from: process.env.EMAIL_USER,
-          to: email,
-          subject: 'Password Reset Request',
-          html: `<p>Click the link below to reset your password:</p><a href="${resetLink}">Reset Password</a>`, // Use backticks for HTML template
-      });
+    // Send email
+    await transporter.sendMail({
+      from: process.env.EMAIL_USER,
+      to: email,
+      subject: 'Password Reset Request',
+      html: `<p>Click the link below to reset your password:</p><a href="${resetLink}">Reset Password</a>`, // Use backticks for HTML template
+    });
 
-      res.json({ message: 'Password reset email sent. Please check your inbox.' });
+    res.json({ message: 'Password reset email sent. Please check your inbox.' });
   } catch (error) {
-      console.error('Error sending password reset email:', error);
-      res.status(500).json({ message: 'Error sending password reset email. Please try again.' });
+    console.error('Error sending password reset email:', error);
+    res.status(500).json({ message: 'Error sending password reset email. Please try again.' });
   }
 });
 
@@ -2909,38 +2867,38 @@ router.post('/recover-password', async (req, res) => {
   console.log(req.body);
 
   try {
-      // Find the partner by email and contact number
-      const partner = await Partner.findOne({ contactNumber });
-      if (!partner) {
-          return res.status(404).json({ message: 'Partner not found with this email and contact number.' });
-      }
+    // Find the partner by email and contact number
+    const partner = await Partner.findOne({ contactNumber });
+    if (!partner) {
+      return res.status(404).json({ message: 'Partner not found with this email and contact number.' });
+    }
 
-      console.log(partner);
+    console.log(partner);
 
-      // Generate a reset token with partner ID
-      const resetToken = jwt.sign(
-          { partnerId: partner._id, contactNumber: partner.contactNumber }, 
-          RESET_PASSWORD_SECRET, 
-          { expiresIn: RESET_PASSWORD_EXPIRY }
-      );
+    // Generate a reset token with partner ID
+    const resetToken = jwt.sign(
+      { partnerId: partner._id, contactNumber: partner.contactNumber },
+      RESET_PASSWORD_SECRET,
+      { expiresIn: RESET_PASSWORD_EXPIRY }
+    );
 
-      // Construct the reset link
-      const resetLink = `${process.env.FRONTEND_URL}/reset-partner-password?token=${resetToken}`; // Ensure using backticks for string interpolation
+    // Construct the reset link
+    const resetLink = `${process.env.FRONTEND_URL}/reset-partner-password?token=${resetToken}`; // Ensure using backticks for string interpolation
 
-      
 
-      // Send email with reset link
-      await transporter.sendMail({
-          from: process.env.EMAIL_USER,
-          to: email,
-          subject: 'Password Reset Request',
-          html: `<p>You requested a password reset. Click the link below to reset your password:</p><a href="${resetLink}">Reset Password</a>`, // Use HTML for better formatting
-      });
 
-      res.status(200).json({ message: 'Password reset email sent. Please check your inbox.' });
+    // Send email with reset link
+    await transporter.sendMail({
+      from: process.env.EMAIL_USER,
+      to: email,
+      subject: 'Password Reset Request',
+      html: `<p>You requested a password reset. Click the link below to reset your password:</p><a href="${resetLink}">Reset Password</a>`, // Use HTML for better formatting
+    });
+
+    res.status(200).json({ message: 'Password reset email sent. Please check your inbox.' });
   } catch (error) {
-      console.error('Error in password recovery:', error);
-      res.status(500).json({ message: 'Internal server error' });
+    console.error('Error in password recovery:', error);
+    res.status(500).json({ message: 'Internal server error' });
   }
 });
 
@@ -2949,31 +2907,31 @@ router.post('/reset-partner-password', async (req, res) => {
   const { token, newPassword } = req.body;
 
   try {
-      // Verify the token
-      const decoded = jwt.verify(token, RESET_PASSWORD_SECRET);
-      const { partnerId } = decoded;
+    // Verify the token
+    const decoded = jwt.verify(token, RESET_PASSWORD_SECRET);
+    const { partnerId } = decoded;
 
-      // Find the partner by ID
-      const partner = await Partner.findById(partnerId);
-      if (!partner) {
-          return res.status(404).json({ message: 'Partner not found.' });
-      }
+    // Find the partner by ID
+    const partner = await Partner.findById(partnerId);
+    if (!partner) {
+      return res.status(404).json({ message: 'Partner not found.' });
+    }
 
-      // Hash the new password
-      const salt = await bcrypt.genSalt(10);
-      const hashedPassword = await bcrypt.hash(newPassword, salt);
+    // Hash the new password
+    const salt = await bcrypt.genSalt(10);
+    const hashedPassword = await bcrypt.hash(newPassword, salt);
 
-      // Update the partner's password
-      partner.password = hashedPassword; // Store the hashed password
-      await partner.save();
+    // Update the partner's password
+    partner.password = hashedPassword; // Store the hashed password
+    await partner.save();
 
-      res.status(200).json({ message: 'Password has been reset successfully.' });
+    res.status(200).json({ message: 'Password has been reset successfully.' });
   } catch (error) {
-      if (error.name === 'TokenExpiredError') {
-          return res.status(400).json({ message: 'Reset token has expired. Please request a new one.' });
-      }
-      console.error('Error resetting password:', error);
-      res.status(500).json({ message: 'Failed to reset password. Please try again.' });
+    if (error.name === 'TokenExpiredError') {
+      return res.status(400).json({ message: 'Reset token has expired. Please request a new one.' });
+    }
+    console.error('Error resetting password:', error);
+    res.status(500).json({ message: 'Failed to reset password. Please try again.' });
   }
 });
 
