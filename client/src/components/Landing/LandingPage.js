@@ -17,7 +17,6 @@ import FooterComponent from '../Landing/LandingFooter';
 import FoodCardLand from '../FreshFood/FoodCardLand';
 import DishCardLand from '../Menu/DishCardLand';
 import InstallPrompt from '../Header/InstallPrompt';
-
 // import videoAd from './client/src/assets/images/8477856-hd_1080_1920_24fps.mp4.crdownload';
 
 
@@ -35,6 +34,7 @@ import deliveryParsonImg from '../../assets/images/deliveryPerason.png';
 import profileImg from '../../assets/images/Eliud.jpg';
 import profileImg2 from '../../assets/images/mzeepassport.JPG';
 import videoAd from '../../assets/7218655-hd_1080_1920_25fps.mp4';
+import AdComponent from './AdComponent';
 
 
 const LandingPage = () => {
@@ -46,6 +46,8 @@ const LandingPage = () => {
     const [discountedFoods, setDiscountedFoods] = useState([]);
     const [searchTerm, setSearchTerm] = useState('');
     const [searchResults, setSearchResults] = useState([]);
+    const [topRatedDishes, setTopRatedDishes] = useState([]);
+    const [topRatedFoods, setTopRatedFoods] = useState([]);
 
 
     const handleSearch = async () => {
@@ -88,25 +90,68 @@ const LandingPage = () => {
     }, []);
 
     useEffect(() => {
-        const fetchTopRatedRestaurants = async () => {
+        const fetchTopRatedData = async () => {
             try {
                 const response = await axios.get(`${config.backendUrl}/api/dishes-and-restaurants`);
-                // console.log('Restaurants response:', response.data);
                 const restaurants = response.data.restaurants || [];
+                const dishes = response.data.dishes || [];
 
-                const topRated = [...restaurants].sort((a, b) => b.averageRating - a.averageRating).slice(0, 4);
-                setTopRatedRestaurants(topRated);
+                // Sort and set top-rated restaurants
+                const topRatedRestaurants = [...restaurants]
+                    .sort((a, b) => b.averageRating - a.averageRating)
+                    .slice(0, 4);
+                setTopRatedRestaurants(topRatedRestaurants);
+
+                // Sort and set top-rated dishes
+                const topRatedDishes = [...dishes]
+                    .sort((a, b) => b.averageRating - a.averageRating)
+                    .slice(0, 5);
+                setTopRatedDishes(topRatedDishes);
             } catch (error) {
-                console.error('Error fetching top-rated restaurants:', error);
+                console.error('Error fetching top-rated data:', error);
             }
         };
 
-        fetchTopRatedRestaurants();
+        fetchTopRatedData();
     }, []);
 
-    const getTopRatedDishes = () => {
-        return [...dishes].sort((a, b) => b.averageRating - a.averageRating).slice(0, 5);
-    };
+    useEffect(() => {
+        const fetchTopRatedFoods = async () => {
+            try {
+                const response = await fetch(`${config.backendUrl}/api/foods`);
+                const data = await response.json();
+                console.log('API Response:', data); // Log the full response for debugging
+
+                if (response.ok && Array.isArray(data)) { // Adjust if the response is directly an array
+                    console.log('All Foods:', data); // Log all foods before filtering
+
+                    const sortedTopRatedFoods = data
+                        .filter(food => {
+                            console.log('Checking food:', food); // Log each food for debugging
+                            return food.averageRating !== undefined && !isNaN(food.averageRating);
+                        })
+                        .sort((a, b) => b.averageRating - a.averageRating)
+                        .slice(0, 5);
+
+                    setTopRatedFoods(sortedTopRatedFoods);
+                } else {
+                    console.error('Invalid response format:', data);
+                    setTopRatedFoods([]);
+                }
+
+            } catch (error) {
+                console.error('Error fetching foods:', error);
+                setTopRatedFoods([]);
+            }
+        };
+
+        fetchTopRatedFoods();
+
+    }, []);
+
+
+    // Remove the separate getTopRatedDishes function and rely on the useEffect data
+
 
     const handleMouseOver = () => {
         setDropdownOpen(true);
@@ -138,7 +183,7 @@ const LandingPage = () => {
 
     return (
         <div className="containerDiv">
-            
+
             <div className="logo-CTA">
                 <div className="logoDiv">
                     <h2 className="land_logo">Anyoka Eats</h2>
@@ -174,10 +219,10 @@ const LandingPage = () => {
 
                             {/* Outside Catering */}
                             {/* <Link to={'/outside-catering'}> */}
-                                <div id="disabled" className="serviceDiv">
-                                    <img src={cateringImg} alt="Outside Catering" className="serviceImg" />
-                                    <p>Outside Catering</p>
-                                </div>
+                            <div id="disabled" className="serviceDiv">
+                                <img src={cateringImg} alt="Outside Catering" className="serviceImg" />
+                                <p>Outside Catering</p>
+                            </div>
                             {/* </Link> */}
 
                             {/* Special Order */}
@@ -188,18 +233,18 @@ const LandingPage = () => {
 
                             {/* More */}
                             {/* <Link to={'/user'}> */}
-                                <div id="moreServices" className="serviceDiv">
-                                    <FontAwesomeIcon icon={faPlusSquare} className="faIcons fa-7x more_icon" />
-                                    <p>More</p>
-                                </div>
+                            <div id="moreServices" className="serviceDiv">
+                                <FontAwesomeIcon icon={faPlusSquare} className="faIcons fa-7x more_icon" />
+                                <p>More</p>
+                            </div>
                             {/* </Link> */}
 
                             {/* Conferencing & Meeting */}
                             {/* <Link to={'/conferences'}> */}
-                                <div id="disabled" className="serviceDiv">
-                                    <img src={conferencingImg} alt="Conferencing & Meeting" className="serviceImg" />
-                                    <p id='longConference'>Conference & Meeting</p>
-                                </div>
+                            <div id="disabled" className="serviceDiv">
+                                <img src={conferencingImg} alt="Conferencing & Meeting" className="serviceImg" />
+                                <p id='longConference'>Conference & Meeting</p>
+                            </div>
                             {/* </Link> */}
 
                             {/* Track Your Order */}
@@ -288,20 +333,43 @@ const LandingPage = () => {
 
                     <div className="offers-container">
                         {/* offer display */}
-                        
-                            {dishes.length > 0 ? (
-                                <div>
-                                    <div className="offerDisplay">
-                                        {dishes.map(dish => (
-                                            <DishCardLand key={dish.dishCode} dish={dish} source="offers" />
-                                        ))}
-                                    </div>
-                                </div>
-                            ) : (
-                                <p>No discounted dishes available at the moment. Please check back later.</p>
-                            )}
-                        
 
+                        {dishes.length > 0 ? (
+                            <div>
+                                <div className="offerDisplay">
+                                    {dishes.map(dish => (
+                                        <DishCardLand key={dish.dishCode} dish={dish} source="offers" />
+                                    ))}
+                                </div>
+                            </div>
+                        ) : (
+                            <div className="ads-container">
+                            <AdComponent
+                                type="flyer"
+                                content="/path/to/your/flyer.jpg"
+                                altText="Flyer for special offers"
+                                link="/freshfood"
+                                heading="Special Offers Just for You!"
+                                description="Check out the best offers on your favorite dishes."
+                            />
+                             {/* Alternatively, you could use video ads */}
+                        <AdComponent
+                            type="video"
+                            content="https://youtu.be/Tn6e94ODPCI?si=kNQgzPEKX6uvji94"
+                            link="/menu"
+                            // heading="Exclusive Discount Video"
+                            // description="Watch the video to discover amazing!"
+                        />
+                            <AdComponent
+                                type="flyer"
+                                content="/path/to/your/flyer.jpg"
+                                altText="Flyer for special offers"
+                                link="/freshfood"
+                                heading="Special Offers Just for You!"
+                                description="Check out the best offers on your favorite dishes."
+                            />
+                        </div>
+                         )} 
 
                         {/* Discounted Foods */}
                         {discountedFoods.length > 0 ? (
@@ -313,7 +381,14 @@ const LandingPage = () => {
                                 </div>
                             </div>
                         ) : (
-                            <p>No discounted foods available at the moment. Keep checking for updates.</p>
+                            <div>
+                                <h2>Foods to Check Out</h2>
+                                <div className="offerDisplay">
+                                    {topRatedFoods.map((food) => (
+                                        <FoodCardLand key={food.foodCode} food={food} />
+                                    ))}
+                                </div>
+                            </div>
                         )}
 
                     </div>
@@ -327,7 +402,7 @@ const LandingPage = () => {
                     <div className="FeaturedDiv">
                         <h2 className="FeaturedHeading">Featured Hotels</h2>
                     </div>
-                
+
                     <div className="DishCards">
                         {topRatedRestaurants && topRatedRestaurants.length > 0 ? (
                             topRatedRestaurants.map((restaurant, index) => (
@@ -348,14 +423,15 @@ const LandingPage = () => {
 
                     {/* Food features */}
                     <div className="featuredFood featured">
-                        {getTopRatedDishes().length > 0 ? (
-                            getTopRatedDishes().map(dish => (
-                                <DishCard key={dish.dishCode} dish={dish} source="featured" />
+                        {topRatedDishes.length > 0 ? (
+                            topRatedDishes.map(dish => (
+                                <DishCardLand key={dish.dishCode} dish={dish} source="featured" />
                             ))
                         ) : (
                             <p>No featured dishes available at the moment. Please check back later.</p>
                         )}
                     </div>
+
 
                 </div>
             </section>
@@ -389,13 +465,13 @@ const LandingPage = () => {
 
                         <div className="join_team_choices" id='video-Ad'>
                             <iframe
-                            src={videoAd}
-                            type="video/mp4"
-                            autoPlay
-                            loop
-                            muted
-                            playsInline
-                            id='video-Ad-video'
+                                src={videoAd}
+                                type="video/mp4"
+                                autoPlay
+                                loop
+                                muted
+                                playsInline
+                                id='video-Ad-video'
                             />
                         </div>
 
@@ -403,7 +479,7 @@ const LandingPage = () => {
                             <h3 className="join_title">Deliver Person</h3>
 
                             <p className="join_explanation">Do you have a job.Fulfill delivery orders for customers and earn per trip</p>
-    
+
                             <div className="join_team_image_div">
                                 <img src={deliveryParsonImg} alt="Delivery Person" className="join_img" />
 
