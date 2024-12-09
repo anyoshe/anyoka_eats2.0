@@ -1,0 +1,71 @@
+/* Styling for the AdComponent */
+.ad-component {
+  margin: 20px 0;
+  padding: 20px;
+  border: 2px solid #ccc;
+  border-radius: 8px;
+  background-color: #f7f7f7;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  text-align: center;
+}
+
+.ad-heading {
+  font-size: 1.8em;
+  color: #333;
+  margin-bottom: 10px;
+}
+
+.ad-description {
+  font-size: 1.1em;
+  color: #555;
+  margin-bottom: 20px;
+}
+
+.video-ad-container {
+  max-width: 100%;
+  margin-bottom: 20px;
+}
+
+.flyer-ad-container {
+  max-width: 100%;
+}
+
+.flyer-ad-image {
+  width: 100%;
+  max-width: 600px; /* Adjust size for flyer */
+  border-radius: 8px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.video-ad-container iframe,
+.video-ad-container video {
+  width: 100%;
+  height: auto;
+  border-radius: 8px;
+}
+
+.ad-cta {
+  margin-top: 15px;
+}
+
+.cta-button {
+  display: inline-block;
+  padding: 12px 25px;
+  background-color: rgb(30, 165, 9);;
+  color: white;
+  font-size: 1.2em;
+  border-radius: 5px;
+  text-decoration: none;
+  transition: background-color 0.3s ease;
+}
+
+.cta-button:hover {
+  background-color: rgb(30, 165, 9);;
+}
+
+.ads-container {
+    display: flex;
+    justify-content: space-between; /* Space out the ads */
+    gap: 10px; /* Adds spacing between flyer and video */
+    flex-wrap: wrap; /* Allow items to wrap on smaller screens */
+  }
