@@ -78,7 +78,7 @@ const LandingPage = () => {
                 const response = await axios.get(`${config.backendUrl}/api/discounts`);
                 // console.log("Full response:", response.data); 
                 const fetchedFoods = response.data;
-                const discountedFoods = fetchedFoods.slice(0, 5);
+                const discountedFoods = fetchedFoods.slice(0, 4);
                 setDiscountedFoods(discountedFoods);
             } catch (error) {
                 console.error('Error fetching discounted foods:', error);
@@ -105,7 +105,7 @@ const LandingPage = () => {
                 // Sort and set top-rated dishes
                 const topRatedDishes = [...dishes]
                     .sort((a, b) => b.averageRating - a.averageRating)
-                    .slice(0, 5);
+                    .slice(0, 4);
                 setTopRatedDishes(topRatedDishes);
             } catch (error) {
                 console.error('Error fetching top-rated data:', error);
@@ -131,7 +131,7 @@ const LandingPage = () => {
                             return food.averageRating !== undefined && !isNaN(food.averageRating);
                         })
                         .sort((a, b) => b.averageRating - a.averageRating)
-                        .slice(0, 5);
+                        .slice(0, 4);
 
                     setTopRatedFoods(sortedTopRatedFoods);
                 } else {
