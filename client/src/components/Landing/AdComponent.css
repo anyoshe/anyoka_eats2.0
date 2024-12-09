@@ -65,7 +65,7 @@
 
 .ads-container {
     display: flex;
-    justify-content: space-between; /* Space out the ads */
+    justify-content: space-around; /* Space out the ads */
     gap: 10px; /* Adds spacing between flyer and video */
     flex-wrap: wrap; /* Allow items to wrap on smaller screens */
   }
