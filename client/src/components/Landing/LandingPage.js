@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import config from '../../config';
-import DishCard from '../Menu/DishCard';
+// import DishCard from '../Menu/DishCard';
 import RestaurantCard from '../Menu/RestaurantCard';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faPlusSquare, faSearch } from '@fortawesome/free-solid-svg-icons';
@@ -11,14 +11,14 @@ import OrderTrackingModal from '../Tracking/OrderTrackingModal';
 import SearchBar from './SearchBar';
 import SpecialOrderModal from '../SpecialOrder/SpecialOrderModal';
 // import FoodCard from '../FreshFood/FoodCard';
-import NavBar from '../Header/navbar';
+// import NavBar from '../Header/navbar';
 import Testimonials from '../Landing/LandingTestimonial';
 import FooterComponent from '../Landing/LandingFooter';
 import FoodCardLand from '../FreshFood/FoodCardLand';
 import DishCardLand from '../Menu/DishCardLand';
 import InstallPrompt from '../Header/InstallPrompt';
 // import videoAd from './client/src/assets/images/8477856-hd_1080_1920_24fps.mp4.crdownload';
-
+import AdComponent from './AdComponent';
 
 
 
@@ -29,13 +29,14 @@ import conferencingImg from '../../assets/images/people-business-meeting-office-
 import trackOrderImg from '../../assets/images/delivery-boy-picks-up-parcel-from-online-store-sending-customer-with-location-application-by-motorcycle-vector-illustration.png';
 import freshFoodImg from '../../assets/images/vegetables-concept-illustration.png';
 import serviceProviderImg from '../../assets/images/service_Provider.png';
-import userPersonImg from '../../assets/images/userPerson.png';
+// import userPersonImg from '../../assets/images/userPerson.png';
 import deliveryParsonImg from '../../assets/images/deliveryPerason.png';
-import profileImg from '../../assets/images/Eliud.jpg';
-import profileImg2 from '../../assets/images/mzeepassport.JPG';
+// import profileImg from '../../assets/images/Eliud.jpg';
+// import profileImg2 from '../../assets/images/mzeepassport.JPG';
 import videoAd from '../../assets/7218655-hd_1080_1920_25fps.mp4';
-import AdComponent from './AdComponent';
-
+import flyer1 from '../../assets/images/fyler1.mp4';
+import flyer2 from '../../assets/images/fyler2.mp4'
+import flyer3 from '../../assets/images/fyler3.mp4'
 
 const LandingPage = () => {
     const [dropdownOpen, setDropdownOpen] = useState(false);
@@ -272,7 +273,7 @@ const LandingPage = () => {
                 {/* offer title and offer search bar */}
                 <div className="title-offerSearch">
                     <div className="title">
-                        <h2 className='offerTitle'>Offers</h2>
+                        <h2 className='offerTitle'>What's New</h2>
                     </div>
                 </div>
 
@@ -280,13 +281,13 @@ const LandingPage = () => {
                     {/* offer categories */}
                     <div className="offerNavContainer">
                         <div className="offerNav">
-                            <button className="categories allBtn">All</button>
+                            {/* <button className="categories allBtn">All</button> */}
 
                             <button className="categories categoryBtn" onMouseOver={handleMouseOver} onMouseOut={handleMouseOut}>
                                 Categories
                             </button>
 
-                            {dropdownOpen && (
+                            {/* {dropdownOpen && (
                                 <div className="dropdown-content" onMouseOver={handleMouseOver} onMouseOut={handleMouseOut}>
                                     <a href="#Food" onClick={selectOption}>Food</a>
                                     <a href="#Special_Orders" onClick={selectOption}>Special Orders</a>
@@ -294,7 +295,7 @@ const LandingPage = () => {
                                     <a href="#Conferencing_&_Meeting" onClick={selectOption}>Conferencing & Meeting</a>
                                     <a href="#Fresh_Foods" onClick={selectOption}>Fresh Foods</a>
                                 </div>
-                            )}
+                            )} */}
                         </div>
 
                         <div className="search-container">
@@ -344,32 +345,38 @@ const LandingPage = () => {
                             </div>
                         ) : (
                             <div className="ads-container">
-                            <AdComponent
-                                type="flyer"
-                                content="/path/to/your/flyer.jpg"
-                                altText="Flyer for special offers"
-                                link="/freshfood"
-                                heading="Special Offers Just for You!"
-                                description="Check out the best offers on your favorite dishes."
-                            />
-                             {/* Alternatively, you could use video ads */}
-                        <AdComponent
-                            type="video"
-                            content="https://youtu.be/Tn6e94ODPCI?si=kNQgzPEKX6uvji94"
-                            link="/menu"
-                            // heading="Exclusive Discount Video"
-                            // description="Watch the video to discover amazing!"
-                        />
-                            <AdComponent
-                                type="flyer"
-                                content="/path/to/your/flyer.jpg"
-                                altText="Flyer for special offers"
-                                link="/freshfood"
-                                heading="Special Offers Just for You!"
-                                description="Check out the best offers on your favorite dishes."
-                            />
-                        </div>
-                         )} 
+
+
+                                <AdComponent
+                                    type="flyer"
+                                    content={flyer2}
+                                    altText="Flyer for special offers"
+                                    link="/menu"
+                                // heading="Special Offers Just for You!"
+                                // description="Check out the best offers on your favorite dishes."
+                                />
+                                {/* Alternatively, you could use video ads */}
+
+                                <AdComponent
+                                    type="video"
+                                    content="https://youtu.be/Tn6e94ODPCI?si=kNQgzPEKX6uvji94"
+                                    // content={flyer1}
+                                    link="/"
+
+                                // heading="Exclusive Discount Video"
+                                // description="Watch the video to discover amazing!"
+                                />
+                                <AdComponent
+                                    type="flyer"
+                                    content={flyer3}
+                                    altText="Flyer for special offers"
+                                    link="/freshfood"
+                                // heading="Special Offers Just for You!"
+                                // description="Check out the best offers on your favorite dishes."
+                                />
+
+                            </div>
+                        )}
 
                         {/* Discounted Foods */}
                         {discountedFoods.length > 0 ? (
