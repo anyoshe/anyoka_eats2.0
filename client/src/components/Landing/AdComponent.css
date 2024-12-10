@@ -79,3 +79,77 @@
     flex-wrap: wrap; 
   }
  
+
+  /* Media Queries */
+
+/* For tablets (768px and below) */
+@media screen and (max-width: 768px) {
+  .ad-component {
+    width: 48%; /* Adjust to two columns */
+    margin: 10px auto; /* Center components */
+  }
+
+  .ad-heading {
+    font-size: 1.6em;
+  }
+
+  .ad-description {
+    font-size: 1em;
+  }
+
+  .cta-button {
+    font-size: 1em;
+    padding: 10px 20px;
+  }
+}
+
+/* For phones (480px and below) */
+@media screen and (max-width: 480px) {
+  .ad-component {
+    width: 100%; /* Take full width */
+    margin: 10px auto; /* Add vertical spacing */
+  }
+
+  .ad-heading {
+    font-size: 1.4em;
+  }
+
+  .ad-description {
+    font-size: 0.9em;
+  }
+
+  .cta-button {
+    font-size: 0.9em;
+    padding: 8px 18px;
+  }
+}
+
+/* For very small phones (320px and below) */
+@media screen and (max-width: 320px) {
+  .ad-component {
+    width: 100%; /* Take full width */
+    margin: 5px auto; /* Reduce margin for small screens */
+    padding: 15px; /* Reduce padding */
+  }
+
+  .ad-heading {
+    font-size: 1.2em;
+  }
+
+  .ad-description {
+    font-size: 0.8em;
+  }
+
+  .cta-button {
+    font-size: 0.8em;
+    padding: 6px 15px;
+  }
+}
+
+/* Adjusting the ads container for small screens */
+@media screen and (max-width: 768px) {
+  .ads-container {
+    flex-direction: column; /* Stack ads vertically */
+    gap: 15px; /* Add more spacing between ads */
+  }
+}
