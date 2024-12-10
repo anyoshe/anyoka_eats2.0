@@ -119,7 +119,7 @@ const DishCategories = () => {
                     <DishCard key={dish.dishCode} dish={dish} addToCart={() => { }} />
                   ))
                 ) : (
-                  <p>No dishes available at the moment. Please check back later.</p>
+                  <p>Dishes Loading Please Wait...</p>
                 )}
                 </ul>
               </div>

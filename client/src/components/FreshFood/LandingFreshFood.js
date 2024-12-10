@@ -114,7 +114,7 @@ const LandingFreshFood = () => {
               <FoodCard key={food._id} food={food} />
             ))
           ) : (
-            <p>Sorry!No foods available in this category. Foods will be available in a week's time</p>
+            <p>Foods Loading Please Wait...</p>
           )}
         </div>
       </section>

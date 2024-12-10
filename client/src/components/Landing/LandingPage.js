@@ -35,8 +35,9 @@ import deliveryParsonImg from '../../assets/images/deliveryPerason.png';
 // import profileImg2 from '../../assets/images/mzeepassport.JPG';
 import videoAd from '../../assets/7218655-hd_1080_1920_25fps.mp4';
 import flyer1 from '../../assets/images/fyler1.mp4';
-import flyer2 from '../../assets/images/fyler2.mp4'
-import flyer3 from '../../assets/images/fyler3.mp4'
+import flyer2 from '../../assets/images/fyler2.mp4';
+import flyer3 from '../../assets/images/fyler3.mp4';
+import Logo from '../../assets/images/anyokaeats Final Logo.png'
 
 const LandingPage = () => {
     const [dropdownOpen, setDropdownOpen] = useState(false);
@@ -191,7 +192,8 @@ const LandingPage = () => {
                 </div>
 
                 <div className="signCta_div">
-                    <Link to="/sign-up-sign-in" className="landing_sign">Log In</Link>
+                    {/* <Link to="/sign-up-sign-in" className="landing_sign">Log In</Link> */}
+                    {/* <img src={Logo} alt="Anyoka Eats Logo" className="land_logo" /> */}
                 </div>
             </div>
             <section className="headerSection">
