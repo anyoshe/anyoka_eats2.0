@@ -192,7 +192,7 @@ const LandingPage = () => {
                 </div>
 
                 <div className="signCta_div">
-                    {/* <Link to="/sign-up-sign-in" className="landing_sign">Log In</Link> */}
+                    <Link to="/sign-up-sign-in" className="landing_sign">Partner Login</Link>
                     {/* <img src={Logo} alt="Anyoka Eats Logo" className="land_logo" /> */}
                 </div>
             </div>
@@ -418,7 +418,7 @@ const LandingPage = () => {
                                 <RestaurantCard key={index} restaurant={restaurant} />
                             ))
                         ) : (
-                            <p>No featured hotels available at the moment. Keep checking for the updates</p>
+                            <p>Featured hotels Loading Please wait...</p>
                         )}
                     </div>
 
@@ -437,7 +437,7 @@ const LandingPage = () => {
                                 <DishCardLand key={dish.dishCode} dish={dish} source="featured" />
                             ))
                         ) : (
-                            <p>No featured dishes available at the moment. Please check back later.</p>
+                            <p>Featured dishes will load in a moment...</p>
                         )}
                     </div>
 
@@ -495,7 +495,7 @@ const LandingPage = () => {
                             </div>
 
                             <Link to="/driverCreateAccount" >
-                                <button className="signup" >Sign Up/In</button>
+                                <button className="signup" >SignUp/Login</button>
                             </Link>
                         </div>
                     </div>
@@ -509,17 +509,11 @@ const LandingPage = () => {
                     </div>
 
                     <div className="about_us_content">
-                        <p className="aboutUs_paragraph">At Anyoka Eats, our mission is to transform the dining experience with a seamless, innovative online restaurant platform. Founded by a passionate team dedicated to enhancing food discovery and ordering, we combine cutting-edge technology with a love for great food.
-
-                            Our platform brings together a diverse range of restaurants and cuisines, allowing users to effortlessly browse, order, and enjoy their favorite dishes. With features like real-time order tracking, personalized recommendations, and a user-friendly interface, we strive to make every meal memorable.
-
-                            In addition to exceptional dining options, Anyoka Eats offers a variety of services to cater to your unique needs. Explore our conference and meeting spaces, perfect for business gatherings and special events. With detailed information on venue capacity, location, and available services, planning your next event has never been easier.
-
-                            Our special ordering feature allows you to request customized meals that are made to your specific preferences, ensuring a home-cooked feel with every bite. We also offer a selection of fresh foods, delivered hot and ready to enjoy, to elevate your dining experience.
-
-                            Our team, composed of experts in web development, user experience design, and culinary arts, works tirelessly to ensure that our platform not only meets but exceeds customer expectations. From dynamic dish updates to intuitive search functionalities, we are committed to providing an exceptional online dining experience.
-
-                            Join us on this culinary journey and discover how Anyoka Eats is redefining the future of dining, events, and personalized food experiences.
+                        <p className="aboutUs_paragraph">Anyoka Eats transforms dining with an innovative platform for 
+                            diverse cuisines, real-time tracking, and personalized meals. 
+                            We also offer event spaces with detailed planning features. 
+                            Combining technology and culinary passion, we deliver exceptional experiences, 
+                            from fresh, hot meals to seamless event planning. Redefine dining and events with Anyoka Eats!
                         </p>
                     </div>
 
