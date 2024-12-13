@@ -17,31 +17,31 @@
     gtag('config', 'G-M8X5JHKVD6');
   </script>
 
-  // Track PWA install events
-let deferredPrompt;
+//   // Track PWA install events
+// let deferredPrompt;
 
-// Listen for the beforeinstallprompt event
-window.addEventListener('beforeinstallprompt', (e) => {
-    // Prevent the mini-infobar from appearing
-    e.preventDefault();
-    deferredPrompt = e;
-    console.log('PWA install prompt shown');
-    // Optionally, track that the user was shown the install prompt
-    gtag('event', 'pwa_install_prompt', {
-        event_category: 'engagement',
-        event_label: 'PWA Install Prompt Shown',
-    });
-});
+// // Listen for the beforeinstallprompt event
+// window.addEventListener('beforeinstallprompt', (e) => {
+//     // Prevent the mini-infobar from appearing
+//     e.preventDefault();
+//     deferredPrompt = e;
+//     console.log('PWA install prompt shown');
+//     // Optionally, track that the user was shown the install prompt
+//     gtag('event', 'pwa_install_prompt', {
+//         event_category: 'engagement',
+//         event_label: 'PWA Install Prompt Shown',
+//     });
+// });
 
-// Track when the app is installed
-window.addEventListener('appinstalled', () => {
-    console.log('PWA installed');
-    // Track the installation event
-    gtag('event', 'pwa_installed', {
-        event_category: 'engagement',
-        event_label: 'PWA Installed',
-    });
-});
+// // Track when the app is installed
+// window.addEventListener('appinstalled', () => {
+//     console.log('PWA installed');
+//     // Track the installation event
+//     gtag('event', 'pwa_installed', {
+//         event_category: 'engagement',
+//         event_label: 'PWA Installed',
+//     });
+// });
 
   <link rel="stylesheet" href="%PUBLIC_URL%/bootstrap.min.css" />
   <link rel="stylesheet" href="node_modules/@fortawesome/fontawesome-free/css/all.min.css">
