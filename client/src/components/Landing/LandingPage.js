@@ -37,7 +37,7 @@ import videoAd from '../../assets/7218655-hd_1080_1920_25fps.mp4';
 import flyer1 from '../../assets/images/fyler1.mp4';
 import flyer2 from '../../assets/images/fyler2.mp4';
 import flyer3 from '../../assets/images/fyler3.mp4';
-import Logo from '../../assets/images/anyokaeats Final Logo.png'
+import Logo from '../../assets/images/anyokaeats Final Logo.png';
 
 const LandingPage = () => {
     const [dropdownOpen, setDropdownOpen] = useState(false);
