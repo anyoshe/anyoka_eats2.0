@@ -106,7 +106,7 @@ const handleSubmit = async (event) => {
                 <i className="fab fa-instagram instagram-bg" id="social_list"></i>
               </a>
 
-              <a href="https://wa.me/254736889880" target="_blank" class="whatsapp-link social_link">
+              <a href="https://wa.me/254706251573" target="_blank" class="whatsapp-link social_link">
                 <i className="fab fa-whatsapp whatsapp-bg" id="social_list"></i>
               </a>
             </div>
