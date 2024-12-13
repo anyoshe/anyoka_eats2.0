@@ -332,7 +332,7 @@ const LandingPage = () => {
                             </div>
                         ) : (
                             <div>
-                                <h2 className="FeaturedHeading">Featured Meals</h2>
+                                <h2 className="FeaturedHeading">Featured Groceries</h2>
                                 <div className="offerDisplay">
                                     {topRatedFoods.map((food) => (
                                         <FoodCardLand key={food.foodCode} food={food} />
@@ -368,7 +368,7 @@ const LandingPage = () => {
                 <div className='divFood divFeatured'>
                     {/* Food heading */}
                     <div className="FeaturedDiv">
-                        <h2 className="FeaturedHeading">Featured Food</h2>
+                        <h2 className="FeaturedHeading">Featured Meals</h2>
                     </div>
 
                     {/* Food features */}
