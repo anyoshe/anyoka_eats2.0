@@ -37,7 +37,7 @@ import videoAd from '../../assets/7218655-hd_1080_1920_25fps.mp4';
 import flyer1 from '../../assets/images/fyler1.mp4';
 import flyer2 from '../../assets/images/fyler2.mp4';
 import flyer3 from '../../assets/images/fyler3.mp4';
-import Logo from '../../assets/images/anyokaeats Final Logo.png'
+import Logo from '../../assets/images/anyokaeats Final Logo.png';
 
 const LandingPage = () => {
     const [dropdownOpen, setDropdownOpen] = useState(false);
@@ -273,67 +273,8 @@ const LandingPage = () => {
             {/* offers section */}
             <section className="offersSection">
                 {/* offer title and offer search bar */}
-                <div className="title-offerSearch">
-                    <div className="title">
-                        <h2 className='offerTitle'>What's New</h2>
-                    </div>
-                </div>
-
+                <h2 className="FeaturedHeading">What's New</h2>
                 <div className="category-dispaly">
-                    {/* offer categories */}
-                    <div className="offerNavContainer">
-                        <div className="offerNav">
-                            {/* <button className="categories allBtn">All</button> */}
-
-                            <button className="categories categoryBtn" onMouseOver={handleMouseOver} onMouseOut={handleMouseOut}>
-                                Categories
-                            </button>
-
-                            {/* {dropdownOpen && (
-                                <div className="dropdown-content" onMouseOver={handleMouseOver} onMouseOut={handleMouseOut}>
-                                    <a href="#Food" onClick={selectOption}>Food</a>
-                                    <a href="#Special_Orders" onClick={selectOption}>Special Orders</a>
-                                    <a href="#Outside_Catering" onClick={selectOption}>Outside Catering</a>
-                                    <a href="#Conferencing_&_Meeting" onClick={selectOption}>Conferencing & Meeting</a>
-                                    <a href="#Fresh_Foods" onClick={selectOption}>Fresh Foods</a>
-                                </div>
-                            )} */}
-                        </div>
-
-                        <div className="search-container">
-                            <input
-                                type="text"
-                                name="search"
-                                placeholder="Search for any offer!!!"
-                                className="search-input"
-                                value={searchTerm}
-                                onChange={(e) => setSearchTerm(e.target.value)}
-                                onKeyPress={(e) => {
-                                    if (e.key === 'Enter') {
-                                        handleSearch();
-                                    }
-                                }}
-                            />
-                            <a href="#" className="search-btn" onClick={handleSearch}>
-                                <FontAwesomeIcon icon={faSearch} />
-                            </a>
-
-
-                            {/* Display Search Results */}
-                            {searchResults.length > 0 && (
-                                <div className="search-results">
-                                    {searchResults.map((result, index) => (
-                                        <div key={index} className="search-result-item">
-                                            <a href={`/${result.type}/${result.dishCode}`} className="search-result-item-a">
-                                                {result.dishName && result.restaurant}
-                                            </a>
-                                        </div>
-                                    ))}
-                                </div>
-                            )}
-                        </div>
-                    </div>
-
                     <div className="offers-container">
                         {/* offer display */}
 
@@ -391,7 +332,7 @@ const LandingPage = () => {
                             </div>
                         ) : (
                             <div>
-                                <h2>Foods to Check Out</h2>
+                                <h2 className="FeaturedHeading">Featured Groceries</h2>
                                 <div className="offerDisplay">
                                     {topRatedFoods.map((food) => (
                                         <FoodCardLand key={food.foodCode} food={food} />
@@ -427,7 +368,7 @@ const LandingPage = () => {
                 <div className='divFood divFeatured'>
                     {/* Food heading */}
                     <div className="FeaturedDiv">
-                        <h2 className="FeaturedHeading">Featured Food</h2>
+                        <h2 className="FeaturedHeading">Featured Meals</h2>
                     </div>
 
                     {/* Food features */}
