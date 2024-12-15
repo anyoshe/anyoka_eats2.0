@@ -156,9 +156,11 @@
   color: green;
   font-weight: bold;
 }
+
 .dish-image-wrapper {
   position: relative;
   display: inline-block;
+  object-fit: cover;
 }
 
 .discounted-price-circle {
