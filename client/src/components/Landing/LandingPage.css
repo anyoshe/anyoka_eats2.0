@@ -342,11 +342,11 @@
 
 .offerDisplay{
     display: grid;
-    grid-template-columns: repeat(5,1fr);
+    grid-template-columns: repeat(6,1fr);
     justify-content: center;
     flex-direction: row;
     flex-wrap: wrap;
-    row-gap: 20px;
+    row-gap: 10px;
     column-gap: 30px;
     margin-top: 20px;
 }
@@ -444,7 +444,7 @@
 
 .featured{
     display: grid;
-    grid-template-columns: repeat(5,1fr);
+    grid-template-columns: repeat(6,1fr);
     gap: 10px;
 }
 
