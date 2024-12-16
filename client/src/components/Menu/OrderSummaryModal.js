@@ -144,6 +144,17 @@ const OrderSummaryModal = ({ show, handleClose, restaurantName, orderedDishes = 
 
           // Continue with payment processing
           console.log(`Proceeding with payment of ${amount}`);
+
+        //   let amount;
+        // let validAmount = false;
+        // while (!validAmount) {
+        //   amount = prompt('Enter the amount to pay:', grandTotal);
+        //   if (isNaN(amount) || amount <= 0 || amount.includes('.') || !Number.isInteger(Number(amount))) {
+        //     alert('Please enter a valid whole number.');
+        //   } else {
+        //     validAmount = true;
+        //   }
+        // }
           // Step 3: Initiate payment and wait for confirmation
           const paymentResponse = await initiateMpesaPayment(paymentPhoneNumber, amount);
           if (paymentResponse && paymentResponse.success) {
