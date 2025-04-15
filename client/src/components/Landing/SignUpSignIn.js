@@ -1,372 +1,329 @@
-import React, { useState, useContext, useEffect } from 'react';
-import axios from 'axios';
-import './SignUpSignIn.css';
+import React, { useState, useEffect, useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { PartnerContext } from '../../contexts/PartnerContext';
+import axios from 'axios';
 import config from '../../config';
-import { FaEye, FaEyeSlash } from 'react-icons/fa';
+import { PartnerContext } from '../../contexts/PartnerContext';
+import MapSelector from '../User/MapSelector';
 
-function SignUpSignIn() {
-    const [formData, setFormData] = useState({
-        businessName: '',
-        businessType: '',
-        contactNumber: '',
-        email: '',
-        location: '',
-        password: '',
-        userName: '', // For login
-        loginPassword: '', // For login
-    });
+const StoreSignUpForm = () => {
+  const [formData, setFormData] = useState({
+    businessName: '',
+    businessType: '',
+    profileImage: null,
+    contactNumber: '',
+    email: '',
+    idNumber: '',
+    businessPermit: null,
+    town: '',
+    location: '',
+    password: '',
+    loginPassword: '', 
+  });
 
-    const [showPassword, setShowPassword] = useState(false);
-    const [showLoginPassword, setShowLoginPassword] = useState(false);
-    const [modalVisible, setModalVisible] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
+  const [showLoginPassword, setShowLoginPassword] = useState(false);
+  const [modalVisible, setModalVisible] = useState(false);
+  const [showMap, setShowMap] = useState(false);
 
-    const navigate = useNavigate();
-    const { setPartner } = useContext(PartnerContext);
 
-    useEffect(() => {
-        // Check if a token exists and fetch the partner data
-        const token = localStorage.getItem('authToken');
-        if (token) {
-            axios.get(`${config.backendUrl}/api/partner`, {
-                headers: { 'Authorization': `Bearer ${token}` }
-            })
-                .then(response => {
-                    const partnerData = response.data;
-                    setPartner(partnerData);
-                    // setPartner(response.data);
-                    // navigate('/dashboard');
-                    // Redirect based on role
-                    if (partnerData.role === 'admin') {
-                        navigate('/superuserdashboard');
-                    } else {
-                        navigate('/dashboard');
-                    }
-                // })
-                })
-                .catch(error => {
-                    console.error('Error fetching partner data:', error);
-                });
-        }
-    }, [navigate, setPartner]);
+  const navigate = useNavigate();
+  const { setPartner } = useContext(PartnerContext);
 
-    // Function to update form data on input change
-    const handleInputChange = (event) => {
-        const { name, value } = event.target;
-        setFormData({ ...formData, [name]: value });
-    };
+  useEffect(() => {
+    const token = localStorage.getItem('authToken');
+    if (token) {
+      axios.get(`${config.backendUrl}/api/partner`, {
+        headers: { Authorization: `Bearer ${token}` },
+      })
+        .then((response) => {
+          const partnerData = response.data;
+          setPartner(partnerData);
+          navigate(partnerData.role === 'admin' ? '/superuserdashboard' : '/dashboard');
+        })
+        .catch((error) => {
+          console.error('Error fetching partner data:', error);
+        });
+    }
+  }, [navigate, setPartner]);
 
-    // Function to handle sign-up submission
-    const handleSubmitSignUp = async (event) => {
-        event.preventDefault();
-        try {
-            const role = formData.email === 'anyokaeats@gmail.com' ? 'admin' : 'partner';
+  // useEffect(() => {
+  //   const token = localStorage.getItem('authToken');
+  //   if (token) {
+  //     axios
+  //       .get(`${config.backendUrl}/api/partner`, {
+  //         headers: { Authorization: `Bearer ${token}` },
+  //       })
+  //       .then((response) => {
+  //         const partnerData = response.data;
+  //         setPartner(partnerData);
+  //         navigate(partnerData.role === 'admin' ? '/superuserdashboard' : '/dashboard');
+  //       })
+  //       .catch((error) => {
+  //         console.error('Error fetching partner data:', error);
+  //         // Optional: Remove invalid token
+  //         localStorage.removeItem('authToken');
+  //       });
+  //   }
+  // }, [navigate, setPartner]);
+  
+  const handleLocationSelect = (location) => {
+    setFormData((prev) => ({ ...prev, location }));
+  };
+  
 
-            const response = await axios.post(`${config.backendUrl}/api/signup`, {
-                businessName: formData.businessName,
-                businessType: formData.businessType,
-                contactNumber: formData.contactNumber,
-                email: formData.email,
-                location: formData.location,
-                password: formData.password,
-                role
-            });
+  const handleInputChange = (event) => {
+    const { name, value, files } = event.target;
+    if (files) {
+      setFormData({ ...formData, [name]: files[0] });
+    } else {
+      setFormData({ ...formData, [name]: value });
+    }
+  };
 
-            const partnerData = response.data;
-            setPartner(partnerData);
-            // alert("Sign up Successful, Welcome!");
-            // navigate('/dashboard');
+  const handleSubmitSignUp = async (event) => {
+    event.preventDefault();
 
-            // Redirect based on role
-            if (partnerData.role === 'admin') {
-                alert("Admin Sign up Successful, Welcome!");
-                navigate('/superuserdashboard');
-            } else {
-                alert("Sign up Successful, Welcome!");
-                navigate('/dashboard');
-            }
-        } catch (error) {
-            console.error('Error signing up:', error);
-            alert(error.response?.data || "An unexpected error occurred. Please try again.");
-        }
-    };
+    try {
+      const role = formData.email === 'anyokaeats@gmail.com' ? 'admin' : 'partner';
 
-    // Function to handle sign-in submission
-    const handleSubmitSignIn = async (event) => {
-        event.preventDefault();
-        try {
-            const loginResponse = await axios.post(`${config.backendUrl}/api/login`, {
-                contactNumber: formData.contactNumber,
-                password: formData.loginPassword,
-            });
+      const data = new FormData();
+data.append('businessName', formData.businessName);
+data.append('businessType', formData.businessType);
+data.append('contactNumber', formData.contactNumber);
+data.append('email', formData.email);
+data.append('idNumber', formData.idNumber);
+data.append('town', formData.town);
+data.append('location', formData.location);
+data.append('password', formData.password);
+data.append('role', role);
 
-            // const token = loginResponse.data.token;
-            const { token, role } = loginResponse.data;
-            if (token) {
-                localStorage.setItem('authToken', token);
 
-                const partnerResponse = await axios.get(`${config.backendUrl}/api/partner`, {
-                    headers: { 'Authorization': `Bearer ${token}` }
-                });
+if (formData.businessPermit) data.append('businessPermit', formData.businessPermit);
 
-                const partnerData = partnerResponse.data;
-                setPartner(partnerData);
-                // navigate('/dashboard');
-                // Redirect based on role
-                if (partnerData.role === 'admin') {
-                    navigate('/superuserdashboard');
-                } else {
-                    navigate('/dashboard');
-                }
-            } else {
-                throw new Error('Token not received');
-            }
-        } catch (error) {
-            console.error('Error signing in:', error);
-            alert("An error occurred during sign-in. Please try again.");
-        }
-    };
+      const response = await axios.post(`${config.backendUrl}/api/signup`, data);
 
-    // Function to handle password recovery
-    const handlePasswordRecovery = async (event) => {
-        event.preventDefault();
-        try {
-            const response = await axios.post(`${config.backendUrl}/api/recover-password`, {
-                email: formData.email,
-                contactNumber: formData.contactNumber,
-            });
+      const partnerData = response.data;
+      setPartner(partnerData);
+      alert('Sign up Successful, Welcome!');
+      navigate(partnerData.role === 'admin' ? '/superuserdashboard' : '/dashboard');
+    } catch (error) {
+      console.error("Sign up error:", error);
+      alert(
+        error.response?.data?.message ||
+        JSON.stringify(error.response?.data) ||
+        "An unexpected error occurred."
+      );
+    }
+  }
 
-            alert("Password recovery link sent to your email!");
-            setModalVisible(false);
-        } catch (error) {
-            console.error('Error in password recovery:', error);
-            alert("An error occurred. Please try again.");
-        }
-    };
+  const handleSubmitSignIn = async (event) => {
+    event.preventDefault();
+    try {
+      const loginResponse = await axios.post(`${config.backendUrl}/api/login`, {
+        contactNumber: formData.contactNumber,
+        password: formData.loginPassword,
+      });
 
-    // Function to toggle the form panel
-    const handleToggle = () => {
-        document.getElementById('container').classList.toggle('right-panel-active');
-    };
+      const { token, role } = loginResponse.data;
+      if (token) {
+        localStorage.setItem('authToken', token);
 
-    const togglePasswordVisibility = () => setShowPassword(!showPassword);
-    const toggleLoginPasswordVisibility = () => setShowLoginPassword(!showLoginPassword);
+        const partnerResponse = await axios.get(`${config.backendUrl}/api/partner`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
 
-    return (
-        <div className='authForm'>
-            <img src="https://i.imgur.com/wcGWHvx.png" className="square" alt="" />
+        const partnerData = partnerResponse.data;
+        setPartner(partnerData);
+        navigate(role === 'admin' ? '/superuserdashboard' : '/dashboard');
+      } else {
+        throw new Error('Token not received');
+      }
+    } catch (error) {
+      console.error('Login error:', error);
+      alert('An error occurred during sign-in. Please try again.');
+    }
+  };
 
-            <div className="container" id="container">
+  return (
+    <section className="signUpContainer">
+      <div className="signUpWrapper">
+        <h2>Create Your Store Account</h2>
 
-                {/* Sign Up Section */}
-                <div className="form-container sign-up-container">
-                    <form onSubmit={handleSubmitSignUp}>
-                        <h1 className='createAccount'>Create Account</h1>
+        <form onSubmit={handleSubmitSignUp}>
+          <div className="form-group">
+            <label htmlFor="businessName">
+              Business Name <span className="required">*</span>
+            </label>
+            <input
+              type="text"
+              id="businessName"
+              name="businessName"
+              required
+              value={formData.businessName}
+              onChange={handleInputChange}
+            />
+          </div>
 
-                        <div className="social-container">
-                            <a href="#" className="log_social_icons" ><i className="fab fa-facebook-f"></i></a>
-                            <a href="#" className="log_social_icons"><i className="fab fa-google-plus-g"></i></a>
-                            <a href="#" className="log_social_icons"><i className="fab fa-linkedin-in"></i></a>
-                        </div>
+          <div className="form-group">
+            <label htmlFor="businessType">
+              Business Type <span className="required">*</span>
+            </label>
+            <input
+              type="text"
+              id="businessType"
+              name="businessType"
+              required
+              value={formData.businessType}
+              onChange={handleInputChange}
+            />
+          </div>
 
-                        <span>or use your email for registration</span>
+          <div className="form-group">
+            <label htmlFor="profileImage">Profile Image</label>
+            <input
+              type="file"
+              id="profileImage"
+              name="profileImage"
+              onChange={handleInputChange}
+            />
+          </div>
 
-                        <div className="infield">
-                            <input
-                                className='input-sign'
-                                type="text"
-                                placeholder="User Name"
-                                name="businessName"
-                                value={formData.businessName}
-                                onChange={handleInputChange}
-                                required
-                            />
-                        </div>
+          <div className="form-group">
+            <label htmlFor="contactNumber">
+              Phone Number <span className="required">*</span>
+            </label>
+            <input
+              type="tel"
+              id="contactNumber"
+              name="contactNumber"
+              required
+              value={formData.contactNumber}
+              onChange={handleInputChange}
+            />
+          </div>
 
-                        <div className="infield">
-                            <input
-                                className='input-sign'
-                                type="text"
-                                placeholder="Type (Hotel, Conference space, Catering e.t.c)"
-                                name="businessType"
-                                value={formData.businessType}
-                                onChange={handleInputChange}
-                                required
-                            />
-                        </div>
+          <div className="form-group">
+            <label htmlFor="email">Email (optional)</label>
+            <input
+              type="email"
+              id="email"
+              name="email"
+              value={formData.email}
+              onChange={handleInputChange}
+            />
+          </div>
 
-                        <div className="infield">
-                            <input
-                                className='input-sign'
-                                type="text"
-                                placeholder="Contact Number"
-                                name="contactNumber"
-                                value={formData.contactNumber}
-                                onChange={handleInputChange}
-                                required
-                            />
-                        </div>
+          <div className="form-group">
+            <label htmlFor="idNumber">
+              Identification Number <span className="required">*</span>
+            </label>
+            <input
+              type="text"
+              id="idNumber"
+              name="idNumber"
+              required
+              value={formData.idNumber}
+              onChange={handleInputChange}
+            />
+          </div>
 
-                        <div className="infield">
-                            <input
-                                className='input-sign'
-                                type="email"
-                                placeholder="Email"
-                                name="email"
-                                value={formData.email}
-                                onChange={handleInputChange}
-                            />
-                        </div>
+          <div className="form-group">
+            <label htmlFor="town">
+              Town or Centre <span className="required">*</span>
+            </label>
+            <input
+              type="text"
+              id="town"
+              name="town"
+              required
+              value={formData.town}
+              onChange={handleInputChange}
+            />
+          </div>
 
-                        <div className="infield">
-                            <input
-                                className='input-sign'
-                                type="text"
-                                placeholder="Business Location"
-                                name="location"
-                                value={formData.location}
-                                onChange={handleInputChange}
-                                required
-                            />
-                        </div>
+          <div className="form-group">
+            <label htmlFor="businessPermit">Business Permit Certificate</label>
+            <input
+              type="file"
+              id="businessPermit"
+              name="businessPermit"
+              onChange={handleInputChange}
+            />
+          </div>
 
-                        <div className="infield">
-                            <input
-                                className='input-sign'
-                                type={showPassword ? "text" : "password"}
-                                placeholder="Password"
-                                name="password"
-                                value={formData.password}
-                                onChange={handleInputChange}
-                                required
-                            />
-                        </div>
-                            <span onClick={togglePasswordVisibility} id='signBlockEye'>
-                                {showPassword ? <i class="fas fa-eye-slash"></i>
-                                : <i class="fas fa-eye"></i>
-                            }
-                            </span>
-
-                        <button className='loginBtn logphone' type="submit">Sign Up</button>
-                    </form>
-                </div>
-
-                {/* Sign In Section */}
-                <div className="form-container sign-in-container">
-                    <form onSubmit={handleSubmitSignIn}>
-                        <h1 className='logIn_h1'>Log in</h1>
-
-                        <div className="social-container">
-                            <a href="#" className="log_social_icons"><i className="fab fa-facebook-f"></i></a>
-                            <a href="#" className="log_social_icons"><i className="fab fa-google-plus-g"></i></a>
-                            <a href="#" className="log_social_icons"><i className="fab fa-linkedin-in"></i></a>
-                        </div>
-
-                        <span>or use your account</span>
-
-                        <div className="infield">
-                            <input
-                                className='input-sign'
-                                type="text"
-                                placeholder="User Name"
-                                name="businessName"
-                                value={formData.businessName}
-                                onChange={handleInputChange}
-                            />
-                        </div>
-
-                        <div className="infield">
-                            <input
-                                className='input-sign'
-                                type="text"
-                                placeholder="Contact Number"
-                                name="contactNumber"
-                                value={formData.contactNumber}
-                                onChange={handleInputChange}
-                                required
-                            />
-                        </div>
-
-                        <div className="infield">
-                            <input
-                                className='input-sign'
-                                type={showLoginPassword ? "text" : "password"}
-                                placeholder="Password"
-                                name="loginPassword"
-                                value={formData.loginPassword}
-                                onChange={handleInputChange}
-                                required
-                            />
-                        </div>  
-                            <span onClick={toggleLoginPasswordVisibility}>
-                                {showLoginPassword ? <i class="fas fa-eye-slash" id='blockSee'></i>
-                                : <i class="fas fa-eye"></i>}
-                            </span>
-
-                        <a href="#" className="forgot" onClick={() => setModalVisible(true)}>Forgot your password?</a>
-
-                        <button className='loginBtn' type="submit">Log In</button>
-                    </form>
-                </div>
-
-                {/* Overlay Messages */}
-                <div className="overlay-container" id="overlayCon">
-                    <div className="overlay">
-
-                        <div className="overlay-panel overlay-left">
-                            <h1>Welcome Back!</h1>
-                            <p>To keep connected with us please login with your personal info</p>
-
-                            <button className="signBtn btnScaled loginBtn" onClick={handleToggle}>Log In</button>
-                            
-                        </div>
-
-                        <div className="overlay-panel overlay-right">
-                            <h1>Hello, Friend!</h1>
-                            <p>Enter your personal details and start your journey with us</p>
-                            <button id="signUpBtn" className="signBtn btnScaled loginBtn" onClick={handleToggle}>Sign Up</button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            {/* Password Recovery Modal */}
-            {modalVisible && (
-                <div className="modal">
-                    <div className="modal-content patnerRecovery">
-                        <span className="close" id='forgetClose' onClick={() => setModalVisible(false)}>&times;</span>
-
-                        <h2 id='forgetHeading' >Password Recovery</h2>
-
-                        <form onSubmit={handlePasswordRecovery}>
-                            <input
-                                className='input-sign'
-                                type="email"
-                                id='forgetEmail'
-                                placeholder="Enter your email"
-                                name="email"
-                                value={formData.email}
-                                onChange={handleInputChange}
-                                required
-                            />
-                            <input
-                                className='input-sign'
-                                type="text"
-                                 id='forgetNumber'
-                                placeholder="Enter your contact number"
-                                name="contactNumber"
-                                value={formData.contactNumber}
-                                onChange={handleInputChange}
-                                required
-                            />
-                            <button className='loginBtn' type="submit">Send Recovery Link</button>
-                        </form>
-                    </div>
-                </div>
+          <div className="form-group">
+            <label htmlFor="location">Location</label>
+            <input
+              type="text"
+              id="location"
+              name="location"
+              value={formData.location}
+              onChange={handleInputChange}
+              readOnly
+              required
+            />
+            <button type="button" onClick={() => setShowMap((prev) => !prev)}>
+              {showMap ? 'Hide Map' : 'Pin Location on Map'}
+            </button>
+            {showMap && (
+              <div style={{ marginTop: '10px' }}>
+                <MapSelector onLocationSelect={handleLocationSelect} />
+              </div>
             )}
-        </div>
-    );
-}
+          </div>
 
-export default SignUpSignIn;
+
+          <div className="form-group">
+            <label htmlFor="password">
+              Password <span className="required">*</span>
+            </label>
+            <input
+              type={showPassword ? 'text' : 'password'}
+              id="password"
+              name="password"
+              value={formData.password}
+              onChange={handleInputChange}
+            />
+            <button type="button" onClick={() => setShowPassword(!showPassword)}>
+              {showPassword ? 'Hide' : 'Show'}
+            </button>
+          </div>
+
+          <button type="submit" className="submitBtn">Sign Up</button>
+        </form>
+
+        <h3>Already have an account? Sign In below</h3>
+        <form onSubmit={handleSubmitSignIn}>
+          <div className="form-group">
+            <label htmlFor="loginPhone">Phone Number</label>
+            <input
+              type="tel"
+              id="loginPhone"
+              name="contactNumber"
+              value={formData.contactNumber}
+              onChange={handleInputChange}
+            />
+          </div>
+
+          <div className="form-group">
+            <label htmlFor="loginPassword">Password</label>
+            <input
+              type={showLoginPassword ? 'text' : 'password'}
+              id="loginPassword"
+              name="loginPassword"
+              value={formData.loginPassword}
+              onChange={handleInputChange}
+            />
+            <button type="button" onClick={() => setShowLoginPassword(!showLoginPassword)}>
+              {showLoginPassword ? 'Hide' : 'Show'}
+            </button>
+          </div>
+
+          <button type="submit" className="submitBtn">Sign In</button>
+        </form>
+      </div>
+    </section>
+  );
+};
+
+export default StoreSignUpForm;

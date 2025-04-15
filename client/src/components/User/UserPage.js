@@ -1,22 +1,27 @@
 import React, { useState } from 'react';
-import AllUndeliveredOrders from './AllUndeliveredOrders';
+// import AllUndeliveredOrders from './AllUndeliveredOrders';
 import AllDeliveredOrders from './AllDeliveredOrders';
 import AllUndeliveredFoodOrders from './AllUndeliveredFoodOrders';
 import AllDeliveredFoodOrders from './AllDeliveredFoodOrders';
 import DriverEarnings from './DriverEarnings';
 import './userAdmin.css';
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faBell } from "@fortawesome/free-solid-svg-icons";
+import NotificationComponent from './NotificationComponent';
 
 const UserPage = () => {
   // State to keep track of the active component
   const [activeTab, setActiveTab] = useState('AllUndeliveredOrders');
+  const [notifications, setNotifications] = useState([]);
+
 
   // Function to render the selected component
   const renderActiveComponent = () => {
     switch (activeTab) {
       case 'AllDeliveredOrders':
         return <AllDeliveredOrders />;
-      case 'AllUndeliveredOrders':
-        return <AllUndeliveredOrders />;
+      // case 'AllUndeliveredOrders':
+      //   return <AllUndeliveredOrders />;
       case 'AllUndeliveredFoodOrders':
         return <AllUndeliveredFoodOrders />;
       case 'AllDeliveredFoodOrders':
@@ -40,7 +45,10 @@ const UserPage = () => {
           </div>
 
           <a href="/" className="homeLink">Home</a>
-
+          <div className='notificationIcon'>
+                    <FontAwesomeIcon icon={faBell} />
+                    {notifications.length > 0 && <span className='notificationBadge'>{notifications.length}</span>}
+                  </div>
           {/* <div className="toggle-button">
             <span></span>
             <span></span>

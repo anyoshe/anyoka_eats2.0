@@ -12,7 +12,7 @@ const passport = require('passport');
 const jwt = require('jsonwebtoken');
 const LocalStrategy = require('passport-local').Strategy;
 const session = require('express-session');
-const { upload, uploadMultiple, uploadProfileImage } = require('../config/multer');
+const { upload, uploadMultiple, uploadProfileImage, uploadBusinessPermit, uploadProductImages } = require('../config/multer');
 const multer = require('multer');
 const path = require('path');
 const fs = require('fs');
@@ -20,8 +20,7 @@ const axios = require('axios');
 const { type } = require("os");
 require('dotenv').config();
 const nodemailer = require('nodemailer');
-// const io = require('socket.io')(server);
-const io = require('../index');
+const { getIo, connectedPartners, pendingOrders } = require('../socket');
 
 
 const JWT_SECRET = process.env.JWT_SECRET;
@@ -44,6 +43,502 @@ function authenticateToken(req, res, next) {
   }
 }
 
+
+//PARTNER /BUSINESS OWNERS LOGS AND PROFILE CONTROL
+
+// Partner Schema 
+const partnerSchema = new mongoose.Schema({
+  businessName: { type: String, required: true, unique: true },
+  businessType: { type: String, required: true },
+  contactNumber: { type: String, required: true, unique: true },
+  email: { type: String, required: false, unique: true },
+  town: {type: String, required: false },
+  location: { type: String, required: false },
+  password: { type: String, required: true },
+  profileImage: { type: String, required: false },
+  idNumber: { type: String, required: true, unique: true },
+  businessPermit: { type: String, required: false },
+  description: { type: String, default: '' },
+  role: { type: String, enum: ['admin', 'partner'], default: 'partner' }
+}, { timestamps: true });
+
+const Partner = mongoose.model('Partner', partnerSchema);
+
+// Find the partner before adding one
+router.get('/partner', authenticateToken, async (req, res) => {
+  try {
+    console.log('User ID:', req.user._id);
+    const partner = await Partner.findById(req.user._id);
+    if (!partner) return res.status(404).send('Partner not found.');
+    res.json(partner);
+  } catch (error) {
+    res.status(500).send(error.message);
+  }
+});
+
+// Partner Sign up  route
+router.post('/signup', uploadBusinessPermit, async (req, res) => {
+  try {
+    const {
+      businessName,
+      businessType,
+      contactNumber,
+      idNumber,
+      email,
+      town,
+      location,
+      password
+    } = req.body;
+
+    console.log('Received:', req.body);
+
+    const existingPartner = await Partner.findOne({
+      $or: [
+        { businessName },
+        { contactNumber }
+      ]
+    });
+
+    if (existingPartner) {
+      return res.status(400).json({ message: 'Business name or contact number already exists.' });
+    }
+
+    const hashedPassword = await bcrypt.hash(password, 10);
+    const role = (email === 'anyokaeats@gmail.com') ? 'admin' : 'partner';
+
+    const newPartnerData = {
+      businessName,
+      businessType,
+      contactNumber,
+      idNumber,
+      email,
+      location,
+      password: hashedPassword,
+      role
+    };
+
+    if (req.file) {
+      newPartnerData.businessPermit = req.file.filename;
+    }
+
+    const newPartner = new Partner(newPartnerData);
+    await newPartner.save();
+    res.status(201).json(newPartner);
+
+  } catch (error) {
+    console.error('Sign-up failed:', error);
+    res.status(500).json({ message: 'Server error during sign-up.' });
+  }
+});
+
+//Partner Log in Route
+router.post('/login', async (req, res) => {
+  try {
+    const { contactNumber, password } = req.body;
+    const partner = await Partner.findOne({ contactNumber });
+
+    if (!partner) return res.status(400).send('Invalid Credentials.');
+
+    const validPassword = await bcrypt.compare(password, partner.password);
+    if (!validPassword) return res.status(400).send('Invalid Credentials.');
+
+    const token = jwt.sign({ _id: partner._id, role: partner.role }, process.env.JWT_SECRET, { expiresIn: '1h' });
+
+    res.json({ token, partner, role: partner.role });
+  } catch (err) {
+    res.status(500).send(err.message);
+  }
+});
+
+// Retrieve Partner Route
+router.get('/partners/:partnerId', async (req, res) => {
+  try {
+    const { partnerId } = req.params;
+
+    if (!partnerId.match(/^[0-9a-fA-F]{24}$/)) {
+      return res.status(400).json({ message: 'Invalid partner ID format' });
+    }
+
+    const partner = await Partner.findById(partnerId);
+
+    if (!partner) {
+      return res.status(404).json({ message: 'Partner not found' });
+    }
+
+    res.status(200).json(partner);
+  } catch (error) {
+    console.error('Error retrieving partner details:', error.message);
+    res.status(500).json({ message: 'Failed to retrieve partner', error: error.message });
+  }
+});
+
+// Update partner details Route
+router.put('/partners/:id', async (req, res) => {
+
+  try {
+    const partnerId = req.params.id;
+    const updatedData = req.body;
+
+    const updatedPartner = await Partner.findByIdAndUpdate(
+      partnerId,
+      updatedData,
+      { new: true }
+    );
+
+    res.status(200).json({ message: 'Partner updated successfully', updatedPartner });
+  } catch (error) {
+    res.status(500).json({ message: 'Failed to update partner', error });
+  }
+});
+
+// Update /Add Partner profile Image
+router.post('/upload-profile-image', (req, res) => {
+  uploadProfileImage(req, res, async (err) => {
+    if (err) {
+      return res.status(400).json({ message: err.message });
+    }
+
+    const imagePath = req.file.path;
+
+    try {
+      const { partnerId } = req.body;
+      const updatedPartner = await Partner.findByIdAndUpdate(
+        partnerId,
+        { profileImage: `/uploads/profile-images/${req.file.filename}` }, 
+        { new: true }
+      );
+
+      if (!updatedPartner) {
+        return res.status(404).json({ message: 'Partner not found' });
+      }
+
+      res.status(200).json({
+        message: 'Image uploaded and profile updated successfully',
+        profileImage: `/uploads/profile-images/${req.file.filename}`, 
+      });
+    } catch (error) {
+      console.error('Error updating partner profile image:', error);
+      res.status(500).json({ message: 'Server error' });
+    }
+  });
+});
+
+//PRODUCTS MANAGEMEMENT
+
+//Product schema
+
+const productSchema = new Schema({
+  productId: { type: String, required: true, unique: true }, // Unique product identifier
+  name: { type: String, required: true }, // Product name
+  description: { type: String, required: false }, // Optional product description
+  images: [{ type: String, required: false }], // Array of image URLs
+  primaryImage: { type: String }, 
+  category: { type: String, required: true }, // Product category
+  subCategory: { type: String, required: false }, // Optional subcategory
+  brand: { type: String, required: true }, // Product brand
+  tags: [{ type: String, required: false }], // Optional tags for the product
+  price: { type: Number, required: true }, // Product price
+  quantity: {type: Number, required: true },
+  unit: { type: String, required: true }, // Unit of measurement (e.g., kg, g, etc.)
+  discountedPrice: { type: Number, required: false }, // Discounted price
+  isOnSale: { type: Boolean, default: false }, // Whether the product is on sale
+  inventory: { type: Number, required: true }, // Inventory count
+  shop: {
+    shopId: { type: mongoose.Schema.Types.ObjectId, ref: 'Partner', required: true }, // Reference to the Partner schema
+    shopName: { type: String, required: true }, // Business name from Partner schema
+    town: { type: String, required: true }, // Town from Partner schema
+    location: { type: String, required: true }, // Location from Partner schema
+  },
+  ratings: {
+    average: { type: Number, default: 0 }, // Average rating
+    reviews: [
+      {
+        user: { type: String, required: true }, // User who left the review
+        rating: { type: Number, required: true }, // Rating value
+        comment: { type: String, required: false }, // Optional comment
+      },
+    ],
+  },
+  createdAt: { type: Date, default: Date.now }, // Timestamp for creation
+  updatedAt: { type: Date, default: Date.now }, // Timestamp for updates
+});
+
+// Pre-save middleware to calculate the discounted price and set `isOnSale`
+productSchema.pre('save', function (next) {
+  if (this.discountedPrice && this.discountedPrice < this.price) {
+    this.isOnSale = true;
+  } else {
+    this.isOnSale = false;
+  }
+  next();
+});
+
+const Product = mongoose.model('Product', productSchema);
+
+
+
+// Route to add a new product
+router.post('/products', uploadProductImages, async (req, res) => {
+  try {
+    const {
+      name,
+      description,
+      category,
+      subCategory,
+      brand,
+      tags,
+      price,
+      discountedPrice,
+      quantity,
+      unit,
+      inventory,
+      shopId, // Partner's ID
+    } = req.body;
+    
+   
+    const images = req.files?.images?.map(file => file.path) || [];
+const primaryImageFile = req.files?.primaryImage?.[0]?.path;
+const primaryImage = primaryImageFile || req.body.primaryImage;
+
+    // Fetch the partner details using the shopId
+    const partner = await Partner.findById(shopId);
+    if (!partner) {
+      return res.status(404).json({ message: 'Shop not found' });
+    }
+
+    // Generate a unique product ID
+    const productId = shortid.generate();
+
+    // Create a new product
+    const newProduct = new Product({
+      productId,
+      name,
+      description,
+      images,
+      primaryImage,
+      category,
+      subCategory,
+      brand,
+      tags,
+      price,
+      discountedPrice: discountedPrice || price, // Default to price if no discount
+      quantity,
+      unit,
+      inventory,
+      shop: {
+        shopId: partner._id,
+        shopName: partner.businessName,
+        town: partner.town,
+        location: partner.location,
+      },
+    });
+
+    // Save the product to the database
+    await newProduct.save();
+
+    res.status(201).json({ message: 'Product added successfully', product: newProduct });
+  } catch (error) {
+    console.error('Error adding product:', error);
+    res.status(500).json({ message: 'Failed to add product', error: error.message });
+  }
+});
+
+
+router.get('/products', async (req, res) => {
+  try {
+      const { partnerId } = req.query; // Get partnerId from query parameters
+
+      if (!partnerId) {
+          return res.status(400).json({ message: 'Partner ID is required' });
+      }
+
+      // Fetch products for the specific partner
+      const products = await Product.find({ 'shop.shopId': partnerId });
+
+      res.status(200).json({ products });
+  } catch (error) {
+      console.error('Error fetching products:', error);
+      res.status(500).json({ message: 'Failed to fetch products' });
+  }
+});
+
+// Route to delete a product by ID
+router.delete('/products/:id', async (req, res) => {
+  try {
+      const productId = req.params.id;
+
+      // Find and delete the product
+      const deletedProduct = await Product.findByIdAndDelete(productId);
+
+      if (!deletedProduct) {
+          return res.status(404).json({ message: 'Product not found' });
+      }
+
+      res.status(200).json({ message: 'Product deleted successfully', product: deletedProduct });
+  } catch (error) {
+      console.error('Error deleting product:', error);
+      res.status(500).json({ message: 'Failed to delete product', error: error.message });
+  }
+});
+
+// Route to update a product by ID
+router.put('/products/:id', uploadProductImages, async (req, res) => {
+  try {
+      const productId = req.params.id;
+      const {
+          name,
+          description,
+          category,
+          subCategory,
+          brand,
+          tags,
+          price,
+          quantity,
+          unit,
+          inventory,
+          primaryImage,   // fallback primary image from req.body
+          deletedImages,  // This should be a JSON string
+      } = req.body;
+
+      // Since we're using upload.fields(), req.files is an object.
+      // Extract additional images (if any)
+      const images = (req.files && req.files.images && Array.isArray(req.files.images))
+          ? req.files.images.map((file) => file.path)
+          : [];
+
+      // Extract primary image file if uploaded
+      const primaryImageFile = (req.files && req.files.primaryImage && Array.isArray(req.files.primaryImage))
+          ? req.files.primaryImage[0].path
+          : null;
+
+      // Use the primary image file if available; otherwise, fallback to primaryImage from req.body.
+      const finalPrimaryImage = primaryImageFile || primaryImage;
+
+      // Normalize deleted image paths to match stored paths
+      const deletedImagesArray = deletedImages
+          ? JSON.parse(deletedImages).map((imgPath) => {
+              const parts = imgPath.split('/uploads/');
+              return parts.length > 1 ? `/var/data/uploads/${parts[1]}` : imgPath;
+            })
+          : [];
+
+      const updatedProduct = await Product.findById(productId);
+      if (!updatedProduct) {
+          return res.status(404).json({ message: 'Product not found' });
+      }
+
+      // Update product fields
+      updatedProduct.name = name || updatedProduct.name;
+      updatedProduct.description = description || updatedProduct.description;
+      updatedProduct.category = category || updatedProduct.category;
+      updatedProduct.subCategory = subCategory || updatedProduct.subCategory;
+      updatedProduct.brand = brand || updatedProduct.brand;
+      updatedProduct.tags = tags ? tags.split(',').map((tag) => tag.trim()) : updatedProduct.tags;
+      updatedProduct.price = price || updatedProduct.price;
+      updatedProduct.quantity = quantity || updatedProduct.quantity;
+      updatedProduct.unit = unit || updatedProduct.unit;
+      updatedProduct.inventory = inventory || updatedProduct.inventory;
+      updatedProduct.primaryImage = finalPrimaryImage || updatedProduct.primaryImage;
+
+      // Add new images
+      updatedProduct.images.push(...images);
+
+      // Remove deleted images from the images array
+      if (deletedImagesArray.length > 0) {
+          updatedProduct.images = updatedProduct.images.filter(
+              (image) => !deletedImagesArray.includes(image)
+          );
+
+          // Delete the files from the file system
+          deletedImagesArray.forEach((imagePath) => {
+              const fullPath = path.resolve(imagePath);
+              if (fs.existsSync(fullPath)) {
+                  fs.unlink(fullPath, (err) => {
+                      if (err) {
+                          console.error(`Failed to delete image file: ${fullPath}`, err);
+                      }
+                  });
+              } else {
+                  console.warn(`File not found: ${fullPath}`);
+              }
+          });
+      }
+
+      await updatedProduct.save();
+      res.status(200).json({ message: 'Product updated successfully', product: updatedProduct });
+  } catch (error) {
+      console.error('Error updating product:', error);
+      res.status(500).json({ message: 'Failed to update product', error: error.message });
+  }
+});
+
+
+
+// Route to fetch all products
+router.get('/all-products', async (req, res) => {
+  try {
+    // Fetch all products from the database
+    const products = await Product.find();
+
+    // Return the products as a JSON response
+    res.status(200).json({ products });
+  } catch (error) {
+    console.error('Error fetching products:', error);
+    res.status(500).json({ message: 'Failed to fetch products', error: error.message });
+  }
+});
+
+
+
+function sendEmailNotification(email, message) {
+  const mailOptions = {
+    from: email,
+    to: 'anyokaeats@gmail.com',
+    subject: 'New Contact Form Submission',
+    text: `Message from ${email}: ${message}`,
+  };
+
+  transporter.sendMail(mailOptions, (error, info) => {
+    if (error) {
+      console.error('Error sending email:', error);
+      return error;
+    }
+    console.log('Email sent: ' + info.response);
+    return 'Email sent successfully';
+  });
+}
+
+
+// Function to notify the supplier about a new order
+const notifySupplier = async (order) => {
+    try {
+      console.log('Sending order details:', order);
+        const restaurant = await Restaurant.findOne({ restaurant: order.selectedRestaurant }).populate('partnerId');
+
+        if (!restaurant || !restaurant.partnerId) {
+            console.log(`❌ No partner found for restaurant: ${order.selectedRestaurant}`);
+            return;
+        }
+
+        const partnerId = restaurant.partnerId._id.toString();
+        const partnerSocket = connectedPartners.get(partnerId);
+
+        if (partnerSocket) {
+            // If online, send the order immediately
+            partnerSocket.emit('newOrder', { orderId: order.orderId, orderDetails: order });
+            console.log(`✅ Order ${order.orderId} sent to partner ${partnerId}`);
+        } else {
+            // If offline, store the order for later
+            console.log(`⚠️ Partner ${partnerId} is offline. Storing order.`);
+            if (!pendingOrders.has(partnerId)) pendingOrders.set(partnerId, []);
+            pendingOrders.get(partnerId).push({ orderId: order.orderId, orderDetails: order });
+            console.log(`Stored orders for ${partnerId}:`, pendingOrders.get(partnerId));
+
+        }
+    } catch (error) {
+        console.error('🚨 Error notifying supplier:', error);
+    }
+};
 
 
 //USER SCHEMA AND ROUTES
@@ -122,361 +617,6 @@ router.get('/auth/current', async (req, res) => {
   }
 });
 
-
-// Define the schema and model first
-const partnerSchema = new mongoose.Schema({
-  businessName: { type: String, required: true, unique: true },
-  businessType: { type: String, required: true },
-  contactNumber: { type: String, required: true, unique: true },
-  email: { type: String, required: false, unique: true },
-  location: { type: String, required: false },
-  password: { type: String, required: true },
-  googleId: { type: String, required: false },
-  profileImage: { type: String, required: false },
-  contact: { type: mongoose.Schema.Types.ObjectId, ref: 'Contact' },
-  role: { type: String, enum: ['admin', 'partner'], default: 'partner' }
-});
-
-const Partner = mongoose.model('Partner', partnerSchema);
-
-router.get('/partner', authenticateToken, async (req, res) => {
-  try {
-    console.log('User ID:', req.user._id);
-    const partner = await Partner.findById(req.user._id);
-    if (!partner) return res.status(404).send('Partner not found.');
-    res.json(partner);
-  } catch (error) {
-    res.status(500).send(error.message);
-  }
-});
-// Define the sign-up route
-router.post('/signup', async (req, res) => {
-  const { businessName, businessType, contactNumber, email, location, password } = req.body;
-  // console.log('Request body:', req.body);
-  // Check if a partner with the same businessName or contactNumber already exists
-  try {
-    // console.log('Request body:', req.body);
-    const existingPartner = await Partner.findOne({
-      $or: [
-        { businessName: businessName },
-        { contactNumber: contactNumber }
-      ]
-    });
-
-    if (existingPartner) {
-      return res.status(400).json('A partner with the same business name or contact number already exists.');
-    }
-
-    // Hash the password
-    const hashedPassword = await bcrypt.hash(password, 10);
-
-    // Set role based on email
-    const role = (email === "anyokaeats@gmail.com") ? 'admin' : 'partner';
-
-
-    // Create a new partner
-    const newPartner = new Partner({
-      businessName,
-      businessType,
-      contactNumber,
-      email,
-      location,
-      password: hashedPassword,
-      role
-    });
-
-    // Save the new partner
-    await newPartner.save();
-
-    res.status(201).json(newPartner);
-    // console.log(newPartner);
-  } catch (error) {
-    console.error('Error during partner sign-up:', error);
-    res.status(500).json('An error occurred during sign-up.');
-  }
-});
-
-
-router.post('/login', async (req, res) => {
-  try {
-    const { contactNumber, password } = req.body;
-    const partner = await Partner.findOne({ contactNumber });
-
-    if (!partner) return res.status(400).send('Invalid Credentials.');
-
-    const validPassword = await bcrypt.compare(password, partner.password);
-    if (!validPassword) return res.status(400).send('Invalid Credentials.');
-
-    // // Generate a JWT token
-    // const token = jwt.sign({ _id: partner._id }, process.env.JWT_SECRET, { expiresIn: '1h' });
-
-    // // Send the token and partner details to the client
-    // res.json({ token, partner });
-    // Generate a JWT token
-    const token = jwt.sign({ _id: partner._id, role: partner.role }, process.env.JWT_SECRET, { expiresIn: '1h' });
-
-    // Send the token, role, and partner details to the client
-    res.json({ token, partner, role: partner.role });
-  } catch (err) {
-    res.status(500).send(err.message);
-  }
-});
-
-// Google login route - redirects to Google for authentication
-router.get('/api/auth/google', passport.authenticate('google', { scope: ['profile', 'email'] }));
-
-// Callback route for Google to redirect to after login
-router.get('/api/auth/google/callback',
-  passport.authenticate('google', { failureRedirect: '/' }),
-  (req, res) => {
-    // Successful authentication, redirect to frontend with JWT token
-    const token = req.user.token;
-    res.redirect(`${process.env.FRONTEND_URL}/login?token=${token}`);
-  }
-);
-
-// Route to get partner details by contact number
-router.get('/partner/:contactNumber', async (req, res) => {
-  try {
-    const partner = await Partner.findOne({ contactNumber: req.params.contactNumber });
-    if (!partner) return res.status(404).send('Partner not found');
-    res.json(partner);
-  } catch (err) {
-    res.status(500).send('Server error');
-  }
-});
-
-router.put('/partners/:id', async (req, res) => {
-  // console.log('Received update for partner partnersection:', req.params.id);
-  // console.log('Request body:', req.body);
-
-  try {
-    const partnerId = req.params.id;
-    const updatedData = req.body;
-
-    const updatedPartner = await Partner.findByIdAndUpdate(
-      partnerId,
-      updatedData,
-      { new: true }
-    );
-
-    res.status(200).json({ message: 'Partner updated successfully', updatedPartner });
-  } catch (error) {
-    res.status(500).json({ message: 'Failed to update partner', error });
-  }
-});
-
-
-router.post('/upload-profile-image', (req, res) => {
-  uploadProfileImage(req, res, async (err) => {
-    if (err) {
-      return res.status(400).json({ message: err.message });
-    }
-
-    const imagePath = req.file.path;
-
-    try {
-      const { partnerId } = req.body;
-      const updatedPartner = await Partner.findByIdAndUpdate(
-        partnerId,
-        { profileImage: `/uploads/profile-images/${req.file.filename}` }, // Save relative URL
-        { new: true }
-      );
-
-      if (!updatedPartner) {
-        return res.status(404).json({ message: 'Partner not found' });
-      }
-
-      // Return the relative URL path instead of the server path
-      res.status(200).json({
-        message: 'Image uploaded and profile updated successfully',
-        profileImage: `/uploads/profile-images/${req.file.filename}`, // Return relative URL
-      });
-    } catch (error) {
-      console.error('Error updating partner profile image:', error);
-      res.status(500).json({ message: 'Server error' });
-    }
-  });
-});
-
-// Get a partner with populated contact details
-router.get('/partners/:partnerId', async (req, res) => {
-  try {
-    const { partnerId } = req.params;
-
-    // Find the partner by ID and populate the contact details
-    const partner = await Partner.findById(partnerId).populate('contact');
-
-    if (!partner) {
-      return res.status(404).json({ message: 'Partner not found' });
-    }
-
-    res.status(200).json(partner);
-  } catch (error) {
-    res.status(500).json({ message: 'Failed to retrieve partner', error });
-  }
-});
-
-const contactSchema = new mongoose.Schema({
-  email: [{ type: String, unique: true }],
-  phoneNumbers: [{ type: String }],
-  faxNumbers: [{ type: String }]
-});
-
-const Contact = mongoose.model('Contact', contactSchema);
-
-// Create a new contact and associate it with a partner
-router.post('/contacts/:partnerId', async (req, res) => {
-  try {
-    const { partnerId } = req.params;
-    const { email, phoneNumbers, faxNumbers } = req.body;
-
-    // Create a new contact
-    const newContact = new Contact({
-      email,
-      phoneNumbers,
-      faxNumbers,
-    });
-
-    // Save the contact to the database
-    const savedContact = await newContact.save();
-
-    // Associate the contact with the partner
-    await Partner.findByIdAndUpdate(partnerId, { contact: savedContact._id });
-
-    res.status(201).json({
-      message: 'Contact created and associated with partner successfully',
-      contact: savedContact,
-    });
-  } catch (error) {
-    res.status(500).json({ message: 'Failed to create contact', error });
-  }
-});
-
-// Update an existing contact
-router.put('/contacts/:contactId', async (req, res) => {
-  const { contactId } = req.params;
-  const updatedData = req.body;
-
-  // Filter out empty fields and avoid inserting empty strings
-  Object.keys(updatedData).forEach((key) => {
-    if (
-      (Array.isArray(updatedData[key]) && updatedData[key].every(value => value.trim() === '')) ||
-      updatedData[key] === '' ||
-      updatedData[key] === null ||
-      updatedData[key] === undefined
-    ) {
-      delete updatedData[key];
-    }
-  });
-
-  try {
-    // Basic validation (only if the field exists in updatedData)
-    if (updatedData.email && !Array.isArray(updatedData.email)) {
-      return res.status(400).json({ message: 'Invalid email format' });
-    }
-    if (updatedData.phoneNumbers && !Array.isArray(updatedData.phoneNumbers)) {
-      return res.status(400).json({ message: 'Invalid phone numbers format' });
-    }
-    if (updatedData.faxNumbers && !Array.isArray(updatedData.faxNumbers)) {
-      return res.status(400).json({ message: 'Invalid fax numbers format' });
-    }
-
-    // Find and update the contact, or create if it does not exist
-    const updatedContact = await Contact.findByIdAndUpdate(
-      contactId,
-      updatedData,
-      { new: true, upsert: true }
-    );
-
-    // console.log(updatedContact);
-
-    res.status(200).json({
-      message: 'Contact updated successfully',
-      contact: updatedContact,
-    });
-  } catch (error) {
-    console.error('Error updating contact:', error);
-    res.status(500).json({ message: 'Failed to update contact', error });
-  }
-});
-
-
-// Get contact details
-router.get('/contacts/:contactId', async (req, res) => {
-  try {
-    const { contactId } = req.params;
-
-    // Find the contact by ID
-    const contact = await Contact.findById(contactId);
-
-    if (!contact) {
-      return res.status(404).json({ message: 'Contact not found' });
-    }
-
-    res.status(200).json(contact);
-  } catch (error) {
-    res.status(500).json({ message: 'Failed to retrieve contact', error });
-  }
-});
-
-// Delete a contact
-router.delete('/contacts/:contactId', async (req, res) => {
-  try {
-    const { contactId } = req.params;
-
-    // Find and delete the contact
-    await Contact.findByIdAndDelete(contactId);
-
-    res.status(200).json({ message: 'Contact deleted successfully' });
-  } catch (error) {
-    res.status(500).json({ message: 'Failed to delete contact', error });
-  }
-});
-
-const otherServicesSchema = new mongoose.Schema({
-  partnerId: { type: mongoose.Schema.Types.ObjectId, ref: 'Partner', required: true },
-  services: [{ type: String, required: true }],
-});
-
-const OtherServices = mongoose.model('OtherServices', otherServicesSchema);
-
-
-// Route to update services for a specific partner
-router.put('/other-services/:partnerId', async (req, res) => {
-  try {
-    const { partnerId } = req.params;
-    const { services } = req.body;
-
-    let otherServices = await OtherServices.findOneAndUpdate(
-      { partnerId },
-      { services },
-      { new: true, upsert: true } // Upsert to create if it doesn't exist
-    );
-
-    res.status(200).json({ message: 'Services updated successfully', otherServices });
-  } catch (error) {
-    res.status(500).json({ message: 'Failed to update services', error });
-  }
-});
-
-// Route to fetch services for a specific partner
-router.get('/other-services/:partnerId', async (req, res) => {
-  try {
-    const { partnerId } = req.params;
-
-    // Fetch the services for the given partnerId
-    const otherServices = await OtherServices.findOne({ partnerId });
-
-    if (!otherServices) {
-      return res.status(404).json({ message: 'No services found for this partner' });
-    }
-
-    res.status(200).json({ message: 'Services fetched successfully', otherServices });
-  } catch (error) {
-    res.status(500).json({ message: 'Failed to fetch services', error });
-  }
-});
 
 
 // Dish SCHEMA AND ITS ROUTES
@@ -1293,31 +1433,12 @@ router.get('/orders/delivered', async (req, res) => {
 });
 
 //WORKINGS AFTER MPESA PAYMENT HAS BEEN DONE
-// router.post('/paidOrder', async (req, res) => {
-//   // console.log('Received order data:', req.body);
-//   // console.log('OrderDetails');
-//   try {
-//     const orderDetails = req.body;
-
-//     // Ensure unique order ID
-//     orderDetails.orderId = uuidv4();
-
-//     // Set initial status
-//     orderDetails.status = 'Order received';
-
-//     // Save order to database
-//     await saveOrder(orderDetails);
-
-//     res.status(200).json({ message: 'Order saved successfully' });
-//   } catch (error) {
-//     console.error('Error saving order:', error);
-//     res.status(500).json({ error: 'Failed to save order' });
-//   }
-// });
 
 router.post('/paidOrder', async (req, res) => {
   try {
     const orderDetails = req.body;
+
+    console.log('Order details received:', orderDetails);
 
     // Generate a unique order ID
     orderDetails.orderId = uuidv4();
@@ -1333,22 +1454,13 @@ router.post('/paidOrder', async (req, res) => {
       return res.status(404).json({ error: 'Restaurant not found' });
     }
 
-    // // Notify the partner
-    // if (restaurant.partnerId) {
-    //   io.to(restaurant.partnerId.toString()).emit('newOrder', {
-    //     message: 'You have a new order!',
-    //     orderId: savedOrder.orderId,
-    //     details: orderDetails,
-    //   });
-    // }
-
      // Notify the partner
      if (restaurant.partnerId && connectedPartners[restaurant.partnerId.toString()]) {
       const partnerSocketId = connectedPartners[restaurant.partnerId.toString()];
       io.to(partnerSocketId).emit('newOrder', {
         message: 'You have a new order!',
         orderId: savedOrder.orderId,
-        details: orderDetails,
+        orderDetails: orderDetails,
       });
       console.log(`Notification sent to partner: ${restaurant.partnerId}`);
     }
@@ -2769,6 +2881,84 @@ router.post('/mpesa/status', async (req, res) => {
   } catch (error) {
     console.error('Error checking payment status:', error.response ? error.response.data : error.message);
     res.status(500).json({ error: 'Failed to check payment status', details: error.message });
+  }
+});
+
+
+// Route to handle Cash on Delivery (COD) payment method
+
+router.post('/cash/pay', async (req, res) => {
+  try {
+    const { phoneNumber, email, selectedRestaurant, customerLocation, expectedDeliveryTime, dishes, deliveryCharges, totalPrice, userId, customerName } = req.body;
+
+    console.log('Received cash order:', { phoneNumber, email, selectedRestaurant, customerLocation, expectedDeliveryTime, dishes, deliveryCharges, totalPrice });
+
+    // Generate unique order ID
+    const orderId = uuidv4();
+
+    // Find restaurant details to notify the partner
+    const restaurant = await Restaurant.findOne({ restaurant: selectedRestaurant }).populate('partnerId');
+
+    if (!restaurant) {
+      return res.status(404).json({ error: 'Restaurant not found' });
+    }
+
+    // Save order to the database
+    const order = new Order({
+      orderId,
+      phoneNumber,
+      email,
+      selectedRestaurant: selectedRestaurant,  // Ensure consistency with paid orders
+      customerLocation,
+      expectedDeliveryTime,
+      dishes,
+      deliveryCharges,
+      totalPrice,
+      paymentMethod: 'cash',
+      paid: false, // Explicitly marking as unpaid
+      status: 'Order received', // Align with paid orders
+      delivered: false,
+    });
+
+    // Add userId and customerName if available
+    if (userId) {
+      order.userId = userId;
+    }
+    if (customerName) {
+      order.customerName = customerName;
+    }
+
+    await order.save();
+
+    console.log('Cash order saved successfully:', order);
+   
+    if (restaurant.partnerId) {
+      notifySupplier(order);
+  } else {
+      console.log(`No partner ID associated with the restaurant: ${selectedRestaurant}`);
+  }
+  
+    // Send email confirmation
+    try {
+      await sendEmailNotification({
+        to: email,
+        subject: `Order Confirmation - ${orderId}`,
+        body: `Your order has been placed successfully. Your order ID is ${orderId}. It will be delivered to ${customerLocation} by ${expectedDeliveryTime}.`,
+      });
+      console.log('Email sent successfully');
+    } catch (emailError) {
+      console.error('Error sending email:', emailError);
+    }
+
+    // Respond with success
+    res.status(200).json({
+      message: 'Order placed successfully with Cash on Delivery!',
+      orderId,
+    });
+
+  } catch (error) {
+    console.error('Error saving cash order:', error);
+    res.status(500).json({ error: 'Failed to place order', details: error.message });
   }
 });
 
