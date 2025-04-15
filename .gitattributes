@@ -1,0 +1,6 @@
+uploads/products/*.jpg filter=lfs diff=lfs merge=lfs -text
+uploads/products/*.png filter=lfs diff=lfs merge=lfs -text
+uploads/products/*.jpeg filter=lfs diff=lfs merge=lfs -text
+uploads/profile-images/*.jpg filter=lfs diff=lfs merge=lfs -text
+uploads/profile-images/*.png filter=lfs diff=lfs merge=lfs -text
+uploads/profile-images/*.jpeg filter=lfs diff=lfs merge=lfs -text
