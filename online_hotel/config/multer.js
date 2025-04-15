@@ -39,6 +39,7 @@ const uploadMultiple = multer({
 // Set storage engine for profile images
 const profileStorage = multer.diskStorage({
   destination: '/var/data/uploads/profile-images',
+  // destination: path.join(__dirname, 'public/uploads/profile-images'),
   filename: (req, file, cb) => {
     cb(null, 'profile-' + Date.now() + path.extname(file.originalname));
   }
@@ -55,6 +56,7 @@ const uploadProfileImage = multer({
 // Set storage engine for business permit PDFs
 const permitStorage = multer.diskStorage({
   destination: '/var/data/uploads/business-permits', // <--- you can change this path
+  // destination: path.join(__dirname, 'public/uploads/business-permits'),
   filename: (req, file, cb) => {
     cb(null, 'permit-' + Date.now() + path.extname(file.originalname));
   }
@@ -91,7 +93,8 @@ function checkFileType(file, cb) {
 
 // Set storage engine for product images
 const productStorage = multer.diskStorage({
-  destination: '/var/data/uploads/products', // Dedicated path for product images
+  // destination: '/var/data/uploads/products', // Dedicated path for product images
+  destination: path.join(__dirname, '../uploads/products'),
   filename: (req, file, cb) => {
     cb(null, 'product-' + Date.now() + path.extname(file.originalname)); // Unique filename for each product image
   }
