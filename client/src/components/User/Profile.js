@@ -4,35 +4,59 @@ import profileImg from "../../assets/images/abstract-star-burst-with-rays-flare.
 import { PartnerContext } from '../../contexts/PartnerContext';
 import axios from 'axios';
 import config from '../../config';
+import MapSelector from './MapSelector';
 
 const Profile = ({ onSave }) => {
     const { partner, updatePartnerDetails } = useContext(PartnerContext);
     const [editImageMode, setEditImageMode] = useState(false);
     const [editSectionMode, setEditSectionMode] = useState(false);
+    const [location, setLocation] = useState('');
+    const [isMapVisible, setIsMapVisible] = useState(false);
+
+     
+    const handleLocationSelect = (plusCode) => {
+        setLocation(plusCode);
+      };
+    
+      const toggleMapVisibility = () => {
+        setIsMapVisible((prev) => !prev);
+      };
+      
     const [formData, setFormData] = useState({
         businessName: '',
         contactNumber: '',
+        town: '',
         location: '',
         businessType: '',
+        email: '',
+        idNumber: '',
+        description: '',
+        businessPermit: ''
     });
 
-    const profileImageRef = useRef(null);
     const profileImageInputRef = useRef(null);
-
     useEffect(() => {
-        // Fetch partner details if partner is not set or refresh the details
         if (partner?._id) {
             const fetchPartnerDetails = async () => {
                 try {
                     const response = await axios.get(`${config.backendUrl}/api/partners/${partner._id}`);
                     if (response.data) {
                         updatePartnerDetails(response.data);
-                        setFormData({
-                            businessName: response.data.businessName || '',
-                            contactNumber: response.data.contactNumber || '',
-                            location: response.data.location || '',
-                            businessType: response.data.businessType || '',
-                        });
+
+                        // Only reset formData if NOT in edit mode
+                        if (!editSectionMode) {
+                            setFormData({
+                                businessName: response.data.businessName || '',
+                                contactNumber: response.data.contactNumber || '',
+                                location: response.data.location || '',
+                                businessType: response.data.businessType || '',
+                                email: response.data.email || '',
+                                idNumber: response.data.idNumber || '',
+                                town: response.data.town || '',
+                                description: response.data.description || '',
+                                businessPermit: response.data.businessPermit || ''
+                            });
+                        }
                     }
                 } catch (error) {
                     console.error('Error fetching partner details:', error);
@@ -41,7 +65,8 @@ const Profile = ({ onSave }) => {
 
             fetchPartnerDetails();
         }
-    }, [partner?._id, updatePartnerDetails]);
+    }, [partner?._id, updatePartnerDetails, editSectionMode]);
+
 
     const toggleEditImageMode = () => setEditImageMode(!editImageMode);
     const toggleEditSection = () => setEditSectionMode(!editSectionMode);
@@ -49,27 +74,22 @@ const Profile = ({ onSave }) => {
     const saveProfileImage = async () => {
         const file = profileImageInputRef.current.files[0];
         if (file) {
-            const formData = new FormData();
-            formData.append('profileImage', file);
-            formData.append('partnerId', partner._id); // Append partnerId
+            const imgFormData = new FormData();
+            imgFormData.append('profileImage', file);
+            imgFormData.append('partnerId', partner._id);
 
             try {
                 const response = await fetch(`${config.backendUrl}/api/upload-profile-image`, {
                     method: 'POST',
-                    body: formData,
+                    body: imgFormData,
                 });
 
                 const data = await response.json();
 
                 if (response.ok) {
-                    console.log('Uploaded image data:', data);
-
-                    // Construct the correct URL to display the profile image
-                    const profileImageUrl = `${config.backendUrl}${data.profileImage.replace(/\\/g, '/')}`; // Ensure no extra slash
-
-                    // Update the state with the new profile image URL
+                    const profileImageUrl = `${config.backendUrl}${data.profileImage.replace(/\\/g, '/')}`;
                     updatePartnerDetails({ ...partner, profileImage: profileImageUrl });
-                    onSave(); // Notify parent component about the change
+                    onSave && onSave();
                 } else {
                     console.error('Error uploading image:', data.message);
                 }
@@ -81,14 +101,11 @@ const Profile = ({ onSave }) => {
         }
     };
 
-
     const saveSection = async () => {
         try {
             const response = await axios.put(`${config.backendUrl}/api/partners/${partner._id}`, formData);
-            console.log('Update successful:', response.data);
-
             updatePartnerDetails(response.data);
-            onSave(); // Notify parent component about the change
+            onSave && onSave();
             setEditSectionMode(false);
         } catch (error) {
             console.error('Error updating partner details:', error);
@@ -97,119 +114,162 @@ const Profile = ({ onSave }) => {
 
     const handleInputChange = (e) => {
         const { name, value } = e.target;
-        setFormData((prevData) => ({
-            ...prevData,
-            [name]: value,
-        }));
+        setFormData(prev => ({ ...prev, [name]: value }));
     };
 
     return (
-        <div id="profileImageSection" className="account_details">
-            <div className="essential_image">
-                <input
-                    type="file"
-                    id="profileImageInput"
-                    className="profile-image-input"
-                    onChange={saveProfileImage}  // Directly call saveProfileImage on file change
-                    ref={profileImageInputRef}
-                    style={{ display: editImageMode ? 'block' : 'none' }}
-                />
+        <div className="profile_wrapper">
+            <div id="profileContent" className="tab-content active">
+                <h2 className="ProfileH2">Your Profile</h2>
 
-                <div className="profile_img_div">
-                    <img
-                        src={partner?.profileImage ? `${config.backendUrl}${partner.profileImage.replace(/\\/g, '/')}` : profileImg}
-                        alt="Business Profile"
-                        className="account_profile_img"
-                        ref={profileImageRef}
-                    />
+                <div className="profile-details">
+                    <div className="profile-image-container">
+                        <input
+                            type="file"
+                            ref={profileImageInputRef}
+                            style={{ display: 'none' }}
+                            onChange={saveProfileImage}
+                        />
+                        <img
+                            id="profileImagePreview"
+                            src={partner?.profileImage ? `${config.backendUrl}${partner.profileImage.replace(/\\/g, '/')}` : profileImg}
+                            alt="Profile"
+                            className="profile-image"
+                            onClick={() => editImageMode && profileImageInputRef.current.click()}
+                        />
+                        <div className="image_buttons">
+                            <button className="edit_btn" onClick={toggleEditImageMode}>
+                                {editImageMode ? 'Cancel' : 'Edit Picture'}
+                            </button>
+                            {editImageMode && (
+                                <button className="save_btn" onClick={saveProfileImage}>
+                                    Save
+                                </button>
+                            )}
+                        </div>
+                    </div>
+
+                    <div className="profile-item permit">
+                        <strong>Business Permit:</strong>
+                        <a
+                            id="profileBusinessPermitLink"
+                            href={formData.businessPermit}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="btn-link"
+                        >
+                            View Permit
+                        </a>
+                    </div>
+
+                    <div className="profile-item">
+                        <strong>Shop Name:</strong>
+                        {editSectionMode ? (
+                            <input type="text" name="businessName" value={formData.businessName} onChange={handleInputChange} />
+                        ) : (
+                            <span id="profileShopName">{formData.businessName}</span>
+                        )}
+                    </div>
+
+                    <div className="profile-item">
+                        <strong>Business Category:</strong>
+                        {editSectionMode ? (
+                            <input type="text" name="businessType" value={formData.businessType} onChange={handleInputChange} />
+                        ) : (
+                            <span id="profileBusinessCategory">{formData.businessType}</span>
+                        )}
+                    </div>
+
+                    <div className="profile-item">
+                        <strong>Town or Centre:</strong>
+                        {editSectionMode ? (
+                            <input type="text" name="town" value={formData.town} onChange={handleInputChange} />
+                        ) : (
+                            <span id="profileBusinessCategory">{formData.town}</span>
+                        )}
+                    </div>
+
+                    <div className="profile-item">
+                        <strong>Phone Number:</strong>
+                        {editSectionMode ? (
+                            <input type="text" name="contactNumber" value={formData.contactNumber} onChange={handleInputChange} />
+                        ) : (
+                            <span id="profilePhoneNumber">{formData.contactNumber}</span>
+                        )}
+                    </div>
+
+                    <div className="profile-item">
+                        <strong>Email:</strong>
+                        {editSectionMode ? (
+                            <input type="email" name="email" value={formData.email} onChange={handleInputChange} />
+                        ) : (
+                            <span id="profileEmail">{formData.email}</span>
+                        )}
+                    </div>
+
+                    <div className="profile-item">
+                        <strong>ID Number:</strong>
+                        {editSectionMode ? (
+                            <input type="text" name="idNumber" value={formData.idNumber} onChange={handleInputChange} />
+                        ) : (
+                            <span id="profileIdNumber">{formData.idNumber}</span>
+                        )}
+                    </div>
+
+                    <div className="profile-item">
+                        <strong>Location:</strong>
+                        {editSectionMode ? (
+                            <>
+                                <input
+                                    type="text"
+                                    name="location"
+                                    value={formData.location}
+                                    readOnly
+                                />
+                                <button type="button" onClick={toggleMapVisibility}>
+                                    {isMapVisible ? 'Hide Map' : 'Edit Location'}
+                                </button>
+                                {isMapVisible && (
+                                    <MapSelector
+                                        onLocationSelect={(plusCode) =>
+                                            setFormData((prev) => ({ ...prev, location: plusCode }))
+                                        }
+                                    />
+                                )}
+                            </>
+                        ) : (
+                            <span id="profileLocation">{formData.location}</span>
+                        )}
+                    </div>
+
+
+                    <div className="profile-item profileDescriptionDiv">
+                        <strong>Description:</strong>
+                        {editSectionMode ? (
+                            <textarea
+                                name="description"
+                                value={formData.description}
+                                onChange={handleInputChange}
+                                placeholder="Describe your business..."
+                            />
+                        ) : (
+                            <span id="profileDescription">{formData.description}</span>
+                        )}
+                    </div>
+
+
                 </div>
 
-                <div className='image_button'>
-                    <button
-                        className="editButton profilePicBtn"
-                        onClick={toggleEditImageMode}
-                    >
-                        {editImageMode ? 'Cancel' : 'Edit Picture'}
+                <div className="details_buttons">
+                    <button className="edit_btn" onClick={toggleEditSection}>
+                        {editSectionMode ? 'Cancel' : 'Edit Details'}
                     </button>
-
-                    {editImageMode && (
-                        <button
-                            className="saveButton profilePicBtn"
-                            onClick={saveProfileImage}
-                        >
-                            Save
+                    {editSectionMode && (
+                        <button className="save_btn" onClick={saveSection}>
+                            Save Changes
                         </button>
                     )}
                 </div>
-            </div>
-
-            {/* Essential Details Section */}
-            <div className="essential_details" id="essentialDetailsSection">
-                <div className="essential_grid">
-                    <div className="essential_grid_content">
-                        <input
-                            type="text"
-                            name="businessName"
-                            className="content_input"
-                            placeholder='Business Name:'
-                            value={formData.businessName}
-                            onChange={handleInputChange}
-                            disabled={!editSectionMode}
-                        />
-                    </div>
-
-                    <div className="essential_grid_content">
-                        <input
-                            type="text"
-                            name="contactNumber"
-                            className="content_input"
-                            placeholder='Main Contact:'
-                            value={formData.contactNumber}
-                            onChange={handleInputChange}
-                            disabled={!editSectionMode}
-                        />
-                    </div>
-
-                    <div className="essential_grid_content">
-                        <input
-                            type="text"
-                            name="location"
-                            className="content_input"
-                            placeholder='Main Location:'
-                            value={formData.location}
-                            onChange={handleInputChange}
-                            disabled={!editSectionMode}
-                        />
-                    </div>
-
-                    <div className="essential_grid_content">
-                        <input
-                            type="text"
-                            name="businessType"
-                            className="content_input"
-                            placeholder='Main Service:'
-                            value={formData.businessType}
-                            onChange={handleInputChange}
-                            disabled={!editSectionMode}
-                        />
-                    </div>
-                </div>
-
-                <button
-                    className="editButton editprofileButton"
-                    onClick={toggleEditSection}
-                >
-                    {editSectionMode ? '' : 'Edit'}
-                </button>
-
-                {editSectionMode && (
-                    <button
-                        className="saveButton editprofileButton"
-                        onClick={saveSection}
-                    >
-                        Save
-                    </button>
-                )}
             </div>
         </div>
     );

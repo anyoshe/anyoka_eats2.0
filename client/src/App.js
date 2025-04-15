@@ -12,7 +12,7 @@ import DriverDashboard from './components/Landing/DriverDashboard';
 import DriverCreateAccount from './components/Landing/DriverCreateAccount';
 import ConferenceLandingPage from './components/Conferences/ConferenceLandingPage';
 import OutsideCateringLandingPage from './components/OutsideCatering/OutsideCateringLandingPage';
-import UserProfileDashBoard from './components/User/UserProfileDashBoard';
+import AccountPage from './components/User/AccountPage';
 import QuoteForm from './components/FreshFood/Getquote';
 import { PartnerProvider } from './contexts/PartnerContext';
 import DishCategories from './components/Menu/DishCategories';
@@ -49,7 +49,7 @@ function App() {
                                     <DriverCreateAccount />
                                 </DriverProvider>
                             } />
-                            <Route path="/dashboard" element={<UserProfileDashBoard />} />
+                            <Route path="/dashboard" element={<AccountPage />} />
                             <Route path="/menu" element={
                                 <CartProvider>
                                     <MenuPage />
@@ -59,7 +59,7 @@ function App() {
                             <Route path="/featured" element={<MenuPage />} />
                             <Route path="/superuserdashboard" element={<UserPage />} />
                             <Route path='/outside-catering' element={<OutsideCateringLandingPage />} />
-                            <Route path="/user" element={<UserProfileDashBoard />} />
+                            <Route path="/user" element={<AccountPage />} />
                             <Route path="/conferences" element={<ConferenceLandingPage />} />
                             <Route path="/conferenceList" element={<ConferenceList />} />
                             <Route path="/freshfood" element={
