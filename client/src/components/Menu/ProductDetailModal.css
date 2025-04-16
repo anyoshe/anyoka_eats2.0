@@ -1,26 +1,30 @@
+/* Modal Overlay */
+.product-detail-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5); /* Semi-transparent background */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  overflow-y: auto; /* Allow scrolling if content exceeds viewport height */
+}
+
+/* Modal Content */
 .product-detail-modal {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    right: auto;
-    bottom: auto;
-    transform: translate(-50%, -50%);
-    background: white;
-    padding: 20px;
-    max-width: 600px;
-    width: 90%;
-    border-radius: 8px;
-    outline: none;
-  }
-  
-  .product-detail-modal-overlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background-color: rgba(0, 0, 0, 0.75);
-  }
+  position: relative;
+  background: white;
+  border-radius: 8px;
+  max-width: 600px;
+  width: 90%;
+  max-height: 90vh; /* Limit modal height to 90% of the viewport */
+  overflow-y: auto; /* Enable scrolling for modal content */
+  padding: 20px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+}
+
   
   .close-button {
     float: right;

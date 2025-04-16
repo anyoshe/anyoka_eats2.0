@@ -19,6 +19,8 @@ const ProductModal = ({ isOpen, onClose, onSubmit, editingProduct, onProductUpda
     const [productDescription, setProductDescription] = useState('');
     const [productTags, setProductTags] = useState('');
     const [productImages, setProductImages] = useState([]);
+    const [productDiscountedPrice, setProductDiscountedPrice] = useState('');
+
 
     // Prefill fields when editingProduct changes
     useEffect(() => {
@@ -34,6 +36,8 @@ const ProductModal = ({ isOpen, onClose, onSubmit, editingProduct, onProductUpda
             setProductDescription(editingProduct.description || '');
             setProductTags(editingProduct.tags?.join(', ') || '');
             setProductImages(editingProduct.images || []);
+            setProductDiscountedPrice(editingProduct.discountedPrice || '');
+
 
             // Format image URLs
             const formattedImages = editingProduct.images?.map((image) =>
@@ -80,6 +84,8 @@ const ProductModal = ({ isOpen, onClose, onSubmit, editingProduct, onProductUpda
         formData.append('description', productDescription);
         formData.append('tags', productTags);
         formData.append('inventory', productInventory);
+        formData.append('discountedPrice', productDiscountedPrice);
+
 
         // Add shopId from PartnerContext
         if (partner && partner._id) {
@@ -222,6 +228,16 @@ const ProductModal = ({ isOpen, onClose, onSubmit, editingProduct, onProductUpda
                         onChange={(e) => setProductPrice(e.target.value)}
                         step="0.01"
                         required
+                    />
+
+                    {/* Discounted Price */}
+                    <label className="product-price-label product-label">Discounted Price:</label>
+                    <input
+                        type="number"
+                        className="product-price-input formInput"
+                        value={productDiscountedPrice}
+                        onChange={(e) => setProductDiscountedPrice(e.target.value)}
+                         placeholder="e.g., 250"
                     />
 
                     {/* Product Brand */}
