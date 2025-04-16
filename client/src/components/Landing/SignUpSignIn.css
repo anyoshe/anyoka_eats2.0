@@ -1,642 +1,109 @@
-@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@100;200;300;400;500;600;700;800;900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Winky+Sans:ital,wght@0,300..900;1,300..900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&family=Winky+Sans:ital,wght@0,300..900;1,300..900&display=swap');
 
-:root{
-    --green:rgb(30, 165, 9);
-    --orange: rgb(255,165,0);
+:root {
+    --green: #1ea509;
+    --orange: #ffa500;
+    --white: #ffffff;
 }
 
 * {
-  padding: 0px;
-  margin: 0px;
-  box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: "Winky Sans", sans-serif;
 }
 
-.authForm{
-  background: #f6f5f7;
-  place-content: center; 
-  font-family: 'Poppins', sans-serif;
-  height: 100vh;
-  width: 100%;
-}
-
-.container {
-  position: relative; 
-  width: 65%;
-  height: 90%; 
-  background-color: #FFF;
-  box-shadow: 25px 30px 55px #5557;
-  overflow: hidden;
-}
-
-.form-container {
-  position: absolute; 
-  width: 60%;
-  height: 100%;
-  padding: 0px 40px; 
-  transition: all 0.6s ease-in-out;
-}
-
-.sign-up-container {
-  opacity: 0;
-  z-index: 1;
-}
-
-.sign-in-container {
-  z-index: 2;
-}
-
-form {
-  height: 100%;
-  display: flex; 
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  padding: 0px 50px;  
-}
-
-h1 {
-  color: var(--green);
-  font-weight: 800;
-}
-
-.social-container {
-  margin: 15px 0px; 
-}
-
-
-.log_social_icons {
-  border: 1px solid #DDD;
-  border-radius: 50%;
-  display: inline-flex;
-  justify-content: center;
-  align-items: center;
-  margin: 0px 5px; 
-  height: 40px;
-  width: 40px;
-  background: var(--orange);
-  color: white;
-  transition: ease-in .2s;
-
-  font-size: 14px;
-  text-decoration: none; 
-}
-
-.log_social_icons:hover {
-  background: white;
-  color: var(--green);
-}
-
-span {
-  font-size: 12px;
-}
-
-.infield {
-  position: relative;
-  margin: 6px 0px; 
-  width: 100%;
-}
-
-.input-sign {
-  width: 100%;
-  padding: 12px 10px; 
-  background-color: #f3f3f3;
-  border: none;
-  outline: none;
-  position: relative;
-  font-size: 0.9rem;
-}
-
-/* .signInMode{ */
-  /* position: absolute;
-  left: 50%;
-  top: 100%;
-  transform: translateX(-50%);
-  width: 0%;
-  height: 2px;
-  background: var(--orange);
-  transition: width 0.3s ease;
-} */
-
-input:focus ~ label {
-  width: 100%;
-}
-
-/* a {
-  color: #333;
-  font-size: 14px;
-  text-decoration: none; 
-  margin: 15px 0px;
-} */
-
-.forgot {
-  margin-top: 2rem;
-  padding-bottom: 3px;
-  border-bottom: 2px solid var(--orange); 
-  color: var(--green);
-  transition: ease-in .2s;
-}
-
-
-.forgot:hover {
-  border-bottom: 2px solid var(--green); 
-  color: var(--orange);
-  font-size: 15px;
-}
-
- .loginBtn {
-  border-radius: 20px;
-  border: none;
-  background: var(--green);
-  color: #FFF;
-  font-size: 12px;
-  font-weight: bold; 
-  padding: 12px 45px; 
-  letter-spacing: 1px;
-  text-transform: uppercase; 
-} 
-
-.form-container button {
-  margin-top: 17px;
-  transition: 0.3s ease-in;
-}
-
-.form-container button:hover {
-  background: #FFF;
-  color: var(--green);
-  cursor: pointer;
-  outline: 1px solid var(--green);
-}
-
-.overlay-container {
-  position: absolute;
-  top: 0;
-  left: 60%;
-  width: 40%;
-  height: 100%;
-  overflow: hidden; 
-  transition: transform 0.6s ease-in-out;
-  z-index: 9;
-} 
-
-#overlayBtn {
-  cursor: pointer;
-  position: absolute;
-  left: 53%;
-  top: 355px;
-  transform: translateX(-50%);
-  width: 143.67px;
-  height: 40px; 
-  border: 1px solid #FFF;
-  /* border: none; */
-  background: transparent; 
-  border-radius: 20px;
-  padding: 5px;
-} 
-
-.overlay {
-  position: relative;
-  /* background: var(--linear-grad); */
-  background: var(--orange);
-  color: #FFF;
-  left: -150%;
-  height: 100%;
-  width: 250%;
-  transition: transform 0.6s ease-in-out;
-} 
-
-.overlay-panel {
-  position: absolute; 
-  display: flex;
-  align-items: center;
-  justify-content: center; 
-  flex-direction: column;
-  padding: 0px 40px;
-  text-align: center;
-  height: 100%;
-  width: 340px;  
-  transition: 0.6s ease-in-out;
-} 
-
-.overlay-left {
-  right: 60%;
-  transform: translateX(-12%);
-}
-
-.overlay-right {
-  right: 0;
-  transform: translateX(0%);
-} 
-
-.overlay-panel h1 {
-  color: #FFF; 
-}
-
-.sign-message{
-  font-size: 14px;
-  font-weight: 300;
-  line-height: 20px;
-  letter-spacing: 0.5px;
-  margin: 25px 0px 35px;
-}
-
-.overlay-panel button {
-  border: none;
-  /* background-color: transparent; */
-  background: var(--green);
-  z-index: 10;
-  transition: 0.3s ease-in;
-  cursor: pointer;
-} 
-
-.overlay-panel button:hover {
-    background: white;
-    color: var(--green);
-  } 
-
-.right-panel-active .overlay-container {
-  transform: translateX(-150%);
-}
-
-.right-panel-active .overlay {
-  transform: translateX(50%);
-}
-
-.right-panel-active .overlay-left {
-  transform: translateX(25%);
-}
-
-.right-panel-active .overlay-right {
-  transform: translateX(35%);
-}
-
-.right-panel-active .sign-in-container {
-  transform: translateX(20%);
-  opacity: 0;
-}
-
-.right-panel-active .sign-up-container {
-  transform: translateX(66.7%);
-  opacity: 1;
-  z-index: 5;
-  animation: show 0.6s;
-}
-
-.driverHead{
-  text-align: center;
-}
-
-.diverResetInput{
-  text-align: center;
-  margin-bottom: 0.2rem;
-  padding: 0.5rem ;
-}
-
-.driverResetButton{
-  text-align: right;
-  margin-top: 0.5rem;
-}
-
-.driverResetBtn{
-  padding: 0.2rem 0.5rem;
-  margin-right: 0.2rem;
-  border: none;
-  background: var(--green);
-  color: white;
-}
-
-@keyframes show {
-  0%, 50% {
-    opacity: 0;
-    z-index: 1;
-  }
-  50.1%, 100% {
-    opacity: 1;
-    z-index: 5;
-  }
-}
-
-btnScaled {
-  animation: scaleBtn 0.6s;
-}
-
-@keyframes scaleBtn {
-  0% {
-    width: 143.67px;
-  }
-  50% {
-    width: 250px;
-  }
-  100% {
-    width: 143.67px;
-  }
-}
-
-.square {
-  position: absolute;
-  height: 50%;
-  top: -5%;
-  left: 59%;
-  transform: translate(181%, 11%);
-  opacity: 0.2;
-
-  z-index: 300;
-}
-
-.big-circle {
-  position: absolute;
-  width: 30%;
-  height: 60%;
-  border-radius: 50%;
-  background: linear-gradient(to bottom, var(--orange), var(--green));
-  bottom: 55%;
-  right: 55%;
-  transform: translate(-40%, 38%);
-}
-
-.inner-circle {
-  position: absolute;
-  width: 72%;
-  height: 72%;
-  background-color: white;
-  border-radius: 50%;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-}
-
-.driverReset{
-  width: 30em;
-  padding: 0.5rem;
-  margin: 0rem 0.2rem;
-}
-
-/* Media Queries for Screens 480px and Below */
-@media screen and (max-width: 480px) {
-  /* the parent div of react  */
-  .authForm {
-    /* border: 5px solid red; */
-    padding: 0.2rem; 
-    width: 100%;
-  }
-
-  .square{
-    height: 20%;
-    top: -1%;
-    left: 46%;
-  }
-
-  /* container carying all the forms */
-  .container {
-    /* border: 5px solid blue; */
-
-    width: 100%; 
-    /* height: auto;  */
-    box-shadow: none; 
-    height: 88%;
-    padding: 0rem;
-  }
-
-  .form-container {
-    /* border: 5px solid green; */
-    
-    width: 100%; 
-    /* padding: 10px;  */
-  }
-
-  .sign-up-container,
-  .sign-in-container {
-    /* width: 100%;  */
-    padding: 0.2rem; 
-  }
-
-  form{
-    padding: 0rem;
-    height: 85%;
-  }
-
-  .input-sign {
-    padding: 10px; 
-    font-size: 0.9rem; 
-  } 
-
-  .loginBtn {
-    padding: 10px 20px; 
-    font-size: 14px; 
-  }
-
-  .forgot {
-    font-size: 13px;
-  }
-
-  .overlay-container {
-    width: 100%; 
-    left: 0%; 
-    top: 85%;
-    height: 30%;
-  }
-
-  .overlay {
-    width: 160%; 
-    left: 0%; 
-    height: 50%;
+/* Centering the form container */
+.signUpContainer {
     display: flex;
-    align-items: center;
     justify-content: center;
-  }
-
-  .overlay-panel {
-    /* border: 5px solid pink; */
-
-    width: 60%;
-    height: 90%;
-  }
-
-  .overlay-panel h1 {
-    font-size: 1rem;
-  }
-
-  .overlay-panel p {
-    /* border: 1px solid red; */
-
+    align-items: center;
     width: 100%;
-    padding: 0px;
-    font-size: 0.8rem;
-    margin-bottom: 0.5rem;
-  }
-
-  .signBtn{
-    padding: 0.5rem 1.2rem;
-    font-size: 0.7rem;
-  }
-
-  .overlay-left {
-    transform: translateX(-80%);
-    padding: 0rem; 
-    right: 55%;
-  }
-
-  .overlay-right {
-    transform: translateX(-65%); 
-    padding: 0rem;
-    margin-left: 4rem;
-  }
-
-  .right-panel-active .overlay-container {
-    transform: translateX(0);
-  } 
-
-  .right-panel-active .overlay {
-    transform: translateX(0); 
-  }
-
-  .right-panel-active .sign-in-container,
-  .right-panel-active .sign-up-container {
-    transform: translateX(0);
-  }
+    height: 100vh;
+    padding: 20px;
 }
 
-@media only screen and (min-width: 768px) and (max-width: 1024px) {
-
-  .authForm {
-    border: none;
-    padding: 0.7rem 0.3rem;
-  }
-
-  .square {
-    height: 25%;
-    top: -5%;
-    left: 55%;
-  }
-
-  .container {
-    width: 100%;
-    height: 90%;
-    background-color: #FFF;
-  }
-
-  .form-container {
-    width: 60%;
-    height: 100%;
-    padding: 0px;
-  }
-
-  form {
-    padding: 0px 45px;
-  }
-
-  .createAccount{
-    margin-bottom: 0rem;
-  }
-
-  .infield {
-    margin: 5px 0px;
-    width: 105%;
-  } 
-
-  .input-sign {
-    width: 100%;
-    padding: 10px 0.3rem;
-    font-size: 0.9rem;
-    border-radius: 0px;
-  } 
-
-  .overlay-container {
-    width: 40%;
-  }
-
-  .overlay-right {
-    right: 0;
-    transform: translateX(0%);
-    width: 300px;
-    padding: 0px 30px;
-  } 
-
-  .overlay-left {
-    width: 300px;
-    padding: 0px 30px;
-  }
-
-  .forgot {
-    margin-top: 1rem;
-    font-size: 0.7rem;
-  }
+.signUpWrapper {
+    background-color: white;
+    padding: 30px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    width: 700px;  /* Increased width for the form */
+    border-radius: 8px;
 }
 
-
-
-/* see password icon */
-
-.infield {
-  position: relative;
-}
-
-.eye-button {
-  position: absolute;
-  right: 10px;
-  transform: translateY(-50%);
-  background: none;
-  border: none;
-  cursor: pointer;
-}
-
-.close {
-  color: #aaa;
-  float: right;
-  font-size: 28px;
-  font-weight: bold;
-}
-
-.close:hover,
-.close:focus {
-  color: black;
-  text-decoration: none;
-  cursor: pointer;
-}
-
-@media(max-width: 320px){
-  #blockSee{
-    position: absolute;
-    right: 1rem;
-    top: 17.5rem;
-  }
-
-  #signBlockEye{
-    position: absolute;
-    right: 1rem;
-    top: 0.7rem;
-  }
-}
-
-@media (min-width:321px) and(max-width: 375px){
-  #blockSee{
-    position: absolute;
-    right: 10rem;
-    top: 17.5rem;
+/* Header */
+h2 {
     text-align: center;
-  }
-
-  #signBlockEye{
-    position: absolute;
-    right: 1rem;
-    top: 0.7rem;
-  }
+    margin-bottom: 20px;
 }
 
+/* Styling form elements */
+form {
+    display: grid;
+    grid-template-columns: 1fr 1fr; /* Create two equal-width columns */
+    gap: 15px;  /* Space between grid items */
+}
 
-@media (min-width:1025px) and (max-width: 1440px){
-  /* .input-sign{
-    position: relative;
-  } */
+.form-group {
+    display: flex;
+    flex-direction: column;
+}
 
-  #blockSee{
-    position: absolute;
-    bottom: 0.9rem;
-    left: 21rem;
-  }
+label {
+    font-size: 14px;
+    font-weight: bold;
+    margin-bottom: 5px;
+    display: block;
+}
 
-  /* #signBlockEye{
-    position: absolute;
-    right: 6.5rem;
-    bottom: 12.5rem;
-  } */
+input[type="text"],
+input[type="email"],
+input[type="tel"],
+input[type="file"] {
+    width: 100%;
+    padding: 10px;
+    font-size: 14px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    box-sizing: border-box;
+    border: none;
+    outline: 1px solid var(--green);
+}
+
+/* Hover effect for the input fields */
+input[type="text"]:hover,
+input[type="email"]:hover,
+input[type="tel"]:hover,
+input[type="file"]:hover {  
+    outline-color: var(--orange);
+    cursor: pointer;  
+}
+
+/* Handling the layout of the "full-width" fields */
+input[type="file"],
+input[type="text"] {
+    grid-column: span 2;  /* These fields span across both columns */
+}
+
+.required {
+    color: red;
+    font-size: 16px;
+}
+
+/* Submit button styling */
+.submitBtn {
+    padding: 10px;
+    background-color: var(--orange); 
+    color: var(--white);
+    border: none;  
+    outline: none;  
+    font-size: 16px;
+    cursor: pointer;
+    grid-column: span 2;  
+}
+
+.submitBtn:hover {
+    background-color: #e68a00; 
+    cursor: pointer;  
 }

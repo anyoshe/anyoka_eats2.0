@@ -31,6 +31,7 @@ const PaymentOptionsModal = ({ show, handleClose, handlePayment }) => {
             <h6>Select your preferred payment method</h6>
             <button type="button" className="optionPay" onClick={() => handlePayment('mpesa')}>Mpesa</button>
             <button type="button" className="optionPay" onClick={() => handlePayment('visa')}>Visa Card</button>
+            <button type="button" className="optionPay" onClick={() => handlePayment('cash')}>Cash on Delivery</button>
           </div>
           <div className="modal-footer">
             <button type="button" className="optionPay" onClick={handleClose}>Close</button>
@@ -200,6 +201,42 @@ const OrderSummaryModal = ({ show, handleClose, restaurantName, orderedDishes = 
           alert('Error initiating M-Pesa payment. Please try again.');
         }
         break;
+
+        case 'cash':
+          console.log('Processing Cash on Delivery...');
+          alert('You have chosen Cash on Delivery. Please ensure you have the correct amount in cash when your order arrives.');
+        
+          // Retrieve readable address
+          const address = await getReadableAddress(pinnedLocation.lat, pinnedLocation.lng);
+        
+          const orderDetails = {
+            phoneNumber: contactNumber,
+            email: customerEmail,
+            selectedRestaurant: restaurantName,
+            customerLocation: address,
+            expectedDeliveryTime: selectedTime,
+            dishes: orderedDishes,
+            deliveryCharges: deliveryCharges,
+            totalPrice: grandTotal,
+            // userId: currentUserId,  // Ensure userId is sent if logged in
+            // customerName: customerFullName,  // Pass customer name if available
+          };
+        
+          try {
+            const response = await axios.post(`${config.backendUrl}/api/cash/pay`, orderDetails);
+        
+            if (response.status === 200) {
+              alert('Order placed successfully with Cash on Delivery!');
+              clearCart();
+              setShowPaymentModal(false);
+              redirectToHomePage();
+            }
+          } catch (error) {
+            console.error('Error placing order:', error);
+            alert('Failed to place order. Please try again.');
+          }
+          break;
+        
 
       default:
         console.error('Unsupported payment method.');
