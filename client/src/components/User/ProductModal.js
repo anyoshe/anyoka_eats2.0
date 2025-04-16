@@ -171,11 +171,17 @@ const ProductModal = ({ isOpen, onClose, onSubmit, editingProduct, onProductUpda
                             <div key={index} className="image-preview-item">
                                 <img
                                     className="product-image-preview"
+                                    // src={
+                                    //     typeof image === 'string'
+                                    //         ? image // Use the URL directly for existing images
+                                    //         : URL.createObjectURL(image) // Create a preview for newly added images
+                                    // }
                                     src={
                                         typeof image === 'string'
-                                            ? image // Use the URL directly for existing images
-                                            : URL.createObjectURL(image) // Create a preview for newly added images
-                                    }
+                                          ? `${config.backendUrl}${image.replace('/mnt/shared/Projects/anyoka_eats2.0/online_hotel', '')}`
+                                          : URL.createObjectURL(image)
+                                      }
+                                      
                                     alt={`Product ${index + 1}`}
                                 />
                                 <button

@@ -21,7 +21,10 @@ const database = mongoose.connection;
 
 // Serve static files from the uploads directory
 // Serve static files from the uploads directory
-app.use('/uploads', express.static('/var/data/uploads'));
+// app.use('/uploads', express.static('/var/data/uploads'));
+// Serve static files from the 'public' directory
+app.use('/uploads', express.static(path.join(__dirname, '/uploads')));
+
 
 // Middleware
 app.use(express.json());

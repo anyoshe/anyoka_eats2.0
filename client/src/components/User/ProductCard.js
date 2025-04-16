@@ -4,7 +4,12 @@ import config from '../../config';
 import './ProductCard.css';
 
 const ProductCard = ({ product }) => {
-  const imageUrl = product.images?.[0] ? `${config.backendUrl}${product.images[0].replace('/var/data', '')}` : '/placeholder.png';
+  // const imageUrl = product.images?.[0] ? `${config.backendUrl}${product.images[0].replace('/var/data', '')}` : '/placeholder.png';
+  const imageUrl = product.primaryImage
+  ? `${config.backendUrl}${product.primaryImage}`
+  : product.images?.[0]
+  ? `${config.backendUrl}${product.images[0]}`
+  : '/path/to/placeholder-image.jpg';
   const [averageRating, setAverageRating] = useState(product.ratings?.average || 0);
   const [ratingCount, setRatingCount] = useState(product.ratings?.reviews?.length || 0);
   const [hoverRating, setHoverRating] = useState(0);
