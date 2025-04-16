@@ -43,19 +43,32 @@ const ProductList = ({ onEditProduct, onDeleteProduct, refreshTrigger }) => {
         fetchProducts();
     }, [refreshTrigger, partner]);
 
+    // const getImageSrc = (product) => {
+    //     if (product.primaryImage) {
+    //         return product.primaryImage.startsWith('http')
+    //             ? product.primaryImage
+    //             : `${config.backendUrl}${product.primaryImage.replace('/var/data', '')}`;
+    //     }
+
+    //     if (product.images && product.images.length > 0) {
+    //         return `${config.backendUrl}${product.images[0].replace('/var/data', '')}`;
+    //     }
+
+    //     return '/path/to/placeholder-image.jpg';
+    // };
+
     const getImageSrc = (product) => {
         if (product.primaryImage) {
-            return product.primaryImage.startsWith('http')
-                ? product.primaryImage
-                : `${config.backendUrl}${product.primaryImage.replace('/var/data', '')}`;
+          return `${config.backendUrl}/uploads/${product.primaryImage.split('/uploads/')[1]}`;
         }
-
+      
         if (product.images && product.images.length > 0) {
-            return `${config.backendUrl}${product.images[0].replace('/var/data', '')}`;
+          return `${config.backendUrl}/uploads/${product.images[0].split('/uploads/')[1]}`;
         }
-
+      
         return '/path/to/placeholder-image.jpg';
-    };
+      };
+      
 
     return (
         <div className="product-list-container">

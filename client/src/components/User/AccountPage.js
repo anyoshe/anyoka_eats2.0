@@ -23,7 +23,7 @@ const AccountPage = () => {
       case "sales":
         // return <Sales />;
       default:
-        return <Profile />;
+        // return <Profile />;
     }
   };
 

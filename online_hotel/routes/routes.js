@@ -296,9 +296,14 @@ router.post('/products', uploadProductImages, async (req, res) => {
     } = req.body;
     
    
-    const images = req.files?.images?.map(file => file.path) || [];
+//     const images = req.files?.images?.map(file => file.path) || [];
+// const primaryImageFile = req.files?.primaryImage?.[0]?.path;
+// const primaryImage = primaryImageFile || req.body.primaryImage;
+const images = req.files?.images?.map((file) => `/uploads/products/${file.filename}`) || [];
 const primaryImageFile = req.files?.primaryImage?.[0]?.path;
-const primaryImage = primaryImageFile || req.body.primaryImage;
+const primaryImage = primaryImageFile
+  ? `/uploads/products/${primaryImageFile.split('/').pop()}`
+  : req.body.primaryImage;
 
     // Fetch the partner details using the shopId
     const partner = await Partner.findById(shopId);
@@ -477,11 +482,8 @@ router.put('/products/:id', uploadProductImages, async (req, res) => {
 // Route to fetch all products
 router.get('/all-products', async (req, res) => {
   try {
-    // Fetch all products from the database
     const products = await Product.find();
-
-    // Return the products as a JSON response
-    res.status(200).json({ products });
+    res.status(200).json({ products }); // Ensure the response contains a `products` key
   } catch (error) {
     console.error('Error fetching products:', error);
     res.status(500).json({ message: 'Failed to fetch products', error: error.message });
