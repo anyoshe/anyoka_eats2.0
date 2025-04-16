@@ -29,21 +29,21 @@ const AccountPage = () => {
 
   return (
     <div className="container">
-      {/* Header with Notification and Logout Icons */}
-      <div className="header-nav">
+      
+      {/* <div className="header-nav">
         <h1>Account Page</h1>
         <div className="header-nav-icons">
-          {/* Notification Icon */}
+         
           <FontAwesomeIcon
             icon={faBell}
             className="icon notification-icon"
             data-count={5} 
             onClick={() => setShowNotifications(!showNotifications)}
           />
-          {/* Logout Icon */}
+        
           <LogoutComponent />
         </div>
-      </div>
+      </div> */}
 
       {/* Notification Dropdown */}
       {showNotifications && <NotificationComponent />}
@@ -74,6 +74,21 @@ const AccountPage = () => {
         >
           Sales
         </div>
+
+        <div className="header-nav-icons">
+          {/* Notification Icon */}
+          <FontAwesomeIcon
+            icon={faBell}
+            className="icon notification-icon profileNotification"
+            data-count={5} 
+            onClick={() => setShowNotifications(!showNotifications)}
+          />
+
+          {/* Logout Icon */}
+          <LogoutComponent />
+
+        </div>
+        
       </div>
 
       {/* Dynamic Tab Content */}
