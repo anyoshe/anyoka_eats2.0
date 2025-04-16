@@ -1,9 +1,10 @@
-// ProductDetailModal.js
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Modal from 'react-modal';
+import ProductCard from '../User/ProductCard'; // Import the ProductCard component
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faStar as solidStar } from '@fortawesome/free-solid-svg-icons';
 import { faStar as regularStar } from '@fortawesome/free-regular-svg-icons';
+import config from '../../config';
 import './ProductDetailModal.css'; // Ensure you create and style this CSS file
 
 Modal.setAppElement('#root'); // For accessibility
@@ -12,15 +13,69 @@ const ProductDetailModal = ({ isOpen, onRequestClose, product, onAddToCart }) =>
   const [hoverRating, setHoverRating] = useState(0);
   const [selectedRating, setSelectedRating] = useState(product.ratings?.average || 0);
   const [comment, setComment] = useState('');
+  const [comments, setComments] = useState([]); // Store previous comments
 
-  const handleStarClick = (rating) => {
-    setSelectedRating(rating);
-    // TODO: Submit rating to the server
+  // Fetch comments and reviews when the modal is opened
+  useEffect(() => {
+    if (isOpen) {
+      fetchComments();
+    }
+  }, [isOpen]);
+
+  const fetchComments = async () => {
+    try {
+      const response = await fetch(`${config.backendUrl}/api/products/${product._id}/comments`);
+      const data = await response.json();
+      if (response.ok) {
+        setComments(data.comments);
+      } else {
+        console.error('Failed to fetch comments:', data.message);
+      }
+    } catch (error) {
+      console.error('Error fetching comments:', error);
+    }
   };
 
-  const handleAddComment = () => {
-    // TODO: Submit comment to the server
-    setComment('');
+  const handleStarClick = async (rating) => {
+    setSelectedRating(rating);
+    try {
+      const response = await fetch(`${config.backendUrl}/api/products/${product._id}/rate`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ rating }),
+      });
+      const data = await response.json();
+      if (response.ok) {
+        console.log('Rating submitted successfully:', data);
+      } else {
+        console.error('Failed to submit rating:', data.message);
+      }
+    } catch (error) {
+      console.error('Error submitting rating:', error);
+    }
+  };
+
+  const handleAddComment = async () => {
+    try {
+      const response = await fetch(`${config.backendUrl}/api/products/${product._id}/comments`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ comment }),
+      });
+      const data = await response.json();
+      if (response.ok) {
+        setComments((prevComments) => [...prevComments, data.comment]);
+        setComment('');
+      } else {
+        console.error('Failed to submit comment:', data.message);
+      }
+    } catch (error) {
+      console.error('Error submitting comment:', error);
+    }
   };
 
   return (
@@ -35,15 +90,12 @@ const ProductDetailModal = ({ isOpen, onRequestClose, product, onAddToCart }) =>
         <button className="close-button" onClick={onRequestClose}>
           &times;
         </button>
-        <img
-          src={product.primaryImage || '/placeholder.png'}
-          alt={product.name}
-          className="modal-image"
-        />
-        <h2>{product.name}</h2>
-        <p className="modal-price">KSH: {product.price}</p>
-        <p className="modal-description">{product.description}</p>
+
+        {/* Render the ProductCard component */}
+        <ProductCard product={product} />
+
         <div className="modal-rating">
+          <h3>Rate this Product</h3>
           {[1, 2, 3, 4, 5].map((star) => (
             <FontAwesomeIcon
               key={star}
@@ -56,7 +108,17 @@ const ProductDetailModal = ({ isOpen, onRequestClose, product, onAddToCart }) =>
           ))}
           <span className="rating-value">({selectedRating.toFixed(1)})</span>
         </div>
+
         <div className="modal-comments">
+          <h3>Comments</h3>
+          <ul className="comments-list">
+            {comments.map((c, index) => (
+              <li key={index} className="comment-item">
+                <p>{c.text}</p>
+                <small>By: {c.user}</small>
+              </li>
+            ))}
+          </ul>
           <textarea
             value={comment}
             onChange={(e) => setComment(e.target.value)}
@@ -67,13 +129,12 @@ const ProductDetailModal = ({ isOpen, onRequestClose, product, onAddToCart }) =>
             Submit Comment
           </button>
         </div>
+
         <button onClick={() => onAddToCart(product)} className="add-to-cart-button">
           Add to Cart
         </button>
       </div>
     </Modal>
-   
-    
   );
 };
 
