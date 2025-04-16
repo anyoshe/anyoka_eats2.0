@@ -19,6 +19,10 @@ const mongoString = process.env.DATABASE_URL;
 mongoose.connect(mongoString);
 const database = mongoose.connection;
 
+// Serve static files from the uploads directory
+// Serve static files from the uploads directory
+app.use('/uploads', express.static('/var/data/uploads'));
+
 // Middleware
 app.use(express.json());
 app.use(bodyParser.json());
@@ -59,30 +63,43 @@ app.use('/api', appRoutes);
 // File Uploads
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 app.use('/uploads', express.static(path.join(__dirname, '/var/data/uploads')));
-// Serve static files from the persistent disk
 app.use('/uploads/images', express.static(path.join('/var/data/uploads/images')));
 app.use('/uploads/profile-images', express.static(path.join('/var/data/uploads/profile-images')));
 app.use('/uploads/conferences', express.static(path.join('/var/data/uploads/conferences')));
-// Serve static files from the "public" directory
-// app.use(express.static(path.join(__dirname, '../client/public')));
+app.use('uploads/business-permits', express.static(path.join('/var/data/uploads/business-permits')));
+app.use('/uploads/products', express.static(path.join('/var/data/uploads/products')));
 
-// Serve static files from the 'public' directory
+const fs = require('fs');
+
+// List of upload directories
+const uploadDirectories = [
+  '/var/data/uploads',
+  '/var/data/uploads/images',
+  '/var/data/uploads/profile-images',
+  '/var/data/uploads/conferences',
+  '/var/data/uploads/business-permits',
+  '/var/data/uploads/products',
+];
+
+// Ensure each directory exists
+uploadDirectories.forEach((dir) => {
+  if (!fs.existsSync(dir)) {
+    fs.mkdirSync(dir, { recursive: true });
+    console.log(`Created directory: ${dir}`);
+  }
+});
+// Serve static files
 app.use(express.static(path.join(__dirname, '../client/build')));
 
-
-// The "catchall" handler: for any request that doesn't
-// match one above, send back index.html.
 app.get('*', (req, res) => {
-  res.sendFile(path.join(__dirname, '../client/build/index.html')); // Adjusted path
+  res.sendFile(path.join(__dirname, '../client/build/index.html'));
 });
 
 // Error Handler
 function errorHandler(err, req, res, next) {
   console.error(err.stack); 
-  const statusCode = err.status || 500; 
-  res.status(statusCode).json({ message: err.message });
+  res.status(err.status || 500).json({ message: err.message });
 }
-
 app.use(errorHandler);
 
 // CORS Headers
@@ -93,60 +110,23 @@ app.use((req, res, next) => {
   next();
 });
 
+// Socket.IO Setup
 
-// Require the http and socket.io modules
 const http = require('http');
-const { Server } = require('socket.io');
+// const app = require('./app'); // Your Express app
+const { initializeSocket } = require('./socket');
 
-// Wrap the Express app with the HTTP server
 const server = http.createServer(app);
 
-// Initialize Socket.IO
-const io = new Server(server, {
-  cors: {
-    origin: '*', // Adjust this for production (e.g., your frontend URL)
-    methods: ['GET', 'POST'],
-  },
-});
+// Initialize WebSocket server
+initializeSocket(server);
 
-// Track connected partners
-const connectedPartners = {};
-
-// Socket.IO connection handler
-io.on('connection', (socket) => {
-  console.log('A user connected:', socket.id);
-
-  // Partner registers their ID
-  socket.on('registerPartner', (partnerId) => {
-    connectedPartners[partnerId] = socket.id; // Map partner ID to the socket ID
-    console.log(`Partner registered: ${partnerId}`);
-  });
-
-  // Handle partner disconnect
-  socket.on('disconnect', () => {
-    const partnerId = Object.keys(connectedPartners).find(key => connectedPartners[key] === socket.id);
-    if (partnerId) {
-      delete connectedPartners[partnerId];
-      console.log(`Partner disconnected: ${partnerId}`);
-    }
-  });
-});
-
-// Export the io object for use in your routes
-module.exports = io;
 // Database Connection Events
-database.on('error', (error) => {
-  console.log(error);
-});
-
-database.once('connected', () => {
-  console.log('Database Connected');
-});
+database.on('error', (error) => console.log(error));
+database.once('connected', () => console.log('Database Connected'));
 
 // Start Server
 const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => {
+server.listen(PORT, () => {
   console.log(`Server Started at ${PORT}`);
 });
-
-
