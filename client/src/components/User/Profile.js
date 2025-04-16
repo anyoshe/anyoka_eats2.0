@@ -120,7 +120,7 @@ const Profile = ({ onSave }) => {
     return (
         <div className="profile_wrapper">
             <div id="profileContent" className="tab-content active">
-                <h2 className="ProfileH2">Your Profile</h2>
+                {/* <h2 className="ProfileH2">Your Profile</h2> */}
 
                 <div className="profile-details">
                     <div className="profile-image-container">
@@ -137,16 +137,19 @@ const Profile = ({ onSave }) => {
                             className="profile-image"
                             onClick={() => editImageMode && profileImageInputRef.current.click()}
                         />
-                        <div className="image_buttons">
-                            <button className="edit_btn" onClick={toggleEditImageMode}>
-                                {editImageMode ? 'Cancel' : 'Edit Picture'}
+                       <div className="image_buttons">
+                            <button className="edit_btn" onClick={toggleEditImageMode} title={editImageMode ? 'Cancel' : 'Edit Picture'}>
+                                <i className={`fas ${editImageMode ? 'fa-times' : 'fa-edit'}`}></i>
                             </button>
+
                             {editImageMode && (
-                                <button className="save_btn" onClick={saveProfileImage}>
-                                    Save
+                                <button className="save_btn" onClick={saveProfileImage} title="Save">
+                                <i className="fas fa-save"></i>
                                 </button>
                             )}
                         </div>
+
+
                     </div>
 
                     <div className="profile-item permit">
@@ -162,7 +165,7 @@ const Profile = ({ onSave }) => {
                         </a>
                     </div>
 
-                    <div className="profile-item">
+                    <div className="profile-item profileItemShop">
                         <strong>Shop Name:</strong>
                         {editSectionMode ? (
                             <input type="text" name="businessName" value={formData.businessName} onChange={handleInputChange} />
@@ -220,28 +223,35 @@ const Profile = ({ onSave }) => {
                         <strong>Location:</strong>
                         {editSectionMode ? (
                             <>
+                            <div className="locationInputWrapper">
                                 <input
-                                    type="text"
-                                    name="location"
-                                    value={formData.location}
-                                    readOnly
+                                type="text"
+                                name="location"
+                                value={formData.location}
+                                readOnly
                                 />
-                                <button type="button" onClick={toggleMapVisibility}>
-                                    {isMapVisible ? 'Hide Map' : 'Edit Location'}
+                                <button
+                                type="button"
+                                className="edit_btn"
+                                onClick={toggleMapVisibility}
+                                title={isMapVisible ? 'Hide Map' : 'Edit Location'}
+                                >
+                                <i className={`fas ${isMapVisible ? 'fa-times' : 'fa-pen'}`}></i>
                                 </button>
-                                {isMapVisible && (
-                                    <MapSelector
-                                        onLocationSelect={(plusCode) =>
-                                            setFormData((prev) => ({ ...prev, location: plusCode }))
-                                        }
-                                    />
-                                )}
+                            </div>
+
+                            {isMapVisible && (
+                                <MapSelector
+                                onLocationSelect={(plusCode) =>
+                                    setFormData((prev) => ({ ...prev, location: plusCode }))
+                                }
+                                />
+                            )}
                             </>
                         ) : (
                             <span id="profileLocation">{formData.location}</span>
                         )}
                     </div>
-
 
                     <div className="profile-item profileDescriptionDiv">
                         <strong>Description:</strong>
@@ -261,15 +271,21 @@ const Profile = ({ onSave }) => {
                 </div>
 
                 <div className="details_buttons">
-                    <button className="edit_btn" onClick={toggleEditSection}>
-                        {editSectionMode ? 'Cancel' : 'Edit Details'}
+                    <button
+                        className="edit_btn"
+                        onClick={toggleEditSection}
+                        title={editSectionMode ? 'Cancel' : 'Edit Details'}
+                    >
+                        <i className={`fas ${editSectionMode ? 'fa-times' : 'fa-pen'}`}></i>
                     </button>
+
                     {editSectionMode && (
-                        <button className="save_btn" onClick={saveSection}>
-                            Save Changes
+                        <button className="save_btn" onClick={saveSection} title="Save Changes">
+                        <i className="fas fa-save"></i>
                         </button>
                     )}
                 </div>
+
             </div>
         </div>
     );

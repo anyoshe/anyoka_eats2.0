@@ -20,14 +20,15 @@
 .container {
     width: 90%;
     /* max-width: 69em;  */
-    margin: 0.1rem auto; 
+    /* margin: 0.1rem auto;  */
     background-color: #ffffff;
     border-radius: 0.5rem; 
     box-shadow: 0 0.25rem 0.625rem rgba(0, 0, 0, 0.1); 
-    padding: 1.5rem; 
+    padding: 1rem; 
+    margin-top: 0.5rem;
 }
 
-.ProfileH2 {
+/* .ProfileH2 {
     color: #333; 
     margin-bottom: 1.2rem;
     font-size: 1.4rem; 
@@ -36,12 +37,12 @@
     border-bottom: 0.1rem solid var(--orange); 
     padding-bottom: 0.2rem; 
     font-weight: bold; 
-}
+} */
 
 /* Tabs */
 .tabs {
     display: flex;
-    justify-content: space-evenly;
+    justify-content: space-around;
     margin-bottom: 0.5rem; 
     background-color: #ffffff;
 }
@@ -72,9 +73,9 @@
 .tab-content {
     display: none;
     /* padding: 1.2rem;  */
-    padding: 0.8rem 0.5rem; 
+    /* padding: 0.8rem 0.5rem;  */
     border-radius: 0.3rem; 
-    border: 0.1rem solid #ddd; 
+    /* border: 0.1rem solid #ddd;  */
     /* margin-bottom: 0.5rem;  */
 }
 
@@ -103,43 +104,84 @@
     grid-column: span 2; 
 }
 
+.permit ,.profileItemShop{
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: start; 
+}
+
 
 .profile-item strong {
     font-weight: 600;
-    font-size: 1rem;
+    font-size: 0.9rem;
     color: var(--green);
 }
 
 .profile-item span {
     color: #555;
     display: block;
-    font-size: 1rem;
+    font-size: 0.8rem;
+}
+
+.profileDescriptionDiv textarea {
+    width: 100%;
+    font-size: 0.8rem;
+    color: #555;
+    font-family: inherit;
+    padding: 0.4rem;
+    margin-top: 0.3rem;
+    border-radius: 0.3rem;
+    border: 1px solid #ccc;
+    resize: vertical;
 }
 
 .profile-image-container {
-    grid-column: span 3; 
+    /* grid-column: span 3;  */
     display: flex;
     text-align: center;
 }
 
 .profile-image {
     border: 1px solid var(--green);
-    width: 12rem; 
-    height: 12rem; 
+    width: 10rem; 
+    height: 10rem; 
     object-fit: cover;
     border-radius: 50%;
     margin-top: 0.6rem; 
 }
+
+.locationInputWrapper {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-top: 0.5rem;
+}
+  
+.locationInputWrapper input {
+    flex: 1;
+    padding: 0.4rem;
+    border-radius: 0.2rem;
+    border: 1px solid #ccc;
+    font-size: 0.9rem;
+}
+
+.details_buttons{
+    margin-top: 0.5rem;
+}
+  
 
 .btn-link {
     color: var(--orange);
     text-decoration: none;
     font-weight: bold;
     display: block;
+    font-size: 0.9rem;
 }
 
 .btn-link:hover {
-    text-decoration: underline;
+    text-decoration: underline var(--orange);
+    color: var(--green);
 }
 
 /* Links */
@@ -428,28 +470,37 @@ a:hover {
     padding: 10px 20px;
     background-color: #f5f5f5;    
     border-bottom: 1px solid #ddd;
-  }
+}
   
-  .header-nav h1 {
+.header-nav h1 {
     margin: 0;
     font-size: 24px;
     color: #333;
-  }
+}
   
  
-  .header-nav-icons {
+.header-nav-icons {
+    /* border: 3px solid red; */
+
     display: flex;
     align-items: center;
-  }
+    justify-content: space-around;
+    width: 5em;
+    height: 2em;
+}
   
-  .header-nav-icons > * {
-    margin-left: 15px;
+.header-nav-icons > * {
+    /* margin-left: 15px; */
     cursor: pointer;
     position: relative;
-  }
+}
   
+  .profileNotification {
+    font-size: 1.3rem;
+    color: var(--green);
+  }
 
-  .notification-icon[data-count]:after {
+.notification-icon[data-count]:after {
     content: attr(data-count);  
     position: absolute;
     top: -5px;
@@ -460,7 +511,8 @@ a:hover {
     padding: 2px 5px;
     font-size: 10px;
     font-weight: bold;
-  }
+}
+
   
 /* IMAGE CONTAINER */
 
