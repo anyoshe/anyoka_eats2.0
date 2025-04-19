@@ -1,10 +1,9 @@
-// ProductDetailModal.js
 import React, { useState } from 'react';
 import Modal from 'react-modal';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faStar as solidStar } from '@fortawesome/free-solid-svg-icons';
 import { faStar as regularStar } from '@fortawesome/free-regular-svg-icons';
-import './ProductDetailModal.css'; // Ensure you create and style this CSS file
+import styles from './ProductDetailModal.module.css';
 
 Modal.setAppElement('#root'); // For accessibility
 
@@ -28,52 +27,62 @@ const ProductDetailModal = ({ isOpen, onRequestClose, product, onAddToCart }) =>
       isOpen={isOpen}
       onRequestClose={onRequestClose}
       contentLabel="Product Details"
-      className="product-detail-modal"
-      overlayClassName="product-detail-modal-overlay"
+      className={styles['product-detail-modal']}
+      overlayClassName={styles['product-detail-modal-overlay']}
     >
-      <div className="modal-content">
-        <button className="close-button" onClick={onRequestClose}>
-          &times;
-        </button>
-        <img
-          src={product.primaryImage || '/placeholder.png'}
-          alt={product.name}
-          className="modal-image"
-        />
-        <h2>{product.name}</h2>
-        <p className="modal-price">KSH: {product.price}</p>
-        <p className="modal-description">{product.description}</p>
-        <div className="modal-rating">
-          {[1, 2, 3, 4, 5].map((star) => (
-            <FontAwesomeIcon
-              key={star}
-              icon={star <= (hoverRating || selectedRating) ? solidStar : regularStar}
-              onMouseEnter={() => setHoverRating(star)}
-              onMouseLeave={() => setHoverRating(0)}
-              onClick={() => handleStarClick(star)}
-              className="star-icon"
+      <button className={styles.closeButton} onClick={onRequestClose}>
+        &times;
+      </button>
+
+      <div className={styles.modalContent}>
+        <div className={styles.topContent}>
+          <div className={styles.leftColumn}>
+            <img
+              src={product.primaryImage || '/placeholder.png'}
+              alt={product.name}
+              className={styles.modalImage}
             />
-          ))}
-          <span className="rating-value">({selectedRating.toFixed(1)})</span>
+          </div>
+
+          <div className={styles.rightColumn}>
+            <h2 className={styles.modalProductTitle}>{product.name}</h2>
+            <p className={styles.modalPrice}>KSH: {product.price}</p>
+            <p className={styles.modalDescription}>{product.description}</p>
+
+            <div className={styles.modalRating}>
+              {[1, 2, 3, 4, 5].map((star) => (
+                <FontAwesomeIcon
+                  key={star}
+                  icon={star <= (hoverRating || selectedRating) ? solidStar : regularStar}
+                  onMouseEnter={() => setHoverRating(star)}
+                  onMouseLeave={() => setHoverRating(0)}
+                  onClick={() => handleStarClick(star)}
+                  className={styles.starIcon}
+                />
+              ))}
+              <span className={styles.ratingValue}>({selectedRating.toFixed(1)})</span>
+            </div>
+          </div>
         </div>
-        <div className="modal-comments">
-          <textarea
-            value={comment}
-            onChange={(e) => setComment(e.target.value)}
-            placeholder="Leave a comment..."
-            className="comment-box"
-          />
-          <button onClick={handleAddComment} className="submit-comment">
-            Submit Comment
+
+        <div className={styles.bottomContent}>
+          <div className={styles.modalComments}>
+            <textarea
+              value={comment}
+              onChange={(e) => setComment(e.target.value)}
+              placeholder="Leave a comment..."
+              className={styles.commentBox}
+            />
+            <button onClick={handleAddComment} className={styles.submitComment}>
+              Submit Comment
+            </button>
+          </div>
+          <button onClick={() => onAddToCart(product)} className={styles.addToCartButton}>
+            Add to Cart
           </button>
         </div>
-        <button onClick={() => onAddToCart(product)} className="add-to-cart-button">
-          Add to Cart
-        </button>
       </div>
     </Modal>
-   
-    
   );
 };
 

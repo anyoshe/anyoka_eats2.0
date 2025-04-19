@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef, useContext } from 'react';
-import './Profile.css';
+import styles from './Profile.module.css';
 import profileImg from "../../assets/images/abstract-star-burst-with-rays-flare.png";
 import { PartnerContext } from '../../contexts/PartnerContext';
 import axios from 'axios';
@@ -13,15 +13,14 @@ const Profile = ({ onSave }) => {
     const [location, setLocation] = useState('');
     const [isMapVisible, setIsMapVisible] = useState(false);
 
-     
     const handleLocationSelect = (plusCode) => {
         setLocation(plusCode);
-      };
-    
-      const toggleMapVisibility = () => {
+    };
+
+    const toggleMapVisibility = () => {
         setIsMapVisible((prev) => !prev);
-      };
-      
+    };
+
     const [formData, setFormData] = useState({
         businessName: '',
         contactNumber: '',
@@ -43,7 +42,6 @@ const Profile = ({ onSave }) => {
                     if (response.data) {
                         updatePartnerDetails(response.data);
 
-                        // Only reset formData if NOT in edit mode
                         if (!editSectionMode) {
                             setFormData({
                                 businessName: response.data.businessName || '',
@@ -66,7 +64,6 @@ const Profile = ({ onSave }) => {
             fetchPartnerDetails();
         }
     }, [partner?._id, updatePartnerDetails, editSectionMode]);
-
 
     const toggleEditImageMode = () => setEditImageMode(!editImageMode);
     const toggleEditSection = () => setEditSectionMode(!editSectionMode);
@@ -118,12 +115,10 @@ const Profile = ({ onSave }) => {
     };
 
     return (
-        <div className="profile_wrapper">
-            <div id="profileContent" className="tab-content active">
-                {/* <h2 className="ProfileH2">Your Profile</h2> */}
-
-                <div className="profile-details">
-                    <div className="profile-image-container">
+        <div className={styles.profile_wrapper}>
+            <div id="profileContent">
+                <div className={styles.profileDetails}>
+                    <div className={styles.profileImageContainer}>
                         <input
                             type="file"
                             ref={profileImageInputRef}
@@ -134,38 +129,36 @@ const Profile = ({ onSave }) => {
                             id="profileImagePreview"
                             src={partner?.profileImage ? `${config.backendUrl}${partner.profileImage.replace(/\\/g, '/')}` : profileImg}
                             alt="Profile"
-                            className="profile-image"
+                            className={styles.profileImage}
                             onClick={() => editImageMode && profileImageInputRef.current.click()}
                         />
-                       <div className="image_buttons">
-                            <button className="edit_btn" onClick={toggleEditImageMode} title={editImageMode ? 'Cancel' : 'Edit Picture'}>
+                        <div className={styles.image_buttons}>
+                            <button className={styles.edit_btn} onClick={toggleEditImageMode} title={editImageMode ? 'Cancel' : 'Edit Picture'}>
                                 <i className={`fas ${editImageMode ? 'fa-times' : 'fa-edit'}`}></i>
                             </button>
 
                             {editImageMode && (
-                                <button className="save_btn" onClick={saveProfileImage} title="Save">
-                                <i className="fas fa-save"></i>
+                                <button className={styles.save_btn} onClick={saveProfileImage} title="Save">
+                                    <i className="fas fa-save"></i>
                                 </button>
                             )}
                         </div>
-
-
                     </div>
 
-                    <div className="profile-item permit">
+                    <div className={`${styles.profileItem} ${styles.permit}`}>
                         <strong>Business Permit:</strong>
                         <a
                             id="profileBusinessPermitLink"
                             href={formData.businessPermit}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="btn-link"
+                            className={styles.permitLink}
                         >
                             View Permit
                         </a>
                     </div>
 
-                    <div className="profile-item profileItemShop">
+                    <div className={`${styles.profileItem} ${styles.profileItemShop}`}>
                         <strong>Shop Name:</strong>
                         {editSectionMode ? (
                             <input type="text" name="businessName" value={formData.businessName} onChange={handleInputChange} />
@@ -174,7 +167,7 @@ const Profile = ({ onSave }) => {
                         )}
                     </div>
 
-                    <div className="profile-item">
+                    <div className={styles.profileItem}>
                         <strong>Business Category:</strong>
                         {editSectionMode ? (
                             <input type="text" name="businessType" value={formData.businessType} onChange={handleInputChange} />
@@ -183,7 +176,7 @@ const Profile = ({ onSave }) => {
                         )}
                     </div>
 
-                    <div className="profile-item">
+                    <div className={styles.profileItem}>
                         <strong>Town or Centre:</strong>
                         {editSectionMode ? (
                             <input type="text" name="town" value={formData.town} onChange={handleInputChange} />
@@ -192,7 +185,7 @@ const Profile = ({ onSave }) => {
                         )}
                     </div>
 
-                    <div className="profile-item">
+                    <div className={styles.profileItem}>
                         <strong>Phone Number:</strong>
                         {editSectionMode ? (
                             <input type="text" name="contactNumber" value={formData.contactNumber} onChange={handleInputChange} />
@@ -201,7 +194,7 @@ const Profile = ({ onSave }) => {
                         )}
                     </div>
 
-                    <div className="profile-item">
+                    <div className={styles.profileItem}>
                         <strong>Email:</strong>
                         {editSectionMode ? (
                             <input type="email" name="email" value={formData.email} onChange={handleInputChange} />
@@ -210,7 +203,7 @@ const Profile = ({ onSave }) => {
                         )}
                     </div>
 
-                    <div className="profile-item">
+                    <div className={styles.profileItem}>
                         <strong>ID Number:</strong>
                         {editSectionMode ? (
                             <input type="text" name="idNumber" value={formData.idNumber} onChange={handleInputChange} />
@@ -219,41 +212,41 @@ const Profile = ({ onSave }) => {
                         )}
                     </div>
 
-                    <div className="profile-item">
+                    <div className={styles.profileItem}>
                         <strong>Location:</strong>
                         {editSectionMode ? (
                             <>
-                            <div className="locationInputWrapper">
-                                <input
-                                type="text"
-                                name="location"
-                                value={formData.location}
-                                readOnly
-                                />
-                                <button
-                                type="button"
-                                className="edit_btn"
-                                onClick={toggleMapVisibility}
-                                title={isMapVisible ? 'Hide Map' : 'Edit Location'}
-                                >
-                                <i className={`fas ${isMapVisible ? 'fa-times' : 'fa-pen'}`}></i>
-                                </button>
-                            </div>
+                                <div className={styles.locationInputWrapper}>
+                                    <input
+                                        type="text"
+                                        name="location"
+                                        value={formData.location}
+                                        readOnly
+                                    />
+                                    <button
+                                        type="button"
+                                        className={styles.edit_btn}
+                                        onClick={toggleMapVisibility}
+                                        title={isMapVisible ? 'Hide Map' : 'Edit Location'}
+                                    >
+                                        <i className={`fas ${isMapVisible ? 'fa-times' : 'fa-pen'}`}></i>
+                                    </button>
+                                </div>
 
-                            {isMapVisible && (
-                                <MapSelector
-                                onLocationSelect={(plusCode) =>
-                                    setFormData((prev) => ({ ...prev, location: plusCode }))
-                                }
-                                />
-                            )}
+                                {isMapVisible && (
+                                    <MapSelector
+                                        onLocationSelect={(plusCode) =>
+                                            setFormData((prev) => ({ ...prev, location: plusCode }))
+                                        }
+                                    />
+                                )}
                             </>
                         ) : (
                             <span id="profileLocation">{formData.location}</span>
                         )}
                     </div>
 
-                    <div className="profile-item profileDescriptionDiv">
+                    <div className={`${styles.profileItem} ${styles.profileDescriptionDiv}`}>
                         <strong>Description:</strong>
                         {editSectionMode ? (
                             <textarea
@@ -266,13 +259,11 @@ const Profile = ({ onSave }) => {
                             <span id="profileDescription">{formData.description}</span>
                         )}
                     </div>
-
-
                 </div>
 
-                <div className="details_buttons">
+                <div className={styles.details_buttons}>
                     <button
-                        className="edit_btn"
+                        className={styles.edit_btn}
                         onClick={toggleEditSection}
                         title={editSectionMode ? 'Cancel' : 'Edit Details'}
                     >
@@ -280,12 +271,11 @@ const Profile = ({ onSave }) => {
                     </button>
 
                     {editSectionMode && (
-                        <button className="save_btn" onClick={saveSection} title="Save Changes">
-                        <i className="fas fa-save"></i>
+                        <button className={styles.save_btn} onClick={saveSection} title="Save Changes">
+                            <i className="fas fa-save"></i>
                         </button>
                     )}
                 </div>
-
             </div>
         </div>
     );

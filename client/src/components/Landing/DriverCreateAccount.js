@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import './SignUpSignIn.css';
+import './SignUpSignIn.module.css';
 import { useNavigate } from 'react-router-dom';
 import config from '../../config';
 import { FaEye, FaEyeSlash } from 'react-icons/fa';
