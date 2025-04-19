@@ -18,6 +18,8 @@ const ProductModal = ({ isOpen, onClose, onSubmit, editingProduct, onProductUpda
     const [productDescription, setProductDescription] = useState('');
     const [productTags, setProductTags] = useState('');
     const [productImages, setProductImages] = useState([]);
+    const [productDiscountedPrice, setProductDiscountedPrice] = useState('');
+
 
     useEffect(() => {
         if (editingProduct) {
@@ -32,6 +34,8 @@ const ProductModal = ({ isOpen, onClose, onSubmit, editingProduct, onProductUpda
             setProductDescription(editingProduct.description || '');
             setProductTags(editingProduct.tags?.join(', ') || '');
             setProductImages(editingProduct.images || []);
+            setProductDiscountedPrice(editingProduct.discountedPrice || '');
+
 
             const formattedImages = editingProduct.images?.map((image) =>
                 image.startsWith('/var/data')
@@ -75,6 +79,8 @@ const ProductModal = ({ isOpen, onClose, onSubmit, editingProduct, onProductUpda
         formData.append('description', productDescription);
         formData.append('tags', productTags);
         formData.append('inventory', productInventory);
+        formData.append('discountedPrice', productDiscountedPrice);
+
 
         if (partner && partner._id) {
             formData.append('shopId', partner._id);

@@ -1,0 +1,74 @@
+/* Wrapper for the product image */
+.product-image-wrapper {
+    position: relative;
+    width: 100%;
+    height: auto;
+  }
+  
+  /* Image carousel container */
+  .image-carousel {
+    display: flex;
+    flex-direction: column; /* Stack images and dots vertically */
+    align-items: center;
+    justify-content: center;
+    position: relative;
+  }
+  
+  /* Product image styling */
+  .product-image {
+    max-width: 100%;
+    height: auto;
+    border-radius: 8px;
+  }
+  
+  /* Navigation buttons for the carousel */
+  .prev-button,
+  .next-button {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    background-color: rgba(0, 0, 0, 0.5);
+    color: white;
+    border: none;
+    padding: 8px;
+    cursor: pointer;
+    border-radius: 50%;
+    z-index: 1;
+  }
+  
+  .prev-button {
+    left: 10px;
+  }
+  
+  .next-button {
+    right: 10px;
+  }
+  
+  .prev-button:hover,
+  .next-button:hover {
+    background-color: rgba(0, 0, 0, 0.8);
+  }
+  
+  /* Dots container */
+  .carousel-dots {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-top: 10px; /* Add space between the image and dots */
+  }
+  
+  /* Individual dot */
+  .dot {
+    width: 10px;
+    height: 10px;
+    margin: 0 5px;
+    background-color: #ccc;
+    border-radius: 50%;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+  }
+  
+  /* Active dot */
+  .dot.active {
+    background-color: #007bff;
+  }

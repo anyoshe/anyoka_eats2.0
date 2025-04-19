@@ -1,107 +1,103 @@
 import React, { useState } from 'react';
-import { useCart } from './CartContext';
 import config from '../../config';
 import './ProductCard.css';
 
 const ProductCard = ({ product }) => {
-  // const imageUrl = product.images?.[0] ? `${config.backendUrl}${product.images[0].replace('/var/data', '')}` : '/placeholder.png';
-  const imageUrl = product.primaryImage
-  ? `${config.backendUrl}${product.primaryImage}`
-  : product.images?.[0]
-  ? `${config.backendUrl}${product.images[0]}`
-  : '/path/to/placeholder-image.jpg';
-  const [averageRating, setAverageRating] = useState(product.ratings?.average || 0);
-  const [ratingCount, setRatingCount] = useState(product.ratings?.reviews?.length || 0);
-  const [hoverRating, setHoverRating] = useState(0);
+  const [currentImageIndex, setCurrentImageIndex] = useState(0);
 
-  const { dispatch } = useCart();
+  const images = product.primaryImage
+    ? [product.primaryImage, ...(product.images || [])]
+    : product.images || [];
 
-  const handleAddToCart = () => {
-    dispatch({
-      type: 'ADD_TO_CART',
-      payload: {
-        productDetails: product
-      }
-    });
+  const handleNextImage = () => {
+    setCurrentImageIndex((prevIndex) => (prevIndex + 1) % images.length);
   };
 
-  const submitRating = async (itemId, itemType, rating) => {
-    try {
-      const response = await fetch(`${config.backendUrl}/api/rating`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ item_id: itemId, item_type: itemType, rating }),
-      });
-
-      const data = await response.json();
-
-      if (response.ok) {
-        setAverageRating(data.newAverageRating);
-        setRatingCount(data.newRatingCount);
-      } else {
-        console.error('Failed to submit rating:', data.message);
-      }
-    } catch (error) {
-      console.error('Error submitting rating:', error);
-    }
+  const handlePrevImage = () => {
+    setCurrentImageIndex((prevIndex) => (prevIndex - 1 + images.length) % images.length);
   };
 
-  const handleStarClick = (value) => {
-    submitRating(product._id, 'Product', value);
+  const handleDotClick = (index) => {
+    setCurrentImageIndex(index);
   };
 
-  const handleStarMouseEnter = (value) => {
-    setHoverRating(value);
-  };
-
-  const handleStarMouseLeave = () => {
-    setHoverRating(0);
-  };
-
-  const getStarClass = (star) => {
-    if (star <= hoverRating) return 'star filled';
-    if (star <= averageRating) return 'star filled';
-    return 'star';
+  const getImageSrc = (imagePath) => {
+    const stripServerPath = (fullPath) =>
+      fullPath.replace('/mnt/shared/Projects/anyoka_eats2.0/online_hotel', '');
+    return `${config.backendUrl}${stripServerPath(imagePath)}`;
   };
 
   return (
     <li className="product-card">
       <div className="product-image-wrapper">
-        <img src={imageUrl} alt={product.name} className='product-image' />
+        {/* Display images in a carousel */}
+        {images.length > 0 ? (
+          <div className="image-carousel">
+            <button className="prev-button" onClick={handlePrevImage}>
+              &#8249;
+            </button>
+            <img
+              src={getImageSrc(images[currentImageIndex])}
+              alt={`Product Image ${currentImageIndex + 1}`}
+              className="product-image"
+              onError={(e) => {
+                e.target.onerror = null;
+                e.target.src = '/path/to/placeholder-image.jpg'; // Fallback image
+              }}
+            />
+            <button className="next-button" onClick={handleNextImage}>
+              &#8250;
+            </button>
+            {/* Dots for navigation */}
+            <div className="carousel-dots">
+              {images.map((_, index) => (
+                <span
+                  key={index}
+                  className={`dot ${index === currentImageIndex ? 'active' : ''}`}
+                  onClick={() => handleDotClick(index)}
+                ></span>
+              ))}
+            </div>
+          </div>
+        ) : (
+          <img
+            src="/path/to/placeholder-image.jpg"
+            alt="Placeholder"
+            className="product-image"
+          />
+        )}
         {product.discountedPrice && (
           <span className="discounted-price-circle">
-            Now <br/> Ksh {product.discountedPrice.toFixed(2)}
+            Now <br /> Ksh {product.discountedPrice.toFixed(2)}
           </span>
         )}
       </div>
 
-      <h6 className='product-name'>{product.name}</h6>
+      <h6 className="product-name">Product Name: {product.name}</h6>
 
       {product.discountedPrice ? (
         <span className="original-price-offer">
-          Was <span className='diagonal-strikethrough linePrice'>Ksh {product.price.toFixed(2)}</span>
+         Price:  Was{' '}
+          <span className="diagonal-strikethrough linePrice">
+            Ksh {product.price.toFixed(2)}
+          </span>
         </span>
       ) : (
-        <p className='product-price'>Ksh {product.price.toFixed(2)}</p>
+        <p className="product-price">Price: Ksh {product.price.toFixed(2)}</p>
       )}
 
-      <p className='product-brand'>{product.brand}</p>
-      <p className='product-category'>{product.category}</p>
-      <p className='product-inventory'>Available: {product.inventory}</p>
+      <p className="product-brand">Brand: {product.brand}</p>
+      <p className="product-category">Category: {product.category}</p>
+      <p className="product-inventory">Available: {product.inventory}</p>
 
-      <button onClick={handleAddToCart} className='add-to-cart'>Add to Cart</button>
-
-      <div className="rating" onMouseLeave={handleStarMouseLeave}>
+      <div className="rating"> Ratings:
         {[...Array(5)].map((_, index) => {
           const star = index + 1;
           return (
+            
             <span
               key={star}
-              className={getStarClass(star)}
-              onClick={() => handleStarClick(star)}
-              onMouseEnter={() => handleStarMouseEnter(star)}
+              className={star <= product.ratings?.average ? 'star filled' : 'star'}
             >
               &#9733;
             </span>
@@ -109,9 +105,10 @@ const ProductCard = ({ product }) => {
         })}
       </div>
 
-      <p className='average'>
-        Avg Rating: {averageRating?.toFixed(2)}<br />
-        ({ratingCount} reviews)
+      <p className="average">
+        Avg Rating: {product.ratings?.average?.toFixed(2) || 0}
+        <br />
+        ({product.ratings?.reviews?.length || 0} reviews)
       </p>
     </li>
   );

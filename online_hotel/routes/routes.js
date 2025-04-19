@@ -238,10 +238,9 @@ const productSchema = new Schema({
   brand: { type: String, required: true }, // Product brand
   tags: [{ type: String, required: false }], // Optional tags for the product
   price: { type: Number, required: true }, // Product price
+  discountedPrice: { type: Number, required: false },
   quantity: {type: Number, required: true },
   unit: { type: String, required: true }, // Unit of measurement (e.g., kg, g, etc.)
-  discountedPrice: { type: Number, required: false }, // Discounted price
-  isOnSale: { type: Boolean, default: false }, // Whether the product is on sale
   inventory: { type: Number, required: true }, // Inventory count
   shop: {
     shopId: { type: mongoose.Schema.Types.ObjectId, ref: 'Partner', required: true }, // Reference to the Partner schema
@@ -261,16 +260,6 @@ const productSchema = new Schema({
   },
   createdAt: { type: Date, default: Date.now }, // Timestamp for creation
   updatedAt: { type: Date, default: Date.now }, // Timestamp for updates
-});
-
-// Pre-save middleware to calculate the discounted price and set `isOnSale`
-productSchema.pre('save', function (next) {
-  if (this.discountedPrice && this.discountedPrice < this.price) {
-    this.isOnSale = true;
-  } else {
-    this.isOnSale = false;
-  }
-  next();
 });
 
 const Product = mongoose.model('Product', productSchema);
@@ -305,6 +294,7 @@ const primaryImage = primaryImageFile
   ? `/uploads/products/${primaryImageFile.split('/').pop()}`
   : req.body.primaryImage;
 
+  
     // Fetch the partner details using the shopId
     const partner = await Partner.findById(shopId);
     if (!partner) {
@@ -326,7 +316,7 @@ const primaryImage = primaryImageFile
       brand,
       tags,
       price,
-      discountedPrice: discountedPrice || price, // Default to price if no discount
+      discountedPrice,
       quantity,
       unit,
       inventory,
@@ -337,6 +327,10 @@ const primaryImage = primaryImageFile
         location: partner.location,
       },
     });
+
+    if (discountedPrice !== undefined) {
+      newProduct.discountedPrice = discountedPrice;
+    }
 
     // Save the product to the database
     await newProduct.save();
@@ -386,7 +380,7 @@ router.delete('/products/:id', async (req, res) => {
   }
 });
 
-// Route to update a product by ID
+
 router.put('/products/:id', uploadProductImages, async (req, res) => {
   try {
       const productId = req.params.id;
@@ -398,6 +392,7 @@ router.put('/products/:id', uploadProductImages, async (req, res) => {
           brand,
           tags,
           price,
+          discountedPrice,
           quantity,
           unit,
           inventory,
@@ -405,15 +400,14 @@ router.put('/products/:id', uploadProductImages, async (req, res) => {
           deletedImages,  // This should be a JSON string
       } = req.body;
 
-      // Since we're using upload.fields(), req.files is an object.
       // Extract additional images (if any)
       const images = (req.files && req.files.images && Array.isArray(req.files.images))
-          ? req.files.images.map((file) => file.path)
+          ? req.files.images.map((file) => `/uploads/products/${file.filename}`)
           : [];
 
       // Extract primary image file if uploaded
       const primaryImageFile = (req.files && req.files.primaryImage && Array.isArray(req.files.primaryImage))
-          ? req.files.primaryImage[0].path
+          ? `/uploads/products/${req.files.primaryImage[0].filename}`
           : null;
 
       // Use the primary image file if available; otherwise, fallback to primaryImage from req.body.
@@ -423,9 +417,12 @@ router.put('/products/:id', uploadProductImages, async (req, res) => {
       const deletedImagesArray = deletedImages
           ? JSON.parse(deletedImages).map((imgPath) => {
               const parts = imgPath.split('/uploads/');
-              return parts.length > 1 ? `/var/data/uploads/${parts[1]}` : imgPath;
+              return parts.length > 1 ? `/uploads/${parts[1]}` : imgPath;
             })
           : [];
+
+        
+          
 
       const updatedProduct = await Product.findById(productId);
       if (!updatedProduct) {
@@ -456,7 +453,7 @@ router.put('/products/:id', uploadProductImages, async (req, res) => {
 
           // Delete the files from the file system
           deletedImagesArray.forEach((imagePath) => {
-              const fullPath = path.resolve(imagePath);
+              const fullPath = path.join(__dirname, '..', imagePath); // Resolve path relative to the project
               if (fs.existsSync(fullPath)) {
                   fs.unlink(fullPath, (err) => {
                       if (err) {
@@ -468,6 +465,9 @@ router.put('/products/:id', uploadProductImages, async (req, res) => {
               }
           });
       }
+      if (discountedPrice !== undefined) {
+        updatedProduct.discountedPrice = discountedPrice;
+      }
 
       await updatedProduct.save();
       res.status(200).json({ message: 'Product updated successfully', product: updatedProduct });
@@ -476,7 +476,6 @@ router.put('/products/:id', uploadProductImages, async (req, res) => {
       res.status(500).json({ message: 'Failed to update product', error: error.message });
   }
 });
-
 
 
 // Route to fetch all products
