@@ -1,0 +1,42 @@
+.shop-section {
+  border: 2px solid green;  
+
+  margin-top: 10rem;
+}
+  
+.titleBtn {
+  text-align: right;
+}
+
+.addItemButton {
+  background-color: var(--green);
+  border: none;
+  padding: 0.5rem;
+  font-size: 0.7rem;
+  color: var(--white);
+  border-radius: 0.3em;
+  cursor: pointer;
+  transition: background-color 0.3s ease, color 0.3s ease, transform 0.1s ease;
+  z-index: 10;
+}
+
+  .addItemButton:hover {
+    background-color: var(--white);
+    color: var(--orange);
+    outline: 1px solid var(--orange);
+    cursor: pointer;
+  }
+  
+  .addItemButton:active {
+    transform: scale(0.95);
+  }
+  
+  /* This was used in className but not styled in the original CSS */
+  .open-modal {
+    /* Optional: define modal trigger button style if needed */
+  }
+  
+  #shopContent {
+    border: 3px solid red;
+  }
+  

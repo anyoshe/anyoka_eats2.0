@@ -1,0 +1,236 @@
+.modalOne {
+  position: fixed;
+  z-index: 1;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  overflow: auto;
+  background-color: rgba(0, 0, 0, 0.4);
+}
+
+.modalContentOne {
+  background-color: #fff;
+  margin: 2% auto;
+  padding: 0.5rem 1rem;
+  border: 1px solid #888;
+  width: 85%;
+  max-width: 38rem;
+  border-radius: 0.3rem;
+  /* height: 170%; */
+}
+
+.closeModalOne {
+  color: var(--green);
+  float: right;
+  font-size: 1.2rem;
+  font-weight: bold;
+}
+
+.closeModalOne:hover,
+.closeModalOne:focus {
+  color: var(--orange);
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.addProductH2 {
+  font-size: 1.1rem;
+  text-align: left;
+  font-weight: bold;
+  text-decoration: underline;
+  margin-top: 0.3rem;
+}
+
+.modal-content-one {
+  background-color: #fff;
+  margin: 2% auto;
+  padding: 0.5rem 1rem;
+  border: 1px solid #888;
+  width: 80%;
+  max-width: 30rem;
+  border-radius: 0.3rem;
+  height: 170%;
+}
+
+.close-modal-one {
+  color: var(--green);
+  float: right;
+  font-size: 1.2rem;
+  font-weight: bold;
+}
+
+.close-modal-one:hover,
+.close-modal-one:focus {
+  color: var(--orange);
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.productForm {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+.productImagePreview{
+  margin-bottom: 0.3rem;
+}
+
+.imagePreviewItem{
+  display: flex;
+  flex-direction: column;
+}
+
+.productImagePreviewContainer{
+  /* border: 2px solid red; */
+
+  display: flex;
+  flex-direction: row;
+  gap: 0.3rem;
+  padding-bottom: 0.2rem;
+  border-bottom: 1px solid #ccc;
+}
+
+.productImagePreviewContainer img{
+  width: 6em;
+  height: 6em;
+}
+
+.setPrimaryImageButton{
+  color: var(--white);
+  background-color: var(--green);
+  border: none;
+  outline: none;
+  cursor:pointer;
+  border-radius: 0.3em;
+  transition: background-color 0.3s ease, color 0.3s ease;
+  font-size: 0.7rem;
+  padding: 0.3rem 0.6rem;
+  margin-right: 0.3rem;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+}
+
+#descFormGroup{
+  border: 3px solid red;
+}
+
+.productLabel {
+  display: block;
+  margin-bottom: 0.1rem;
+  font-weight: 600;
+  font-size: 0.8rem;
+  align-items: start;
+}
+
+.productImageLabel{
+  margin-top: 0.2rem;
+}
+
+.productImageInput{
+  border: none;
+  font-size: 0.8rem;
+}
+
+
+.productNameInput,.productPriceInput,.productBrandInput,.productCategoryInput,.productSubcategoryInput,.productQuantityInput,.productUnitSelect,.productInventoryInput,.productTagsInput,.productDescriptionInput {
+  width: 100%;
+  padding: 0.5rem;
+  border-radius: 0.3rem;
+  border: none;
+  outline: 1px solid #ccc;
+  font-size: 0.8rem;
+  cursor: pointer;
+}
+
+i.productNameInput:hover,.productPriceInput:hover,.productBrandInput:hover,.productCategoryInput:hover,.productSubcategoryInput:hover,.productQuantityInput:hover,.productUnitSelect:hover,.productInventoryInput:hover,.productTagsInput:hover,.productDescriptionInput :hover {
+  border: none;
+  outline: 1px solid var(--orange);
+}
+
+.product-image-preview-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 10px;
+}
+
+.imagePreviewItem {
+  position: relative;
+}
+
+.product-image-preview {
+  width: 100px;
+  height: 100px;
+  object-fit: cover;
+  border: 2px solid #ddd;
+  border-radius: 5px;
+}
+
+.deleteImageButton {
+  position: absolute;
+  top: 2px;
+  right: 2px;
+  background: red;
+  color: var(--white);
+  border: none;
+  outline: none;
+  border-radius: 50%;
+  width: 1.25rem;      
+  height: 1.25rem;     
+  font-size: 0.875rem; 
+  font-weight: bold;
+  cursor: pointer;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  transition: background-color 0.3s ease;
+}
+
+.delete-image-button:hover {
+  background-color: var(--white);
+  color: red;
+  outline: 1px solid red;
+}
+
+.setPrimaryImageButton {
+  font-size: 0.75rem;
+  padding: 0.2rem 0.5rem;
+  background-color: var(--green);
+  color: white;
+  border: none;
+  border-radius: 0.25rem;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.setPrimaryImageButton:hover {
+  background-color: var(--white);
+  color: var(--orange);
+  outline: 1px solid var(--orange);
+}
+
+
+.submitProductButton {
+  width: 100%;
+  padding: 0.5rem;
+  background-color: var(--green);
+  color: #fff;
+  border: none;
+  border-radius: 0.3rem;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  font-size: 1rem;
+  margin-top: 1rem;
+}
+
+.submitProductButton:hover {
+  background-color: var(--white);
+  outline: 1px solid var(--orange);
+  color: var(--orange);
+}

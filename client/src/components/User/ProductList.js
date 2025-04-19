@@ -2,7 +2,9 @@ import React, { useState, useEffect, useContext } from 'react';
 import { PartnerContext } from '../../contexts/PartnerContext';
 import config from '../../config';
 import ReviewsModal from './ReviewsModal';
-import './ProductList.css';
+import styles from './ProductList.module.css';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faEdit, faTrash, faComments } from '@fortawesome/free-solid-svg-icons';
 
 const ProductList = ({ onEditProduct, onDeleteProduct, refreshTrigger }) => {
     const [productsByCategory, setProductsByCategory] = useState({});
@@ -15,13 +17,13 @@ const ProductList = ({ onEditProduct, onDeleteProduct, refreshTrigger }) => {
                 console.error('Partner ID is missing. Please log in.');
                 return;
             }
+            
 
             try {
                 const response = await fetch(`${config.backendUrl}/api/products?partnerId=${partner._id}`);
                 if (response.ok) {
                     const data = await response.json();
 
-                    // Group products by category
                     const groupedProducts = data.products.reduce((acc, product) => {
                         if (!acc[product.category]) {
                             acc[product.category] = [];
@@ -43,87 +45,80 @@ const ProductList = ({ onEditProduct, onDeleteProduct, refreshTrigger }) => {
         fetchProducts();
     }, [refreshTrigger, partner]);
 
-    // const getImageSrc = (product) => {
-    //     if (product.primaryImage) {
-    //         return product.primaryImage.startsWith('http')
-    //             ? product.primaryImage
-    //             : `${config.backendUrl}${product.primaryImage.replace('/var/data', '')}`;
-    //     }
-
-    //     if (product.images && product.images.length > 0) {
-    //         return `${config.backendUrl}${product.images[0].replace('/var/data', '')}`;
-    //     }
-
-    //     return '/path/to/placeholder-image.jpg';
-    // };
-
     const getImageSrc = (product) => {
         if (product.primaryImage) {
-          return `${config.backendUrl}/uploads/${product.primaryImage.split('/uploads/')[1]}`;
+            return `${config.backendUrl}/uploads/${product.primaryImage.split('/uploads/')[1]}`;
         }
-      
+
         if (product.images && product.images.length > 0) {
-          return `${config.backendUrl}/uploads/${product.images[0].split('/uploads/')[1]}`;
+            return `${config.backendUrl}/uploads/${product.images[0].split('/uploads/')[1]}`;
         }
-      
+
         return '/path/to/placeholder-image.jpg';
-      };
-      
+    };
 
     return (
-        <div className="product-list-container">
+        <div className={styles.productListContainer}>
             {Object.keys(productsByCategory).map((category) => (
-                <div key={category} className="category-section">
-                    {/* Category Heading */}
-                    <h2 className="category-heading">{category}</h2>
+                <div key={category} className={styles.categorySection}>
+                    <h2 className={styles.categoryHeading}>{category}</h2>
 
-                    {/* Products Grid */}
-                    <div className="products-grid">
+                    <div className={styles.productsGrid}>
                         {productsByCategory[category].map((product) => (
-                            <div className="product-item" key={product._id}>
+                            <div className={styles.productItem} key={product._id}>
                                 <img
                                     src={getImageSrc(product)}
                                     alt={product.name}
-                                    className="product-image-preview"
+                                    className={styles.productImagePreview}
                                     onError={(e) => {
                                         e.target.onerror = null;
                                         e.target.src = '/path/to/placeholder-image.jpg';
                                     }}
                                 />
-                                <div className="product-details">
-                                    <p className="product-name">
-                                        <strong>Name:</strong> {product.name}
-                                    </p>
-                                    <p className="product-price">
-                                        <strong>Price:</strong> KSh {product.price}
-                                    </p>
-                                    <p className="product-brand">
-                                        <strong>Brand:</strong> {product.brand}
-                                    </p>
-                                    <p className="product-quantity">
-                                        <strong>Quantity:</strong> {product.quantity} <span>{product.unit}</span>
-                                    </p>
-                                    <p className="product-rating">
-                                        <strong>Rating:</strong> {product.ratings?.average?.toFixed(1) || 0} / 5
-                                    </p>
-                                    <button
-                                        className="reviews-button"
-                                        onClick={() => setSelectedProduct(product)} // Open the modal for this product
-                                    >
-                                        Reviews ({product.ratings?.reviews?.length || 0})
-                                    </button>
-                                    <div className="buttons-container">
+                                <div className={styles.productDetails}>
+                                    <div className={styles.productField}>
+                                        <strong>Name:</strong>
+                                        <span>{product.name}</span>
+                                    </div>
+                                    <div className={styles.productField}>
+                                        <strong>Price:</strong>
+                                        <span>KSh {product.price}</span>
+                                    </div>
+                                    <div className={styles.productField}>
+                                        <strong>Brand:</strong>
+                                        <span>{product.brand}</span>
+                                    </div>
+                                    <div className={styles.productField}>
+                                        <strong>Quantity:</strong>
+                                        <span>{product.quantity} {product.unit}</span>
+                                    </div>
+                                    <div className={styles.productField}>
+                                        <strong>Rating:</strong>
+                                        <span>{product.ratings?.average?.toFixed(1) || 0} / 5</span>
+                                    </div>
+
+                                    <div className={styles.buttonsContainer}>
                                         <button
-                                            className="edit-product-button"
-                                            onClick={() => onEditProduct(product)}
+                                            className={styles.reviewsButton}
+                                            onClick={() => setSelectedProduct(product)}
                                         >
-                                            Edit
+                                            <FontAwesomeIcon icon={faComments} />
+                                            {product.ratings?.reviews?.length > 0 && `(${product.ratings.reviews.length})`}
+                                        </button>
+
+                                        <button
+                                            className={styles.editProductButton}
+                                            onClick={() => onEditProduct(product)}
+                                            title="Edit"
+                                        >
+                                            <FontAwesomeIcon icon={faEdit} />
                                         </button>
                                         <button
-                                            className="delete-product-button"
+                                            className={styles.deleteProductButton}
                                             onClick={() => onDeleteProduct(product._id)}
+                                            title="Delete"
                                         >
-                                            Delete
+                                            <FontAwesomeIcon icon={faTrash} />
                                         </button>
                                     </div>
                                 </div>
@@ -132,11 +127,10 @@ const ProductList = ({ onEditProduct, onDeleteProduct, refreshTrigger }) => {
                     </div>
                 </div>
             ))}
-            {/* Reviews Modal */}
             {selectedProduct && (
                 <ReviewsModal
                     product={selectedProduct}
-                    onClose={() => setSelectedProduct(null)} // Close the modal
+                    onClose={() => setSelectedProduct(null)}
                 />
             )}
         </div>

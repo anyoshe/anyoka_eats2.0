@@ -3,6 +3,7 @@ import { PartnerContext } from '../../contexts/PartnerContext';
 import { useNavigate } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faSignOutAlt } from '@fortawesome/free-solid-svg-icons';
+import styles from './LogoutComponent.module.css';
 
 const LogoutComponent = () => {
   const { logout } = useContext(PartnerContext);
@@ -16,7 +17,7 @@ const LogoutComponent = () => {
   return (
     <FontAwesomeIcon
       icon={faSignOutAlt}
-      className="icon logout-icon"
+      className={styles.logoutIcon}
       onClick={handleLogout}
     />
   );
