@@ -448,3 +448,8 @@
     color: var(--green);
     font-weight: bold;
 }
+
+.star-icon {
+  color: #ffc107; /* Gold color for filled stars */
+  margin-right: 2px;
+}

@@ -33,7 +33,7 @@ function authenticateToken(req, res, next) {
   if (!token) return res.status(401).send('Access Denied');
 
   try {
-    const verified = jwt.verify(token, process.env.JWT_SECRET);
+    const verified = jwt.verify(token, JWT_SECRET);
     req.user = verified;
     console.log('Token verified:', verified);
     next();  // Make sure this line is executed
@@ -52,7 +52,7 @@ const partnerSchema = new mongoose.Schema({
   businessType: { type: String, required: true },
   contactNumber: { type: String, required: true, unique: true },
   email: { type: String, required: false, unique: true },
-  town: {type: String, required: false },
+  town: { type: String, required: false },
   location: { type: String, required: false },
   password: { type: String, required: true },
   profileImage: { type: String, required: false },
@@ -112,6 +112,7 @@ router.post('/signup', uploadBusinessPermit, async (req, res) => {
       contactNumber,
       idNumber,
       email,
+      town,
       location,
       password: hashedPassword,
       role
@@ -131,24 +132,7 @@ router.post('/signup', uploadBusinessPermit, async (req, res) => {
   }
 });
 
-//Partner Log in Route
-router.post('/login', async (req, res) => {
-  try {
-    const { contactNumber, password } = req.body;
-    const partner = await Partner.findOne({ contactNumber });
 
-    if (!partner) return res.status(400).send('Invalid Credentials.');
-
-    const validPassword = await bcrypt.compare(password, partner.password);
-    if (!validPassword) return res.status(400).send('Invalid Credentials.');
-
-    const token = jwt.sign({ _id: partner._id, role: partner.role }, process.env.JWT_SECRET, { expiresIn: '1h' });
-
-    res.json({ token, partner, role: partner.role });
-  } catch (err) {
-    res.status(500).send(err.message);
-  }
-});
 
 // Retrieve Partner Route
 router.get('/partners/:partnerId', async (req, res) => {
@@ -204,7 +188,7 @@ router.post('/upload-profile-image', (req, res) => {
       const { partnerId } = req.body;
       const updatedPartner = await Partner.findByIdAndUpdate(
         partnerId,
-        { profileImage: `/uploads/profile-images/${req.file.filename}` }, 
+        { profileImage: `/uploads/profile-images/${req.file.filename}` },
         { new: true }
       );
 
@@ -214,13 +198,193 @@ router.post('/upload-profile-image', (req, res) => {
 
       res.status(200).json({
         message: 'Image uploaded and profile updated successfully',
-        profileImage: `/uploads/profile-images/${req.file.filename}`, 
+        profileImage: `/uploads/profile-images/${req.file.filename}`,
       });
     } catch (error) {
       console.error('Error updating partner profile image:', error);
       res.status(500).json({ message: 'Server error' });
     }
   });
+});
+
+
+
+// Dealing with the user
+
+//USER SCHEMA AND ROUTES
+const userSchema = new mongoose.Schema({
+  username: { type: String, required: true, unique: true },
+  names: { type: String, required: true },
+  email: { type: String, required: false, unique: true },
+  phoneNumber: { type: String, required: true, unique: true },
+  town: { type: String, required: true },
+  location: { type: String, required: true },
+  password: { type: String, required: true }
+});
+
+const User = mongoose.model('User', userSchema);
+
+
+
+// Route to handle user signup
+router.post('/auth/userSignup', async (req, res) => {
+  const { username, names, email, phoneNumber, town, location, password } = req.body;
+
+  try {
+    // Validate required fields
+    if (!username || !names || !phoneNumber || !town || !location || !password) {
+      return res.status(400).json({ success: false, message: 'All fields are required' });
+    }
+
+    // Check if the user already exists
+    const existingUser = await User.findOne({ $or: [{ username }, { email }, { phoneNumber }] });
+    if (existingUser) {
+      return res.status(400).json({ success: false, message: 'User already exists' });
+    }
+
+    // Hash the password
+    const hashedPassword = await bcrypt.hash(password, 10);
+
+    // Create a new user
+    const newUser = new User({
+      username,
+      names,
+      email,
+      phoneNumber,
+      town,
+      location,
+      password: hashedPassword,
+    });
+
+    // Save the user to the database
+    await newUser.save();
+
+    // Generate a JWT token
+    const token = jwt.sign({ id: newUser._id }, JWT_SECRET, { expiresIn: '1h' });
+
+    // Return the token and user details
+    res.status(201).json({
+      success: true,
+      message: 'User registered successfully',
+      token,
+      user: {
+        // id: newUser._id,
+        _id: newUser._id,
+        username: newUser.username,
+        names: newUser.names,
+        email: newUser.email,
+        phoneNumber: newUser.phoneNumber,
+        town: newUser.town,
+        location: newUser.location,
+      },
+    });
+  } catch (error) {
+    console.error('Error during signup:', error.message);
+    res.status(500).json({ success: false, message: 'Server error' });
+  }
+});
+
+
+router.get('/auth/current', async (req, res) => {
+  const token = req.headers.authorization?.split(' ')[1];
+
+  if (!token) {
+    return res.status(401).json({ success: false, message: 'No token provided' });
+  }
+
+  try {
+    const decoded = jwt.verify(token, JWT_SECRET); // Use your secret key here
+    const user = await User.findById(decoded.id);
+
+    if (!user) {
+      return res.status(404).json({ success: false, message: 'User not found' });
+    }
+
+    res.json({ success: true, user });
+  } catch (err) {
+    res.status(500).json({ success: false, message: 'Server error' });
+  }
+});
+
+
+router.get('/user/me', authenticateToken, async (req, res) => {
+  if (req.user.role !== 'user') {
+    return res.status(403).json({ message: 'Forbidden: Not a user' });
+  }
+
+  try {
+    const user = await User.findById(req.user._id).select('-password');
+    if (!user) return res.status(404).json({ message: 'User not found' });
+
+    res.json(user);
+  } catch (err) {
+    res.status(500).json({ message: 'Server error', error: err.message });
+  }
+});
+
+
+router.post('/login', async (req, res) => {
+  const { identifier, password } = req.body;
+  console.log('Login attempt:', req.body);
+
+  if (!identifier || !password) {
+    return res.status(400).json({ message: 'Identifier and password are required' });
+  }
+
+  try {
+    // Attempt to find user by username or phone number
+    let account = await User.findOne({
+      $or: [
+        { username: identifier },
+        { phoneNumber: identifier }
+      ]
+    });
+
+    let role = 'user';
+
+    // If not found, attempt to find partner by business name or contact number
+    if (!account) {
+      account = await Partner.findOne({
+        $or: [
+          { businessName: identifier },
+          { contactNumber: identifier }
+        ]
+      });
+      role = 'partner';
+    }
+
+    // If account is still not found
+    if (!account) {
+      console.error('Account not found for identifier:', identifier);
+      return res.status(404).json({ message: 'Account not found' });
+    }
+
+    // Compare passwords
+    const isMatch = await bcrypt.compare(password, account.password);
+    if (!isMatch) {
+      console.error('Invalid credentials for identifier:', identifier);
+      return res.status(401).json({ message: 'Invalid credentials' });
+    }
+
+    // Generate JWT token
+    const token = jwt.sign(
+      { _id: account._id, role },
+      process.env.JWT_SECRET,
+      { expiresIn: '7d' }
+    );
+
+    // Respond with token and role
+    res.status(200).json({
+      message: 'Login successful',
+      token,
+      role,
+      redirectTo: role === 'partner' ? '/shop' : 'back'
+    });
+
+  } catch (error) {
+    console.error('Error during login:', error);
+    res.status(500).json({ message: 'Login error', error: error.message });
+  }
 });
 
 //PRODUCTS MANAGEMEMENT
@@ -232,14 +396,14 @@ const productSchema = new Schema({
   name: { type: String, required: true }, // Product name
   description: { type: String, required: false }, // Optional product description
   images: [{ type: String, required: false }], // Array of image URLs
-  primaryImage: { type: String }, 
+  primaryImage: { type: String },
   category: { type: String, required: true }, // Product category
   subCategory: { type: String, required: false }, // Optional subcategory
   brand: { type: String, required: true }, // Product brand
   tags: [{ type: String, required: false }], // Optional tags for the product
   price: { type: Number, required: true }, // Product price
   discountedPrice: { type: Number, required: false },
-  quantity: {type: Number, required: true },
+  quantity: { type: Number, required: true },
   unit: { type: String, required: true }, // Unit of measurement (e.g., kg, g, etc.)
   inventory: { type: Number, required: true }, // Inventory count
   shop: {
@@ -252,9 +416,10 @@ const productSchema = new Schema({
     average: { type: Number, default: 0 }, // Average rating
     reviews: [
       {
-        user: { type: String, required: true }, // User who left the review
-        rating: { type: Number, required: true }, // Rating value
+        user: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },  // User who left the review
+        rating: { type: Number, required: false }, // Rating value
         comment: { type: String, required: false }, // Optional comment
+        date: { type: Date, default: Date.now },
       },
     ],
   },
@@ -283,18 +448,18 @@ router.post('/products', uploadProductImages, async (req, res) => {
       inventory,
       shopId, // Partner's ID
     } = req.body;
-    
-   
-//     const images = req.files?.images?.map(file => file.path) || [];
-// const primaryImageFile = req.files?.primaryImage?.[0]?.path;
-// const primaryImage = primaryImageFile || req.body.primaryImage;
-const images = req.files?.images?.map((file) => `/uploads/products/${file.filename}`) || [];
-const primaryImageFile = req.files?.primaryImage?.[0]?.path;
-const primaryImage = primaryImageFile
-  ? `/uploads/products/${primaryImageFile.split('/').pop()}`
-  : req.body.primaryImage;
 
-  
+
+    //     const images = req.files?.images?.map(file => file.path) || [];
+    // const primaryImageFile = req.files?.primaryImage?.[0]?.path;
+    // const primaryImage = primaryImageFile || req.body.primaryImage;
+    const images = req.files?.images?.map((file) => `/uploads/products/${file.filename}`) || [];
+    const primaryImageFile = req.files?.primaryImage?.[0]?.path;
+    const primaryImage = primaryImageFile
+      ? `/uploads/products/${primaryImageFile.split('/').pop()}`
+      : req.body.primaryImage;
+
+
     // Fetch the partner details using the shopId
     const partner = await Partner.findById(shopId);
     if (!partner) {
@@ -345,135 +510,132 @@ const primaryImage = primaryImageFile
 
 router.get('/products', async (req, res) => {
   try {
-      const { partnerId } = req.query; // Get partnerId from query parameters
+    const { partnerId } = req.query; // Get partnerId from query parameters
 
-      if (!partnerId) {
-          return res.status(400).json({ message: 'Partner ID is required' });
-      }
+    if (!partnerId) {
+      return res.status(400).json({ message: 'Partner ID is required' });
+    }
 
-      // Fetch products for the specific partner
-      const products = await Product.find({ 'shop.shopId': partnerId });
+    // Fetch products for the specific partner
+    const products = await Product.find({ 'shop.shopId': partnerId });
 
-      res.status(200).json({ products });
+    res.status(200).json({ products });
   } catch (error) {
-      console.error('Error fetching products:', error);
-      res.status(500).json({ message: 'Failed to fetch products' });
+    console.error('Error fetching products:', error);
+    res.status(500).json({ message: 'Failed to fetch products' });
   }
 });
 
 // Route to delete a product by ID
 router.delete('/products/:id', async (req, res) => {
   try {
-      const productId = req.params.id;
+    const productId = req.params.id;
 
-      // Find and delete the product
-      const deletedProduct = await Product.findByIdAndDelete(productId);
+    // Find and delete the product
+    const deletedProduct = await Product.findByIdAndDelete(productId);
 
-      if (!deletedProduct) {
-          return res.status(404).json({ message: 'Product not found' });
-      }
+    if (!deletedProduct) {
+      return res.status(404).json({ message: 'Product not found' });
+    }
 
-      res.status(200).json({ message: 'Product deleted successfully', product: deletedProduct });
+    res.status(200).json({ message: 'Product deleted successfully', product: deletedProduct });
   } catch (error) {
-      console.error('Error deleting product:', error);
-      res.status(500).json({ message: 'Failed to delete product', error: error.message });
+    console.error('Error deleting product:', error);
+    res.status(500).json({ message: 'Failed to delete product', error: error.message });
   }
 });
 
 
 router.put('/products/:id', uploadProductImages, async (req, res) => {
   try {
-      const productId = req.params.id;
-      const {
-          name,
-          description,
-          category,
-          subCategory,
-          brand,
-          tags,
-          price,
-          discountedPrice,
-          quantity,
-          unit,
-          inventory,
-          primaryImage,   // fallback primary image from req.body
-          deletedImages,  // This should be a JSON string
-      } = req.body;
+    const productId = req.params.id;
+    const {
+      name,
+      description,
+      category,
+      subCategory,
+      brand,
+      tags,
+      price,
+      discountedPrice,
+      quantity,
+      unit,
+      inventory,
+      primaryImage,   // fallback primary image from req.body
+      deletedImages,  // This should be a JSON string
+    } = req.body;
 
-      // Extract additional images (if any)
-      const images = (req.files && req.files.images && Array.isArray(req.files.images))
-          ? req.files.images.map((file) => `/uploads/products/${file.filename}`)
-          : [];
+    // Extract additional images (if any)
+    const images = (req.files && req.files.images && Array.isArray(req.files.images))
+      ? req.files.images.map((file) => `/uploads/products/${file.filename}`)
+      : [];
 
-      // Extract primary image file if uploaded
-      const primaryImageFile = (req.files && req.files.primaryImage && Array.isArray(req.files.primaryImage))
-          ? `/uploads/products/${req.files.primaryImage[0].filename}`
-          : null;
+    // Extract primary image file if uploaded
+    const primaryImageFile = (req.files && req.files.primaryImage && Array.isArray(req.files.primaryImage))
+      ? `/uploads/products/${req.files.primaryImage[0].filename}`
+      : null;
 
-      // Use the primary image file if available; otherwise, fallback to primaryImage from req.body.
-      const finalPrimaryImage = primaryImageFile || primaryImage;
+    // Use the primary image file if available; otherwise, fallback to primaryImage from req.body.
+    const finalPrimaryImage = primaryImageFile || primaryImage;
 
-      // Normalize deleted image paths to match stored paths
-      const deletedImagesArray = deletedImages
-          ? JSON.parse(deletedImages).map((imgPath) => {
-              const parts = imgPath.split('/uploads/');
-              return parts.length > 1 ? `/uploads/${parts[1]}` : imgPath;
-            })
-          : [];
+    // Normalize deleted image paths to match stored paths
+    const deletedImagesArray = deletedImages
+      ? JSON.parse(deletedImages).map((imgPath) => {
+        const parts = imgPath.split('/uploads/');
+        return parts.length > 1 ? `/uploads/${parts[1]}` : imgPath;
+      })
+      : [];
 
-        
-          
+    const updatedProduct = await Product.findById(productId);
+    if (!updatedProduct) {
+      return res.status(404).json({ message: 'Product not found' });
+    }
 
-      const updatedProduct = await Product.findById(productId);
-      if (!updatedProduct) {
-          return res.status(404).json({ message: 'Product not found' });
-      }
+    // Update product fields
+    updatedProduct.name = name || updatedProduct.name;
+    updatedProduct.description = description || updatedProduct.description;
+    updatedProduct.category = category || updatedProduct.category;
+    updatedProduct.subCategory = subCategory || updatedProduct.subCategory;
+    updatedProduct.brand = brand || updatedProduct.brand;
+    updatedProduct.tags = tags ? tags.split(',').map((tag) => tag.trim()) : updatedProduct.tags;
+    updatedProduct.price = price || updatedProduct.price;
+    updatedProduct.quantity = quantity || updatedProduct.quantity;
+    updatedProduct.unit = unit || updatedProduct.unit;
+    updatedProduct.inventory = inventory || updatedProduct.inventory;
+    updatedProduct.primaryImage = finalPrimaryImage || updatedProduct.primaryImage;
 
-      // Update product fields
-      updatedProduct.name = name || updatedProduct.name;
-      updatedProduct.description = description || updatedProduct.description;
-      updatedProduct.category = category || updatedProduct.category;
-      updatedProduct.subCategory = subCategory || updatedProduct.subCategory;
-      updatedProduct.brand = brand || updatedProduct.brand;
-      updatedProduct.tags = tags ? tags.split(',').map((tag) => tag.trim()) : updatedProduct.tags;
-      updatedProduct.price = price || updatedProduct.price;
-      updatedProduct.quantity = quantity || updatedProduct.quantity;
-      updatedProduct.unit = unit || updatedProduct.unit;
-      updatedProduct.inventory = inventory || updatedProduct.inventory;
-      updatedProduct.primaryImage = finalPrimaryImage || updatedProduct.primaryImage;
+    // Add new images
+    updatedProduct.images.push(...images);
 
-      // Add new images
-      updatedProduct.images.push(...images);
+    // Remove deleted images from the images array
+    if (deletedImagesArray.length > 0) {
+      updatedProduct.images = updatedProduct.images.filter(
+        (image) => !deletedImagesArray.includes(image)
+      );
 
-      // Remove deleted images from the images array
-      if (deletedImagesArray.length > 0) {
-          updatedProduct.images = updatedProduct.images.filter(
-              (image) => !deletedImagesArray.includes(image)
-          );
-
-          // Delete the files from the file system
-          deletedImagesArray.forEach((imagePath) => {
-              const fullPath = path.join(__dirname, '..', imagePath); // Resolve path relative to the project
-              if (fs.existsSync(fullPath)) {
-                  fs.unlink(fullPath, (err) => {
-                      if (err) {
-                          console.error(`Failed to delete image file: ${fullPath}`, err);
-                      }
-                  });
-              } else {
-                  console.warn(`File not found: ${fullPath}`);
-              }
+      // Delete the files from the file system
+      deletedImagesArray.forEach((imagePath) => {
+        const fullPath = path.join(__dirname, '..', imagePath); // Resolve path relative to the project
+        if (fs.existsSync(fullPath)) {
+          fs.unlink(fullPath, (err) => {
+            if (err) {
+              console.error(`Failed to delete image file: ${fullPath}`, err);
+            }
           });
-      }
-      if (discountedPrice !== undefined) {
-        updatedProduct.discountedPrice = discountedPrice;
-      }
+        } else {
+          console.warn(`File not found: ${fullPath}`);
+        }
+      });
+    }
+    if (discountedPrice !== undefined) {
+      updatedProduct.discountedPrice = discountedPrice;
+    }
 
-      await updatedProduct.save();
-      res.status(200).json({ message: 'Product updated successfully', product: updatedProduct });
+    await updatedProduct.save();
+    res.status(200).json({ message: 'Product updated successfully', product: updatedProduct });
   } catch (error) {
-      console.error('Error updating product:', error);
-      res.status(500).json({ message: 'Failed to update product', error: error.message });
+    console.error('Error updating product:', error);
+    res.status(500).json({ message: 'Failed to update product', error: error.message });
   }
 });
 
@@ -486,6 +648,140 @@ router.get('/all-products', async (req, res) => {
   } catch (error) {
     console.error('Error fetching products:', error);
     res.status(500).json({ message: 'Failed to fetch products', error: error.message });
+  }
+});
+
+
+
+// Route to fetch product details by ID
+router.get('/products/:id', async (req, res) => {
+  try {
+    const { id } = req.params;
+    const product = await Product.findById(id);
+
+    if (!product) {
+      return res.status(404).json({ message: 'Product not found' });
+    }
+
+    res.status(200).json(product);
+  } catch (error) {
+    console.error('Error fetching product details:', error.message);
+    res.status(500).json({ message: 'Failed to fetch product details', error: error.message });
+  }
+});
+
+
+
+// GET /api/products/:id/reviews
+router.get('/products/:id/reviews', async (req, res) => {
+  try {
+    const product = await Product.findById(req.params.id).populate('ratings.reviews.user', 'username names');
+    if (!product) return res.status(404).json({ message: 'Product not found' });
+
+    res.json({ reviews: product.ratings.reviews });
+  } catch (err) {
+    res.status(500).json({ message: 'Server error' });
+  }
+});
+
+
+// Route to add a comment to a product
+router.post('/products/:id/comments', async (req, res) => {
+  const { user: userId, comment } = req.body;
+
+  if (!userId || !comment) {
+    return res.status(400).json({ message: 'User and comment are required' });
+  }
+
+  try {
+    const product = await Product.findById(req.params.id);
+    if (!product) return res.status(404).json({ message: 'Product not found' });
+
+    product.ratings.reviews.push({ user: userId, comment });
+    await product.save();
+
+    res.status(201).json({ message: 'Comment added successfully' });
+  } catch (err) {
+    res.status(500).json({ message: 'Server error' });
+  }
+});
+
+// Route to submit a rating for a product
+router.post('/products/:id/rate', async (req, res) => {
+  try {
+    let { user, rating, comment } = req.body;
+    console.log(req.body);
+
+    // Ensure rating is a number and comment is optional
+    rating = Number(rating);
+
+    if (!user || rating == null || isNaN(rating)) {
+      return res.status(400).json({ message: 'User and rating are required and must be valid' });
+    }
+
+    if (!mongoose.Types.ObjectId.isValid(user)) {
+      return res.status(400).json({ message: 'Invalid user ID' });
+    }
+
+    if (rating < 1 || rating > 5) {
+      return res.status(400).json({ message: 'Rating must be between 1 and 5' });
+    }
+
+    const product = await Product.findById(req.params.id);
+
+    if (!product) {
+      return res.status(404).json({ message: 'Product not found' });
+    }
+
+    // Ensure ratings object structure exists
+    if (!product.ratings) {
+      product.ratings = { average: 0, reviews: [] };
+    } else if (!Array.isArray(product.ratings.reviews)) {
+      product.ratings.reviews = [];
+    }
+
+    // Check if the user has already rated the product
+    const existingReview = product.ratings.reviews.find(
+      (review) => review.user.toString() === user
+    );
+
+    if (existingReview) {
+      // Update the existing rating and comment
+      existingReview.rating = rating;
+      existingReview.comment = comment || existingReview.comment; // Only update comment if a new one is provided
+    } else {
+      // Add new review (with both rating and comment)
+      product.ratings.reviews.push({
+        user: new mongoose.Types.ObjectId(user),
+        rating,
+        comment,
+      });
+    }
+
+    // Recalculate the average rating, considering only reviews with a rating (not null or undefined)
+    const validReviews = product.ratings.reviews.filter(review => review.rating != null && !isNaN(review.rating));
+    const totalRatings = validReviews.reduce(
+      (sum, review) => sum + (Number(review.rating) || 0),
+      0
+    );
+
+    const reviewCount = validReviews.length;
+    const averageRating = reviewCount > 0 ? totalRatings / reviewCount : 0;
+
+    product.ratings.average = averageRating;
+
+    await product.save();
+
+    res.status(201).json({
+      message: 'Rating submitted successfully',
+      averageRating,
+    });
+  } catch (error) {
+    console.error('Error submitting rating:', error.message);
+    res.status(500).json({
+      message: 'Failed to submit rating',
+      error: error.message,
+    });
   }
 });
 
@@ -512,111 +808,37 @@ function sendEmailNotification(email, message) {
 
 // Function to notify the supplier about a new order
 const notifySupplier = async (order) => {
-    try {
-      console.log('Sending order details:', order);
-        const restaurant = await Restaurant.findOne({ restaurant: order.selectedRestaurant }).populate('partnerId');
+  try {
+    console.log('Sending order details:', order);
+    const restaurant = await Restaurant.findOne({ restaurant: order.selectedRestaurant }).populate('partnerId');
 
-        if (!restaurant || !restaurant.partnerId) {
-            console.log(`❌ No partner found for restaurant: ${order.selectedRestaurant}`);
-            return;
-        }
-
-        const partnerId = restaurant.partnerId._id.toString();
-        const partnerSocket = connectedPartners.get(partnerId);
-
-        if (partnerSocket) {
-            // If online, send the order immediately
-            partnerSocket.emit('newOrder', { orderId: order.orderId, orderDetails: order });
-            console.log(`✅ Order ${order.orderId} sent to partner ${partnerId}`);
-        } else {
-            // If offline, store the order for later
-            console.log(`⚠️ Partner ${partnerId} is offline. Storing order.`);
-            if (!pendingOrders.has(partnerId)) pendingOrders.set(partnerId, []);
-            pendingOrders.get(partnerId).push({ orderId: order.orderId, orderDetails: order });
-            console.log(`Stored orders for ${partnerId}:`, pendingOrders.get(partnerId));
-
-        }
-    } catch (error) {
-        console.error('🚨 Error notifying supplier:', error);
+    if (!restaurant || !restaurant.partnerId) {
+      console.log(`❌ No partner found for restaurant: ${order.selectedRestaurant}`);
+      return;
     }
+
+    const partnerId = restaurant.partnerId._id.toString();
+    const partnerSocket = connectedPartners.get(partnerId);
+
+    if (partnerSocket) {
+      // If online, send the order immediately
+      partnerSocket.emit('newOrder', { orderId: order.orderId, orderDetails: order });
+      console.log(`✅ Order ${order.orderId} sent to partner ${partnerId}`);
+    } else {
+      // If offline, store the order for later
+      console.log(`⚠️ Partner ${partnerId} is offline. Storing order.`);
+      if (!pendingOrders.has(partnerId)) pendingOrders.set(partnerId, []);
+      pendingOrders.get(partnerId).push({ orderId: order.orderId, orderDetails: order });
+      console.log(`Stored orders for ${partnerId}:`, pendingOrders.get(partnerId));
+
+    }
+  } catch (error) {
+    console.error('🚨 Error notifying supplier:', error);
+  }
 };
 
 
-//USER SCHEMA AND ROUTES
-const userSchema = new mongoose.Schema({
-  username: { type: String, required: true, unique: true },
-  names: { type: String, required: true },
-  email: { type: String, required: true, unique: true },
-  phoneNumber: { type: String, required: true },
-  password: { type: String, required: true }
-});
 
-userSchema.pre('save', async function (next) {
-  if (this.isModified('password')) {
-    this.password = await bcrypt.hash(this.password, 10);
-  }
-  next();
-});
-
-const User = mongoose.model('User', userSchema);
-
-router.post('/auth/userSignup', async (req, res) => {
-  // console.log(req.body);
-  const { username, names, email, phoneNumber, password } = req.body;
-  // console.log(req.body);
-  try {
-    let user = await User.findOne({ email });
-    if (user) {
-      return res.status(400).json({ success: false, message: 'Email already registered' });
-    }
-    user = new User({ username, names, email, phoneNumber, password });
-    // console.log(user);
-    await user.save();
-    // console.log(user);
-    res.json({ success: true, message: 'User registered successfully' });
-  } catch (err) {
-    res.status(500).json({ success: false, message: 'Server error' });
-    console.log(err);
-  }
-});
-
-router.post('/auth/userLogin', async (req, res) => {
-  const { username, password } = req.body;
-  try {
-    const user = await User.findOne({ username });
-    if (!user) {
-      return res.status(400).json({ success: false, message: 'User not found' });
-    }
-    const isMatch = await bcrypt.compare(password, user.password);
-    if (!isMatch) {
-      return res.status(400).json({ success: false, message: 'Invalid credentials' });
-    }
-    const token = jwt.sign({ id: user._id }, 'secret', { expiresIn: '1h' });
-    res.json({ success: true, token });
-  } catch (err) {
-    res.status(500).json({ success: false, message: 'Server error' });
-  }
-});
-router.get('/auth/current', async (req, res) => {
-  const token = req.headers.authorization?.split(' ')[1];
-
-  if (!token) {
-    return res.status(401).json({ success: false, message: 'No token provided' });
-  }
-
-  try {
-    const decoded = jwt.verify(token, 'secret'); // Use your secret key here
-    const user = await User.findById(decoded.id);
-
-    if (!user) {
-      return res.status(404).json({ success: false, message: 'User not found' });
-    }
-
-    res.json({ success: true, user });
-  } catch (err) {
-    res.status(500).json({ success: false, message: 'Server error' });
-  }
-});
 
 
 
@@ -1447,7 +1669,7 @@ router.post('/paidOrder', async (req, res) => {
 
     // Save order to database
     const savedOrder = await saveOrder(orderDetails);
- 
+
     // Fetch the restaurant and partner details
     const restaurant = await Restaurant.findOne({ restaurant: orderDetails.selectedRestaurant }).populate('partnerId');
 
@@ -1455,8 +1677,8 @@ router.post('/paidOrder', async (req, res) => {
       return res.status(404).json({ error: 'Restaurant not found' });
     }
 
-     // Notify the partner
-     if (restaurant.partnerId && connectedPartners[restaurant.partnerId.toString()]) {
+    // Notify the partner
+    if (restaurant.partnerId && connectedPartners[restaurant.partnerId.toString()]) {
       const partnerSocketId = connectedPartners[restaurant.partnerId.toString()];
       io.to(partnerSocketId).emit('newOrder', {
         message: 'You have a new order!',
@@ -2422,7 +2644,7 @@ router.get('/driver', authenticateToken, async (req, res) => {
 
 
 const generateAuthToken = (user) => {
-  const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, { expiresIn: '1h' });  // Adjust the secret and expiration as needed
+  const token = jwt.sign({ id: user._id }, JWT_SECRET, { expiresIn: '1h' });  // Adjust the secret and expiration as needed
   return token;
 };
 router.post('/driverSignup', async (req, res) => {
@@ -2932,13 +3154,13 @@ router.post('/cash/pay', async (req, res) => {
     await order.save();
 
     console.log('Cash order saved successfully:', order);
-   
+
     if (restaurant.partnerId) {
       notifySupplier(order);
-  } else {
+    } else {
       console.log(`No partner ID associated with the restaurant: ${selectedRestaurant}`);
-  }
-  
+    }
+
     // Send email confirmation
     try {
       await sendEmailNotification({

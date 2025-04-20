@@ -192,7 +192,8 @@ const LandingPage = () => {
                 </div>
 
                 <div className="signCta_div">
-                    <Link to="/sign-up-sign-in" className="landing_sign">Partner Login</Link>
+                    <Link to="/sign-up-sign-in" className="landing_sign">Partner Signup</Link>
+                    <Link to="/sign-in" className="landing_sign">Partner Login</Link>
                     {/* <img src={Logo} alt="Anyoka Eats Logo" className="land_logo" /> */}
                 </div>
             </div>
