@@ -22,12 +22,12 @@ const StoreSignUpForm = () => {
 
   const [showPassword, setShowPassword] = useState(false);
   const [showLoginPassword, setShowLoginPassword] = useState(false);
-  const [modalVisible, setModalVisible] = useState(false);
-  const [showMap, setShowMap] = useState(false);
-
-
-  const navigate = useNavigate();
+  const [mapCenter, setMapCenter] = useState({ lat: -1.286389, lng: 36.817223 }); // Default to Nairobi
   const { setPartner } = useContext(PartnerContext);
+  const navigate = useNavigate();
+
+
+  
 
   useEffect(() => {
     const token = localStorage.getItem('authToken');
@@ -46,29 +46,6 @@ const StoreSignUpForm = () => {
     }
   }, [navigate, setPartner]);
 
-  // useEffect(() => {
-  //   const token = localStorage.getItem('authToken');
-  //   if (token) {
-  //     axios
-  //       .get(`${config.backendUrl}/api/partner`, {
-  //         headers: { Authorization: `Bearer ${token}` },
-  //       })
-  //       .then((response) => {
-  //         const partnerData = response.data;
-  //         setPartner(partnerData);
-  //         navigate(partnerData.role === 'admin' ? '/superuserdashboard' : '/dashboard');
-  //       })
-  //       .catch((error) => {
-  //         console.error('Error fetching partner data:', error);
-  //         // Optional: Remove invalid token
-  //         localStorage.removeItem('authToken');
-  //       });
-  //   }
-  // }, [navigate, setPartner]);
-  
-  const handleLocationSelect = (location) => {
-    setFormData((prev) => ({ ...prev, location }));
-  };
   
 
   const handleInputChange = (event) => {
@@ -77,8 +54,22 @@ const StoreSignUpForm = () => {
       setFormData({ ...formData, [name]: files[0] });
     } else {
       setFormData({ ...formData, [name]: value });
+    // Update map center dynamically based on town
+    if (name === 'town') {
+      const geocoder = new window.google.maps.Geocoder();
+      geocoder.geocode({ address: value }, (results, status) => {
+        if (status === 'OK' && results[0]?.geometry?.location) {
+          const { lat, lng } = results[0].geometry.location;
+          setMapCenter({ lat: lat(), lng: lng() });
+        }
+      });
     }
-  };
+  }
+};
+
+const handleLocationSelect = (location) => {
+  setFormData((prev) => ({ ...prev, location }));
+};
 
   const handleSubmitSignUp = async (event) => {
     event.preventDefault();
@@ -119,7 +110,7 @@ if (formData.businessPermit) data.append('businessPermit', formData.businessPerm
   const handleSubmitSignIn = async (event) => {
     event.preventDefault();
     try {
-      const loginResponse = await axios.post(`${config.backendUrl}/api/login`, {
+      const loginResponse = await axios.post(`${config.backendUrl}/api/login-partner`, {
         contactNumber: formData.contactNumber,
         password: formData.loginPassword,
       });
@@ -251,26 +242,16 @@ if (formData.businessPermit) data.append('businessPermit', formData.businessPerm
             />
           </div>
 
-          <div className="form-group">
-            <label htmlFor="location">Location</label>
-            <input
-              type="text"
-              id="location"
-              name="location"
-              value={formData.location}
-              onChange={handleInputChange}
-              readOnly
-              required
-            />
-            <button type="button" onClick={() => setShowMap((prev) => !prev)}>
-              {showMap ? 'Hide Map' : 'Pin Location on Map'}
-            </button>
-            {showMap && (
-              <div style={{ marginTop: '10px' }}>
-                <MapSelector onLocationSelect={handleLocationSelect} />
-              </div>
-            )}
-          </div>
+          <div className="form-group-map">
+  <label>Pin Your Location</label>
+  <div className="map-container">
+    <MapSelector onLocationSelect={handleLocationSelect} center={mapCenter} />
+  </div>
+  <p className="location-preview">
+    Selected Location: {formData.location || 'None'}
+  </p>
+</div>
+
 
 
           <div className="form-group">
@@ -292,35 +273,6 @@ if (formData.businessPermit) data.append('businessPermit', formData.businessPerm
           <button type="submit" className="submitBtn">Sign Up</button>
         </form>
 
-        <h3>Already have an account? Sign In below</h3>
-        <form onSubmit={handleSubmitSignIn}>
-          <div className="form-group">
-            <label htmlFor="loginPhone">Phone Number</label>
-            <input
-              type="tel"
-              id="loginPhone"
-              name="contactNumber"
-              value={formData.contactNumber}
-              onChange={handleInputChange}
-            />
-          </div>
-
-          <div className="form-group">
-            <label htmlFor="loginPassword">Password</label>
-            <input
-              type={showLoginPassword ? 'text' : 'password'}
-              id="loginPassword"
-              name="loginPassword"
-              value={formData.loginPassword}
-              onChange={handleInputChange}
-            />
-            <button type="button" onClick={() => setShowLoginPassword(!showLoginPassword)}>
-              {showLoginPassword ? 'Hide' : 'Show'}
-            </button>
-          </div>
-
-          <button type="submit" className="submitBtn">Sign In</button>
-        </form>
       </div>
     </section>
   );

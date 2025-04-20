@@ -14,7 +14,7 @@ const ReviewsModal = ({ product, onClose }) => {
                         product.ratings.reviews.map((review, index) => (
                             <div key={index} className="review-item">
                                 <p>
-                                    <strong>User:</strong> {review.user}
+                                    <strong>User:</strong> {review.user.username}
                                 </p>
                                 <p>
                                     <strong>Rating:</strong> {review.rating} / 5

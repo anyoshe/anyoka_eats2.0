@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useContext, useRef } from 'react';
 import './MenuPage.css';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap/dist/js/bootstrap.bundle.min';
@@ -7,12 +7,26 @@ import { faCartShopping, faCaretDown } from '@fortawesome/free-solid-svg-icons';
 import axios from 'axios';
 import config from '../../config';
 import ProductDetailModal from './ProductDetailModal';
+import { AuthContext } from '../../contexts/AuthContext';
+import { useNavigate } from 'react-router-dom'; // Add this import
+import { faStar as solidStar } from '@fortawesome/free-solid-svg-icons';
+import { faStar as regularStar } from '@fortawesome/free-regular-svg-icons';
+
+
 
 const MenuPage = () => {
+  const navigate = useNavigate();
+  const { currentProduct, setCurrentProduct, user, setRedirectPath } = useContext(AuthContext);
   const [productsByCategory, setProductsByCategory] = useState({});
   const [cart, setCart] = useState([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState(null);
+
+
+
+  useEffect(() => {
+    console.log('User in MenuPage:', user);
+  }, [user]);
 
   useEffect(() => {
     const fetchProducts = async () => {
@@ -37,45 +51,49 @@ const MenuPage = () => {
     fetchProducts();
   }, []);
 
+
   const handleProductClick = (product) => {
     setSelectedProduct(product);
     setIsModalOpen(true);
+  };
+
+  const closeModal = () => {
+    setIsModalOpen(false);
+    setCurrentProduct(null); // Clear the current product
   };
 
   const handleAddToCart = (product) => {
     setCart((prevCart) => [...prevCart, product]);
   };
 
-  // const getImageSrc = (product) => {
-  //   if (product.primaryImage) {
-  //     return product.primaryImage.startsWith('http')
-  //       ? product.primaryImage
-  //       : `${config.backendUrl}${product.primaryImage.replace('/var/data', '')}`;
-  //   }
-
-  //   if (product.images && product.images.length > 0) {
-  //     return `${config.backendUrl}${product.images[0].replace('/var/data', '')}`;
-  //   }
-
-  //   return '/path/to/placeholder-image.jpg';
-  // };
-
   const getImageSrc = (product) => {
     const stripServerPath = (fullPath) =>
       fullPath.replace('/mnt/shared/Projects/anyoka_eats2.0/online_hotel', '');
-  
+
     if (product.primaryImage) {
       return `${config.backendUrl}${stripServerPath(product.primaryImage)}`;
     }
-  
+
     if (product.images && product.images.length > 0) {
       return `${config.backendUrl}${stripServerPath(product.images[0])}`;
     }
-  
+
     return '/path/to/placeholder-image.jpg'; // Fallback to a placeholder image
   };
-  
-  
+
+  const renderStars = (averageRating) => {
+    const stars = [];
+    for (let i = 1; i <= 5; i++) {
+      stars.push(
+        <FontAwesomeIcon
+          key={i}
+          icon={i <= Math.round(averageRating) ? solidStar : regularStar}
+          className="star-icon"
+        />
+      );
+    }
+    return stars;
+  };
 
   return (
     <div className="storeWrapper">
@@ -107,7 +125,13 @@ const MenuPage = () => {
                         <span>{product.quantity}</span>
                         {product.unit}
                       </p>
+                      
                     </div>
+                    <div className="ratingsDiv star-icon">
+                        {product.ratings?.average
+                          ? renderStars(product.ratings.average)
+                          : 'No ratings yet'}
+                      </div>
                     <div className="addCartBtn">
                       <button
                         className="addToCartBtn"
@@ -149,15 +173,18 @@ const MenuPage = () => {
           </div>
           <div className="doneButtonDiv">Check Out</div>
         </section>
+
+        {/* Render the ProductDetailModal */}
+        {selectedProduct && (
+          <ProductDetailModal
+            isOpen={isModalOpen}
+            onRequestClose={closeModal}
+            product={selectedProduct}
+            // onAddToCart={(product) => console.log('Add to cart:', product)}
+            onAddToCart={handleAddToCart}
+          />
+        )}
       </div>
-      {selectedProduct && (
-        <ProductDetailModal
-          isOpen={isModalOpen}
-          onRequestClose={() => setIsModalOpen(false)}
-          product={selectedProduct}
-          onAddToCart={handleAddToCart}
-        />
-      )}
     </div>
   );
 };

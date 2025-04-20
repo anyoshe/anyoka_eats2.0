@@ -38,8 +38,8 @@ const uploadMultiple = multer({
 
 // Set storage engine for profile images
 const profileStorage = multer.diskStorage({
-  destination: '/var/data/uploads/profile-images',
-  // destination: path.join(__dirname, 'public/uploads/profile-images'),
+  // destination: '/var/data/uploads/profile-images',
+  destination: path.join(__dirname, '../uploads/profile-images'),
   filename: (req, file, cb) => {
     cb(null, 'profile-' + Date.now() + path.extname(file.originalname));
   }
@@ -55,8 +55,8 @@ const uploadProfileImage = multer({
 
 // Set storage engine for business permit PDFs
 const permitStorage = multer.diskStorage({
-  destination: '/var/data/uploads/business-permits', // <--- you can change this path
-  // destination: path.join(__dirname, 'public/uploads/business-permits'),
+  // destination: '/var/data/uploads/business-permits', // <--- you can change this path
+  destination: path.join(__dirname, '../uploads/business-permits'),
   filename: (req, file, cb) => {
     cb(null, 'permit-' + Date.now() + path.extname(file.originalname));
   }
