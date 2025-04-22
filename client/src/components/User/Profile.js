@@ -22,9 +22,14 @@ const Profile = ({ onSave }) => {
         setLocation(plusCode);
     };
 
+    // const toggleMapVisibility = () => {
+    // };
+
     const toggleMapVisibility = () => {
         setIsMapVisible((prev) => !prev);
     };
+
+    
 
     const [formData, setFormData] = useState({
         businessName: '',
@@ -47,7 +52,6 @@ const Profile = ({ onSave }) => {
                     if (response.data) {
                         updatePartnerDetails(response.data);
 
-                        // Only reset formData if NOT in edit mode
                         if (!editSectionMode) {
                             setFormData({
                                 businessName: response.data.businessName || '',
@@ -73,7 +77,6 @@ const Profile = ({ onSave }) => {
             fetchPartnerDetails();
         }
     }, [partner?._id, updatePartnerDetails, editSectionMode]);
-
 
     const toggleEditImageMode = () => setEditImageMode(!editImageMode);
     const toggleEditSection = () => setEditSectionMode(!editSectionMode);
@@ -139,15 +142,18 @@ const Profile = ({ onSave }) => {
                             id="profileImagePreview"
                             src={partner?.profileImage ? `${config.backendUrl}${partner.profileImage.replace(/\\/g, '/')}` : profileImg}
                             alt="Profile"
+                            
                             className={styles.profileImage}
                             onClick={() => editImageMode && profileImageInputRef.current.click()}
                         />
+                       
                         <div className={styles.image_buttons}>
                             <button className={styles.edit_btn} onClick={toggleEditImageMode} title={editImageMode ? 'Cancel' : 'Edit Picture'}>
                                 <i className={`fas ${editImageMode ? 'fa-times' : 'fa-edit'}`}></i>
                             </button>
 
                             {editImageMode && (
+                               
                                 <button className={styles.save_btn} onClick={saveProfileImage} title="Save">
                                     <i className="fas fa-save"></i>
                                 </button>
@@ -155,6 +161,7 @@ const Profile = ({ onSave }) => {
                         </div>
                     </div>
 
+                
                     <div className={`${styles.profileItem} ${styles.permit}`}>
                         <strong>Business Permit:</strong>
                         <a
@@ -163,11 +170,13 @@ const Profile = ({ onSave }) => {
                             target="_blank"
                             rel="noopener noreferrer"
                             className={styles.permitLink}
+                           
                         >
                             View Permit
                         </a>
                     </div>
 
+                    
                     <div className={`${styles.profileItem} ${styles.profileItemShop}`}>
                         <strong>Shop Name:</strong>
                         {editSectionMode ? (
@@ -177,6 +186,7 @@ const Profile = ({ onSave }) => {
                         )}
                     </div>
 
+                    
                     <div className={styles.profileItem}>
                         <strong>Business Category:</strong>
                         {editSectionMode ? (
@@ -186,6 +196,7 @@ const Profile = ({ onSave }) => {
                         )}
                     </div>
 
+                    
                     <div className={styles.profileItem}>
                         <strong>Town or Centre:</strong>
                         {editSectionMode ? (
@@ -195,6 +206,7 @@ const Profile = ({ onSave }) => {
                         )}
                     </div>
 
+                   
                     <div className={styles.profileItem}>
                         <strong>Phone Number:</strong>
                         {editSectionMode ? (
@@ -204,6 +216,7 @@ const Profile = ({ onSave }) => {
                         )}
                     </div>
 
+                    
                     <div className={styles.profileItem}>
                         <strong>Email:</strong>
                         {editSectionMode ? (
@@ -213,6 +226,7 @@ const Profile = ({ onSave }) => {
                         )}
                     </div>
 
+                   
                     <div className={styles.profileItem}>
                         <strong>ID Number:</strong>
                         {editSectionMode ? (
@@ -226,6 +240,22 @@ const Profile = ({ onSave }) => {
                         <strong>Location:</strong>
                         {editSectionMode ? (
                             <>
+                                <div className={styles.locationInputWrapper}>
+                                    <input
+                                        type="text"
+                                        name="location"
+                                        value={formData.location}
+                                        readOnly
+                                    />
+                                    <button
+                                        type="button"
+                                        className={styles.edit_btn}
+                                        onClick={toggleMapVisibility}
+                                        title={isMapVisible ? 'Hide Map' : 'Edit Location'}
+                                    >
+                                        <i className={`fas ${isMapVisible ? 'fa-times' : 'fa-pen'}`}></i>
+                                    </button>
+                                </div>
                                 <div className={styles.locationInputWrapper}>
                                     <input
                                         type="text"
@@ -280,6 +310,7 @@ const Profile = ({ onSave }) => {
                         )}
                     </div>
 
+                   
                     <div className={`${styles.profileItem} ${styles.profileDescriptionDiv}`}>
                         <strong>Description:</strong>
                         {editSectionMode ? (
@@ -295,8 +326,10 @@ const Profile = ({ onSave }) => {
                     </div>
                 </div>
 
+               
                 <div className={styles.details_buttons}>
                     <button
+                       
                         className={styles.edit_btn}
                         onClick={toggleEditSection}
                         title={editSectionMode ? 'Cancel' : 'Edit Details'}
@@ -305,12 +338,12 @@ const Profile = ({ onSave }) => {
                     </button>
 
                     {editSectionMode && (
+                       
                         <button className={styles.save_btn} onClick={saveSection} title="Save Changes">
                             <i className="fas fa-save"></i>
                         </button>
                     )}
                 </div>
-
             </div>
         </div>
     );

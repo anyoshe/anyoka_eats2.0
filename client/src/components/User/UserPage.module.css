@@ -86,7 +86,7 @@ h4 {
 label {
   font-size: 15px;
   font-weight: bold;
-  text-align: center;
+  /* text-align: center; */
 }
 .updateDish {
   background-color: wheat;
@@ -474,20 +474,23 @@ div[id$="-section"] {
   background-color: #fff;
   margin: 4px 0;
 }
-
 .navs {
-  width: 100vw;
+  width: 100%;
   box-shadow: 0 4px 6px 0;
 }
-
 .navs-container {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin:  0px 20px;
+  margin-left: 20px;
+  margin-right: 20px;
   top: 0;
   margin-top: 0;
   height: 4.5em;
+  
+}
+.Kitchen h3 {
+  color: #ED0800;
 }
 
 .navs-container a {
@@ -504,37 +507,12 @@ div[id$="-section"] {
   padding: 3px;
   border-radius: 5px;
 }
-
 .navbar-container li a {
   list-style: none;
   color: white;
   font-size: 20px;
   text-decoration: none;
 }
-
-.userCover{
-    width: 100vw;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-}
-
-.tab-buttons{
-    width: 90%;
-    display: grid;
-    grid-template-columns: repeat(5,0.5fr);
-    gap: 0.6rem;
-    margin: 1rem 0.2rem;
-}
-
-.tab-buttons button{
-    padding: 0.2rem;
-    background-color: var(--green);
-    color: white;
-    border: none;
-}
-
 
 #updateModalBtn,
 #openModalBtn {
@@ -733,7 +711,6 @@ table th {
 }
 
 .foodList {
-
   display: flex;
   flex-wrap: wrap;
   justify-content: center;
@@ -742,6 +719,7 @@ table th {
   border: 1px solid rgba(0, 0, 0, 0.5);
   width: 80%;
 }
+
 .foodList img {
   width: 5%;
   height: 5%;
@@ -749,69 +727,11 @@ table th {
 }
 
 @media(max-width:320px){
-  .saleTh {
-    padding: 5px;
-    font-size: 0.7rem;
-    width: 2rem;
-  }
 
-  .saleDate{
-    width: 2rem;
-  }
-
-  table th, table td {
-    padding: 5px;
-    font-size: 0.8rem;
-  }
-
-  .saleOption{
-    font-size: 0.7rem;
-    width: 2rem;
-  }
-
-  .tableRes{
-    width: 1rem;
-    font-size: 0.7rem;
-  }
-
-  .saleCode{
-    width: 2.5rem;
-  }
 }
 
 
 @media(max-width:480px){
-  .saleTh {
-    padding: 5px;
-    font-size: 0.7rem;
-    width: 2rem;
-  }
-
-  .saleDate{
-    width: 2rem;
-  }
-
-  table th, table td {
-    padding: 5px;
-    font-size: 0.7rem;
-  }
-
-  .saleOption{
-    font-size: 0.7rem;
-    width: 2rem;
-  }
-
-  .tableRes{
-    width: 1rem;
-    font-size: 0.7rem;
-  }
-
-  .saleCode{
-    width: 2.5rem;
-  }
-
-
-
   .dayOrders{
     /* border: 5px dotted blue; */
 
@@ -915,8 +835,4 @@ table th {
   .sameTotal {
     font-size: 1rem;
   }
-}
-
-@media (min-width:1025) and (max-width:1440px){
-
 }
