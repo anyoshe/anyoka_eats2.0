@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import config from '../../config';
 import './ProductCard.css';
+import styles from '../Menu/ProductDetailModal.module.css';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faStar as solidStar } from '@fortawesome/free-solid-svg-icons';
 import { faStar as regularStar } from '@fortawesome/free-regular-svg-icons';
@@ -91,6 +92,8 @@ const ProductCard = ({ product }) => {
 
       <p className="product-brand">Brand: {product.brand}</p>
       <p className="product-category">Category: {product.category}</p>
+      <p className="product-inventory">Seller: {product.shop.shopName}</p>
+      <p className="product-inventory">Town: {product.shop.town}</p>
       <p className="product-inventory">Available: {product.inventory}</p>
 
       <div className="rating">

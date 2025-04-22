@@ -219,6 +219,11 @@ const userSchema = new mongoose.Schema({
   phoneNumber: { type: String, required: true, unique: true },
   town: { type: String, required: true },
   location: { type: String, required: true },
+  savedLocations: [{ // new field
+    label: { type: String }, // e.g., "Work", "Home", "Parents"
+    town: { type: String },
+    location: { type: String },
+  }],
   password: { type: String, required: true }
 });
 
@@ -384,6 +389,45 @@ router.post('/login', async (req, res) => {
   } catch (error) {
     console.error('Error during login:', error);
     res.status(500).json({ message: 'Login error', error: error.message });
+  }
+});
+
+router.post('/users/addSavedLocation', async (req, res) => {
+  const { userId, locationData } = req.body;
+  console.log(req.body);
+  if (!userId || !locationData) {
+    return res.status(400).json({ error: 'User ID and location data are required.' });
+  }
+
+  try {
+    const user = await User.findById(userId);
+    if (!user) return res.status(404).json({ error: 'User not found' });
+
+    // Add to savedLocations array
+    user.savedLocations.push(locationData);
+    await user.save();
+
+    res.status(200).json({ message: 'Location saved', savedLocations: user.savedLocations });
+  } catch (error) {
+    console.error('Error saving location:', error);
+    res.status(500).json({ error: 'Server error' });
+  }
+});
+
+// GET savedLocations by userId
+router.get('/users/getSavedLocations/:userId', async (req, res) => {
+  const { userId } = req.params;
+
+  try {
+    const user = await User.findById(userId).select('savedLocations');
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+
+    res.json({ locations: user.savedLocations });
+  } catch (err) {
+    console.error('Error fetching saved locations:', err);
+    res.status(500).json({ message: 'Server error' });
   }
 });
 
@@ -785,6 +829,312 @@ router.post('/products/:id/rate', async (req, res) => {
   }
 });
 
+//Handling distance calculations.
+router.get('/distance', async (req, res) => {
+  const { origins, destinations } = req.query;
+
+  try {
+    const response = await fetch(`https://maps.googleapis.com/maps/api/distancematrix/json?origins=${origins}&destinations=${destinations}&key=${process.env.GOOGLE_API_KEY}`);
+    const data = await response.json();
+    res.json(data);
+  } catch (err) {
+    console.error('Error fetching from Google:', err);
+    res.status(500).json({ error: 'Google API fetch failed' });
+  }
+});
+
+
+// --- ORDERS SCHEMAS & MODELS ---
+const CounterSchema = new mongoose.Schema({
+  date: { type: String, required: true, unique: true }, // Format: '20250421'
+  seq: { type: Number, default: 0 },
+});
+
+const Counter = mongoose.models.Counter || mongoose.model('Counter', CounterSchema);
+
+
+const OrderItemSchema = new mongoose.Schema({
+  product: { type: mongoose.Schema.Types.ObjectId, ref: 'Product', required: true },
+  quantity: { type: Number, required: true },
+  price: { type: Number, required: true },
+  shop: {
+    shopId: { type: mongoose.Schema.Types.ObjectId, ref: 'Partner', required: true },
+    shopName: { type: String, required: true },
+  }
+});
+
+const OrderSchema = new mongoose.Schema({
+  orderId: { type: String, unique: true },
+  user: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
+  items: [OrderItemSchema],
+  subOrders: [{ type: mongoose.Schema.Types.ObjectId, ref: 'SubOrder' }],
+  delivery: {
+    town: String,
+    location: String,
+    fee: Number,
+  },
+  total: { type: Number, default: 0 },
+  paymentMethod: { type: String, enum: ['COD', 'Mpesa', 'PayPal', 'Card'], required: true },
+  paymentStatus: { type: String, enum: ['Pending', 'Paid'], default: 'Pending' },
+  createdAt: { type: Date, default: Date.now }
+});
+// Hook must be BEFORE model is compiled
+OrderSchema.pre('save', async function (next) {
+  if (this.orderId) return next();
+
+  const today = new Date();
+  const dateStr = today.toISOString().split('T')[0].replace(/-/g, '');
+
+  try {
+    const counter = await Counter.findOneAndUpdate(
+      { date: dateStr },
+      { $inc: { seq: 1 } },
+      { new: true, upsert: true }
+    );
+
+    const paddedSeq = String(counter.seq).padStart(6, '0');
+    this.orderId = `ANYEAT-${dateStr}-${paddedSeq}`;
+    next();
+  } catch (err) {
+    next(err);
+  }
+});
+
+// Compile model AFTER hook
+// Prevent OverwriteModelError
+const Order = mongoose.models.Order || mongoose.model('Order', OrderSchema);
+
+const SubOrderSchema = new mongoose.Schema({
+  parentOrder: { type: mongoose.Schema.Types.ObjectId, ref: 'Order', required: true },
+  shop: { type: mongoose.Schema.Types.ObjectId, ref: 'Partner', required: true },
+  items: [{
+    product: { type: mongoose.Schema.Types.ObjectId, ref: 'Product', required: true },
+    quantity: { type: Number, required: true },
+    price: { type: Number, required: true },
+  }],
+  total: { type: Number, required: true },
+  status: {
+    type: String,
+    enum: [
+      'Pending',
+      'OrderReceived',
+      'Preparing',
+      'ReadyForPickup',
+      'PickedUp',
+      'OutForDelivery',
+      'Delivered',
+    ],
+    default: 'Pending'
+  },
+  createdAt: { type: Date, default: Date.now }
+});
+
+const SubOrder = mongoose.models.SubOrder || mongoose.model('SubOrder', SubOrderSchema);
+
+
+// --- ROUTES ---
+
+router.post('/orders/place', async (req, res) => {
+  const {
+    userId,
+    items,           // [{ productId, quantity, price, shop: { shopId, shopName } }, ...]
+    delivery,
+    paymentMethod
+  } = req.body;
+
+  if (!items || items.length === 0) {
+    return res.status(400).json({ error: 'No items in order.' });
+  }
+
+  const session = await mongoose.startSession();
+  session.startTransaction();
+  try {
+    // 1. Create main order
+    const total = items.reduce((sum, i) => sum + i.price * i.quantity, 0);
+    const order = await Order.create([{
+      user: userId,
+      items,
+      delivery,
+      paymentMethod,
+      total // <- Add this
+    }], { session });
+
+
+    // 2. Group items by shop
+    const byShop = items.reduce((acc, it) => {
+      const sid = it.shop.shopId.toString();
+      if (!acc[sid]) acc[sid] = [];
+      acc[sid].push(it);
+      return acc;
+    }, {});
+
+    // 3. Create suborders
+    const subOrderIds = [];
+    for (let shopId in byShop) {
+      const shopItems = byShop[shopId];
+      const total = shopItems.reduce((sum, i) => sum + i.price * i.quantity, 0);
+
+      const subOrder = await SubOrder.create([{
+        parentOrder: order[0]._id,
+        shop: shopId,
+        items: shopItems.map(i => ({
+          product: i.product,
+          quantity: i.quantity,
+          price: i.price
+        })),
+        total
+      }], { session });
+
+      subOrderIds.push(subOrder[0]._id);
+    }
+
+    // 4. Link subOrders
+    order[0].subOrders = subOrderIds;
+    await order[0].save({ session });
+
+    await session.commitTransaction();
+    session.endSession();
+
+    res.json({ success: true, orderId: order[0]._id });
+  } catch (err) {
+    await session.abortTransaction();
+    session.endSession();
+    console.error(err);
+    res.status(500).json({ error: 'Failed to place order.' });
+  }
+});
+
+
+
+// GET order by ID
+router.get('/orders/:orderId', authenticateToken, async (req, res) => {
+  const { orderId } = req.params;
+  try {
+    // Ensure you populate the user field to get user data
+    const order = await Order.findById(orderId)
+      .populate('user', 'name email')  // Populating user details (name, email)
+      .populate('items.product', 'name price')  // Populating product details
+      // .populate('items.shop.shopId', 'name')  // Populating shop details
+
+    // Log the order to check the structure
+    console.log('Fetched order:', order);
+
+    if (!order) {
+      return res.status(404).json({ error: 'Order not found' });
+    }
+
+    // Check if order has a user and if user matches
+    if (!order.user) {
+      return res.status(500).json({ error: 'Order user is missing' });
+    }
+
+    // Log the order.user for debugging
+    console.log('Order user:', order.user);
+
+    // Ensure req.user is populated (you must have middleware setting this)
+    if (!req.user) {
+      return res.status(403).json({ error: 'User not authenticated' });
+    }
+
+    // Now check if the user from the order matches the authenticated user
+    if (order.user._id.toString() !== req.user._id.toString()) {
+      return res.status(403).json({ error: 'Unauthorized access to order' });
+    }
+
+    // If everything is good, send the order as response
+    res.json(order);
+  } catch (err) {
+    console.error('Error fetching order:', err.message);
+    res.status(500).json({ error: 'Server error fetching order' });
+  }
+});
+
+
+
+// GET /api/partners/:partnerId/orders
+// router.get('/partners/:partnerId/orders', async (req, res) => {
+//   try {
+//     const { partnerId } = req.params;
+
+//     // Validate partnerId
+//     if (!mongoose.Types.ObjectId.isValid(partnerId)) {
+//       return res.status(400).json({ error: 'Invalid partner ID' });
+//     }
+
+//     // Fetch suborders for the partner
+//     const subOrders = await SubOrder.find({ shop: partnerId })
+//       .populate('parentOrder') // Populate parent order details
+//       .populate('items.product') // Populate product details
+//       .sort({ createdAt: -1 }); // Sort by most recent
+
+//     res.json(subOrders);
+//   } catch (error) {
+//     console.error('Error fetching suborders:', error);
+//     res.status(500).json({ error: 'Server error' });
+//   }
+// });
+
+router.get('/partners/:partnerId/orders', async (req, res) => {
+  try {
+    const { partnerId } = req.params;
+
+    // Validate partnerId
+    if (!mongoose.Types.ObjectId.isValid(partnerId)) {
+      return res.status(400).json({ error: 'Invalid partner ID' });
+    }
+
+    // Fetch suborders for the partner with nested population
+    const subOrders = await SubOrder.find({ shop: partnerId })
+      .populate({
+        path: 'parentOrder',
+        populate: { path: 'user', select: 'names' } // Populate the 'user' field within 'parentOrder'
+      })
+      .populate('items.product') // Populate product details
+      .sort({ createdAt: -1 }); // Sort by most recent
+
+    res.json(subOrders);
+    
+  } catch (error) {
+    console.error('Error fetching suborders:', error);
+    res.status(500).json({ error: 'Server error' });
+  }
+});
+
+router.put('/suborders/:id/status', async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { status } = req.body;
+
+    // Validate status
+    const validStatuses = [
+      'Pending',
+      'OrderReceived',
+      'Preparing',
+      'ReadyForPickup',
+      'PickedUp',
+      'OutForDelivery',
+      'Delivered',
+    ];
+    if (!validStatuses.includes(status)) {
+      return res.status(400).json({ error: 'Invalid status' });
+    }
+
+    const subOrder = await SubOrder.findByIdAndUpdate(
+      id,
+      { status },
+      { new: true }
+    );
+
+    if (!subOrder) {
+      return res.status(404).json({ error: 'SubOrder not found' });
+    }
+
+    res.json(subOrder);
+  } catch (error) {
+    console.error('Error updating suborder status:', error);
+    res.status(500).json({ error: 'Server error' });
+  }
+});
 
 
 function sendEmailNotification(email, message) {
@@ -1470,83 +1820,83 @@ router.get('/categories', async (req, res) => {
 });
 
 
-//ORDER SCHEMAS AND ITS ROUTES
-const orderDishSchema = new Schema({
-  dish: { type: String, required: true },
-  dishName: { type: String, required: true },
-  quantity: { type: Number, required: true },
-  dishPrice: { type: Number, required: true }
-});
+// //ORDER SCHEMAS AND ITS ROUTES
+// const orderDishSchema = new Schema({
+//   dish: { type: String, required: true },
+//   dishName: { type: String, required: true },
+//   quantity: { type: Number, required: true },
+//   dishPrice: { type: Number, required: true }
+// });
 
-const orderSchema = new Schema({
-  orderId: { type: String, required: true, unique: true },
-  customerName: { type: String, required: false },
-  phoneNumber: { type: String, required: true },
-  selectedCategory: { type: String, required: false },
-  selectedRestaurant: { type: String, required: true },
-  customerLocation: { type: String, required: true },
-  expectedDeliveryTime: { type: String, required: true },
-  dishes: [
-    {
-      dishCode: { type: String, required: true },
-      dishName: { type: String, required: true },
-      quantity: { type: Number, required: true },
-      price: { type: Number, required: true }
-    }
-  ],
-  deliveryCharges: { type: Number, required: true },
-  totalPrice: { type: Number, required: true },
-  createdAt: { type: Date, default: Date.now },
-  delivered: { type: Boolean, default: false },
-  paid: { type: Boolean, default: false },
-  // userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: false },
-  status: { type: String, enum: ['Order received', 'Processed and packed', 'Dispatched', 'On Transit', 'Delivered'], default: 'Order received' },
-  driverId: { type: String, required: false },
-  driverDetails: {
-    name: { type: String },
-    contactNumber: { type: String },
-    vehicleRegistration: { type: String }
-  },
-  pickedAt: { type: Date }
-});
+// const orderSchema = new Schema({
+//   orderId: { type: String, required: true, unique: true },
+//   customerName: { type: String, required: false },
+//   phoneNumber: { type: String, required: true },
+//   selectedCategory: { type: String, required: false },
+//   selectedRestaurant: { type: String, required: true },
+//   customerLocation: { type: String, required: true },
+//   expectedDeliveryTime: { type: String, required: true },
+//   dishes: [
+//     {
+//       dishCode: { type: String, required: true },
+//       dishName: { type: String, required: true },
+//       quantity: { type: Number, required: true },
+//       price: { type: Number, required: true }
+//     }
+//   ],
+//   deliveryCharges: { type: Number, required: true },
+//   totalPrice: { type: Number, required: true },
+//   createdAt: { type: Date, default: Date.now },
+//   delivered: { type: Boolean, default: false },
+//   paid: { type: Boolean, default: false },
+//   // userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: false },
+//   status: { type: String, enum: ['Order received', 'Processed and packed', 'Dispatched', 'On Transit', 'Delivered'], default: 'Order received' },
+//   driverId: { type: String, required: false },
+//   driverDetails: {
+//     name: { type: String },
+//     contactNumber: { type: String },
+//     vehicleRegistration: { type: String }
+//   },
+//   pickedAt: { type: Date }
+// });
 
-const Order = model('Order', orderSchema);
+// const Order = model('Order', orderSchema);
 
 
-//Function to generate custom order IDs
-async function generateOrderId() {
-  const latestOrder = await Order.findOne({}, {}, { sort: { 'createdAt': -1 } });
-  if (latestOrder) {
-    const latestOrderId = latestOrder?.orderId?.substring(1); // Extract numeric part
-    const nextOrderId = parseInt(latestOrderId) + 1;
-    return 'O' + String(nextOrderId).padStart(4, '0'); // Format as O0001, O0002, etc.
-  } else {
-    return 'O0001'; // Initial ID if no existing orders
-  }
-}
+// //Function to generate custom order IDs
+// async function generateOrderId() {
+//   const latestOrder = await Order.findOne({}, {}, { sort: { 'createdAt': -1 } });
+//   if (latestOrder) {
+//     const latestOrderId = latestOrder?.orderId?.substring(1); // Extract numeric part
+//     const nextOrderId = parseInt(latestOrderId) + 1;
+//     return 'O' + String(nextOrderId).padStart(4, '0'); // Format as O0001, O0002, etc.
+//   } else {
+//     return 'O0001'; // Initial ID if no existing orders
+//   }
+// }
 
-// Function to create a new order
-async function createOrder(orderData) {
-  try {
-    const orderId = await generateOrderId(); // Generate custom order ID
-    orderData.orderId = orderId; // Assign custom ID to the order data
-    const { selectedCategory, selectedRestaurant, ...otherOrderData } = orderData;
-    const newOrder = new Order({
-      ...otherOrderData,
-      selectedCategory,
-      selectedRestaurant
-    });
-    if (!selectedCategory || !selectedRestaurant) {
-      throw new Error('Missing required order details: selectedCategory and selectedRestaurant');
-    }
-    const savedOrder = await newOrder.save();
-    return savedOrder;
-  } catch (error) {
-    throw error;
-  }
-}
+// // Function to create a new order
+// async function createOrder(orderData) {
+//   try {
+//     const orderId = await generateOrderId(); // Generate custom order ID
+//     orderData.orderId = orderId; // Assign custom ID to the order data
+//     const { selectedCategory, selectedRestaurant, ...otherOrderData } = orderData;
+//     const newOrder = new Order({
+//       ...otherOrderData,
+//       selectedCategory,
+//       selectedRestaurant
+//     });
+//     if (!selectedCategory || !selectedRestaurant) {
+//       throw new Error('Missing required order details: selectedCategory and selectedRestaurant');
+//     }
+//     const savedOrder = await newOrder.save();
+//     return savedOrder;
+//   } catch (error) {
+//     throw error;
+//   }
+// }
 
-module.exports = { Order, createOrder };
+// module.exports = { Order, createOrder };
 // Your route handler for creating a new order
 router.post('/orders', async (req, res) => {
   try {

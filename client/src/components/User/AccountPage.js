@@ -1,5 +1,5 @@
 import React, { useState, useContext } from "react";
-import './AccountPage.css';
+import styles from './AccountPage.module.css';
 import { PartnerContext } from '../../contexts/PartnerContext';
 import Profile from './Profile';
 import ShopSection from "./ShopSection";
@@ -7,10 +7,19 @@ import NotificationComponent from './NotificationComponent';
 import LogoutComponent from './LogoutComponent';
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faBell, faSignOutAlt } from "@fortawesome/free-solid-svg-icons";
+import Orders from './Orders';
+import { faBars } from "@fortawesome/free-solid-svg-icons";
+
 
 const AccountPage = () => {
+  const [menuOpen, setMenuOpen] = useState(false);
   const [activeTab, setActiveTab] = useState("profile");
   const [showNotifications, setShowNotifications] = useState(false);
+
+  const handleTabChange = (tab) => {
+    setActiveTab(tab);
+    setMenuOpen(false);
+  };
 
   const renderTabContent = () => {
     switch (activeTab) {
@@ -19,7 +28,7 @@ const AccountPage = () => {
       case "shop":
         return <ShopSection />;
       case "orders":
-        // return <Orders />;
+        return <Orders />;
       case "sales":
         // return <Sales />;
       default:
@@ -28,61 +37,66 @@ const AccountPage = () => {
   };
 
   return (
-    <div className="container">
-      
-      {/* <div className="header-nav">
-        <h1>Account Page</h1>
-        <div className="header-nav-icons">
-         
-          <FontAwesomeIcon
-            icon={faBell}
-            className="icon notification-icon"
-            data-count={5} 
-            onClick={() => setShowNotifications(!showNotifications)}
-          />
-        
-          <LogoutComponent />
-        </div>
-      </div> */}
+    <div className={styles.accountPageWrapper}>
+      <div className={styles.container}>
 
       {/* Notification Dropdown */}
       {showNotifications && <NotificationComponent />}
 
-      {/* Tab navigation */}
-      <div className="tabs">
-        <div
-          className={`tab ${activeTab === "profile" ? "active" : ""}`}
-          onClick={() => setActiveTab("profile")}
-        >
-          Profile
-        </div>
-        <div
-          className={`tab ${activeTab === "shop" ? "active" : ""}`}
-          onClick={() => setActiveTab("shop")}
-        >
-          Shop
-        </div>
-        <div
-          className={`tab ${activeTab === "orders" ? "active" : ""}`}
-          onClick={() => setActiveTab("orders")}
-        >
-          Orders
-        </div>
-        <div
-          className={`tab ${activeTab === "sales" ? "active" : ""}`}
-          onClick={() => setActiveTab("sales")}
-        >
-          Sales
+     {/* Hamburger icon for small screens */}
+     <div className={styles.hamburgerMenu}>
+          <FontAwesomeIcon
+            icon={faBars}
+            className={styles.hamburgerIcon}
+            onClick={() => setMenuOpen(!menuOpen)}
+          />
         </div>
 
-        <div className="header-nav-icons">
-          {/* Notification Icon */}
-          <FontAwesomeIcon
-            icon={faBell}
-            className="icon notification-icon profileNotification"
-            data-count={5} 
-            onClick={() => setShowNotifications(!showNotifications)}
-          />
+        {/* Slide-out menu shown conditionally */}
+        {menuOpen && (
+          <div className={styles.mobileMenu}>
+            <div className={styles.mobileTab} onClick={() => handleTabChange("profile")}>Profile</div>
+            <div className={styles.mobileTab} onClick={() => handleTabChange("orders")}>Orders</div>
+            <div className={styles.mobileTab} onClick={() => handleTabChange("sales")}>Sales</div>
+            <div className={styles.mobileTab} onClick={() => handleTabChange("shop")}>Shop</div>
+          </div>
+        )}
+
+
+      {/* Tab navigation */}
+      <div className={styles.tabs}>
+      <div
+            className={`${styles.tab} ${activeTab === "profile" ? styles.active : ""}`}
+            onClick={() => setActiveTab("profile")}
+          >
+            Profile
+          </div>
+          <div
+            className={`${styles.tab} ${activeTab === "shop" ? styles.active : ""}`}
+            onClick={() => setActiveTab("shop")}
+          >
+            Shop
+          </div>
+          <div
+            className={`${styles.tab} ${activeTab === "orders" ? styles.active : ""}`}
+            onClick={() => setActiveTab("orders")}
+          >
+            Orders
+          </div>
+          <div
+            className={`${styles.tab} ${activeTab === "sales" ? styles.active : ""}`}
+            onClick={() => setActiveTab("sales")}
+          >
+            Sales
+          </div>
+
+          <div className={styles.headerNavIcons}>
+            <FontAwesomeIcon
+              icon={faBell}
+              className={`${styles.icon} ${styles.notificationIcon} ${styles.profileNotification}`}
+              data-count={5}
+              onClick={() => setShowNotifications(!showNotifications)}
+            />
 
           {/* Logout Icon */}
           <LogoutComponent />
@@ -91,9 +105,10 @@ const AccountPage = () => {
         
       </div>
 
-      {/* Dynamic Tab Content */}
-      <div className="tab-content active">
-        {renderTabContent()}
+      {/* Content */}
+      <div className={`${styles.tabContent} ${styles.active}`}>
+          {renderTabContent()}
+        </div>
       </div>
     </div>
   );

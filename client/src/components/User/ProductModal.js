@@ -1,13 +1,12 @@
 import React, { useState, useContext, useEffect } from 'react';
 import config from '../../config';
 import { PartnerContext } from '../../contexts/PartnerContext';
-import './AccountPage.css';
+import styles from './ProductModal.module.css';
 
 const ProductModal = ({ isOpen, onClose, onSubmit, editingProduct, onProductUpdated }) => {
     const { partner } = useContext(PartnerContext);
     const [primaryImage, setPrimaryImage] = useState(null);
     const [deletedImages, setDeletedImages] = useState([]); // Track deleted images
-    // State for product fields
     const [productName, setProductName] = useState('');
     const [productPrice, setProductPrice] = useState('');
     const [productBrand, setProductBrand] = useState('');
@@ -22,7 +21,6 @@ const ProductModal = ({ isOpen, onClose, onSubmit, editingProduct, onProductUpda
     const [productDiscountedPrice, setProductDiscountedPrice] = useState('');
 
 
-    // Prefill fields when editingProduct changes
     useEffect(() => {
         if (editingProduct) {
             setProductName(editingProduct.name || '');
@@ -158,31 +156,20 @@ const ProductModal = ({ isOpen, onClose, onSubmit, editingProduct, onProductUpda
     if (!isOpen) return null;
 
     return (
-        <div className="modal-one">
-            <div className="modal-content-one">
-                <span className="close-modal-one" onClick={resetForm}>&times;</span>
-                <h2 className="addProductH2">{editingProduct ? 'Edit Product' : 'Add Product'}</h2>
-                <form className="product-form" onSubmit={handleSubmit}>
-                    {/* Product Image */}
-                    <label className="product-image-label product-label">Product Images:</label>
-                    <input
-                        type="file"
-                        className="product-image-input formInput"
-                        accept="image/*"
-                        multiple
-                        onChange={handleImageChange}
-                    />
-                    <div className="product-image-preview-container">
-                        {productImages.map((image, index) => (
-                            <div key={index} className="image-preview-item">
-                                <img
-                                    className="product-image-preview"
-                                    // src={
-                                    //     typeof image === 'string'
-                                    //         ? image // Use the URL directly for existing images
-                                    //         : URL.createObjectURL(image) // Create a preview for newly added images
-                                    // }
-                                    src={
+        <div className={styles.modalOne}>
+            <div className={styles.modalContentOne}>
+
+                <span className={styles.closeModalOne} onClick={resetForm}>&times;</span>
+
+                <h2 className={styles.addProductH2}>{editingProduct ? 'Edit Product' : 'Add Product'}</h2>
+
+                          <div className={styles.productImagePreviewContainer}>
+                    {productImages.map((image, index) => (
+                    <div key={index} className={styles.imagePreviewItem}>
+                        <img
+                        className={styles.productImagePreview}
+                        src={
+                                   
                                         typeof image === 'string'
                                           ? `${config.backendUrl}${image.replace('/mnt/shared/Projects/anyoka_eats2.0/online_hotel', '')}`
                                           : URL.createObjectURL(image)
@@ -190,79 +177,96 @@ const ProductModal = ({ isOpen, onClose, onSubmit, editingProduct, onProductUpda
                                       
                                     alt={`Product ${index + 1}`}
                                 />
-                                <button
-                                    type="button"
-                                    className="set-primary-image-button"
-                                    onClick={() => handleSetPrimaryImage(image)}
-                                >
-                                    {image === primaryImage ? 'Primary' : 'Set as Primary'}
-                                </button>
+                                 <div className={styles.imageBtns}>
+                            <button
+                            type="button"
+                            className={styles.setPrimaryImageButton}
+                            onClick={() => handleSetPrimaryImage(image)}
+                            >
+                            {image === primaryImage ? 'Primary' : 'Set Primary'}
+                            </button>
                                 {/* Delete Button */}
                                 <button
-                                    type="button"
-                                    className="delete-image-button"
-                                    onClick={() => handleDeleteImage(index)}
-                                >
-                                    &times;
-                                </button>
-                            </div>
+                            type="button"
+                            className={styles.deleteImageButton}
+                            onClick={() => handleDeleteImage(index)}
+                            >
+                            &times;
+                            </button>
+                        </div>
+                    </div>
                         ))}
                     </div>
+                    
+                <label className={`${styles.productImageLabel} ${styles.productLabel}`}>Images:</label>
+                
 
-                    {/* Product Name */}
-                    <label className="product-name-label product-label">Product Name:</label>
-                    <input
+                <input
+                    type="file"
+                    className={`${styles.productImageInput} ${styles.formInput}`}
+                    id='productImageInput'
+                    accept="image/*"
+                    multiple
+                    onChange={handleImageChange}
+                />
+                 <form className={styles.productForm} onSubmit={handleSubmit}>
+                    
+                    <div className={styles.formGroup}>
+                        <label className={`${styles.productNameLabel} ${styles.productLabel}`}>Name:</label>
+                        <input
                         type="text"
-                        className="product-name-input formInput"
+                        className={`${styles.productNameInput} ${styles.formInput}`}
                         value={productName}
                         onChange={(e) => setProductName(e.target.value)}
                         required
-                    />
+                        />
+                    </div>
 
-                    {/* Product Price */}
-                    <label className="product-price-label product-label">Price:</label>
-                    <input
+                    <div className={styles.formGroup}>
+                        <label className={`${styles.productPriceLabel} ${styles.productLabel}`}>Price:</label>
+                        <input
                         type="number"
-                        className="product-price-input formInput"
+                        className={`${styles.productPriceInput} ${styles.formInput}`}
                         value={productPrice}
                         onChange={(e) => setProductPrice(e.target.value)}
                         step="0.01"
                         required
-                    />
-
-                    {/* Discounted Price */}
-                    <label className="product-price-label product-label">Discounted Price:</label>
+                        />
+                    </div>
+                    <div className={styles.formGroup}>
+                    <label className={`${styles.productPriceLabel} ${styles.productLabel}`}>Discounted Price:</label>
                     <input
                         type="number"
-                        className="product-price-input formInput"
+                        className={`${styles.productPriceInput} ${styles.formInput}`}
                         value={productDiscountedPrice}
                         onChange={(e) => setProductDiscountedPrice(e.target.value)}
                          placeholder="e.g., 250"
                     />
-
-                    {/* Product Brand */}
-                    <label className="product-brand-label product-label">Brand:</label>
-                    <input
+                    </div>
+                    <div className={styles.formGroup}>
+                        <label className={`${styles.productBrandLabel} ${styles.productLabel}`}>Brand:</label>
+                        <input
                         type="text"
-                        className="product-brand-input formInput"
+                        className={`${styles.productBrandInput} ${styles.formInput}`}
                         value={productBrand}
                         onChange={(e) => setProductBrand(e.target.value)}
                         required
-                    />
+                        />
+                    </div>
 
-                    {/* Product Category */}
-                    <label className="product-category-label product-label">Category:</label>
-                    <input
+                    <div className={styles.formGroup}>
+                        <label className={`${styles.productCategoryLabel} ${styles.productLabel}`}>Category:</label>
+                        <input
                         type="text"
                         id="productCategoryInput"
-                        className="product-category-input formInput"
+                        className={`${styles.productCategoryInput} ${styles.formInput}`}
                         list="productCategories"
                         value={productCategory}
                         onChange={(e) => setProductCategory(e.target.value)}
                         placeholder="Select a category"
                         required
-                    />
-                    <datalist id="productCategories">
+                        />
+                        <datalist id="productCategories">
                         <option value="Electronics" />
                         <option value="Fashion" />
                         <option value="Home & Kitchen" />
@@ -272,35 +276,38 @@ const ProductModal = ({ isOpen, onClose, onSubmit, editingProduct, onProductUpda
                         <option value="Toys And Games" />
                         <option value="Health" />
                         <option value="Pet Supplies" />
-                    </datalist>
+                        </datalist>
+                    </div>
 
-                    {/* Product Subcategory */}
-                    <label className="product-subcategory-label product-label">Subcategory:</label>
-                    <input
+                    <div className={styles.formGroup}>
+                        <label className={`${styles.productSubcategoryLabel} ${styles.productLabel}`}>Subcategory:</label>
+                        <input
                         type="text"
-                        className="product-subcategory-input formInput"
+                        className={`${styles.productSubcategoryInput} ${styles.formInput}`}
                         value={productSubCategory}
                         onChange={(e) => setProductSubCategory(e.target.value)}
-                    />
+                        />
+                    </div>
 
-                    {/* Product Quantity */}
-                    <label className="product-quantity-label product-label">Quantity:</label>
-                    <input
+                    <div className={styles.formGroup}>
+                        <label className={`${styles.productQuantityLabel} ${styles.productLabel}`}>Quantity:</label>
+                        <input
                         type="number"
-                        className="product-quantity-input formInput"
+                        className={`${styles.productQuantityInput} ${styles.formInput}`}
                         value={productQuantity}
                         onChange={(e) => setProductQuantity(e.target.value)}
                         required
-                    />
+                        />
+                    </div>
 
-                    {/* Measurement Unit */}
-                    <label className="product-unit-label product-label">Unit:</label>
-                    <select
-                        className="product-unit-select formInput"
+                    <div className={styles.formGroup}>
+                        <label className={`${styles.productUnitLabel} ${styles.productLabel}`}>Unit:</label>
+                        <select
+                        className={`${styles.productUnitSelect} ${styles.formInput}`}
                         value={productUnit}
                         onChange={(e) => setProductUnit(e.target.value)}
                         required
-                    >
+                        >
                         <option value="pcs">Pcs</option>
                         <option value="kg">Kg</option>
                         <option value="grams">Grams</option>
@@ -308,39 +315,45 @@ const ProductModal = ({ isOpen, onClose, onSubmit, editingProduct, onProductUpda
                         <option value="set">Set</option>
                         <option value="plate">plate</option>
                         <option value="other">Other</option>
-                    </select>
+                        </select>
+                    </div>
 
-                    {/* Inventory */}
-                    <label className="product-inventory-label product-label">Total Inventory:</label>
-                    <input
+                    <div className={styles.formGroup}>
+                        <label className={`${styles.productInventoryLabel} ${styles.productLabel}`}>Total Inventory:</label>
+                        <input
                         type="number"
-                        className="product-inventory-input formInput"
+                        className={`${styles.productInventoryInput} ${styles.formInput}`}
                         value={productInventory}
                         onChange={(e) => setProductInventory(e.target.value)}
                         required
-                    />
+                        />
+                    </div>
 
-                    {/* Product Description */}
-                    <label className="product-description-label product-label">Description:</label>
-                    <textarea
-                        className="product-description-input formInput"
-                        value={productDescription}
-                        onChange={(e) => setProductDescription(e.target.value)}
-                    />
-
-                    {/* Product Tags */}
-                    <label className="product-tags-label product-label">Tags (comma-separated):</label>
-                    <input
+                    <div className={styles.formGroup}>
+                        <label className={`${styles.productTagsLabel} ${styles.productLabel}`}>Tags (comma-separated):</label>
+                        <input
                         type="text"
-                        className="product-tags-input formInput"
+                        className={`${styles.productTagsInput} ${styles.formInput}`}
                         value={productTags}
                         onChange={(e) => setProductTags(e.target.value)}
-                    />
+                        />
+                    </div>
 
-                    <button type="submit" className="submit-product-button">
+                    <div id='descFormGroup' className={styles.formGroup}>
+                        <label className={`${styles.productDescriptionLabel} ${styles.productLabel}`}>Description:</label>
+                        <textarea
+                        className={`${styles.productDescriptionInput} ${styles.formInput}`}
+                        value={productDescription}
+                        onChange={(e) => setProductDescription(e.target.value)}
+                        required
+                        />
+                    </div>
+                    <button type="submit" className={styles.submitProductButton}>
                         {editingProduct ? 'Update Product' : 'Add Product'}
-                    </button>
+                </button>
                 </form>
+
+                
             </div>
         </div>
     );

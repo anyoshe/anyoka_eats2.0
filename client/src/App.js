@@ -2,7 +2,7 @@ import React from 'react';
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import LandingPage from './components/Landing/LandingPage';
 import MenuPage from './components/Menu/MenuPage';
-import { CartProvider } from './components/Menu/CartContext';
+import { CartProvider } from './contexts/CartContext';
 import ConferenceList from './components/Conferences/ConferenceList';
 import LandingFreshFood from './components/FreshFood/LandingFreshFood';
 import { FreshFoodCartProvider } from './components/FreshFood/FreshFoodCartContext';
@@ -27,6 +27,7 @@ import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import Logout from './components/User/UserLogout';
 import Login from './components/User/Login';
+import OrderSummaryPage from './components/User/OrderSummaryPage';
 function App() {
     return (
 
@@ -63,6 +64,7 @@ function App() {
                                     <MenuPage />
                                 </CartProvider>
                             } />
+                            <Route path="/orders/:orderId" element={<OrderSummaryPage />} />
                             <Route path="/offers" element={<MenuPage />} />
                             <Route path="/featured" element={<MenuPage />} />
                             <Route path="/superuserdashboard" element={<UserPage />} />

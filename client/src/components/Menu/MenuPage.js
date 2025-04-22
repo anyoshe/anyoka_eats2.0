@@ -1,24 +1,26 @@
 import React, { useEffect, useState, useContext, useRef } from 'react';
-import './MenuPage.css';
+import styles from './MenuPage.module.css';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap/dist/js/bootstrap.bundle.min';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCartShopping, faCaretDown } from '@fortawesome/free-solid-svg-icons';
 import axios from 'axios';
+import '../User/ProductCard.css';
 import config from '../../config';
 import ProductDetailModal from './ProductDetailModal';
 import { AuthContext } from '../../contexts/AuthContext';
 import { useNavigate } from 'react-router-dom'; // Add this import
 import { faStar as solidStar } from '@fortawesome/free-solid-svg-icons';
 import { faStar as regularStar } from '@fortawesome/free-regular-svg-icons';
-
-
+import CartSection from '../User/CartSection';
+import { CartContext } from '../../contexts/CartContext';
+import { faTruck } from '@fortawesome/free-solid-svg-icons';
 
 const MenuPage = () => {
   const navigate = useNavigate();
   const { currentProduct, setCurrentProduct, user, setRedirectPath } = useContext(AuthContext);
   const [productsByCategory, setProductsByCategory] = useState({});
-  const [cart, setCart] = useState([]);
+  const { cart, addToCart } = useContext(CartContext);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState(null);
 
@@ -62,9 +64,17 @@ const MenuPage = () => {
     setCurrentProduct(null); // Clear the current product
   };
 
+
   const handleAddToCart = (product) => {
-    setCart((prevCart) => [...prevCart, product]);
+    const priceToUse = product.discountedPrice ?? product.price;
+    const productToAdd = {
+      ...product,
+      price: priceToUse,
+      quantity: 1, // Initialize quantity to 1
+    };
+    addToCart(productToAdd);
   };
+
 
   const getImageSrc = (product) => {
     const stripServerPath = (fullPath) =>
@@ -96,45 +106,77 @@ const MenuPage = () => {
   };
 
   return (
-    <div className="storeWrapper">
-      <div className="bodyWrapper">
-        <section className="dispalySection">
+    <div className={styles.storeWrapper}>
+      <div className={styles.bodyWrapper}>
+        <section className={styles.dispalySection}>
           {Object.keys(productsByCategory).map((category) => (
             <div key={category}>
-              <h3 className="categorySectiontitle">{category}</h3>
-              <section className="categorySectionDisplay">
+              <h3 className={styles.categorySectiontitle}>{category}</h3>
+              <section className={styles.categorySectionDisplay}>
                 {productsByCategory[category].map((product, index) => (
                   <div
                     key={index}
-                    className="categorySectionDisplayDivs"
+                    className={styles.categorySectionDisplayDivs}
                     onClick={() => handleProductClick(product)}
                   >
+
+                    {/* Discounted price - shown above the image ONLY if there is a discount */}
+                    {product.discountedPrice && (
+                      <p className="product-price discounted-now">
+                        Ksh {product.discountedPrice.toFixed(2)}
+                      </p>
+                    )}
+
                     <img
                       src={getImageSrc(product)}
                       alt={product.name}
-                      className="categorySectionImage"
+                      className={styles.categorySectionImage}
                       onError={(e) => {
                         e.target.onerror = null;
                         e.target.src = '/path/to/placeholder-image.jpg';
                       }}
                     />
-                    <p className="categorySectionName categorySectionP">{product.name}</p>
+
+                    <p className={`${styles.categorySectionName} ${styles.categorySectionP}`}>
+                      {product.name}
+                    </p>
+
                     <div className="priceQuantityRow">
-                      <p className="categorySectionPrice categorySectionP">KSH:{product.price}</p>
-                      <p className="categorySectionQuantity categorySectionP">
-                        <span>{product.quantity}</span>
-                        {product.unit}
-                      </p>
-                      
+                      {/* If there’s a discount, show original price with strikethrough */}
+                      {product.discountedPrice ? (
+                        <span className="original-price-offer">
+                          Was{' '}
+                          <span className="diagonal-strikethrough linePrice">
+                            Ksh {product.price.toFixed(2)}
+                          </span>
+                        </span>
+                      ) : (
+                        // If no discount, just show normal price
+                        <p className="product-price">Price: Ksh {product.price.toFixed(2)}</p>
+                      )}
                     </div>
-                    <div className="ratingsDiv star-icon">
-                        {product.ratings?.average
-                          ? renderStars(product.ratings.average)
-                          : 'No ratings yet'}
+
+
+                      <div className={styles.priceQuantityRow}>
+                        <p className={`${styles.categorySectionPrice} ${styles.categorySectionP}`}>
+                          KSH:{product.price}
+                        </p>
+                        <p className={`${styles.categorySectionQuantity} ${styles.categorySectionP}`}>
+                          <span>{product.quantity}</span>
+                          {product.unit}
+                        </p>
                       </div>
-                    <div className="addCartBtn">
+
+                    
+                    <div className="ratingsDiv star-icon">
+                      {product.ratings?.average
+                        ? renderStars(product.ratings.average)
+                        : 'No ratings yet'}
+                    </div>
+
+                    <div className={styles.addCartBtn}>
                       <button
-                        className="addToCartBtn"
+                        className={styles.addToCartBtn}
                         onClick={(e) => {
                           e.stopPropagation();
                           handleAddToCart(product);
@@ -150,28 +192,8 @@ const MenuPage = () => {
           ))}
         </section>
 
-        <section className="cartSection">
-          <div className="deliveryPointDiv">
-            Delivering to Rongai
-            <FontAwesomeIcon icon={faCaretDown} />
-          </div>
-          <div className="cartWrapperDiv">
-            <div className="cartListDiv">
-              {cart.map((item, index) => (
-                <div key={index} className="cartItem">
-                  <p className="cartItemName">{item.name}</p>
-                  <p className="cartItemPrice">KSH {item.price}</p>
-                </div>
-              ))}
-            </div>
-            <div className="cartTotal">
-              <p className="totalP">Total</p>
-              <p className="totalfigure">
-                KSH {cart.reduce((total, item) => total + item.price, 0)}
-              </p>
-            </div>
-          </div>
-          <div className="doneButtonDiv">Check Out</div>
+        <section className={styles.cartSecti}>
+          <CartSection />
         </section>
 
         {/* Render the ProductDetailModal */}
