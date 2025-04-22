@@ -6,6 +6,8 @@ import styles from './ProductList.module.css';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faEdit, faTrash, faComments } from '@fortawesome/free-solid-svg-icons';
 
+
+
 const ProductList = ({ onEditProduct, onDeleteProduct, refreshTrigger }) => {
     const [productsByCategory, setProductsByCategory] = useState({});
     const [selectedProduct, setSelectedProduct] = useState(null);
@@ -17,13 +19,13 @@ const ProductList = ({ onEditProduct, onDeleteProduct, refreshTrigger }) => {
                 console.error('Partner ID is missing. Please log in.');
                 return;
             }
+            
 
             try {
                 const response = await fetch(`${config.backendUrl}/api/products?partnerId=${partner._id}`);
                 if (response.ok) {
                     const data = await response.json();
 
-                    // Group products by category
                     const groupedProducts = data.products.reduce((acc, product) => {
                         if (!acc[product.category]) {
                             acc[product.category] = [];
@@ -47,17 +49,18 @@ const ProductList = ({ onEditProduct, onDeleteProduct, refreshTrigger }) => {
 
     const getImageSrc = (product) => {
         if (product.primaryImage) {
-          return `${config.backendUrl}/uploads/${product.primaryImage.split('/uploads/')[1]}`;
+            return `${config.backendUrl}/uploads/${product.primaryImage.split('/uploads/')[1]}`;
         }
-      
+
         if (product.images && product.images.length > 0) {
-          return `${config.backendUrl}/uploads/${product.images[0].split('/uploads/')[1]}`;
+            return `${config.backendUrl}/uploads/${product.images[0].split('/uploads/')[1]}`;
         }
-      
+
         return '/path/to/placeholder-image.jpg';
       };
       
     return (
+     
         <div className={styles.productListContainer}>
             {Object.keys(productsByCategory).map((category) => (
                 <div key={category}  className={styles.categorySection}>
@@ -68,10 +71,12 @@ const ProductList = ({ onEditProduct, onDeleteProduct, refreshTrigger }) => {
                     <div className={styles.productsGrid}>
                         {productsByCategory[category].map((product) => (
                             <div className={styles.productItem} key={product._id}>
+                            
                                 <img
                                     src={getImageSrc(product)}
                                     alt={product.name}
                                     className={styles.productImagePreview}
+                                    
                                     onError={(e) => {
                                         e.target.onerror = null;
                                         e.target.src = '/path/to/placeholder-image.jpg';
@@ -109,15 +114,20 @@ const ProductList = ({ onEditProduct, onDeleteProduct, refreshTrigger }) => {
 
                                         <button
                                             className={styles.editProductButton}
+                                            
                                             onClick={() => onEditProduct(product)}
                                             title="Edit"
+                                            
                                         >
+                                          
                                             <FontAwesomeIcon icon={faEdit} />
                                         </button>
                                         <button
                                             className={styles.deleteProductButton}
+                                           
                                             onClick={() => onDeleteProduct(product._id)}
                                             title="Delete"
+                                            
                                         >
                                             <FontAwesomeIcon icon={faTrash} />
                                         </button>
@@ -128,11 +138,10 @@ const ProductList = ({ onEditProduct, onDeleteProduct, refreshTrigger }) => {
                     </div>
                 </div>
             ))}
-            {/* Reviews Modal */}
             {selectedProduct && (
                 <ReviewsModal
                     product={selectedProduct}
-                    onClose={() => setSelectedProduct(null)} // Close the modal
+                    onClose={() => setSelectedProduct(null)}
                 />
             )}
         </div>

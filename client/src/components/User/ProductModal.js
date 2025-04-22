@@ -3,6 +3,7 @@ import config from '../../config';
 import { PartnerContext } from '../../contexts/PartnerContext';
 import styles from './ProductModal.module.css';
 
+
 const ProductModal = ({ isOpen, onClose, onSubmit, editingProduct, onProductUpdated }) => {
     const { partner } = useContext(PartnerContext);
     const [primaryImage, setPrimaryImage] = useState(null);
@@ -37,15 +38,13 @@ const ProductModal = ({ isOpen, onClose, onSubmit, editingProduct, onProductUpda
             setProductDiscountedPrice(editingProduct.discountedPrice || '');
 
 
-            // Format image URLs
             const formattedImages = editingProduct.images?.map((image) =>
-                image.startsWith('/var/data') // Check if the path is relative
-                    ? `${config.backendUrl}${image.replace('/var/data', '')}` // Format relative paths
-                    : image // Use absolute URLs as-is
+                image.startsWith('/var/data')
+                    ? `${config.backendUrl}${image.replace('/var/data', '')}`
+                    : image
             ) || [];
             setProductImages(formattedImages);
         }
-
     }, [editingProduct]);
 
     const handleImageChange = (event) => {
@@ -53,7 +52,6 @@ const ProductModal = ({ isOpen, onClose, onSubmit, editingProduct, onProductUpda
         setProductImages((prevImages) => [...prevImages, ...files]);
     };
 
-    // Function to set the primary image
     const handleSetPrimaryImage = (image) => {
         setPrimaryImage(image);
     };
@@ -62,7 +60,7 @@ const ProductModal = ({ isOpen, onClose, onSubmit, editingProduct, onProductUpda
         setProductImages((prevImages) => {
             const imageToDelete = prevImages[index];
             if (typeof imageToDelete === 'string') {
-                setDeletedImages((prevDeleted) => [...prevDeleted, imageToDelete]); // Track deleted images
+                setDeletedImages((prevDeleted) => [...prevDeleted, imageToDelete]);
             }
             return prevImages.filter((_, i) => i !== index);
         });
@@ -85,7 +83,6 @@ const ProductModal = ({ isOpen, onClose, onSubmit, editingProduct, onProductUpda
         formData.append('discountedPrice', productDiscountedPrice);
 
 
-        // Add shopId from PartnerContext
         if (partner && partner._id) {
             formData.append('shopId', partner._id);
         } else {
@@ -95,23 +92,21 @@ const ProductModal = ({ isOpen, onClose, onSubmit, editingProduct, onProductUpda
 
         productImages.forEach((image) => {
             if (typeof image !== 'string') {
-                formData.append('images', image); // Only append new images
+                formData.append('images', image);
             }
         });
-    
-        // Append the primary image
+
         if (primaryImage) {
             formData.append('primaryImage', primaryImage);
         }
-    
-        // Append deleted images
+
         if (deletedImages.length > 0) {
             formData.append('deletedImages', JSON.stringify(deletedImages));
         }
-    
+
         try {
             const url = editingProduct
-                ? `${config.backendUrl}/api/products/${editingProduct._id}` // Update product
+                ? `${config.backendUrl}/api/products/${editingProduct._id}`
                 : `${config.backendUrl}/api/products`;
 
             const method = editingProduct ? 'PUT' : 'POST';
@@ -215,18 +210,22 @@ const ProductModal = ({ isOpen, onClose, onSubmit, editingProduct, onProductUpda
                         <label className={`${styles.productNameLabel} ${styles.productLabel}`}>Name:</label>
                         <input
                         type="text"
+                       
                         className={`${styles.productNameInput} ${styles.formInput}`}
                         value={productName}
                         onChange={(e) => setProductName(e.target.value)}
                         required
                         />
                     </div>
+                    
 
                     <div className={styles.formGroup}>
                         <label className={`${styles.productPriceLabel} ${styles.productLabel}`}>Price:</label>
                         <input
+                   
                         type="number"
                         className={`${styles.productPriceInput} ${styles.formInput}`}
+                        
                         value={productPrice}
                         onChange={(e) => setProductPrice(e.target.value)}
                         step="0.01"
@@ -247,18 +246,22 @@ const ProductModal = ({ isOpen, onClose, onSubmit, editingProduct, onProductUpda
                         <label className={`${styles.productBrandLabel} ${styles.productLabel}`}>Brand:</label>
                         <input
                         type="text"
+                        
                         className={`${styles.productBrandInput} ${styles.formInput}`}
                         value={productBrand}
                         onChange={(e) => setProductBrand(e.target.value)}
                         required
                         />
                     </div>
+                        
 
                     <div className={styles.formGroup}>
                         <label className={`${styles.productCategoryLabel} ${styles.productLabel}`}>Category:</label>
                         <input
+                    
                         type="text"
                         id="productCategoryInput"
+                        
                         className={`${styles.productCategoryInput} ${styles.formInput}`}
                         list="productCategories"
                         value={productCategory}
@@ -266,6 +269,7 @@ const ProductModal = ({ isOpen, onClose, onSubmit, editingProduct, onProductUpda
                         placeholder="Select a category"
                         required
                         />
+                       
                         <datalist id="productCategories">
                         <option value="Electronics" />
                         <option value="Fashion" />
@@ -278,27 +282,33 @@ const ProductModal = ({ isOpen, onClose, onSubmit, editingProduct, onProductUpda
                         <option value="Pet Supplies" />
                         </datalist>
                     </div>
-
+                        
                     <div className={styles.formGroup}>
                         <label className={`${styles.productSubcategoryLabel} ${styles.productLabel}`}>Subcategory:</label>
                         <input
+                   
                         type="text"
                         className={`${styles.productSubcategoryInput} ${styles.formInput}`}
+                        
                         value={productSubCategory}
                         onChange={(e) => setProductSubCategory(e.target.value)}
                         />
                     </div>
+                       
 
                     <div className={styles.formGroup}>
                         <label className={`${styles.productQuantityLabel} ${styles.productLabel}`}>Quantity:</label>
                         <input
+                    
                         type="number"
+                        
                         className={`${styles.productQuantityInput} ${styles.formInput}`}
                         value={productQuantity}
                         onChange={(e) => setProductQuantity(e.target.value)}
                         required
                         />
                     </div>
+                     
 
                     <div className={styles.formGroup}>
                         <label className={`${styles.productUnitLabel} ${styles.productLabel}`}>Unit:</label>
@@ -308,6 +318,7 @@ const ProductModal = ({ isOpen, onClose, onSubmit, editingProduct, onProductUpda
                         onChange={(e) => setProductUnit(e.target.value)}
                         required
                         >
+                        
                         <option value="pcs">Pcs</option>
                         <option value="kg">Kg</option>
                         <option value="grams">Grams</option>
@@ -317,11 +328,14 @@ const ProductModal = ({ isOpen, onClose, onSubmit, editingProduct, onProductUpda
                         <option value="other">Other</option>
                         </select>
                     </div>
+                        
 
                     <div className={styles.formGroup}>
                         <label className={`${styles.productInventoryLabel} ${styles.productLabel}`}>Total Inventory:</label>
                         <input
+                    
                         type="number"
+                        
                         className={`${styles.productInventoryInput} ${styles.formInput}`}
                         value={productInventory}
                         onChange={(e) => setProductInventory(e.target.value)}
@@ -329,15 +343,19 @@ const ProductModal = ({ isOpen, onClose, onSubmit, editingProduct, onProductUpda
                         />
                     </div>
 
+                    
+
                     <div className={styles.formGroup}>
                         <label className={`${styles.productTagsLabel} ${styles.productLabel}`}>Tags (comma-separated):</label>
                         <input
                         type="text"
+                        
                         className={`${styles.productTagsInput} ${styles.formInput}`}
                         value={productTags}
                         onChange={(e) => setProductTags(e.target.value)}
                         />
                     </div>
+                      
 
                     <div id='descFormGroup' className={styles.formGroup}>
                         <label className={`${styles.productDescriptionLabel} ${styles.productLabel}`}>Description:</label>

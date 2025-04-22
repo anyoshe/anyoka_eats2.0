@@ -30,9 +30,9 @@ const AccountPage = () => {
       case "orders":
         return <Orders />;
       case "sales":
-        // return <Sales />;
+        return <div>Sales content coming soon...</div>;
       default:
-        // return <Profile />;
+        return null;
     }
   };
 
@@ -100,9 +100,7 @@ const AccountPage = () => {
 
           {/* Logout Icon */}
           <LogoutComponent />
-
         </div>
-        
       </div>
 
       {/* Content */}

@@ -80,9 +80,11 @@ const MenuPage = () => {
     const stripServerPath = (fullPath) =>
       fullPath.replace('/mnt/shared/Projects/anyoka_eats2.0/online_hotel', '');
 
+
     if (product.primaryImage) {
       return `${config.backendUrl}${stripServerPath(product.primaryImage)}`;
     }
+
 
     if (product.images && product.images.length > 0) {
       return `${config.backendUrl}${stripServerPath(product.images[0])}`;
@@ -106,6 +108,7 @@ const MenuPage = () => {
   };
 
   return (
+    
     <div className={styles.storeWrapper}>
       <div className={styles.bodyWrapper}>
         <section className={styles.dispalySection}>
@@ -117,6 +120,7 @@ const MenuPage = () => {
                   <div
                     key={index}
                     className={styles.categorySectionDisplayDivs}
+                   
                     onClick={() => handleProductClick(product)}
                   >
 
@@ -131,6 +135,7 @@ const MenuPage = () => {
                       src={getImageSrc(product)}
                       alt={product.name}
                       className={styles.categorySectionImage}
+                      
                       onError={(e) => {
                         e.target.onerror = null;
                         e.target.src = '/path/to/placeholder-image.jpg';
@@ -177,6 +182,7 @@ const MenuPage = () => {
                     <div className={styles.addCartBtn}>
                       <button
                         className={styles.addToCartBtn}
+                        
                         onClick={(e) => {
                           e.stopPropagation();
                           handleAddToCart(product);

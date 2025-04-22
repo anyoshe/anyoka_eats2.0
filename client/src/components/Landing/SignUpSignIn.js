@@ -95,6 +95,7 @@ const StoreSignUpForm = () => {
 
 
       if (formData.businessPermit) data.append('businessPermit', formData.businessPermit);
+      if (formData.businessPermit) data.append('businessPermit', formData.businessPermit);
 
       const response = await axios.post(`${config.backendUrl}/api/signup`, data);
 
@@ -117,7 +118,6 @@ const StoreSignUpForm = () => {
       <div className={styles.signUpWrapper}>
         <h2 className={styles.signUpWrapperH2}>Create Store Account</h2>
 
-
         <form onSubmit={handleSubmitSignUp} className={styles.formSignUp}>
           <div className={styles.formGroup}>
             <label htmlFor="businessName" className={styles.formSighUpLables}>
@@ -131,6 +131,7 @@ const StoreSignUpForm = () => {
               value={formData.businessName}
               onChange={handleInputChange}
               className={styles.formSighUpInputs}
+              
             />
           </div>
 
@@ -146,6 +147,7 @@ const StoreSignUpForm = () => {
               value={formData.businessType}
               onChange={handleInputChange}
               className={styles.formSighUpInputs}
+              
             />
           </div>
 
@@ -172,6 +174,7 @@ const StoreSignUpForm = () => {
               value={formData.contactNumber}
               onChange={handleInputChange}
               className={styles.formSighUpInputs}
+           
             />
           </div>
 
@@ -184,6 +187,7 @@ const StoreSignUpForm = () => {
               value={formData.email}
               onChange={handleInputChange}
               className={styles.formSighUpInputs}
+             
             />
           </div>
           <div className={styles.formGroup}>
@@ -201,6 +205,7 @@ const StoreSignUpForm = () => {
             />
           </div>
 
+          
           <div className={styles.formGroup}>
             <label htmlFor="businessPermit" className={styles.formSighUpLables}>Business Permit Certificate</label>
             <input
@@ -226,6 +231,7 @@ const StoreSignUpForm = () => {
               value={formData.town}
               onChange={handleInputChange}
               className={styles.formSighUpInputs}
+              
             />
           </div>
 
