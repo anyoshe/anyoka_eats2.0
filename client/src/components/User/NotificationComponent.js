@@ -1,6 +1,8 @@
 import React, { useEffect, useState, useRef } from "react";
 import { io } from "socket.io-client";
 import config from "../../config";
+import styles from "./NotificationComponent.module.css"; // Assuming you have a CSS module for styling
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
 const socket = io(config.backendUrl); // Don't forget the correct template usage
 

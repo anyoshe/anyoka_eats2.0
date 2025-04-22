@@ -1,0 +1,24 @@
+.order-summary {
+    max-width: 600px;
+    margin: auto;
+    padding: 20px;
+    border: 1px solid #ddd;
+    border-radius: 12px;
+    background: #fff;
+    box-shadow: 0 0 10px rgba(0,0,0,0.05);
+  }
+  
+  .order-summary h2, h3 {
+    color: #333;
+  }
+  
+  .order-summary ul {
+    list-style: none;
+    padding-left: 0;
+  }
+  
+  .order-summary li {
+    padding: 5px 0;
+    border-bottom: 1px solid #eee;
+  }
+  

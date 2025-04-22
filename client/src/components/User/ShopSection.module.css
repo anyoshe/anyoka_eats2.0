@@ -1,0 +1,109 @@
+.shop-section {
+  border: 2px solid green;  
+
+  margin-top: 10rem;
+}
+  
+.titleBtn {
+  text-align: right;
+  margin-bottom: 1rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.searchWrapper {
+  position: relative;
+  width: 50%;
+}
+
+.searchIcon {
+  position: absolute;
+  right: 0.8rem;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--green);
+  font-size: 1rem;
+  pointer-events: none;
+  z-index: 1;
+  font-weight: bold;
+}
+
+.searchBar {
+  padding: 0.5rem 2.2rem 0.5rem 1rem; /* right padding for the icon */
+  font-size: 0.9rem;
+  border: none;
+  border-radius: 0.3rem;
+  width: 100%;
+  outline: 1px solid #ccc;
+  background-color: #fff;
+  cursor: pointer;
+  transition: 0.2s ease-in;
+}
+
+.searchBar:hover {
+  outline-color: var(--orange);
+}
+
+.searchBar:focus {
+  outline-color: var(--orange);
+}
+
+.addItemButton {
+  background-color: var(--green);
+  border: none;
+  padding: 0.5rem;
+  font-size: 0.7rem;
+  color: var(--white);
+  border-radius: 0.3em;
+  cursor: pointer;
+  transition: background-color 0.3s ease, color 0.3s ease, transform 0.1s ease;
+  z-index: 10;
+}
+
+.addItemButton:hover {
+  background-color: var(--white);
+  color: var(--orange);
+  outline: 1px solid var(--orange);
+  cursor: pointer;
+}
+  
+.addItemButton:active {
+  transform: scale(0.95);
+}
+  
+
+#shopContent {
+  border: 3px solid red;
+}
+  
+
+
+@media (min-width: 1440px) { /* 1440px */
+  .titleBtn {
+    gap: 2rem;
+    margin-bottom: 2rem;
+  }
+
+  .searchWrapper {
+    /* max-width: 24rem; */
+  }
+
+  .searchBar {
+    font-size: 1.1rem;
+    padding: 0.7rem 2.5rem 0.7rem 1.2rem;
+  }
+
+  .searchIcon {
+    font-size: 1.2rem;
+    right: 1rem;
+  }
+
+  .addItemButton {
+    font-size: 1rem;
+    padding: 0.7rem 1.2rem;
+    border-radius: 0.4rem;
+  }
+}

@@ -65,29 +65,7 @@ const Login = () => {
   };
 
   return (
-    // <form className={styles.form} onSubmit={handleSubmit}>
-    //   <h2>Login</h2>
-    //   {error && <p style={{ color: 'red' }}>{error}</p>}
-    //   <div>
-    //     <label>Username / Phone / Business Name:</label>
-    //     <input
-    //       type="text"
-    //       value={identifier}
-    //       onChange={(e) => setIdentifier(e.target.value)}
-    //       required
-    //     />
-    //   </div>
-    //   <div>
-    //     <label>Password:</label>
-    //     <input
-    //       type="password"
-    //       value={password}
-    //       onChange={(e) => setPassword(e.target.value)}
-    //       required
-    //     />
-    //   </div>
-    //   <button type="submit">Login</button>
-    // </form>
+  
     <form className={styles.form} onSubmit={handleSubmit}>
   <h2>Login</h2>
   {error && <p className={styles.error}>{error}</p>}

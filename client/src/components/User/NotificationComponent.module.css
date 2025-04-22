@@ -1,0 +1,11 @@
+.logoutIcon{
+    color: var(--green);
+    cursor: pointer;
+    transition: color 0.3s ease, transform 0.1s ease;
+}
+
+.logoutIcon:hover{
+    color: var(--orange);
+    cursor: pointer;
+    transition: color 0.3s ease, transform 0.1s ease;
+}

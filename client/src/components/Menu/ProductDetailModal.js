@@ -7,8 +7,10 @@ import { faStar as solidStar } from '@fortawesome/free-solid-svg-icons';
 import { faStar as regularStar } from '@fortawesome/free-regular-svg-icons';
 import config from '../../config';
 import ProductCard from '../User/ProductCard';
-import './ProductDetailModal.css';
+import styles from './ProductDetailModal.module.css';
 import AuthPromptModal from '../User/AuthPromptModal';
+import { useLocation } from 'react-router-dom';
+
 
 Modal.setAppElement('#root'); // For accessibility
 
@@ -20,6 +22,8 @@ const ProductDetailModal = ({ isOpen, onRequestClose, product, onAddToCart }) =>
   const { isLoggedIn, setRedirectPath, setCurrentProduct, user } = useContext(AuthContext);
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
   const navigate = useNavigate();
+  const location = useLocation();
+
 
   // Fetch comments and reviews when the modal is opened
   useEffect(() => {
@@ -50,7 +54,7 @@ const ProductDetailModal = ({ isOpen, onRequestClose, product, onAddToCart }) =>
     if (!isLoggedIn) {
       // Redirect to sign-up page
       setCurrentProduct(product);
-      setRedirectPath(`/menu`);
+      setRedirectPath(location.pathname);
       // navigate('/signup'); // Redirect to sign-up page
       setIsAuthModalOpen(true);
       return;
@@ -79,7 +83,7 @@ const ProductDetailModal = ({ isOpen, onRequestClose, product, onAddToCart }) =>
   const handleAddComment = async () => {
     if (!isLoggedIn) {
       setCurrentProduct(product);
-      setRedirectPath(`/menu`);
+      setRedirectPath(location.pathname);
       // navigate('/signup'); // Redirect to sign-up page
       setIsAuthModalOpen(true);
 
@@ -111,23 +115,25 @@ const ProductDetailModal = ({ isOpen, onRequestClose, product, onAddToCart }) =>
 
   return (
     <Modal
-      isOpen={isOpen}
-      onRequestClose={onRequestClose}
-      contentLabel="Product Details"
-      className="product-detail-modal"
-      overlayClassName="product-detail-modal-overlay"
+    isOpen={isOpen}
+    onRequestClose={onRequestClose}
+    contentLabel="Product Details"
+    className={styles['product-detail-modal']}
+    overlayClassName={styles['product-detail-modal-overlay']}
     >
-      <div className="modal-content">
-        <button className="close-button" onClick={onRequestClose}>
-          &times;
-        </button>
-
+    {/* <div className="modal-content"> */}
+    <div className={styles.modalContentWrapper}>
+      <button className={styles.closeButton} onClick={onRequestClose}>
+        &times;
+      </button>
+      <div className={styles.modalInnerScrollable}>
         {/* Render ProductCard with reviews */}
         <ProductCard product={{ ...product, ratings: { ...product.ratings, reviews } }} />
 
         {/* Review interaction controls */}
-        <div className="review-controls">
-          <div className="modal-rating">
+        {/* <div className="review-controls"> */}
+        <div className={styles.reviewControls}>
+        <div className={styles.modalRating}>
             <h3>Rate this Product</h3>
             {[1, 2, 3, 4, 5].map((star) => (
               <FontAwesomeIcon
@@ -136,27 +142,30 @@ const ProductDetailModal = ({ isOpen, onRequestClose, product, onAddToCart }) =>
                 onMouseEnter={() => setHoverRating(star)}
                 onMouseLeave={() => setHoverRating(0)}
                 onClick={() => handleStarClick(star)}
-                className="star-icon"
+                className={styles.starIcon}
               />
             ))}
             {/* <span className="rating-value">({selectedRating.toFixed(1)})</span> */}
           </div>
 
-          <div className="modal-comments">
+          <div className={styles.bottomContent}>
+          <div className={styles.modalComments}>
             <textarea
               value={comment}
               onChange={(e) => setComment(e.target.value)}
               placeholder="Leave a comment..."
-              className="comment-box"
+              className={styles.commentBox}
             />
-            <button onClick={handleAddComment} className="submit-comment">
+            <button onClick={handleAddComment} className={styles.submitComment}>
               Submit Comment
             </button>
           </div>
         </div>
-        <button onClick={() => onAddToCart(product)} className="add-to-cart-button">
+        </div>
+        <button onClick={() => onAddToCart(product)} className={styles.addToCartButton}>
           Add to Cart
         </button>
+      </div>
       </div>
       <AuthPromptModal
         isOpen={isAuthModalOpen}

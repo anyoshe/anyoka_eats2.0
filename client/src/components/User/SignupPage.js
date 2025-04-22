@@ -5,6 +5,7 @@ import MapSelector from './MapSelector';
 import './SignupPage.css';
 import config from '../../config';
 
+
 const SignupPage = () => {
   const [formData, setFormData] = useState({
     username: '',

@@ -1,0 +1,246 @@
+:root {
+    --green: #1ea509;
+    --orange: #ffa500;
+    --white: #ffffff;
+}
+  
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: "Winky Sans", sans-serif;
+}
+  
+.signUpContainer {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    min-height: 100vh;
+    background-color: #f9f9f9;
+}
+  
+.signUpWrapper {
+    background-color: var(--white);
+    padding: 2rem;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    width: 60rem;  /* ~960px */
+    border-radius: 0.5rem;
+}
+  
+.signUpWrapperH2 {
+    text-align: center;
+    font-size: 1.75rem;
+    font-weight: bold;
+    margin-bottom: 1rem;
+    color: var(--green);
+    text-decoration: underline;
+}
+
+.signInHeading{
+    text-align: center;
+    font-weight: bold;
+    margin-bottom: 1rem;
+    color: var(--green);
+    text-decoration: underline;
+}
+  
+.formSignUp {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.5rem;
+}
+  
+.form-group {
+    display: flex;
+    flex-direction: column;
+}
+  
+.formSighUpLables {
+    font-size: 1rem;
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+    color: #333;
+}
+  
+.required {
+    color: red;
+    font-size: 1rem;
+}
+  
+.formSighUpInputs {
+    padding: 0.75rem 1rem;
+    font-size: 1rem;
+    border: 1px solid #ddd;
+    border-radius: 0.4rem;
+    outline: none;
+    width: 100%;
+}
+  
+.formSighUpInputs:focus {
+    border-color: var(--green);
+    outline: 2px solid var(--green);
+}
+  
+.inputWithIcon {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+  
+.inputWithIcon input {
+    width: 100%;
+    padding-right: 2.5rem;
+}
+  
+.locationIcon, .eyeIcon {
+    position: absolute;
+    right: 0.75rem;
+    color: var(--green);
+    font-size: 1.25rem;
+    cursor: pointer;
+    z-index: 2;
+    top: 50%;
+    transform: translateY(-50%);
+}
+  
+.submitBtn {
+    padding: 0.75rem;
+    background-color: var(--orange);
+    color: var(--white);
+    border: none;
+    font-size: 1rem;
+    cursor: pointer;
+    grid-column: span 2;
+    border-radius: 0.4rem;
+    transition: 0.2s ease-in;
+    margin-top: 1rem;
+}
+  
+.submitBtn:hover {
+    background-color: var(--white);
+    color: var(--orange);
+    outline: 1px solid var(--orange);
+}
+  
+.submitBtn:active {
+    transform: scale(0.96);
+    box-shadow: inset 0 2px 6px rgba(0, 0, 0, 0.2);
+}
+  
+/* ===== RESPONSIVE MEDIA QUERIES ===== */
+  
+/* Ultra-Wide Screens: 1441px and up */
+@media (min-width: 1441px) {
+    .signUpWrapper {
+        width: 70rem;
+        padding: 2.5rem;
+    }
+  
+    .formSignUp {
+      gap: 2rem;
+    }
+  
+    .formSighUpInputs {
+      font-size: 1.05rem;
+      padding: 1rem 1.25rem;
+    }
+  
+    .formSighUpLables {
+      font-size: 1.05rem;
+    }
+  
+    .submitBtn {
+      font-size: 1.1rem;
+      padding: 1rem;
+    }
+}
+  
+/* Large Screens: 1025px – 1440px */
+ @media (min-width: 1025px) and (max-width: 1440px) {
+    .signUpWrapper {
+      width: 55rem;
+    }
+  
+    .formSignUp {
+      gap: 1.25rem;
+    }
+  
+    .formSighUpInputs {
+      font-size: 0.95rem;
+      padding: 0.65rem 1rem;
+    }
+}
+  
+/* Medium Screens: 769px – 1024px */
+@media (min-width: 769px) and (max-width: 1024px) {
+    .signUpWrapper {
+      width: 85%;
+      padding: 1.5rem;
+    }
+  
+    .formSignUp {
+      grid-template-columns: 1fr 1fr;
+      gap: 1rem;
+    }
+  
+    .formSighUpInputs {
+      font-size: 0.95rem;
+      padding: 0.6rem 0.9rem;
+    }
+  
+    .submitBtn {
+      font-size: 0.95rem;
+      grid-column: span 2;
+    }
+}
+  
+/* Small Screens: 481px – 768px */
+@media (min-width: 481px) and (max-width: 768px) {
+    .signUpWrapper {
+      width: 90%;
+      padding: 1.2rem;
+    }
+  
+    .formSignUp {
+      grid-template-columns: 1fr;
+      gap: 0.8rem;
+    }
+  
+    .formSighUpInputs {
+      font-size: 0.9rem;
+      padding: 0.6rem 0.8rem;
+    }
+  
+    .submitBtn {
+      font-size: 0.95rem;
+      grid-column: span 1;
+    }
+}
+  
+/* Extra Small Screens: up to 480px */
+@media (max-width: 480px) {
+    .signUpWrapper {
+      width: 95%;
+      padding: 1rem;
+    }
+  
+    .formSignUp {
+      grid-template-columns: 1fr;
+      gap: 0.7rem;
+    }
+  
+    .formSighUpInputs {
+      font-size: 0.85rem;
+      padding: 0.5rem 0.75rem;
+    }
+  
+    .submitBtn {
+      font-size: 0.9rem;
+      padding: 0.6rem;
+      grid-column: span 1;
+    }
+}
+  
+  
+  
