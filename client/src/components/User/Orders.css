@@ -1,0 +1,37 @@
+.orders-container {
+    padding: 20px;
+  }
+  
+  .export-button {
+    background-color: #007bff;
+    color: #fff;
+    border: none;
+    padding: 10px 15px;
+    margin-bottom: 20px;
+    cursor: pointer;
+  }
+  
+  .order-card {
+    border: 1px solid #ccc;
+    padding: 15px;
+    margin-bottom: 20px;
+    border-radius: 5px;
+  }
+  
+  .order-card h3 {
+    margin-top: 0;
+  }
+  
+  .order-card p {
+    margin: 5px 0;
+  }
+  
+  .order-card ul {
+    list-style-type: none;
+    padding-left: 0;
+  }
+  
+  .order-card li {
+    margin: 5px 0;
+  }
+  

@@ -2,18 +2,18 @@ import React, { useState, useEffect } from 'react';
 import styles from './ShopSection.module.css';
 import ProductModal from './ProductModal';
 import ProductList from './ProductList';
-import { faPlus } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faSearch } from "@fortawesome/free-solid-svg-icons";
 import config from '../../config'; 
+import { faPlus } from '@fortawesome/free-solid-svg-icons';
+import { faSearch } from "@fortawesome/free-solid-svg-icons";
 
 const ShopSection = () => {
     const [products, setProducts] = useState([]);
     const [modalVisible, setModalVisible] = useState(false);
     const [editingProduct, setEditingProduct] = useState(null);
-    const [refreshTrigger, setRefreshTrigger] = useState(0);
+    const [refreshTrigger, setRefreshTrigger] = useState(0); // Trigger to refresh the product list
     const [searchTerm, setSearchTerm] = useState('');
-
 
     const fetchProducts = async () => {
         try {
@@ -68,8 +68,8 @@ const ShopSection = () => {
     return (
         <div id="shopContent" className={styles.shopSection}>
             <div className={styles.titleBtn}>
-                
-                <div className={styles.searchWrapper}>
+
+            <div className={styles.searchWrapper}>
                     <input
                     type="text"
                     placeholder="Search items..."
@@ -79,10 +79,9 @@ const ShopSection = () => {
                     />
                     <FontAwesomeIcon icon={faSearch} className={styles.searchIcon} />
                 </div>
-                
-                <button className={`${styles.addItemButton} open-modal`} onClick={handleAddProduct}>
+                    <button className={`${styles.addItemButton} open-modal`} onClick={handleAddProduct}>
                     Add Item
-                </button>
+                    </button>
             </div>
 
             <ProductModal

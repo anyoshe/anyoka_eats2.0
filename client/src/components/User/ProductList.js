@@ -6,6 +6,8 @@ import styles from './ProductList.module.css';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faEdit, faTrash, faComments } from '@fortawesome/free-solid-svg-icons';
 
+
+
 const ProductList = ({ onEditProduct, onDeleteProduct, refreshTrigger }) => {
     const [productsByCategory, setProductsByCategory] = useState({});
     const [selectedProduct, setSelectedProduct] = useState(null);
@@ -55,27 +57,32 @@ const ProductList = ({ onEditProduct, onDeleteProduct, refreshTrigger }) => {
         }
 
         return '/path/to/placeholder-image.jpg';
-    };
-
+      };
+      
     return (
+     
         <div className={styles.productListContainer}>
             {Object.keys(productsByCategory).map((category) => (
-                <div key={category} className={styles.categorySection}>
+                <div key={category}  className={styles.categorySection}>
+                    {/* Category Heading */}
                     <h2 className={styles.categoryHeading}>{category}</h2>
 
+                    {/* Products Grid */}
                     <div className={styles.productsGrid}>
                         {productsByCategory[category].map((product) => (
                             <div className={styles.productItem} key={product._id}>
+                            
                                 <img
                                     src={getImageSrc(product)}
                                     alt={product.name}
                                     className={styles.productImagePreview}
+                                    
                                     onError={(e) => {
                                         e.target.onerror = null;
                                         e.target.src = '/path/to/placeholder-image.jpg';
                                     }}
                                 />
-                                <div className={styles.productDetails}>
+                               <div className={styles.productDetails}>
                                     <div className={styles.productField}>
                                         <strong>Name:</strong>
                                         <span>{product.name}</span>
@@ -96,7 +103,6 @@ const ProductList = ({ onEditProduct, onDeleteProduct, refreshTrigger }) => {
                                         <strong>Rating:</strong>
                                         <span>{product.ratings?.average?.toFixed(1) || 0} / 5</span>
                                     </div>
-
                                     <div className={styles.buttonsContainer}>
                                         <button
                                             className={styles.reviewsButton}
@@ -108,15 +114,20 @@ const ProductList = ({ onEditProduct, onDeleteProduct, refreshTrigger }) => {
 
                                         <button
                                             className={styles.editProductButton}
+                                            
                                             onClick={() => onEditProduct(product)}
                                             title="Edit"
+                                            
                                         >
+                                          
                                             <FontAwesomeIcon icon={faEdit} />
                                         </button>
                                         <button
                                             className={styles.deleteProductButton}
+                                           
                                             onClick={() => onDeleteProduct(product._id)}
                                             title="Delete"
+                                            
                                         >
                                             <FontAwesomeIcon icon={faTrash} />
                                         </button>

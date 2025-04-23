@@ -3,10 +3,11 @@ import config from '../../config';
 import { PartnerContext } from '../../contexts/PartnerContext';
 import styles from './ProductModal.module.css';
 
+
 const ProductModal = ({ isOpen, onClose, onSubmit, editingProduct, onProductUpdated }) => {
     const { partner } = useContext(PartnerContext);
     const [primaryImage, setPrimaryImage] = useState(null);
-    const [deletedImages, setDeletedImages] = useState([]);
+    const [deletedImages, setDeletedImages] = useState([]); // Track deleted images
     const [productName, setProductName] = useState('');
     const [productPrice, setProductPrice] = useState('');
     const [productBrand, setProductBrand] = useState('');
@@ -157,19 +158,21 @@ const ProductModal = ({ isOpen, onClose, onSubmit, editingProduct, onProductUpda
 
                 <h2 className={styles.addProductH2}>{editingProduct ? 'Edit Product' : 'Add Product'}</h2>
 
-                <div className={styles.productImagePreviewContainer}>
+                          <div className={styles.productImagePreviewContainer}>
                     {productImages.map((image, index) => (
                     <div key={index} className={styles.imagePreviewItem}>
                         <img
                         className={styles.productImagePreview}
                         src={
-                            typeof image === 'string'
-                            ? `${config.backendUrl}${image.replace('/mnt/shared/Projects/anyoka_eats2.0/online_hotel', '')}`
-                            : URL.createObjectURL(image)
-                        }
-                        alt={`Product ${index + 1}`}
-                        />
-                        <div className={styles.imageBtns}>
+                                   
+                                        typeof image === 'string'
+                                          ? `${config.backendUrl}${image.replace('/mnt/shared/Projects/anyoka_eats2.0/online_hotel', '')}`
+                                          : URL.createObjectURL(image)
+                                      }
+                                      
+                                    alt={`Product ${index + 1}`}
+                                />
+                                 <div className={styles.imageBtns}>
                             <button
                             type="button"
                             className={styles.setPrimaryImageButton}
@@ -177,7 +180,8 @@ const ProductModal = ({ isOpen, onClose, onSubmit, editingProduct, onProductUpda
                             >
                             {image === primaryImage ? 'Primary' : 'Set Primary'}
                             </button>
-                            <button
+                                {/* Delete Button */}
+                                <button
                             type="button"
                             className={styles.deleteImageButton}
                             onClick={() => handleDeleteImage(index)}
@@ -186,9 +190,9 @@ const ProductModal = ({ isOpen, onClose, onSubmit, editingProduct, onProductUpda
                             </button>
                         </div>
                     </div>
-                    ))}
-                </div>
-
+                        ))}
+                    </div>
+                    
                 <label className={`${styles.productImageLabel} ${styles.productLabel}`}>Images:</label>
                 
 
@@ -200,48 +204,64 @@ const ProductModal = ({ isOpen, onClose, onSubmit, editingProduct, onProductUpda
                     multiple
                     onChange={handleImageChange}
                 />
-
-                <form className={styles.productForm} onSubmit={handleSubmit}>
+                 <form className={styles.productForm} onSubmit={handleSubmit}>
                     
                     <div className={styles.formGroup}>
                         <label className={`${styles.productNameLabel} ${styles.productLabel}`}>Name:</label>
                         <input
                         type="text"
+                       
                         className={`${styles.productNameInput} ${styles.formInput}`}
                         value={productName}
                         onChange={(e) => setProductName(e.target.value)}
                         required
                         />
                     </div>
+                    
 
                     <div className={styles.formGroup}>
                         <label className={`${styles.productPriceLabel} ${styles.productLabel}`}>Price:</label>
                         <input
+                   
                         type="number"
                         className={`${styles.productPriceInput} ${styles.formInput}`}
+                        
                         value={productPrice}
                         onChange={(e) => setProductPrice(e.target.value)}
                         step="0.01"
                         required
                         />
                     </div>
-
+                    <div className={styles.formGroup}>
+                    <label className={`${styles.productPriceLabel} ${styles.productLabel}`}>Discounted Price:</label>
+                    <input
+                        type="number"
+                        className={`${styles.productPriceInput} ${styles.formInput}`}
+                        value={productDiscountedPrice}
+                        onChange={(e) => setProductDiscountedPrice(e.target.value)}
+                         placeholder="e.g., 250"
+                    />
+                    </div>
                     <div className={styles.formGroup}>
                         <label className={`${styles.productBrandLabel} ${styles.productLabel}`}>Brand:</label>
                         <input
                         type="text"
+                        
                         className={`${styles.productBrandInput} ${styles.formInput}`}
                         value={productBrand}
                         onChange={(e) => setProductBrand(e.target.value)}
                         required
                         />
                     </div>
+                        
 
                     <div className={styles.formGroup}>
                         <label className={`${styles.productCategoryLabel} ${styles.productLabel}`}>Category:</label>
                         <input
+                    
                         type="text"
                         id="productCategoryInput"
+                        
                         className={`${styles.productCategoryInput} ${styles.formInput}`}
                         list="productCategories"
                         value={productCategory}
@@ -249,6 +269,7 @@ const ProductModal = ({ isOpen, onClose, onSubmit, editingProduct, onProductUpda
                         placeholder="Select a category"
                         required
                         />
+                       
                         <datalist id="productCategories">
                         <option value="Electronics" />
                         <option value="Fashion" />
@@ -261,27 +282,33 @@ const ProductModal = ({ isOpen, onClose, onSubmit, editingProduct, onProductUpda
                         <option value="Pet Supplies" />
                         </datalist>
                     </div>
-
+                        
                     <div className={styles.formGroup}>
                         <label className={`${styles.productSubcategoryLabel} ${styles.productLabel}`}>Subcategory:</label>
                         <input
+                   
                         type="text"
                         className={`${styles.productSubcategoryInput} ${styles.formInput}`}
+                        
                         value={productSubCategory}
                         onChange={(e) => setProductSubCategory(e.target.value)}
                         />
                     </div>
+                       
 
                     <div className={styles.formGroup}>
                         <label className={`${styles.productQuantityLabel} ${styles.productLabel}`}>Quantity:</label>
                         <input
+                    
                         type="number"
+                        
                         className={`${styles.productQuantityInput} ${styles.formInput}`}
                         value={productQuantity}
                         onChange={(e) => setProductQuantity(e.target.value)}
                         required
                         />
                     </div>
+                     
 
                     <div className={styles.formGroup}>
                         <label className={`${styles.productUnitLabel} ${styles.productLabel}`}>Unit:</label>
@@ -291,6 +318,7 @@ const ProductModal = ({ isOpen, onClose, onSubmit, editingProduct, onProductUpda
                         onChange={(e) => setProductUnit(e.target.value)}
                         required
                         >
+                        
                         <option value="pcs">Pcs</option>
                         <option value="kg">Kg</option>
                         <option value="grams">Grams</option>
@@ -300,11 +328,14 @@ const ProductModal = ({ isOpen, onClose, onSubmit, editingProduct, onProductUpda
                         <option value="other">Other</option>
                         </select>
                     </div>
+                        
 
                     <div className={styles.formGroup}>
                         <label className={`${styles.productInventoryLabel} ${styles.productLabel}`}>Total Inventory:</label>
                         <input
+                    
                         type="number"
+                        
                         className={`${styles.productInventoryInput} ${styles.formInput}`}
                         value={productInventory}
                         onChange={(e) => setProductInventory(e.target.value)}
@@ -312,15 +343,19 @@ const ProductModal = ({ isOpen, onClose, onSubmit, editingProduct, onProductUpda
                         />
                     </div>
 
+                    
+
                     <div className={styles.formGroup}>
                         <label className={`${styles.productTagsLabel} ${styles.productLabel}`}>Tags (comma-separated):</label>
                         <input
                         type="text"
+                        
                         className={`${styles.productTagsInput} ${styles.formInput}`}
                         value={productTags}
                         onChange={(e) => setProductTags(e.target.value)}
                         />
                     </div>
+                      
 
                     <div id='descFormGroup' className={styles.formGroup}>
                         <label className={`${styles.productDescriptionLabel} ${styles.productLabel}`}>Description:</label>
@@ -331,12 +366,12 @@ const ProductModal = ({ isOpen, onClose, onSubmit, editingProduct, onProductUpda
                         required
                         />
                     </div>
-                </form>
-
-                <button type="submit" className={styles.submitProductButton}>
+                    <button type="submit" className={styles.submitProductButton}>
                         {editingProduct ? 'Update Product' : 'Add Product'}
                 </button>
+                </form>
 
+                
             </div>
         </div>
     );

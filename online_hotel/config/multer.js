@@ -38,8 +38,8 @@ const uploadMultiple = multer({
 
 // Set storage engine for profile images
 const profileStorage = multer.diskStorage({
-  destination: '/var/data/uploads/profile-images',
-  // destination: path.join(__dirname, 'public/uploads/profile-images'),
+  // destination: '/var/data/uploads/profile-images',
+  destination: path.join(__dirname, '../uploads/profile-images'),
   filename: (req, file, cb) => {
     cb(null, 'profile-' + Date.now() + path.extname(file.originalname));
   }
@@ -55,8 +55,8 @@ const uploadProfileImage = multer({
 
 // Set storage engine for business permit PDFs
 const permitStorage = multer.diskStorage({
-  destination: '/var/data/uploads/business-permits', // <--- you can change this path
-  // destination: path.join(__dirname, 'public/uploads/business-permits'),
+  // destination: '/var/data/uploads/business-permits', // <--- you can change this path
+  destination: path.join(__dirname, '../uploads/business-permits'),
   filename: (req, file, cb) => {
     cb(null, 'permit-' + Date.now() + path.extname(file.originalname));
   }
@@ -130,3 +130,131 @@ module.exports = {
   uploadBusinessPermit,
   uploadProductImages // Export the new product image uploader
 };
+
+
+// const multer = require('multer');
+// const path = require('path');
+
+// // ===== FILE TYPE CHECKERS =====
+
+// // General checker for images, videos, and PDFs
+// function generalFileTypeChecker(file, cb) {
+//   if (!file || !file.originalname || !file.mimetype) {
+//     return cb(new Error('Invalid file upload: file data missing'));
+//   }
+
+//   const ext = path.extname(file.originalname).toLowerCase().slice(1);
+//   const mimetype = file.mimetype;
+
+//   const imageTypes = /jpeg|jpg|png|gif/;
+//   const videoTypes = /mp4|webm|ogg/;
+//   const pdfTypes = /pdf/;
+
+//   if (
+//     (imageTypes.test(ext) && imageTypes.test(mimetype)) ||
+//     (videoTypes.test(ext) && videoTypes.test(mimetype)) ||
+//     (pdfTypes.test(ext) && mimetype === 'application/pdf')
+//   ) {
+//     return cb(null, true);
+//   } else {
+//     return cb(new Error('Only Images, Videos, and PDF files are allowed!'));
+//   }
+// }
+
+// // Image-only checker
+// function imageOnlyChecker(file, cb) {
+//   const imageTypes = /jpeg|jpg|png|gif/;
+//   const ext = path.extname(file.originalname).toLowerCase().slice(1);
+//   const mimetype = file.mimetype;
+
+//   if (imageTypes.test(ext) && imageTypes.test(mimetype)) {
+//     return cb(null, true);
+//   } else {
+//     return cb(new Error('Only image files are allowed!'));
+//   }
+// }
+
+// // ===== IMAGE UPLOAD =====
+// const imageStorage = multer.diskStorage({
+//   destination: '/var/data/uploads/images',
+//   filename: (req, file, cb) => {
+//     cb(null, file.fieldname + '-' + Date.now() + path.extname(file.originalname));
+//   }
+// });
+
+// const upload = multer({
+//   storage: imageStorage,
+//   limits: { fileSize: 1000000 },
+//   fileFilter: imageOnlyChecker
+// }).single('image');
+
+// // ===== CONFERENCE FILES UPLOAD (images + videos) =====
+// const conferenceStorage = multer.diskStorage({
+//   destination: '/var/data/uploads/conferences',
+//   filename: (req, file, cb) => {
+//     cb(null, Date.now() + path.extname(file.originalname));
+//   }
+// });
+
+// const uploadMultiple = multer({
+//   storage: conferenceStorage,
+//   fileFilter: generalFileTypeChecker
+// }).fields([
+//   { name: 'venueImages', maxCount: 5 },
+//   { name: 'videoTours', maxCount: 4 },
+//   { name: 'floorPlans', maxCount: 4 }
+// ]);
+
+// // ===== PROFILE IMAGE UPLOAD =====
+// const profileStorage = multer.diskStorage({
+//   destination: path.join(__dirname, '../uploads/profile-images'),
+//   filename: (req, file, cb) => {
+//     cb(null, 'profile-' + Date.now() + path.extname(file.originalname));
+//   }
+// });
+
+// const uploadProfileImage = multer({
+//   storage: profileStorage,
+//   limits: { fileSize: 1000000 },
+//   fileFilter: imageOnlyChecker
+// }).single('profileImage');
+
+// // ===== BUSINESS PERMIT (PDF) UPLOAD =====
+// const permitStorage = multer.diskStorage({
+//   destination: path.join(__dirname, '../uploads/business-permits'),
+//   filename: (req, file, cb) => {
+//     cb(null, 'permit-' + Date.now() + path.extname(file.originalname));
+//   }
+// });
+
+// const uploadBusinessPermit = multer({
+//   storage: permitStorage,
+//   limits: { fileSize: 2000000 },
+//   fileFilter: generalFileTypeChecker
+// }).single('businessPermit');
+
+// // ===== PRODUCT IMAGE UPLOAD (multiple images) =====
+// const productStorage = multer.diskStorage({
+//   destination: path.join(__dirname, '../uploads/products'),
+//   filename: (req, file, cb) => {
+//     cb(null, 'product-' + Date.now() + path.extname(file.originalname));
+//   }
+// });
+
+// const uploadProductImages = multer({
+//   storage: productStorage,
+//   limits: { fileSize: 2000000 },
+//   fileFilter: imageOnlyChecker
+// }).fields([
+//   { name: 'images', maxCount: 5 },
+//   { name: 'primaryImage', maxCount: 1 }
+// ]);
+
+// // ===== EXPORT =====
+// module.exports = {
+//   upload,
+//   uploadMultiple,
+//   uploadProfileImage,
+//   uploadBusinessPermit,
+//   uploadProductImages
+// };

@@ -69,7 +69,16 @@
   outline: 1px solid var(--orange);
   cursor: pointer;
 }
+.addItemButton:hover {
+  background-color: var(--white);
+  color: var(--orange);
+  outline: 1px solid var(--orange);
+  cursor: pointer;
+}
   
+.addItemButton:active {
+  transform: scale(0.95);
+}
 .addItemButton:active {
   transform: scale(0.95);
 }

@@ -1,13 +1,18 @@
 import React, { useState } from 'react';
 import config from '../../config';
 import './ProductCard.css';
+import styles from '../Menu/ProductDetailModal.module.css';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faStar as solidStar } from '@fortawesome/free-solid-svg-icons';
+import { faStar as regularStar } from '@fortawesome/free-regular-svg-icons';
 
 const ProductCard = ({ product }) => {
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
+  const [showReviews, setShowReviews] = useState(false); // Toggle for reviews section
 
   const images = product.primaryImage
     ? [product.primaryImage, ...(product.images || [])]
-    : product.images || [];
+    : product.images || ['/path/to/placeholder-image.jpg'];
 
   const handleNextImage = () => {
     setCurrentImageIndex((prevIndex) => (prevIndex + 1) % images.length);
@@ -48,7 +53,6 @@ const ProductCard = ({ product }) => {
             <button className="next-button" onClick={handleNextImage}>
               &#8250;
             </button>
-            {/* Dots for navigation */}
             <div className="carousel-dots">
               {images.map((_, index) => (
                 <span
@@ -77,7 +81,7 @@ const ProductCard = ({ product }) => {
 
       {product.discountedPrice ? (
         <span className="original-price-offer">
-         Price:  Was{' '}
+          Price: Was{' '}
           <span className="diagonal-strikethrough linePrice">
             Ksh {product.price.toFixed(2)}
           </span>
@@ -88,13 +92,15 @@ const ProductCard = ({ product }) => {
 
       <p className="product-brand">Brand: {product.brand}</p>
       <p className="product-category">Category: {product.category}</p>
+      <p className="product-inventory">Seller: {product.shop.shopName}</p>
+      <p className="product-inventory">Town: {product.shop.town}</p>
       <p className="product-inventory">Available: {product.inventory}</p>
 
-      <div className="rating"> Ratings:
+      <div className="rating">
+        Ratings:
         {[...Array(5)].map((_, index) => {
           const star = index + 1;
           return (
-            
             <span
               key={star}
               className={star <= product.ratings?.average ? 'star filled' : 'star'}
@@ -110,8 +116,43 @@ const ProductCard = ({ product }) => {
         <br />
         ({product.ratings?.reviews?.length || 0} reviews)
       </p>
+
+      {/* Toggle Reviews Section */}
+      <button onClick={() => setShowReviews(!showReviews)} className="toggle-reviews-button">
+        {showReviews ? 'Hide Reviews' : 'Show Reviews'}
+      </button>
+
+      {showReviews && (
+        <div className="reviews-section">
+          <h4>Customer Reviews</h4>
+          {product.ratings?.reviews?.length > 0 ? (
+            <ul className="reviews-list">
+              {product.ratings.reviews.map((review, index) => (
+                <li key={index} className="review-item">
+                  <strong>{review.user?.username || 'Unknown User'}</strong>
+                  {review.rating && (
+                    <p>
+                      Rating:{' '}
+                      {[...Array(review.rating)].map((_, i) => (
+                        <FontAwesomeIcon key={i} icon={solidStar} className="star-icon" />
+                      ))}
+                    </p>
+                  )}
+                  {review.comment && <p>Comment: {review.comment}</p>}
+                  <small>Date: {review.date ? new Date(review.date).toLocaleDateString() : '-'}</small>
+                </li>
+              ))}
+            </ul>
+          ) : (
+            <p>No reviews yet.</p>
+          )}
+        </div>
+      )}
+
+      <hr />
     </li>
   );
 };
 
 export default ProductCard;
+
