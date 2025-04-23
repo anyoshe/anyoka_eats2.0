@@ -109,7 +109,7 @@ const ProductList = ({ onEditProduct, onDeleteProduct, refreshTrigger }) => {
                                             onClick={() => setSelectedProduct(product)}
                                         >
                                             <FontAwesomeIcon icon={faComments} />
-                                            {product.ratings?.reviews?.length > 0 && `(${product.ratings.reviews.length})`}
+                                            {/* {product.ratings?.reviews?.length > 0 && `(${product.ratings.reviews.length})`} */}
                                         </button>
 
                                         <button

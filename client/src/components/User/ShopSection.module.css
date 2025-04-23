@@ -1,7 +1,7 @@
-.shop-section {
-  border: 2px solid green;  
+.shopSection {
+  /* border: 2px solid green;   */
 
-  margin-top: 10rem;
+  margin-top: 0.4rem;
 }
   
 .titleBtn {
@@ -43,9 +43,9 @@
   transition: 0.2s ease-in;
 }
 
-.searchBar:hover {
+/* .searchBar:hover {
   outline-color: var(--orange);
-}
+} */
 
 .searchBar:focus {
   outline-color: var(--orange);
@@ -69,7 +69,16 @@
   outline: 1px solid var(--orange);
   cursor: pointer;
 }
+.addItemButton:hover {
+  background-color: var(--white);
+  color: var(--orange);
+  outline: 1px solid var(--orange);
+  cursor: pointer;
+}
   
+.addItemButton:active {
+  transform: scale(0.95);
+}
 .addItemButton:active {
   transform: scale(0.95);
 }
@@ -105,5 +114,12 @@
     font-size: 1rem;
     padding: 0.7rem 1.2rem;
     border-radius: 0.4rem;
+  }
+}
+
+
+@media screen and (max-width: 480px) {
+  .searchWrapper{
+    width: 60%;
   }
 }
