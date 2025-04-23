@@ -6,8 +6,10 @@ import ShopSection from "./ShopSection";
 import NotificationComponent from './NotificationComponent';
 import LogoutComponent from './LogoutComponent';
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faBell } from "@fortawesome/free-solid-svg-icons";
+import { faBell, faSignOutAlt } from "@fortawesome/free-solid-svg-icons";
+import Orders from './Orders';
 import { faBars } from "@fortawesome/free-solid-svg-icons";
+
 
 const AccountPage = () => {
   const [menuOpen, setMenuOpen] = useState(false);
@@ -26,7 +28,7 @@ const AccountPage = () => {
       case "shop":
         return <ShopSection />;
       case "orders":
-        return <div>Orders content coming soon...</div>;
+        return <Orders />;
       case "sales":
         return <div>Sales content coming soon...</div>;
       default:
@@ -37,11 +39,12 @@ const AccountPage = () => {
   return (
     <div className={styles.accountPageWrapper}>
       <div className={styles.container}>
-        {/* Notification dropdown */}
-        {showNotifications && <NotificationComponent />}
 
-        {/* Hamburger icon for small screens */}
-        <div className={styles.hamburgerMenu}>
+      {/* Notification Dropdown */}
+      {showNotifications && <NotificationComponent />}
+
+     {/* Hamburger icon for small screens */}
+     <div className={styles.hamburgerMenu}>
           <FontAwesomeIcon
             icon={faBars}
             className={styles.hamburgerIcon}
@@ -60,9 +63,9 @@ const AccountPage = () => {
         )}
 
 
-        {/* Tabs */}
-        <div className={styles.tabs}>
-          <div
+      {/* Tab navigation */}
+      <div className={styles.tabs}>
+      <div
             className={`${styles.tab} ${activeTab === "profile" ? styles.active : ""}`}
             onClick={() => setActiveTab("profile")}
           >
@@ -94,12 +97,14 @@ const AccountPage = () => {
               data-count={5}
               onClick={() => setShowNotifications(!showNotifications)}
             />
-            <LogoutComponent />
-          </div>
-        </div>
 
-        {/* Content */}
-        <div className={`${styles.tabContent} ${styles.active}`}>
+          {/* Logout Icon */}
+          <LogoutComponent />
+        </div>
+      </div>
+
+      {/* Content */}
+      <div className={`${styles.tabContent} ${styles.active}`}>
           {renderTabContent()}
         </div>
       </div>

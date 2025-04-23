@@ -1,0 +1,86 @@
+/* src/components/PaymentMethods.css */
+
+.paymentMethods {
+    background: #fff;
+    border-radius: 8px;
+    padding: 1.5rem;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+    max-width: 400px;
+    margin: 0 auto;
+  }
+  
+  .paymentMethods h4 {
+    margin-bottom: 1rem;
+    font-size: 1.25rem;
+    color: #333;
+    text-align: center;
+  }
+  
+  .paymentMethods label {
+    display: flex;
+    align-items: center;
+    margin-bottom: 0.75rem;
+    font-size: 1rem;
+    color: #444;
+    cursor: pointer;
+    transition: color 0.2s ease;
+  }
+  
+  .paymentMethods label:hover {
+    color: #000;
+  }
+  
+  .paymentMethods input[type="radio"] {
+    margin-right: 0.5rem;
+    accent-color: #007bff;
+    width: 1.1rem;
+    height: 1.1rem;
+  }
+  
+  .paymentMethods button {
+    display: block;
+    width: 100%;
+    background: #007bff;
+    color: #fff;
+    border: none;
+    border-radius: 6px;
+    padding: 0.75rem;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    margin-top: 1rem;
+    transition: background 0.2s ease, transform 0.1s ease;
+  }
+  
+  .paymentMethods button:hover:not(:disabled) {
+    background: #0056b3;
+  }
+  
+  .paymentMethods button:active:not(:disabled) {
+    transform: scale(0.98);
+  }
+  
+  .paymentMethods button:disabled {
+    background: #ccc;
+    cursor: not-allowed;
+  }
+  
+  @media (max-width: 480px) {
+    .paymentMethods {
+      padding: 1rem;
+    }
+  
+    .paymentMethods h4 {
+      font-size: 1.1rem;
+    }
+  
+    .paymentMethods label {
+      font-size: 0.95rem;
+    }
+  
+    .paymentMethods button {
+      padding: 0.65rem;
+      font-size: 0.95rem;
+    }
+  }
+  

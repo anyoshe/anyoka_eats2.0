@@ -1,22 +1,15 @@
 import React, { useCallback, useRef } from 'react';
 import { GoogleMap, useJsApiLoader } from '@react-google-maps/api';
 
-// const googleApiKey = process.env.REACT_APP_GOOGLE_API_KEY;
-
 const containerStyle = {
   width: '100%',
   height: '400px',
 };
 
-const center = {
-  lat: -3.2192, // Default latitude
-  lng: 40.1169, // Default longitude
-};
-
-function MapSelector({ onLocationSelect }) {
+function MapSelector({ onLocationSelect, center }) {
   const { isLoaded } = useJsApiLoader({
     id: 'google-map-script',
-    googleMapsApiKey: process.env.REACT_APP_GOOGLE_API_KEY, // Replace with your API key
+    googleMapsApiKey: process.env.REACT_APP_GOOGLE_API_KEY,
   });
 
   const mapRef = useRef(null);
@@ -43,7 +36,6 @@ function MapSelector({ onLocationSelect }) {
           if (plusCode) {
             onLocationSelect(plusCode);
           } else {
-            // Fallback to formatted address if Plus Code is not available
             onLocationSelect(results[0].formatted_address);
           }
         } else {

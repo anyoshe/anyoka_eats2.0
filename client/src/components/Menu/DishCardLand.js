@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useCart } from './CartContext';
+// import { useCart } from './CartContext';
 import config from '../../config';
 import './DishCard.css';
 import { useNavigate } from 'react-router-dom';
@@ -10,16 +10,16 @@ const DishCardLand = ({ dish, source }) => {
   const [ratingCount, setRatingCount] = useState(dish.ratingCount);
   const [hoverRating, setHoverRating] = useState(0);
 
-  const { dispatch } = useCart();
+  // const { dispatch } = useCart();
   const navigate = useNavigate();
 
   const handleAddToCart = () => {
-    dispatch({
-      type: 'ADD_TO_CART',
-      payload: {
-        dishDetails: dish
-      }
-    });
+    // dispatch({
+    //   type: 'ADD_TO_CART',
+    //   payload: {
+    //     dishDetails: dish
+    //   }
+    // });
 
     // Navigate based on the source prop
     if (source === 'featured') {
