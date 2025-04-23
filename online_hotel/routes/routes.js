@@ -20,7 +20,8 @@ const axios = require('axios');
 const { type } = require("os");
 require('dotenv').config();
 const nodemailer = require('nodemailer');
-const { getIo, connectedPartners, pendingOrders } = require('../socket');
+// const { getIo, connectedPartners, pendingOrders } = require('../socket');
+const { notifyPartner } = require('../socketServer'); 
 
 
 const JWT_SECRET = process.env.JWT_SECRET;
@@ -985,6 +986,14 @@ router.post('/orders/place', async (req, res) => {
         total
       }], { session });
 
+      notifyPartner(shopId, {
+        message: "New order received!",
+        subOrderId: subOrder[0]._id,
+        orderId: order[0]._id, // Add this
+        total,
+        timestamp: new Date(),
+      });
+      
       subOrderIds.push(subOrder[0]._id);
     }
 
