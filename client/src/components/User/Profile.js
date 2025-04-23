@@ -130,6 +130,7 @@ const Profile = ({ onSave }) => {
     return (
         <div className={styles.profile_wrapper}>
             <div id="profileContent" className={styles.profileContent}>
+            <div id="profileContent" className={styles.profileContent}>
                 <div className={styles.profileDetails}>
                     <div className={styles.profileImageContainer}>
                         <input
@@ -237,6 +238,7 @@ const Profile = ({ onSave }) => {
                     </div>
 
                     <div className={`${styles.profileItem} ${styles.profileLocationDiv}`}>
+                    <div className={`${styles.profileItem} ${styles.profileLocationDiv}`}>
                         <strong>Location:</strong>
                         {editSectionMode ? (
                             <>
@@ -256,33 +258,15 @@ const Profile = ({ onSave }) => {
                                         <i className={`fas ${isMapVisible ? 'fa-times' : 'fa-pen'}`}></i>
                                     </button>
                                 </div>
-                                <div className={styles.locationInputWrapper}>
-                                    <input
-                                        type="text"
-                                        name="location"
-                                        value={formData.location}
-                                        readOnly
-                                    />
-                                    <button
-                                        type="button"
-                                        className={styles.edit_btn}
-                                        onClick={toggleMapVisibility}
-                                        title={isMapVisible ? 'Hide Map' : 'Edit Location'}
-                                    >
-                                        <i className={`fas ${isMapVisible ? 'fa-times' : 'fa-pen'}`}></i>
-                                    </button>
-                                </div>
 
                                 {/* {isMapVisible && (
-                                <MapSelector
-                                onLocationSelect={(plusCode) =>
-                                    setFormData((prev) => ({ ...prev, location: plusCode }))
-                                }
-                                />
-                            )} */}
-
+                                    <MapSelector
+                                        onLocationSelect={(plusCode) =>
+                                            setFormData((prev) => ({ ...prev, location: plusCode }))
+                                        }
+                                    />
+                                )} */}
                                 {isMapVisible && (
-                                    console.log("Map should be visible:", isMapVisible),
                                     <div className={styles.mapModalOverlay}>
                                         <div className={styles.mapModalContent}>
                                             <button
@@ -293,17 +277,16 @@ const Profile = ({ onSave }) => {
                                                 &times;
                                             </button>
                                             <MapSelector
-                                                town={formData.town}
-                                                defaultLocation={formData.town !== originalTown ? '' : originalLocation}
                                                 onLocationSelect={(plusCode) => {
-                                                    setFormData((prev) => ({ ...prev, location: plusCode }));
-                                                    setIsMapVisible(false); // close map
+                                                setFormData((prev) => ({ ...prev, location: plusCode }));
+                                                setIsMapVisible(false); // close modal after selection
                                                 }}
                                             />
-
                                         </div>
                                     </div>
                                 )}
+
+
                             </>
                         ) : (
                             <span id="profileLocation">{formData.location}</span>

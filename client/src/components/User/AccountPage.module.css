@@ -105,6 +105,11 @@
     
   
   @media (min-width: 769px) and (max-width: 1024px) {
+    
+    /* .container{
+      margin-top: 5rem;
+    } */
+
       .tabs {
         justify-content: space-between;
         padding: 0.5rem 1rem;
