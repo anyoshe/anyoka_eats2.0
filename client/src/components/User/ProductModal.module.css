@@ -1,6 +1,6 @@
-.modalOne {
+/* .modalOne {
   position: fixed;
-  z-index: 1;
+  z-index: 1001;
   left: 0;
   top: 0;
   width: 100%;
@@ -17,7 +17,6 @@
   width: 85%;
   max-width: 38rem;
   border-radius: 0.3rem;
-  /* height: 170%; */
 }
 
 .closeModalOne {
@@ -84,8 +83,6 @@
 }
 
 .productImagePreviewContainer{
-  /* border: 2px solid red; */
-
   display: flex;
   flex-direction: row;
   gap: 0.3rem;
@@ -233,4 +230,322 @@ i.productNameInput:hover,.productPriceInput:hover,.productBrandInput:hover,.prod
   background-color: var(--white);
   outline: 1px solid var(--orange);
   color: var(--orange);
+}
+
+ @media (min-width: 1440px) {
+  .container {
+    width: 85%;
+    padding: 2rem;
+    height: 95vh;
+  }
+
+  .tab {
+    font-size: 1rem;
+    padding: 1rem 1.5rem;
+  }
+
+  .headerNavIcons {
+    width: 6em;
+    height: 2.5em;
+  }
+
+  .tabContent {
+    height: 90%;
+  }
+
+  .profileDetails {
+    gap: 2rem;
+    font-size: 1.5rem;
+    grid-template-columns: repeat(4, 1fr);
+  }
+
+  .profileDescriptionDiv {
+    grid-column: span 2;
+  }
+
+  .profileLocationDiv {
+    grid-column: span 2;
+  }
+
+  .profileImage {
+    width: 12rem;
+    height: 12rem;
+  }
+
+  .profileItem strong {
+    font-size: 1.1rem;
+    font-weight: 800;
+    padding-bottom: 1rem;
+  }
+
+  .profileItem span {
+    font-size: 1.2rem;
+    font-weight: 500;
+  }
+
+  .edit_btn,
+  .save_btn {
+    font-size: 0.85rem;
+    padding: 0.4rem 0.6rem;
+  }
+
+  .profileItem input,
+  .profileItem textarea {
+    font-size: 1rem;
+  }
+
+  .mapModalContent {
+    max-width: 44rem;
+    padding: 2rem;
+  }
+
+  .permitLink {
+    font-size: 0.95rem;
+  }
+}
+ */
+
+
+
+ /* ========== BASE STYLES FOR PRODUCT MODAL ========== */
+
+.modalOne {
+  position: fixed;
+  z-index: 1001;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  overflow: auto;
+  background-color: rgba(0, 0, 0, 0.4);
+}
+
+.modalContentOne {
+  background-color: #fff;
+  margin: 2% auto;
+  padding: 0.5rem 1rem;
+  border: 1px solid #888;
+  width: 85%;
+  max-width: 38rem;
+  border-radius: 0.3rem;
+}
+
+.closeModalOne {
+  color: var(--green);
+  float: right;
+  font-size: 1.2rem;
+  font-weight: bold;
+}
+
+.closeModalOne:hover,
+.closeModalOne:focus {
+  color: var(--orange);
+  cursor: pointer;
+}
+
+.addProductH2 {
+  font-size: 1.1rem;
+  text-align: left;
+  font-weight: bold;
+  text-decoration: underline;
+  margin-top: 0.3rem;
+}
+
+.productForm {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+.productLabel {
+  display: block;
+  margin-bottom: 0.1rem;
+  font-weight: 600;
+  font-size: 0.8rem;
+  align-items: start;
+}
+
+.formInput {
+  width: 100%;
+  padding: 0.5rem;
+  border-radius: 0.3rem;
+  border: none;
+  outline: 1px solid #ccc;
+  font-size: 0.8rem;
+  cursor: pointer;
+}
+
+.formInput:hover {
+  outline: 1px solid var(--orange);
+}
+
+.imagePreviewItem {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+}
+
+.productImagePreviewContainer {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  gap: 0.3rem;
+  padding-bottom: 0.2rem;
+  border-bottom: 1px solid #ccc;
+  margin-top: 0.5rem;
+}
+
+.productImagePreviewContainer img {
+  width: 6em;
+  height: 6em;
+}
+
+.setPrimaryImageButton,
+.deleteImageButton {
+  font-size: 0.75rem;
+  padding: 0.3rem 0.6rem;
+  border-radius: 0.3em;
+  border: none;
+  cursor: pointer;
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+.setPrimaryImageButton {
+  background-color: var(--green);
+  color: white;
+}
+
+.setPrimaryImageButton:hover {
+  background-color: var(--white);
+  color: var(--orange);
+  outline: 1px solid var(--orange);
+}
+
+.deleteImageButton {
+  background-color: red;
+  color: var(--white);
+  position: absolute;
+  top: 2px;
+  right: 2px;
+  border-radius: 50%;
+  width: 1.25rem;
+  height: 1.25rem;
+  font-size: 0.875rem;
+  font-weight: bold;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.deleteImageButton:hover {
+  background-color: var(--white);
+  color: red;
+  outline: 1px solid red;
+}
+
+.submitProductButton {
+  width: 100%;
+  padding: 0.5rem;
+  background-color: var(--green);
+  color: #fff;
+  border: none;
+  border-radius: 0.3rem;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  font-size: 1rem;
+  margin-top: 1rem;
+}
+
+.submitProductButton:hover {
+  background-color: var(--white);
+  outline: 1px solid var(--orange);
+  color: var(--orange);
+}
+
+/* ========== MEDIA QUERIES ========== */
+
+@media screen and (min-width: 1440px) {
+  .modalContentOne {
+    max-width: 42rem;
+    padding: 2rem;
+  }
+
+  .productForm {
+    gap: 1.5rem;
+  }
+
+  .formInput,
+  .productLabel {
+    font-size: 0.9rem;
+  }
+
+  .productImagePreviewContainer img {
+    width: 7em;
+    height: 7em;
+  }
+}
+
+@media screen and (max-width: 768px) {
+  .modalContentOne {
+    width: 95%;
+  }
+
+  /* .productForm {
+    grid-template-columns: 1fr;
+  } */
+}
+
+@media screen and (max-width: 480px) {
+  .modalContentOne{
+    margin-top: 3.2rem;
+  }
+
+  .formInput {
+    font-size: 0.75rem;
+    padding: 0.4rem;
+  }
+
+  .productImagePreviewContainer img {
+    width: 5em;
+    height: 5em;
+  }
+
+  .setPrimaryImageButton,
+  .deleteImageButton {
+    font-size: 0.65rem;
+    padding: 0.2rem 0.5rem;
+  }
+
+  .productForm {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media screen and (max-width: 376px) {
+  .productLabel {
+    font-size: 0.75rem;
+  }
+
+  .formInput {
+    font-size: 0.7rem;
+  }
+
+    .productForm {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media screen and (max-width: 320px) {
+  .formInput {
+    font-size: 0.65rem;
+  }
+
+  .productLabel {
+    font-size: 0.7rem;
+  }
+
+  .productForm {
+    grid-template-columns: 1fr;
+  }
 }

@@ -137,7 +137,7 @@ const StoreSignUpForm = () => {
   return (
     <section className={styles.signUpContainer}>
       <div className={styles.signUpWrapper}>
-        <h2 className={styles.signUpWrapperH2}>Create Your Store Account</h2>
+        {/* <h2 className={styles.signUpWrapperH2}>Create Store Account</h2>
 
         <form onSubmit={handleSubmitSignUp} className={styles.formSignUp}>
           <div className={styles.formGroup}>
@@ -336,7 +336,7 @@ const StoreSignUpForm = () => {
 
 
           <button type="submit" className={styles.submitBtn}>Sign Up</button>
-        </form>
+        </form> */}
 
         <h3 className={styles.signInHeading}>Already have an account? Sign In below</h3>
 
