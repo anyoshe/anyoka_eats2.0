@@ -9,16 +9,33 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faBell, faSignOutAlt } from "@fortawesome/free-solid-svg-icons";
 import Orders from './Orders';
 import { faBars } from "@fortawesome/free-solid-svg-icons";
+import axios from 'axios';
+import config from '../../config';
 
 
 const AccountPage = () => {
   const [menuOpen, setMenuOpen] = useState(false);
   const [activeTab, setActiveTab] = useState("profile");
   const [showNotifications, setShowNotifications] = useState(false);
+  const { notifications, addNotification, markAsRead } = useContext(PartnerContext);
+  const [orderDetails, setOrderDetails] = useState(null);
+
+
 
   const handleTabChange = (tab) => {
     setActiveTab(tab);
     setMenuOpen(false);
+  };
+
+
+  const handleViewOrder = async (orderId) => {
+    try {
+      const res = await axios.get(`${config.backendUrl}/api/orders/${orderId}`);
+      setOrderDetails(res.data);
+      // Optionally show in a modal or route to detail page
+    } catch (err) {
+      console.error('Failed to fetch order:', err);
+    }
   };
 
   const renderTabContent = () => {
@@ -40,11 +57,20 @@ const AccountPage = () => {
     <div className={styles.accountPageWrapper}>
       <div className={styles.container}>
 
-      {/* Notification Dropdown */}
-      {showNotifications && <NotificationComponent />}
+        {/* Notification Dropdown */}
+        {showNotifications && (
+          <NotificationComponent
+            notifications={notifications}
+            onView={(notif) => {
+              markAsRead(notif);
+              if (notif.orderId) handleViewOrder(notif.orderId);
+            }}
+          />
 
-     {/* Hamburger icon for small screens */}
-     <div className={styles.hamburgerMenu}>
+        )}
+
+        {/* Hamburger icon for small screens */}
+        <div className={styles.hamburgerMenu}>
           <FontAwesomeIcon
             icon={faBars}
             className={styles.hamburgerIcon}
@@ -63,9 +89,9 @@ const AccountPage = () => {
         )}
 
 
-      {/* Tab navigation */}
-      <div className={styles.tabs}>
-      <div
+        {/* Tab navigation */}
+        <div className={styles.tabs}>
+          <div
             className={`${styles.tab} ${activeTab === "profile" ? styles.active : ""}`}
             onClick={() => setActiveTab("profile")}
           >
@@ -91,22 +117,54 @@ const AccountPage = () => {
           </div>
 
           <div className={styles.headerNavIcons}>
+
             <FontAwesomeIcon
               icon={faBell}
               className={`${styles.icon} ${styles.notificationIcon} ${styles.profileNotification}`}
-              data-count={5}
+              data-count={notifications.length}
               onClick={() => setShowNotifications(!showNotifications)}
             />
 
-          {/* Logout Icon */}
-          <LogoutComponent />
+            {/* Logout Icon */}
+            <LogoutComponent />
+          </div>
         </div>
-      </div>
 
-      {/* Content */}
-      <div className={`${styles.tabContent} ${styles.active}`}>
+        {/* Content */}
+        <div className={`${styles.tabContent} ${styles.active}`}>
           {renderTabContent()}
         </div>
+        {orderDetails && (
+          <OrderDetailsModal
+            order={orderDetails}
+            onClose={() => setOrderDetails(null)}
+          />
+        )}
+      </div>
+    </div>
+  );
+};
+
+
+const OrderDetailsModal = ({ order, onClose }) => {
+  return (
+    <div className={styles.modalOverlay}>
+      <div className={styles.modalContent}>
+        <h2>Order Details</h2>
+        <p><strong>Order ID:</strong> {order.orderId}</p>
+        <p><strong>Delivery:</strong> {order.delivery.town}, {order.delivery.location}</p>
+        <p><strong>Total:</strong> KES {order.total}</p>
+
+        <h4>Items</h4>
+        <ul>
+          {order.items.map((item, index) => (
+            <li key={index}>
+              {item.product.name} - {item.quantity} x KES {item.price}
+            </li>
+          ))}
+        </ul>
+
+        <button className={styles.closeBtn} onClick={onClose}>Close</button>
       </div>
     </div>
   );

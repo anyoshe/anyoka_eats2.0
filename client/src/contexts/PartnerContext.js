@@ -1,92 +1,25 @@
-// import React, { createContext, useState, useEffect } from 'react';
-// import config from '../config';
-// import io from 'socket.io-client';
-
-// export const PartnerContext = createContext();
-
-// export const PartnerProvider = ({ children }) => {
-//     const [partner, setPartner] = useState({
-//         _id: '',
-//         businessName: '',
-//         businessType: '',
-//         contactNumber: '',
-//         email: '',
-//         town: '',
-//         location: '',
-//         password: '',
-//         profileImage: '',
-//         idNumber: '',
-//         businessPermit: '',
-//         description: '',
-//         role: 'partner',
-//     });
-
-//     const [socket, setSocket] = useState(null);
-
-//     // Update partner details
-//     const updatePartnerDetails = (updatedDetails) => {
-//         setPartner(prevPartner => ({
-//             ...prevPartner,
-//             ...updatedDetails
-//         }));
-//         localStorage.setItem('partnerDetails', JSON.stringify({
-//             ...partner,
-//             ...updatedDetails
-//         }));
-//     };
-
-//     // Initialize socket connection and handle events
-//     useEffect(() => {
-//         if (partner._id) {
-//             const newSocket = io(config.backendUrl);
-//             setSocket(newSocket);
-
-//             newSocket.emit('registerPartner', partner._id);
-
-//             newSocket.on('newOrder', (data) => {
-//                 console.log('New order notification:', data);
-//                 alert(`New Order: ${data.message}`);
-//             });
-
-//             return () => {
-//                 newSocket.disconnect();
-//             };
-//         }
-//     }, [partner._id]);
-
-//     // Load partner data from localStorage on mount
-//     useEffect(() => {
-//         const storedPartner = JSON.parse(localStorage.getItem('partnerDetails'));
-//         if (storedPartner) {
-//             setPartner(storedPartner);
-//         }
-//     }, []);
-
-//     return (
-//         <PartnerContext.Provider value={{
-//             partner,
-//             setPartner,
-//             updatePartnerDetails,
-//             socket,
-//         }}>
-//             {children}
-//         </PartnerContext.Provider>
-//     );
-// };
-
-
-
-
 import React, { createContext, useState, useEffect } from 'react';
 import config from '../config';
 import io from 'socket.io-client';
+import { playNotificationSound, showBrowserNotification } from '../components/utils/notifications';
 
 export const PartnerContext = createContext();
 
 export const PartnerProvider = ({ children }) => {
   const [partner, setPartner] = useState(null);
   const [socket, setSocket] = useState(null);
+  const [notifications, setNotifications] = useState([]);
 
+
+  const addNotification = (notif) => {
+    setNotifications((prev) => [notif, ...prev]);
+  };
+  
+  const markAsRead = (notif) => {
+    setNotifications((prev) =>
+      prev.map((n) => (n === notif ? { ...n, read: true } : n))
+    );
+  };
   // Update partner details
   const updatePartnerDetails = (updatedDetails) => {
     const newPartner = { ...partner, ...updatedDetails };
@@ -108,11 +41,21 @@ export const PartnerProvider = ({ children }) => {
       const newSocket = io(config.backendUrl);
       setSocket(newSocket);
 
-      newSocket.emit('registerPartner', partner._id);
+      newSocket.emit('joinPartnerRoom', partner._id);
+      console.log("Joined socket room:", partner._id);
 
-      newSocket.on('newOrder', (data) => {
-        console.log('New order notification:', data);
-        alert(`New Order: ${data.message}`);
+      newSocket.on('newSubOrder', (data) => {
+      console.log("🎉 Notification received!", data);
+         
+      // Play sound
+         playNotificationSound();
+
+         // Show browser notification
+         showBrowserNotification(data);
+ 
+         // Save notification in context
+         addNotification({ ...data, read: false, timestamp: new Date().toISOString() });
+
       });
 
       return () => {
@@ -140,6 +83,9 @@ export const PartnerProvider = ({ children }) => {
         updatePartnerDetails,
         socket,
         logout,
+        notifications,
+        addNotification,
+        markAsRead       
       }}
     >
       {children}
