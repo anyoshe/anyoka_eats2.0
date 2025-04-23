@@ -1,4 +1,6 @@
-import React, { useState } from 'react';
+// import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import config from '../../config';
 import Modal from 'react-modal';
 import ProductCard from '../User/ProductCard'; // Import the ProductCard component
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';

@@ -116,7 +116,7 @@ const Profile = ({ onSave }) => {
 
     return (
         <div className={styles.profile_wrapper}>
-            <div id="profileContent">
+            <div id="profileContent" className={styles.profileContent}>
                 <div className={styles.profileDetails}>
                     <div className={styles.profileImageContainer}>
                         <input
@@ -212,7 +212,7 @@ const Profile = ({ onSave }) => {
                         )}
                     </div>
 
-                    <div className={styles.profileItem}>
+                    <div className={`${styles.profileItem} ${styles.profileLocationDiv}`}>
                         <strong>Location:</strong>
                         {editSectionMode ? (
                             <>
@@ -233,13 +233,34 @@ const Profile = ({ onSave }) => {
                                     </button>
                                 </div>
 
-                                {isMapVisible && (
+                                {/* {isMapVisible && (
                                     <MapSelector
                                         onLocationSelect={(plusCode) =>
                                             setFormData((prev) => ({ ...prev, location: plusCode }))
                                         }
                                     />
+                                )} */}
+                                {isMapVisible && (
+                                    <div className={styles.mapModalOverlay}>
+                                        <div className={styles.mapModalContent}>
+                                            <button
+                                                onClick={toggleMapVisibility}
+                                                className={styles.mapModalClose}
+                                                title="Close Map"
+                                            >
+                                                &times;
+                                            </button>
+                                            <MapSelector
+                                                onLocationSelect={(plusCode) => {
+                                                setFormData((prev) => ({ ...prev, location: plusCode }));
+                                                setIsMapVisible(false); // close modal after selection
+                                                }}
+                                            />
+                                        </div>
+                                    </div>
                                 )}
+
+
                             </>
                         ) : (
                             <span id="profileLocation">{formData.location}</span>
