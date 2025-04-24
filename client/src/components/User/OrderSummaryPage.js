@@ -2,7 +2,7 @@ import React, { useEffect, useState, useContext } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import config from '../../config';
 import { AuthContext } from '../../contexts/AuthContext';
-import './OrderSummaryPage.css'; // Optional: create a CSS file for styles
+import './OrderSummaryPage.css'; 
 
 const OrderSummaryPage = () => {
   const { orderId } = useParams();
@@ -26,7 +26,7 @@ const OrderSummaryPage = () => {
             Authorization: `Bearer ${token}`,
           },
         });
-  
+        console.log('Response:', res);
         const text = await res.text();
         let data;
         try {
@@ -58,6 +58,7 @@ const OrderSummaryPage = () => {
       <p><strong>Payment Method:</strong> {order.paymentMethod}</p>
       <p><strong>Delivery Location:</strong> {order.delivery?.location} ({order.delivery?.town})</p>
       <p><strong>Delivery Fee:</strong> KES {order.delivery?.fee}</p>
+      <p><strong>Delivery Means:</strong> {order.delivery?.option}</p>
 
       <h3>Items:</h3>
       <ul>

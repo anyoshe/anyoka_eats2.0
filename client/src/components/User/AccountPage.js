@@ -38,6 +38,19 @@ const AccountPage = () => {
     }
   };
 
+  const handleViewSubOrder = async (subOrderId) => {
+    try {
+      const res = await axios.get(`${config.backendUrl}/api/suborders/${subOrderId}`);
+      setOrderDetails({
+        ...res.data,
+        isSubOrder: true,
+      });
+    } catch (err) {
+      console.error('Failed to fetch suborder:', err);
+    }
+  };
+  
+
   const renderTabContent = () => {
     switch (activeTab) {
       case "profile":
@@ -60,12 +73,15 @@ const AccountPage = () => {
         {/* Notification Dropdown */}
         {showNotifications && (
           <NotificationComponent
-            notifications={notifications}
-            onView={(notif) => {
-              markAsRead(notif);
-              if (notif.orderId) handleViewOrder(notif.orderId);
-            }}
-          />
+          onView={(id, isSubOrder) => {
+            if (isSubOrder) {
+              handleViewSubOrder(id);
+            } else {
+              handleViewOrder(id);
+            }
+          }}
+        />
+              
 
         )}
 
@@ -147,27 +163,48 @@ const AccountPage = () => {
 
 
 const OrderDetailsModal = ({ order, onClose }) => {
+  const isSubOrder = order.isSubOrder;
+
   return (
     <div className={styles.modalOverlay}>
       <div className={styles.modalContent}>
-        <h2>Order Details</h2>
-        <p><strong>Order ID:</strong> {order.orderId}</p>
-        <p><strong>Delivery:</strong> {order.delivery.town}, {order.delivery.location}</p>
-        <p><strong>Total:</strong> KES {order.total}</p>
-
-        <h4>Items</h4>
-        <ul>
-          {order.items.map((item, index) => (
-            <li key={index}>
-              {item.product.name} - {item.quantity} x KES {item.price}
-            </li>
-          ))}
-        </ul>
-
+        <h2>{isSubOrder ? 'SubOrder Summary' : 'Order Details'}</h2>
+        
+        {isSubOrder ? (
+          <>
+            <p><strong>SubOrder ID:</strong> {order._id}</p>
+            <p><strong>Status:</strong> {order.status}</p>
+            <p><strong>Total:</strong> KES {order.total}</p>
+            <h4>Items</h4>
+            <ul>
+              {order.items.map((item, index) => (
+                <li key={index}>
+                  {item.product.name} - {item.quantity} x KES {item.price}
+                </li>
+              ))}
+            </ul>
+          </>
+        ) : (
+          <>
+            <p><strong>Order ID:</strong> {order.orderId}</p>
+            <p><strong>Delivery:</strong> {order.delivery.town}, {order.delivery.location}</p>
+            <p><strong>Total:</strong> KES {order.total}</p>
+            <h4>Items</h4>
+            <ul>
+              {order.items.map((item, index) => (
+                <li key={index}>
+                  {item.product.name} - {item.quantity} x KES {item.price}
+                </li>
+              ))}
+            </ul>
+          </>
+        )}
+        
         <button className={styles.closeBtn} onClick={onClose}>Close</button>
       </div>
     </div>
   );
 };
+
 
 export default AccountPage;
