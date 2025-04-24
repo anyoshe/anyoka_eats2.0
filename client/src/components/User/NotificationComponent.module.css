@@ -75,3 +75,8 @@
     font-size: 0.9rem;
   }
   
+  /* NotificationComponent.module.css */
+.unread {
+  background-color: #f2f6ff;
+  font-weight: 600;
+}

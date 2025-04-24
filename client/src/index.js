@@ -7,21 +7,6 @@ import App from './App';
 import reportWebVitals from './reportWebVitals';
 import { AuthProvider } from './contexts/AuthContext';
 
-// Remove service worker registration
-// if ('serviceWorker' in navigator) {
-//   navigator.serviceWorker.getRegistrations().then((registrations) => {
-//     for (let registration of registrations) {
-//       registration
-//         .unregister()
-//         .then(() => {
-//           console.log('Service Worker unregistered:', registration);
-//         })
-//         .catch((error) => {
-//           console.error('Service Worker unregistration failed:', error);
-//         });
-//     }
-//   });
-// }
 
 // ✅ Register service worker for notifications
 if ('serviceWorker' in navigator) {

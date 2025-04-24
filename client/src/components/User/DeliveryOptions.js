@@ -1,6 +1,7 @@
-// components/DeliveryOptions.js
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import config from '../../config';
+import styles from './DeliveryOptions.module.css';
+
 
 const DELIVERY_CONFIG = {
   baseFee: 100,
@@ -10,10 +11,14 @@ const DELIVERY_CONFIG = {
   interTownFee: 200,
 };
 
-const DeliveryOptions = ({ cart, userLocation, deliveryTown, onDeliveryOptionSelected }) => {
-  const [deliveryCost, setDeliveryCost] = useState(null);
+const DeliveryOptions = ({ cart, userLocation, deliveryTown, onDeliveryOptionSelected, handleDeliveryChange }) => {
+  const [deliveryFee, setDeliveryFee] = useState(null);
   const [distanceInfo, setDistanceInfo] = useState([]);
   const [option, setOption] = useState('platform');
+  const [calculating, setCalculating] = useState(false);
+  const [requestId, setRequestId] = useState(0);
+  const latestRequestRef = useRef(0);
+
 
   const geocodeAddress = async (address) => {
     const response = await fetch(
@@ -40,58 +45,73 @@ const DeliveryOptions = ({ cart, userLocation, deliveryTown, onDeliveryOptionSel
     }
   };
 
-  const calculateDeliveryCost = async () => {
+  const calculateDeliveryFee = async () => {
     if (!userLocation || cart.length === 0) return;
+  
+    const currentRequestId = requestId + 1;
+    setRequestId(currentRequestId);
+    latestRequestRef.current = currentRequestId;
+   
+    setCalculating(true); // START calculating
+  onDeliveryOptionSelected(null, 'platform', true);
 
     const shopAddresses = cart.map(item => item.shop.location);
     const uniqueShops = [...new Set(shopAddresses)];
-
+  
     try {
       const shopCoordsList = await Promise.all(uniqueShops.map(addr => geocodeAddress(addr)));
       const userGeo = await geocodeAddress(userLocation);
       const userCoords = userGeo.coords;
       const deliveryTownDetected = userGeo.town?.toLowerCase();
-
+  
       const origins = shopCoordsList.map(c => c.coords).join('|');
       const response = await fetch(`${config.backendUrl}/api/distance?origins=${origins}&destinations=${userCoords}`);
       const data = await response.json();
-
+  
+      if (currentRequestId !== latestRequestRef.current) {
+        console.log('Ignored stale delivery calculation.');
+        return;
+      }
+  
       if (data.status !== 'OK') throw new Error('Failed to fetch distance');
-
+  
       const elements = data.rows.map(row => row.elements[0]);
-      let maxDistanceInKm = 0;
-
+  
+      let maxDistanceInKm = null;
       elements.forEach((el, idx) => {
         if (el.status === 'OK' && el.distance?.value != null) {
           const distanceInKm = el.distance.value / 1000;
-          maxDistanceInKm = Math.max(maxDistanceInKm, distanceInKm);
+          if (maxDistanceInKm === null || distanceInKm > maxDistanceInKm) {
+            maxDistanceInKm = distanceInKm;
+          }
         } else {
           console.warn(`Invalid distance for shop at index ${idx}:`, el);
         }
       });
-
+  
+      if (maxDistanceInKm === null) throw new Error('Could not determine any valid shop-to-user distances.');
+  
       const extraKm = Math.max(0, maxDistanceInKm - DELIVERY_CONFIG.freeLimitKm);
       const baseDeliveryFee = DELIVERY_CONFIG.baseFee + (extraKm * DELIVERY_CONFIG.perKmFee);
       let totalFee = baseDeliveryFee;
-
+  
       if (uniqueShops.length > 1) {
         totalFee += (uniqueShops.length - 1) * DELIVERY_CONFIG.extraShopHandlingFee;
       }
-
+  
       const shopTowns = await Promise.all(uniqueShops.map(async (addr) => {
         const result = await geocodeAddress(addr);
         return result.town?.toLowerCase();
       }));
-      
+  
       const anyDifferentTown = shopTowns.some(town =>
         town && deliveryTownDetected && town !== deliveryTownDetected
       );
-      
-
+  
       if (anyDifferentTown) {
         totalFee += DELIVERY_CONFIG.interTownFee;
       }
-
+  
       const details = elements.map((el, idx) => {
         if (el.status === 'OK' && el.distance?.value != null) {
           const distanceInKm = el.distance.value / 1000;
@@ -110,32 +130,45 @@ const DeliveryOptions = ({ cart, userLocation, deliveryTown, onDeliveryOptionSel
           };
         }
       });
-
-      setDistanceInfo(details);
-      const finalCost = Math.ceil(totalFee);
-      setDeliveryCost(finalCost);
-      onDeliveryOptionSelected(finalCost);
-
+  
+      // Final safety check before updating state
+      if (currentRequestId === latestRequestRef.current) {
+        setDistanceInfo(details);
+        const finalCost = Math.ceil(totalFee);
+        setDeliveryFee(finalCost);
+        onDeliveryOptionSelected(finalCost, 'platform', false);
+      }
+  
     } catch (error) {
-      console.error('Error calculating delivery:', error);
-      alert('Could not calculate delivery cost. Try again.');
+      if (currentRequestId === latestRequestRef.current) {
+        console.error('Error calculating delivery:', error);
+        alert('Could not calculate delivery cost. Try again.');
+        onDeliveryOptionSelected(null, 'platform', false);
+      }
+    } finally {
+      if (currentRequestId === latestRequestRef.current) {
+        setCalculating(false); // FINISHED
+      }
     }
   };
 
   useEffect(() => {
     if (option === 'platform') {
-      calculateDeliveryCost();
+      calculateDeliveryFee();
     } else {
-      setDeliveryCost(0);
-      onDeliveryOptionSelected(0);
+      setDeliveryFee(0);
+      setDistanceInfo([]);
+      setCalculating(false);
+      onDeliveryOptionSelected(0, 'own', false); // notify parent
     }
   }, [option, userLocation]);
+  
 
   return (
-    <div className="deliveryOptions">
-      <h4>Delivery Options</h4>
+    <div className={styles.wrapper}>
+      <h4 className={styles.heading}>Delivery Options</h4>
 
-      <label>
+      <label className={styles.option}>
         <input
           type="radio"
           value="platform"
@@ -145,7 +178,7 @@ const DeliveryOptions = ({ cart, userLocation, deliveryTown, onDeliveryOptionSel
         Use our Delivery Service
       </label>
 
-      <label>
+      <label className={styles.option}>
         <input
           type="radio"
           value="own"
@@ -156,16 +189,17 @@ const DeliveryOptions = ({ cart, userLocation, deliveryTown, onDeliveryOptionSel
       </label>
 
       {option === 'platform' && (
-        <div className="deliveryBreakdown">
-          <h5>Delivery Cost: KSH {deliveryCost}</h5>
+        <div className={styles.deliveryBreakdown}>
+          <h5>Delivery Cost: KSH {deliveryFee}</h5>
           {distanceInfo.map((info, idx) => (
-            <div key={idx}>
+            <div key={idx} className={styles.deliveryLine}>
               From: {info.shop} — {info.distance} km → KSH {info.fee}
             </div>
           ))}
         </div>
       )}
     </div>
+
   );
 };
 
