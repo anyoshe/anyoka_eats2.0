@@ -1,0 +1,449 @@
+@import url('https://fonts.googleapis.com/css2?family=Winky+Sans:ital,wght@0,300..900;1,300..900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&family=Winky+Sans:ital,wght@0,300..900;1,300..900&display=swap');
+
+/* ======= Root & Global Reset ======= */
+:root {
+    --green: #1ea509;
+    --orange: #ffa500;
+    --white: #ffffff;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: "Winky Sans", sans-serif;
+}
+
+/* ======= Hero Header Section ======= */
+.heroHeader {
+    position: relative;
+    width: 100%;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-bottom: 9rem;
+}
+
+.landingNav {
+    position: fixed;
+    z-index: 100;
+    width: 100%;
+    padding: 0.3em 3em;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background-color: var(--orange);
+}
+
+.homeLogoPic {
+    background-color: var(--white);
+    display: flex;
+    align-items: center;
+    border-radius: 50%;
+}
+
+.logoImg {
+    border-radius: 50%;
+    width: 2.5em;
+    height: 2.5em;
+    background-color: var(--orange);
+    margin: 0.1rem;
+}
+
+.logInButton {
+    padding: 0.5rem 1rem;
+    font-size: 1em;
+    border-radius: 60rem;
+    border: none;
+    background-color: var(--green);
+    color: var(--white);
+    cursor: pointer;
+    transition: 0.2s ease-in;
+}
+
+.logInButton:hover {
+    background-color: white;
+    color: var(--orange);
+    outline: 1px solid var(--orange);
+    font-size: 1.2rem;
+}
+
+.fa-sign-in-alt {
+    padding-right: 0.5rem;
+}
+
+/* ======= Hero Ads Section ======= */
+.heroAdsDiv {
+    margin-top: 2.5em;
+    display: flex;
+    align-items: row;
+    gap: 1em;
+    padding: 1em;
+}
+
+.adsDiv {
+    display: flex;
+    align-items: center;
+    padding: 1rem;
+    gap: 2rem;
+    border-radius: 1rem;
+}
+
+.leftAd {
+    background-color: var(--orange);
+}
+
+.rightAd {
+    background-color: var(--orange);
+}
+
+.adtext {
+    width: 80%;
+    text-align: justify;
+    font-size: 0.9em;
+}
+
+.adImage {
+    width: 15em;
+    height: 15em;
+    border-radius: 50%;
+}
+
+/* ======= Category Section ======= */
+.categorySection {
+    position: relative;
+    width: 80%;
+}
+
+.categoryListH2{
+    text-align: center;
+}
+
+.searchContainer {
+    position: relative;
+    width: 100%;
+    max-width: 20rem;
+    margin: 1rem auto;
+  }
+  
+.searchInput {
+    width: 100%;
+    padding: 0.7rem 2.5rem 0.7rem 1rem;
+    border-radius: 2rem;
+    border: none;
+    outline: 1px solid #ccc;
+    font-size: 1rem;
+    cursor: pointer;
+}
+
+.searchInput:hover{
+    outline: 1px solid var(--orange);
+}
+
+.searchIcon {
+    position: absolute;
+    right: 1rem;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--green);
+    font-size: 1.2rem;
+    cursor: pointer;
+}
+  
+.searchContainer:hover .searchIcon {
+    color: var(--orange);
+}
+
+
+.categoryDivs {
+    display: flex;
+    overflow: hidden;
+    width: 100%;
+    justify-content: space-around;
+    padding: 0.5rem;
+}
+
+.categoryDiv {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding-top: 1rem;
+}
+
+.categoryPic {
+    border-radius: 50%;
+    padding: 1.2rem;
+    /* background-color: var(--orange); */
+    font-size: 2.2rem;
+    display: block;
+    margin: 0 auto 0.5rem auto;
+    color: var(--orange);
+}
+
+.slow1 { --fa-animation-duration: 2.5s; }
+.slow2 { --fa-animation-duration: 4s; }
+.slow3 { --fa-animation-duration: 3.2s; }
+.slow4 { --fa-animation-duration: 2s; }
+.slow5 { --fa-animation-duration: 5s; }
+.slow6 { --fa-animation-duration: 3s; }
+.slow7 { --fa-animation-duration: 5s; }
+
+.categoryText {
+    font-size: 0.9rem;
+    padding: 0.2rem;
+    font-weight: 500;
+    color: var(--white);
+    border-radius: 0.5rem;
+    width: 7rem;
+    text-align: center;
+    margin-top: 1rem;
+    background-color: var(--green);
+    border: none;
+    outline: none;
+    cursor: pointer;
+    transition: 0.2s ease-in;
+}
+
+.categoryText:hover{
+    color: var(--orange);
+    background-color: var(--white);
+    outline: 1px solid var(--orange);
+}
+
+.categoryText:active {
+    transform: scale(0.96);
+    box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.2);
+    transition: transform 0.05s ease;
+}
+
+.categoryDivsWrapper {
+    display: flex;
+    gap: 2em;
+}
+
+/* ======= Landing Body Section ======= */
+.landingBodyContainer {
+    height: 100vh;
+    width: 100%;
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+    margin-top: 2em;
+}
+
+.landingWrapper {
+    width: 80%;
+}
+
+.h1Shield {
+    padding: 0rem 2rem;
+    font-size: 3rem;
+    color: var(--green);
+}
+
+.storeDivsWrapper {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    column-gap: 1em;
+    row-gap: 1rem;
+    width: 100%;
+    padding-top: 1em;
+}
+
+.imageDiv {
+    height: 7rem;
+    border-radius: 0.5rem;
+}
+
+.storeImage {
+    width: 100%;
+    height: 100%;
+    border-radius: 0.5rem;
+}
+
+.storeName {
+    font-size: 1rem;
+    padding-top: 0.2rem;
+}
+
+.starIcon {
+    font-size: 0.8rem;
+    color: var(--orange);
+}
+
+/* ======= Partnership Section ======= */
+.partnershipSection {
+    width: 100%;
+    height: 90vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding-top: 2em;
+    padding: 4rem 1rem;
+    text-align: center;
+    background-color: #f9f9f9;
+    margin-bottom: 3rem;
+}
+
+.sectionTitle {
+    font-size: 2rem;
+    margin-bottom: 3rem;
+}
+
+.puzzleContainer {
+    display: flex;
+    justify-content: center;
+    align-items: stretch;
+    gap: 0;
+    flex-wrap: wrap;
+}
+
+.puzzlePiece {
+    width: 23rem;
+    height: 23rem;
+    margin: -0.625rem;
+    padding: 1rem;
+    background-color: #ccc;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    opacity: 0;
+    transform: translateY(3.125rem);
+    animation: snapIn 0.8s ease forwards;
+    text-align: center;
+    overflow: hidden;
+    box-sizing: border-box;
+}
+
+.promoImg {
+    width: 10rem;
+    height: 10rem;
+    border-radius: 50%;
+    object-fit: cover;
+    margin-bottom: 0.2rem;
+}
+
+.pieceContent {
+    padding: 0.5rem;
+    color: #fff;
+    z-index: 2;
+}
+
+.platformPieceContent {
+    transform: translateY(50%);
+    padding-top: 1.2rem;
+}
+
+.pieceContent h3 {
+    font-size: 1.5rem;
+    margin-bottom: 0.1rem;
+}
+
+.pieceContent p {
+    font-size: 1rem;
+    line-height: 1.5;
+}
+
+.vendor {
+    background-color: #f39c12;
+    animation-delay: 0s;
+}
+
+.platform {
+    background-color: #3498db;
+    clip-path: polygon(
+        0% 0%, 10% 0%, 10% 30%, 0% 30%, 0% 70%, 10% 70%, 10% 100%, 90% 100%, 
+        90% 70%, 100% 70%, 100% 30%, 90% 30%, 90% 0%, 0% 0%
+    );
+    animation-delay: 0.4s;
+    z-index: 5;
+    transform: translateY(50%);
+    padding-top: 3.5rem;
+}
+
+.driver {
+    background-color: #2ecc71;
+    animation-delay: 0.8s;
+}
+
+@keyframes snapIn {
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.puzzlePiece:hover {
+    transform: scale(1.03);
+    transition: transform 0.3s ease;
+}
+
+@media (max-width: 48rem) {
+    .puzzleContainer {
+        flex-direction: column;
+        gap: 2rem;
+        align-items: center;
+    }
+
+    .puzzlePiece {
+        width: 90%;
+        height: auto;
+        clip-path: none;
+        border-radius: 1rem;
+        animation: snapInUp 0.8s ease forwards;
+    }
+
+    .promoImg {
+        width: 10rem;
+        height: 10rem;
+    }
+
+    @keyframes snapInUp {
+        from {
+            opacity: 0;
+            transform: translateY(3.75rem);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+}
+
+.vendorCta,
+.deliveryCta {
+    display: inline-block;
+    margin-top: 0.5rem;
+    padding: 0.4rem 2rem;
+    font-size: 1rem;
+    color: var(--white);
+    text-decoration: none;
+    border-radius: 0.5rem;
+    transition: background-color 0.3s ease;
+}
+
+.vendorCta {
+    background-color: var(--green);
+    border: none;
+}
+
+.vendorCta:hover {
+    background-color: var(--white);
+    color: var(--orange);
+    outline: 1px solid var(--orange);
+}
+
+.deliveryCta {
+    background-color: var(--orange);
+}
+
+.deliveryCta:hover {
+    background-color: var(--white);
+    color: var(--orange);
+    outline: 1px solid var(--orange);
+}

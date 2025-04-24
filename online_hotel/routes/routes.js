@@ -247,6 +247,16 @@ router.post('/upload-profile-image', (req, res) => {
 });
 
 
+// Route to fetch all partners
+router.get('/partners', async (req, res) => {
+  try {
+    const partners = await Partner.find({ role: 'partner' }); // Fetch all partners
+    res.status(200).json(partners);
+  } catch (error) {
+    console.error('Error fetching partners:', error);
+    res.status(500).json({ message: 'Failed to fetch partners', error });
+  }
+});
 
 // Dealing with the user
 
@@ -879,6 +889,23 @@ router.get('/distance', async (req, res) => {
   } catch (err) {
     console.error('Error fetching from Google:', err);
     res.status(500).json({ error: 'Google API fetch failed' });
+  }
+});
+
+// Route: /api/products-by-partner/:partnerId
+router.get('/products-by-partner/:partnerId', async (req, res) => {
+
+  const { partnerId } = req.params;
+  console.log(req.params);
+  try {
+    const products = await Product.find({ 'shop.shopId': partnerId });
+
+    res.status(200).json({ products });
+
+    console.log(products);
+  } catch (err) {
+    console.error('Error fetching partner products:', err);
+    res.status(500).json({ message: 'Failed to get products' });
   }
 });
 
