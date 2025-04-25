@@ -3,7 +3,6 @@ import styles from './ShopSection.module.css';
 import ProductModal from './ProductModal';
 import ProductList from './ProductList';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faSearch } from "@fortawesome/free-solid-svg-icons";
 import config from '../../config'; 
 import { faPlus } from '@fortawesome/free-solid-svg-icons';
 

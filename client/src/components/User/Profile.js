@@ -7,6 +7,7 @@ import config from '../../config';
 import MapSelector from './MapSelector';
 
 
+
 const Profile = ({ onSave }) => {
     const { partner, updatePartnerDetails } = useContext(PartnerContext);
     const [editImageMode, setEditImageMode] = useState(false);
@@ -15,22 +16,8 @@ const Profile = ({ onSave }) => {
     const [isMapVisible, setIsMapVisible] = useState(false);
     const [originalTown, setOriginalTown] = useState('');
     const [originalLocation, setOriginalLocation] = useState('');
-
-
-
-    const handleLocationSelect = (plusCode) => {
-        setLocation(plusCode);
-    };
-
-    // const toggleMapVisibility = () => {
-    // };
-
-    const toggleMapVisibility = () => {
-        setIsMapVisible((prev) => !prev);
-    };
-
-    
-
+    const [mapCenter, setMapCenter] = useState({ lat: -1.286389, lng: 36.817223 }); // default Nairobi
+    const [showMap, setShowMap] = useState(false);
     const [formData, setFormData] = useState({
         businessName: '',
         contactNumber: '',
@@ -42,6 +29,33 @@ const Profile = ({ onSave }) => {
         description: '',
         businessPermit: ''
     });
+
+    const handleInputChange = (event) => {
+        const { name, value, files } = event.target;
+        if (files) {
+            setFormData({ ...formData, [name]: files[0] });
+        } else {
+            setFormData({ ...formData, [name]: value });
+            // Update map center dynamically based on town
+            if (name === 'town') {
+                const geocoder = new window.google.maps.Geocoder();
+                geocoder.geocode({ address: value }, (results, status) => {
+                    if (status === 'OK' && results[0]?.geometry?.location) {
+                        const { lat, lng } = results[0].geometry.location;
+                        setMapCenter({ lat: lat(), lng: lng() });
+                        setShowMap(true);
+                    }
+                });
+            }
+        }
+    };
+
+
+    const handleLocationSelect = (location) => {
+        setFormData((prev) => ({ ...prev, location }));
+    };
+
+
 
     const profileImageInputRef = useRef(null);
     useEffect(() => {
@@ -66,6 +80,17 @@ const Profile = ({ onSave }) => {
                             });
                             setOriginalTown(response.data.town || '');
                             setOriginalLocation(response.data.location || '');
+
+                            if (response.data.town) {
+                                const geocoder = new window.google.maps.Geocoder();
+                                geocoder.geocode({ address: response.data.town }, (results, status) => {
+                                    if (status === 'OK' && results[0]?.geometry?.location) {
+                                        const { lat, lng } = results[0].geometry.location;
+                                        setMapCenter({ lat: lat(), lng: lng() });
+                                    }
+                                });
+                            }
+                            
                         }
 
                     }
@@ -122,11 +147,6 @@ const Profile = ({ onSave }) => {
         }
     };
 
-    const handleInputChange = (e) => {
-        const { name, value } = e.target;
-        setFormData(prev => ({ ...prev, [name]: value }));
-    };
-
     return (
         <div className={styles.profile_wrapper}>
             <div id="profileContent" className={styles.profileContent}>
@@ -142,18 +162,18 @@ const Profile = ({ onSave }) => {
                             id="profileImagePreview"
                             src={partner?.profileImage ? `${config.backendUrl}${partner.profileImage.replace(/\\/g, '/')}` : profileImg}
                             alt="Profile"
-                            
+
                             className={styles.profileImage}
                             onClick={() => editImageMode && profileImageInputRef.current.click()}
                         />
-                       
+
                         <div className={styles.image_buttons}>
                             <button className={styles.edit_btn} onClick={toggleEditImageMode} title={editImageMode ? 'Cancel' : 'Edit Picture'}>
                                 <i className={`fas ${editImageMode ? 'fa-times' : 'fa-edit'}`}></i>
                             </button>
 
                             {editImageMode && (
-                               
+
                                 <button className={styles.save_btn} onClick={saveProfileImage} title="Save">
                                     <i className="fas fa-save"></i>
                                 </button>
@@ -161,7 +181,7 @@ const Profile = ({ onSave }) => {
                         </div>
                     </div>
 
-                
+
                     <div className={`${styles.profileItem} ${styles.permit}`}>
                         <strong>Business Permit:</strong>
                         <a
@@ -170,13 +190,13 @@ const Profile = ({ onSave }) => {
                             target="_blank"
                             rel="noopener noreferrer"
                             className={styles.permitLink}
-                           
+
                         >
                             View Permit
                         </a>
                     </div>
 
-                    
+
                     <div className={`${styles.profileItem} ${styles.profileItemShop}`}>
                         <strong>Shop Name:</strong>
                         {editSectionMode ? (
@@ -186,7 +206,7 @@ const Profile = ({ onSave }) => {
                         )}
                     </div>
 
-                    
+
                     <div className={styles.profileItem}>
                         <strong>Business Category:</strong>
                         {editSectionMode ? (
@@ -196,7 +216,7 @@ const Profile = ({ onSave }) => {
                         )}
                     </div>
 
-                    
+
                     <div className={styles.profileItem}>
                         <strong>Town or Centre:</strong>
                         {editSectionMode ? (
@@ -206,7 +226,7 @@ const Profile = ({ onSave }) => {
                         )}
                     </div>
 
-                   
+
                     <div className={styles.profileItem}>
                         <strong>Phone Number:</strong>
                         {editSectionMode ? (
@@ -216,7 +236,7 @@ const Profile = ({ onSave }) => {
                         )}
                     </div>
 
-                    
+
                     <div className={styles.profileItem}>
                         <strong>Email:</strong>
                         {editSectionMode ? (
@@ -226,7 +246,7 @@ const Profile = ({ onSave }) => {
                         )}
                     </div>
 
-                   
+
                     <div className={styles.profileItem}>
                         <strong>ID Number:</strong>
                         {editSectionMode ? (
@@ -250,39 +270,36 @@ const Profile = ({ onSave }) => {
                                     <button
                                         type="button"
                                         className={styles.edit_btn}
-                                        onClick={toggleMapVisibility}
-                                        title={isMapVisible ? 'Hide Map' : 'Edit Location'}
+                                        onClick={() => setShowMap(true)}
+                                        title={showMap ? 'Hide Map' : 'Edit Location'}
                                     >
-                                        <i className={`fas ${isMapVisible ? 'fa-times' : 'fa-pen'}`}></i>
+                                        <i className={`fas ${showMap ? 'fa-times' : 'fa-pen'}`}></i>
                                     </button>
                                 </div>
 
-                                {/* {isMapVisible && (
-                                    <MapSelector
-                                        onLocationSelect={(plusCode) =>
-                                            setFormData((prev) => ({ ...prev, location: plusCode }))
-                                        }
-                                    />
-                                )} */}
-                                {isMapVisible && (
+
+                                {showMap && (
                                     <div className={styles.mapModalOverlay}>
                                         <div className={styles.mapModalContent}>
                                             <button
-                                                onClick={toggleMapVisibility}
+                                                onClick={() => setShowMap(false)}
                                                 className={styles.mapModalClose}
                                                 title="Close Map"
                                             >
                                                 &times;
                                             </button>
+
                                             <MapSelector
-                                                onLocationSelect={(plusCode) => {
-                                                setFormData((prev) => ({ ...prev, location: plusCode }));
-                                                setIsMapVisible(false); // close modal after selection
+                                                onLocationSelect={(location) => {
+                                                    handleLocationSelect(location);
+                                                    setShowMap(false);
                                                 }}
+                                                center={mapCenter} // 👈 pass the current map center
                                             />
                                         </div>
                                     </div>
                                 )}
+
 
 
                             </>
@@ -291,7 +308,7 @@ const Profile = ({ onSave }) => {
                         )}
                     </div>
 
-                   
+
                     <div className={`${styles.profileItem} ${styles.profileDescriptionDiv}`}>
                         <strong>Description:</strong>
                         {editSectionMode ? (
@@ -307,10 +324,10 @@ const Profile = ({ onSave }) => {
                     </div>
                 </div>
 
-               
+
                 <div className={styles.details_buttons}>
                     <button
-                       
+
                         className={styles.edit_btn}
                         onClick={toggleEditSection}
                         title={editSectionMode ? 'Cancel' : 'Edit Details'}
@@ -319,7 +336,7 @@ const Profile = ({ onSave }) => {
                     </button>
 
                     {editSectionMode && (
-                       
+
                         <button className={styles.save_btn} onClick={saveSection} title="Save Changes">
                             <i className="fas fa-save"></i>
                         </button>

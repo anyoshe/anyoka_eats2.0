@@ -283,6 +283,9 @@ const CheckoutModal = ({ isOpen, onClose, cart, total }) => {
   const { user, setRedirectPath } = useContext(AuthContext);
   const [savedLocations, setSavedLocations] = useState([]);
   const [isAddingNewLocation, setIsAddingNewLocation] = useState(false);
+  const [deliveryOption, setDeliveryOption] = useState('platform'); // add to state
+  const [isDeliveryFeeReady, setIsDeliveryFeeReady] = useState(false);
+  const [isDeliveryCalculating, setIsDeliveryCalculating] = useState(false);
 
   const location = useLocation();
 
@@ -295,7 +298,15 @@ const CheckoutModal = ({ isOpen, onClose, cart, total }) => {
   const [mapCenter, setMapCenter] = useState({ lat: -3.2192, lng: 40.1169 });
   const [isEditingLocation, setIsEditingLocation] = useState(false);
   const [showAuthPrompt, setShowAuthPrompt] = useState(false);
-  const [deliveryFee, setDeliveryFee] = useState(100);
+  const [deliveryFee, setDeliveryFee] = useState(null); // Default
+
+
+  const handleDeliveryChange = (fee, option, calculating) => {
+    setDeliveryFee(fee);
+    setDeliveryOption(option);
+    setIsDeliveryCalculating(calculating);
+    setIsDeliveryFeeReady(!calculating && fee !== null);
+  };
 
   useEffect(() => {
     const fetchSavedLocations = async () => {
@@ -354,6 +365,7 @@ const CheckoutModal = ({ isOpen, onClose, cart, total }) => {
     setFormState((prev) => ({ ...prev, selectedLocation: location }));
   };
 
+  
   const handleSaveLocation = async () => {
     if (!formState.selectedLocation.trim() || !formState.town.trim()) {
       alert('Please enter both a town and pin your location.');
@@ -491,12 +503,18 @@ const CheckoutModal = ({ isOpen, onClose, cart, total }) => {
                 </div>
               ))}
 
+
               <DeliveryOptions
                 cart={cart}
                 userLocation={formState.selectedLocation}
                 deliveryTown={formState.town}
-                onDeliveryOptionSelected={(fee) => setDeliveryFee(fee)}
+                onDeliveryOptionSelected={(fee, option) => {
+                  setDeliveryFee(fee);
+                  setDeliveryOption(option); // New: you need to track this in CheckoutModal!
+                  setIsDeliveryFeeReady(option === 'own' || (option === 'platform' && fee > 0));
+                }}
               />
+
 
               <div className={`${styles.orderItem} ${styles.total}`}>
                 <strong>Total:</strong> KSH {total + deliveryFee}
@@ -507,8 +525,11 @@ const CheckoutModal = ({ isOpen, onClose, cart, total }) => {
               cart={cart}
               total={total}
               deliveryFee={deliveryFee}
+              deliveryOption={deliveryOption}
+              deliveryTown={formState.town}
+              isDeliveryFeeReady={isDeliveryFeeReady}
               deliveryLocation={formState.selectedLocation}
-              clearCart={() => {}}
+              clearCart={() => { /* clear context cart */ }}
               onSuccess={() => alert('Order placed!')}
               onError={msg => alert(`Order error: ${msg}`)}
             />

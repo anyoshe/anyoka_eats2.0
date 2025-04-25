@@ -1,4 +1,5 @@
 import React, { useEffect, useState, useContext, useRef } from 'react';
+import { useLocation } from 'react-router-dom';
 import styles from './MenuPage.module.css';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap/dist/js/bootstrap.bundle.min';
@@ -18,11 +19,15 @@ import { faTruck } from '@fortawesome/free-solid-svg-icons';
 
 const MenuPage = () => {
   const navigate = useNavigate();
+  const location = useLocation();
+  const params = new URLSearchParams(location.search);
+  const selectedCategory = params.get('category');
   const { currentProduct, setCurrentProduct, user, setRedirectPath } = useContext(AuthContext);
   const [productsByCategory, setProductsByCategory] = useState({});
   const { cart, addToCart } = useContext(CartContext);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState(null);
+  const [loading, setLoading] = useState(true);
   const [showCart, setShowCart] = useState(false);
 
   useEffect(() => {
@@ -32,6 +37,7 @@ const MenuPage = () => {
   useEffect(() => {
     const fetchProducts = async () => {
       try {
+        setLoading(true);
         const response = await axios.get(`${config.backendUrl}/api/all-products`);
         const products = response.data.products || [];
 
@@ -46,6 +52,8 @@ const MenuPage = () => {
         setProductsByCategory(groupedProducts);
       } catch (error) {
         console.error('Error fetching products:', error);
+      } finally {
+        setLoading(false); // End loading
       }
     };
 
@@ -107,7 +115,7 @@ const MenuPage = () => {
   };
 
   return (
-    
+
     <div className={styles.storeWrapper}>
       <div className={styles.bodyWrapper}>
         <section className={styles.dispalySection}>
@@ -146,20 +154,20 @@ const MenuPage = () => {
                     )}
 
 
-                    <img
-                      src={getImageSrc(product)}
-                      alt={product.name}
-                      className={styles.categorySectionImage}
-                      
-                      onError={(e) => {
-                        e.target.onerror = null;
-                        e.target.src = '/path/to/placeholder-image.jpg';
-                      }}
-                    />
+                            <img
+                              src={getImageSrc(product)}
+                              alt={product.name}
+                              className={styles.categorySectionImage}
 
-                    <p className={`${styles.categorySectionName} ${styles.categorySectionP}`}>
-                      {product.name}
-                    </p>
+                              onError={(e) => {
+                                e.target.onerror = null;
+                                e.target.src = '/path/to/placeholder-image.jpg';
+                              }}
+                            />
+
+                            <p className={`${styles.categorySectionName} ${styles.categorySectionP}`}>
+                              {product.name}
+                            </p>
 
                     <div className={styles.priceQuantityRow}>
                       {/* If there’s a discount, show original price with strikethrough */}
