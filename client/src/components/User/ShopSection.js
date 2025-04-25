@@ -5,7 +5,6 @@ import ProductList from './ProductList';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import config from '../../config'; 
 import { faPlus } from '@fortawesome/free-solid-svg-icons';
-import { faSearch } from "@fortawesome/free-solid-svg-icons";
 
 const ShopSection = () => {
     const [products, setProducts] = useState([]);

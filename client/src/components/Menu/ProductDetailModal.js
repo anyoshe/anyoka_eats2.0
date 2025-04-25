@@ -133,8 +133,10 @@ const ProductDetailModal = ({ isOpen, onRequestClose, product, onAddToCart }) =>
         {/* Review interaction controls */}
         {/* <div className="review-controls"> */}
         <div className={styles.reviewControls}>
-        <div className={styles.modalRating}>
-            <h3>Rate this Product</h3>
+          <div className={styles.modalRating}>
+
+            <h3 className={styles.modalRatingH3}>Rate this Product</h3>
+            
             {[1, 2, 3, 4, 5].map((star) => (
               <FontAwesomeIcon
                 key={star}
@@ -149,18 +151,20 @@ const ProductDetailModal = ({ isOpen, onRequestClose, product, onAddToCart }) =>
           </div>
 
           <div className={styles.bottomContent}>
-          <div className={styles.modalComments}>
-            <textarea
-              value={comment}
-              onChange={(e) => setComment(e.target.value)}
-              placeholder="Leave a comment..."
-              className={styles.commentBox}
-            />
-            <button onClick={handleAddComment} className={styles.submitComment}>
-              Submit Comment
-            </button>
+            <div className={styles.modalComments}>
+              <textarea
+                value={comment}
+                onChange={(e) => setComment(e.target.value)}
+                placeholder="Leave a comment..."
+                className={styles.commentBox}
+              />
+
+              <button onClick={handleAddComment} className={styles.submitComment}>
+                Submit Comment
+              </button>
+
+            </div>
           </div>
-        </div>
         </div>
         <button onClick={() => onAddToCart(product)} className={styles.addToCartButton}>
           Add to Cart
