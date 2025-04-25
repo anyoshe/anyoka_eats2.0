@@ -16,6 +16,8 @@ import { faStar as regularStar } from '@fortawesome/free-regular-svg-icons';
 import CartSection from '../User/CartSection';
 import { CartContext } from '../../contexts/CartContext';
 import { faTruck } from '@fortawesome/free-solid-svg-icons';
+import Logout from '../User/UserLogout';
+
 
 const MenuPage = () => {
   const navigate = useNavigate();
@@ -118,6 +120,7 @@ const MenuPage = () => {
   return (
 
     <div className={styles.storeWrapper}>
+      <Logout /> 
       <div className={styles.bodyWrapper}>
 
         {loading ? (

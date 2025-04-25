@@ -131,6 +131,8 @@ const deleteNotification = async (notifId) => {
     if (socket) {
       socket.disconnect();
       setSocket(null);
+      setToken(null);
+
     }
   };
 

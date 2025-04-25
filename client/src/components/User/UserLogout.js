@@ -3,27 +3,20 @@ import { useNavigate } from 'react-router-dom';
 import { AuthContext } from '../../contexts/AuthContext';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faSignOutAlt } from '@fortawesome/free-solid-svg-icons';
-import './UserLogout.css'; // Optional: Add styles for the logout icon
+import styles from './UserLogout.module.css';
 
 const Logout = () => {
-  const { setUser, setIsLoggedIn } = useContext(AuthContext);
+  const { logout } = useContext(AuthContext);
   const navigate = useNavigate();
 
   const handleLogout = () => {
-    // Clear user data from AuthContext
-    setUser(null);
-    setIsLoggedIn(false);
-
-    // Remove user data from localStorage
-    localStorage.removeItem('userToken');
-    localStorage.removeItem('user');
-
-    // Redirect to the login or home page
+    logout(); 
     navigate('/');
   };
 
+
   return (
-    <div className="logout-icon" onClick={handleLogout} title="Logout">
+    <div className={styles.logoutIcon} onClick={handleLogout} title="Logout">
       <FontAwesomeIcon icon={faSignOutAlt} size="lg" />
     </div>
   );

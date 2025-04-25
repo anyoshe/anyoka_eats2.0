@@ -27,7 +27,7 @@ function App() {
             <PartnerProvider>
                
                 <CartProvider>
-                    <Logout />
+    
                     <Routes>
 
                         <Route path="/" element={<LandingPage />} />

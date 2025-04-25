@@ -12,7 +12,7 @@ const passport = require('passport');
 const jwt = require('jsonwebtoken');
 const LocalStrategy = require('passport-local').Strategy;
 const session = require('express-session');
-const { upload, uploadMultiple, uploadProfileImage, uploadBusinessPermit, uploadProductImages } = require('../config/multer');
+const { upload, uploadMultiple, uploadFiles, uploadProfileImage, uploadBusinessPermit, uploadProductImages } = require('../config/multer');
 const multer = require('multer');
 const path = require('path');
 const fs = require('fs');
@@ -120,13 +120,28 @@ router.post('/signup', uploadBusinessPermit, async (req, res) => {
       role
     };
 
-    if (req.file) {
-      newPartnerData.businessPermit = req.file.filename;
+  
+
+    // Check if business permit is uploaded
+    if (req.file && req.file.fieldname === 'businessPermit') {
+      newPartnerData.businessPermit = `/uploads/business-permits/${req.file.filename}`;
     }
 
     const newPartner = new Partner(newPartnerData);
     await newPartner.save();
-    res.status(201).json(newPartner);
+
+
+    // Generate JWT token after partner is created
+    const token = jwt.sign(
+      { _id: newPartner._id, role: newPartner.role },
+      process.env.JWT_SECRET,
+      { expiresIn: '7d' }
+    );
+
+    res.status(201).json({
+      token,
+      partner: newPartner
+    });
 
   } catch (error) {
     console.error('Sign-up failed:', error);
@@ -159,23 +174,6 @@ router.get('/partners/:partnerId', async (req, res) => {
 });
 
 // Update partner details Route
-// router.put('/partners/:id', async (req, res) => {
-
-//   try {
-//     const partnerId = req.params.id;
-//     const updatedData = req.body;
-
-//     const updatedPartner = await Partner.findByIdAndUpdate(
-//       partnerId,
-//       updatedData,
-//       { new: true }
-//     );
-
-//     res.status(200).json({ message: 'Partner updated successfully', updatedPartner });
-//   } catch (error) {
-//     res.status(500).json({ message: 'Failed to update partner', error });
-//   }
-// });
 
 router.put('/partners/:id', async (req, res) => {
   try {
@@ -247,6 +245,8 @@ router.post('/upload-profile-image', (req, res) => {
 });
 
 
+
+
 // Route to fetch all partners
 router.get('/partners', async (req, res) => {
   try {
@@ -314,7 +314,7 @@ router.post('/auth/userSignup', async (req, res) => {
     await newUser.save();
 
     // Generate a JWT token
-    const token = jwt.sign({ id: newUser._id }, JWT_SECRET, { expiresIn: '1h' });
+    const token = jwt.sign({ id: newUser._id }, JWT_SECRET, { expiresIn: '7d' });
 
     // Return the token and user details
     res.status(201).json({
@@ -424,7 +424,6 @@ router.post('/login', async (req, res) => {
     const token = jwt.sign(
       { _id: account._id, role },
       process.env.JWT_SECRET,
-      { expiresIn: '7d' }
     );
 
     // Respond with token and role
