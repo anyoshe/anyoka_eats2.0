@@ -10,7 +10,7 @@ export const AuthProvider = ({ children }) => {
     const storedUser = localStorage.getItem('user');
     return storedUser ? JSON.parse(storedUser) : null;
   });
-
+  const [currentStore, setCurrentStore] = useState(null);
   const [redirectPath, setRedirectPath] = useState('/');
   const [currentProduct, setCurrentProduct] = useState(null);
   const [token, setToken] = useState(() => localStorage.getItem('userToken'));
@@ -53,6 +53,8 @@ export const AuthProvider = ({ children }) => {
         token,
         setToken,
         logout,
+        currentStore,
+        setCurrentStore,
       }}
     >
       {children}

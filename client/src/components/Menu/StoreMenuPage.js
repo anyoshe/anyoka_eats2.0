@@ -6,7 +6,6 @@ import 'bootstrap/dist/js/bootstrap.bundle.min';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCartShopping, faCaretDown } from '@fortawesome/free-solid-svg-icons';
 import axios from 'axios';
-import '../User/ProductCard.css';
 import config from '../../config';
 import ProductDetailModal from './ProductDetailModal';
 import { AuthContext } from '../../contexts/AuthContext';
@@ -34,7 +33,7 @@ const StoreMenuPage = () => {
     useEffect(() => {
         console.log('User in MenuPage:', user);
     }, [user]);
-    
+
 
     useEffect(() => {
 
@@ -121,8 +120,9 @@ const StoreMenuPage = () => {
     return (
 
         <div className={styles.storeWrapper}>
-            <Logout /> 
+            <Logout />
             <div className={styles.bodyWrapper}>
+                  
                 {loading ? (
                     <div className={styles.loadingWrapper}>
                         <div className={styles.spinner}></div>
@@ -143,11 +143,12 @@ const StoreMenuPage = () => {
                                                 onClick={() => handleProductClick(product)}
                                             >
 
-                                                {/* Discounted price - shown above the image ONLY if there is a discount */}
-                                                {product.discountedPrice && (
-                                                    <p className="product-price discounted-now">
-                                                        Ksh {product.discountedPrice.toFixed(2)}
-                                                    </p>
+                                                {typeof product.discountedPrice === 'number' && product.discountedPrice > 0 && (
+                                                    <div className={styles.discountBadge}>
+                                                        <span>
+                                                            Ksh {product.discountedPrice.toFixed(1)}
+                                                        </span>
+                                                    </div>
                                                 )}
 
                                                 <img
@@ -165,39 +166,34 @@ const StoreMenuPage = () => {
                                                     {product.name}
                                                 </p>
 
-                                                <div className="priceQuantityRow">
-                                                    {/* If there’s a discount, show original price with strikethrough */}
-                                                    {product.discountedPrice ? (
-                                                        <span className="original-price-offer">
-                                                            Was{' '}
-                                                            <span className="diagonal-strikethrough linePrice">
-                                                                Ksh {product.price.toFixed(2)}
-                                                            </span>
-                                                        </span>
+                                                <div className={styles.priceQuantityRow}>
+                                                                      {/* If there’s a discount, show original price with strikethrough */}
+                                                                      {product.discountedPrice ? (
+                                                                        <span className={styles.originalPriceOffer}>
+                                                                          {/* Was{' '} */}
+                                                                          <span className={`${styles.diagonalStrikethrough} ${styles.linePrice}`}>
+                                                                            Ksh {product.price.toFixed(1)}
+                                                                          </span>
+                                                                        </span>
                                                     ) : (
                                                         // If no discount, just show normal price
-                                                        <p className="product-price">Price: Ksh {product.price.toFixed(2)}</p>
+                                                        <p className={styles.productPrice}>Ksh {product.price.toFixed(1)}</p>
                                                     )}
-                                                </div>
-
-
-                                                <div className={styles.priceQuantityRow}>
-                                                    <p className={`${styles.categorySectionPrice} ${styles.categorySectionP}`}>
-                                                        KSH:{product.price}
-                                                    </p>
                                                     <p className={`${styles.categorySectionQuantity} ${styles.categorySectionP}`}>
-                                                        <span>{product.quantity}</span>
-                                                        {product.unit}
-                                                    </p>
+                                                                            <span>{product.quantity}</span>
+                                                                            {product.unit}
+                                                                          </p>
                                                 </div>
 
 
-                                                <div className="ratingsDiv star-icon">
-                                                    {product.ratings?.average
-                                                        ? renderStars(product.ratings.average)
-                                                        : 'No ratings yet'}
-                                                </div>
+                                               
 
+
+                                                 <div className={`${styles.ratingsDiv} ${styles.starIcon}`}>
+                                                                      {product.ratings?.average
+                                                                        ? renderStars(product.ratings.average)
+                                                                        : 'No ratings yet'}
+                                                                    </div>
                                                 <div className={styles.addCartBtn}>
                                                     <button
                                                         className={styles.addToCartBtn}

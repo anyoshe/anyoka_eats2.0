@@ -56,7 +56,7 @@ const HeroHeader = () => {
                             <p class="categoryText">Fashion</p>
                         </div>
                     </Link>
-                    <Link to="/menu?category=Pet supplies">
+                    <Link to="/menu?category=Pet Supplies">
                         <div class="categoryDiv">
                             <i class="fas fa-dog fa-beat slow3 categoryPic"></i>
                             <p class="categoryText">Pet supplies</p>
@@ -81,7 +81,7 @@ const HeroHeader = () => {
                             <p class="categoryText">Health</p>
                         </div>
                     </Link>
-                    <Link to="/menu?category=Beauty">
+                    <Link to="/menu?category=Beauty & Personal Care">
                         <div class="categoryDiv">
                             <i className="fas fa-spa fa-flip slow7 categoryPic"></i>
                             <p class="categoryText">Beauty</p>
