@@ -6,8 +6,8 @@ import {
   faMinus,
   faTrash,
 } from '@fortawesome/free-solid-svg-icons';
-import './CartSection.css';
-import styles from '../Menu/MenuPage.module.css';
+import styles from './CartSection.module.css';
+// import styles from '../Menu/MenuPage.module.css';
 import { AuthContext } from '../../contexts/AuthContext';
 import CheckoutModal from './CheckoutModal';
 import { CartContext } from '../../contexts/CartContext';
@@ -65,35 +65,41 @@ const CartSection = () => {
   return (
     <section className={styles.cartSection}>
           <div className={styles.deliveryPointDiv}>
-          <p className={styles.deliveringP}>
+            <p className={styles.deliveringP}>
               <FontAwesomeIcon icon={faTruck} className={styles.deliveryTruck} />
               to 
               <span className={styles.locationChoice}>{getLocationText()}</span>
-              </p>
+            </p>
               <FontAwesomeIcon icon={faCaretDown} className={styles.deliveringIcon} />
-      </div>
+          </div>
 
       <div className={styles.cartWrapperDiv}>
-            <div className={styles.cartListDiv}>
-              {cart.map((item, index) => (
-                <div key={index} className={styles.cartItem}>
-                  <p className={styles.cartItemName}>{item.name}</p>
-             
-              <div className="cartQuantityControls">
-                <button onClick={() => handleDecrement(index)} className="quantityBtn">
+        <div className={styles.cartListDiv}>
+          {cart.map((item, index) => (
+            <div key={index} className={styles.cartItem}>
+              
+              <div className={styles.cartItemTop}>
+                <p className={styles.cartItemName}>{item.name}</p>
+                <p className={styles.cartItemPrice}>
+                  Ksh {item.price * (item.quantity || 1)}
+                </p>
+              </div>
+
+              <div className={styles.cartQuantityControls}>
+                <button onClick={() => handleDecrement(index)} className=       {styles.quantityBtn}>
                   <FontAwesomeIcon icon={faMinus} />
                 </button>
-                <span className="cartItemQty">{item.quantity || 1}</span>
-                <button onClick={() => handleIncrement(index)} className="quantityBtn">
+
+                <span className={styles.cartItemQty}>{item.quantity || 1}</span>
+
+                <button onClick={() => handleIncrement(index)} className={styles.quantityBtn}>
                   <FontAwesomeIcon icon={faPlus} />
                 </button>
-                <button onClick={() => handleRemove(index)} className="quantityBtn removeBtn">
+
+                <button onClick={() => handleRemove(index)} className={`${styles.quantityBtn} ${styles.removeBtn}`}>
                   <FontAwesomeIcon icon={faTrash} />
                 </button>
               </div>
-              <p className={styles.cartItemPrice}>
-                KSH {item.price * (item.quantity || 1)}
-              </p>
             </div>
           ))}
         </div>

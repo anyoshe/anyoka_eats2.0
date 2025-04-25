@@ -130,7 +130,6 @@ const Profile = ({ onSave }) => {
     return (
         <div className={styles.profile_wrapper}>
             <div id="profileContent" className={styles.profileContent}>
-            <div id="profileContent" className={styles.profileContent}>
                 <div className={styles.profileDetails}>
                     <div className={styles.profileImageContainer}>
                         <input
@@ -237,7 +236,6 @@ const Profile = ({ onSave }) => {
                         )}
                     </div>
 
-                    <div className={`${styles.profileItem} ${styles.profileLocationDiv}`}>
                     <div className={`${styles.profileItem} ${styles.profileLocationDiv}`}>
                         <strong>Location:</strong>
                         {editSectionMode ? (
