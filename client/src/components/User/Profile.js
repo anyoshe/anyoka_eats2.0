@@ -256,7 +256,6 @@ const Profile = ({ onSave }) => {
                         )}
                     </div>
 
-
                     <div className={`${styles.profileItem} ${styles.profileLocationDiv}`}>
                         <strong>Location:</strong>
                         {editSectionMode ? (

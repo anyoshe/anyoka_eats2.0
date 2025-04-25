@@ -6,7 +6,7 @@ import 'bootstrap/dist/js/bootstrap.bundle.min';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCartShopping, faCaretDown } from '@fortawesome/free-solid-svg-icons';
 import axios from 'axios';
-import '../User/ProductCard.css';
+// import '../User/ProductCard.module.css';
 import config from '../../config';
 import ProductDetailModal from './ProductDetailModal';
 import { AuthContext } from '../../contexts/AuthContext';
@@ -30,8 +30,7 @@ const MenuPage = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState(null);
   const [loading, setLoading] = useState(true);
-
-
+  const [showCart, setShowCart] = useState(false);
 
   useEffect(() => {
     console.log('User in MenuPage:', user);
@@ -122,35 +121,41 @@ const MenuPage = () => {
     <div className={styles.storeWrapper}>
       <Logout /> 
       <div className={styles.bodyWrapper}>
+        <section className={styles.dispalySection}>
 
-        {loading ? (
-          <div className={styles.loadingWrapper}>
-            <div className={styles.spinner}></div>
-            <p>Loading category products...</p>
+          <div className={styles.cartTopDiv}>
+            <button className={styles.floatingCartIcon} onClick={() => setShowCart(true)}>
+              <FontAwesomeIcon icon={faCartShopping} />
+            </button>
           </div>
-        ) : (
-          <>
-            <section className={styles.dispalySection}>
+
+          {showCart && (
+            <div className={styles.cartModal}>
+              <button className={styles.closeCartBtn} onClick={() => setShowCart(false)}>×</button>
+              <CartSection />
+            </div>
+          )}
 
 
-              {selectedCategory
-                ? (
-                  productsByCategory[selectedCategory]?.length > 0 ? (
-                    <div>
-                      <h3 className={styles.categorySectiontitle}>{selectedCategory}</h3>
-                      <section className={styles.categorySectionDisplay}>
-                        {productsByCategory[selectedCategory].map((product, index) => (
-                          <div
-                            key={index}
-                            className={styles.categorySectionDisplayDivs}
-                            onClick={() => handleProductClick(product)}
-                          >
-                            {/* Discounted price - shown above the image ONLY if there is a discount */}
-                            {product.discountedPrice && (
-                              <p className="product-price discounted-now">
-                                Ksh {product.discountedPrice.toFixed(2)}
-                              </p>
-                            )}
+          {Object.keys(productsByCategory).map((category) => (
+            <div key={category}>
+              <h3 className={styles.categorySectiontitle}>{category}</h3>
+              <section className={styles.categorySectionDisplay}>
+                {productsByCategory[category].map((product, index) => (
+                  <div
+                    key={index}
+                    className={styles.categorySectionDisplayDivs}
+                   
+                    onClick={() => handleProductClick(product)}>
+
+                    {typeof product.discountedPrice === 'number' && product.discountedPrice > 0 && (
+                      <div className={styles.discountBadge}>
+                        <span>
+                          Ksh {product.discountedPrice.toFixed(1)}
+                        </span>
+                      </div>
+                    )}
+
 
                             <img
                               src={getImageSrc(product)}
@@ -167,168 +172,64 @@ const MenuPage = () => {
                               {product.name}
                             </p>
 
-                            <div className="priceQuantityRow">
-                              {/* If there’s a discount, show original price with strikethrough */}
-                              {product.discountedPrice ? (
-                                <span className="original-price-offer">
-                                  Was{' '}
-                                  <span className="diagonal-strikethrough linePrice">
-                                    Ksh {product.price.toFixed(2)}
-                                  </span>
-                                </span>
-                              ) : (
-                                // If no discount, just show normal price
-                                <p className="product-price">Price: Ksh {product.price.toFixed(2)}</p>
-                              )}
-                            </div>
+                    <div className={styles.priceQuantityRow}>
+                      {/* If there’s a discount, show original price with strikethrough */}
+                      {product.discountedPrice ? (
+                        <span className={styles.originalPriceOffer}>
+                          {/* Was{' '} */}
+                          <span className={`${styles.diagonalStrikethrough} ${styles.linePrice}`}>
+                            Ksh {product.price.toFixed(1)}
+                          </span>
+                        </span>
+                      ) : (
+                        // If no discount, just show normal price
+                        <p className={styles.productPrice}>Ksh {product.price.toFixed(1)}</p>
+                      )}
 
-
-                            <div className={styles.priceQuantityRow}>
-                              <p className={`${styles.categorySectionPrice} ${styles.categorySectionP}`}>
-                                KSH:{product.price}
-                              </p>
-                              <p className={`${styles.categorySectionQuantity} ${styles.categorySectionP}`}>
-                                <span>{product.quantity}</span>
-                                {product.unit}
-                              </p>
-                            </div>
-
-
-                            <div className="ratingsDiv star-icon">
-                              {product.ratings?.average
-                                ? renderStars(product.ratings.average)
-                                : 'No ratings yet'}
-                            </div>
-
-                            <div className={styles.addCartBtn}>
-                              <button
-                                className={styles.addToCartBtn}
-
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  handleAddToCart(product);
-                                }}
-                              >
-                                <FontAwesomeIcon icon={faCartShopping} />
-                              </button>
-                            </div>
-                          </div>
-                        ))}
-                      </section>
+                      <p className={`${styles.categorySectionQuantity} ${styles.categorySectionP}`}>
+                        <span>{product.quantity}</span>
+                        {product.unit}
+                      </p>
                     </div>
-                  ) : (
-                    <p className="text-center">No products found under <strong>{selectedCategory}</strong>.</p>
-                  )
-                )
-                : (
-                  Object.keys(productsByCategory).map((category) => (
-                    <div key={category}>
-                      <h3 className={styles.categorySectiontitle}>{category}</h3>
-                      <section className={styles.categorySectionDisplay}>
-                        {productsByCategory[category].map((product, index) => (
 
-                          <div
-                            key={index}
-                            className={styles.categorySectionDisplayDivs}
-                            onClick={() => handleProductClick(product)}
-                          >
-                            {/* Discounted price - shown above the image ONLY if there is a discount */}
-                            {product.discountedPrice && (
-                              <p className="product-price discounted-now">
-                                Ksh {product.discountedPrice.toFixed(2)}
-                              </p>
-                            )}
-
-                            <img
-                              src={getImageSrc(product)}
-                              alt={product.name}
-                              className={styles.categorySectionImage}
-
-                              onError={(e) => {
-                                e.target.onerror = null;
-                                e.target.src = '/path/to/placeholder-image.jpg';
-                              }}
-                            />
-
-                            <p className={`${styles.categorySectionName} ${styles.categorySectionP}`}>
-                              {product.name}
-                            </p>
-
-                            <div className="priceQuantityRow">
-                              {/* If there’s a discount, show original price with strikethrough */}
-                              {product.discountedPrice ? (
-                                <span className="original-price-offer">
-                                  Was{' '}
-                                  <span className="diagonal-strikethrough linePrice">
-                                    Ksh {product.price.toFixed(2)}
-                                  </span>
-                                </span>
-                              ) : (
-                                // If no discount, just show normal price
-                                <p className="product-price">Price: Ksh {product.price.toFixed(2)}</p>
-                              )}
-                            </div>
-
-
-                            <div className={styles.priceQuantityRow}>
-                              <p className={`${styles.categorySectionPrice} ${styles.categorySectionP}`}>
-                                KSH:{product.price}
-                              </p>
-                              <p className={`${styles.categorySectionQuantity} ${styles.categorySectionP}`}>
-                                <span>{product.quantity}</span>
-                                {product.unit}
-                              </p>
-                            </div>
-
-
-                            <div className="ratingsDiv star-icon">
-                              {product.ratings?.average
-                                ? renderStars(product.ratings.average)
-                                : 'No ratings yet'}
-                            </div>
-
-                            <div className={styles.addCartBtn}>
-                              <button
-                                className={styles.addToCartBtn}
-
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  handleAddToCart(product);
-                                }}
-                              >
-                                <FontAwesomeIcon icon={faCartShopping} />
-                              </button>
-                            </div>
-                          </div>
-                        ))}
-
-                      </section>
+                    <div className={`${styles.ratingsDiv} ${styles.starIcon}`}>
+                      {product.ratings?.average
+                        ? renderStars(product.ratings.average)
+                        : 'No ratings yet'}
                     </div>
-                  ))
-                )
-              }
 
+                    <div className={styles.addCartBtn}>
+                      <button
+                        className={styles.addToCartBtn}
+                        
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleAddToCart(product);
+                        }}
+                      >
+                        <FontAwesomeIcon icon={faCartShopping} />
+                      </button>
+                    </div>
+                  </div>
+                ))}
+              </section>
+            </div>
+          ))}
+        </section>
 
-
-            </section>
-
-
-
-            {/* Render the ProductDetailModal */}
-            {selectedProduct && (
-              <ProductDetailModal
-                isOpen={isModalOpen}
-                onRequestClose={closeModal}
-                product={selectedProduct}
-                // onAddToCart={(product) => console.log('Add to cart:', product)}
-                onAddToCart={handleAddToCart}
-              />
-            )}
-          </>
-        )}
         <section className={styles.cartSecti}>
           <CartSection />
         </section>
+
+        {/* Render the ProductDetailModal */}
+        {selectedProduct && (
+          <ProductDetailModal
+            isOpen={isModalOpen}
+            onRequestClose={closeModal}
+            product={selectedProduct}
+            onAddToCart={handleAddToCart}
+          />
+        )}
       </div>
     </div>
   );
