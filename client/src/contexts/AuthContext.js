@@ -4,17 +4,17 @@ export const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
   const [isLoggedIn, setIsLoggedIn] = useState(() => {
-    return !!localStorage.getItem('authToken');
+    return !!localStorage.getItem('userToken');
   });
   const [user, setUser] = useState(() => {
     const storedUser = localStorage.getItem('user');
     return storedUser ? JSON.parse(storedUser) : null;
   });
-  
-  const [redirectPath, setRedirectPath] = useState('/'); 
+
+  const [redirectPath, setRedirectPath] = useState('/');
   const [currentProduct, setCurrentProduct] = useState(null);
   const [token, setToken] = useState(() => localStorage.getItem('userToken'));
-  
+
 
   useEffect(() => {
     const storedUser = localStorage.getItem('user');
@@ -30,6 +30,15 @@ export const AuthProvider = ({ children }) => {
     }
   }, []);
 
+  const logout = () => {
+    setUser(null);
+    setIsLoggedIn(false);
+    setToken(null);
+    localStorage.removeItem('user');
+    localStorage.removeItem('userToken');
+   
+  };
+
   return (
     <AuthContext.Provider
       value={{
@@ -42,7 +51,8 @@ export const AuthProvider = ({ children }) => {
         user,
         setUser,
         token,
-    setToken,
+        setToken,
+        logout,
       }}
     >
       {children}
