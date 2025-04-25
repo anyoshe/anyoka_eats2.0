@@ -1,8 +1,7 @@
-// components/AuthPromptModal.js
 import React from 'react';
 import Modal from 'react-modal';
 import { useNavigate } from 'react-router-dom';
-import './AuthPromptModal.css'; // Ensure this CSS file is created for styling
+import styles from './AuthPromptModal.module.css'; // CSS Module import
 
 Modal.setAppElement('#root'); // For accessibility
 
@@ -24,17 +23,17 @@ const AuthPromptModal = ({ isOpen, onRequestClose }) => {
       isOpen={isOpen}
       onRequestClose={onRequestClose}
       contentLabel="Authentication Required"
-      className="auth-prompt-modal"
-      overlayClassName="auth-prompt-overlay"
+      className={styles.authPromptModal}
+      overlayClassName={styles.authPromptOverlay}
     >
-      <div className="auth-prompt-content">
+      <div className={styles.authPromptContent}>
         <h2>Please Log In or Sign Up</h2>
         <p>You need to be logged in to perform this action.</p>
-        <div className="auth-prompt-buttons">
-          <button onClick={handleLogin} className="auth-button login-button">
+        <div className={styles.authPromptButtons}>
+          <button onClick={handleLogin} className={`${styles.authButton} ${styles.loginButton}`}>
             Log In
           </button>
-          <button onClick={handleSignup} className="auth-button signup-button">
+          <button onClick={handleSignup} className={`${styles.authButton} ${styles.signupButton}`}>
             Sign Up
           </button>
         </div>
