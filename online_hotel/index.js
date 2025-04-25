@@ -117,13 +117,11 @@ app.use((req, res, next) => {
 
 const http = require('http');
 // const app = require('./app'); // Your Express app
-const { initializeSocket } = require('./socket');
+const { initSocket } = require('./socketServer');
 
 const server = http.createServer(app);
 
-// Initialize WebSocket server
-initializeSocket(server);
-
+initSocket(server);
 // Database Connection Events
 database.on('error', (error) => console.log(error));
 database.once('connected', () => console.log('Database Connected'));

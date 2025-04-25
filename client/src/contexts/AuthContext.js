@@ -11,26 +11,14 @@ export const AuthProvider = ({ children }) => {
     return storedUser ? JSON.parse(storedUser) : null;
   });
   
-  const [redirectPath, setRedirectPath] = useState('/'); // Track where to redirect after login
+  const [redirectPath, setRedirectPath] = useState('/'); 
   const [currentProduct, setCurrentProduct] = useState(null);
-  const [token, setToken] = useState(() => localStorage.getItem('authToken'));
-
+  const [token, setToken] = useState(() => localStorage.getItem('userToken'));
   
-  // useEffect(() => {
-  //   const storedUser = localStorage.getItem('user');
-  //   const storedToken = localStorage.getItem('authToken');
-  //   if (storedUser && storedToken) {
-  //     setUser(JSON.parse(storedUser));
-  //     setIsLoggedIn(true);
-  //   } else {
-  //     setUser(null);
-  //     setIsLoggedIn(false);
-  //   }
-  // }, []);
 
   useEffect(() => {
     const storedUser = localStorage.getItem('user');
-    const storedToken = localStorage.getItem('authToken');
+    const storedToken = localStorage.getItem('userToken');
     if (storedUser && storedToken) {
       setUser(JSON.parse(storedUser));
       setToken(storedToken);

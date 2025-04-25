@@ -20,7 +20,9 @@ const axios = require('axios');
 const { type } = require("os");
 require('dotenv').config();
 const nodemailer = require('nodemailer');
-const { getIo, connectedPartners, pendingOrders } = require('../socket');
+const { notifyPartner } = require('../socketServer');
+// const { notifyPartner: emitSocketNotification } = require('../socketServer');
+
 
 
 const JWT_SECRET = process.env.JWT_SECRET;
@@ -157,8 +159,25 @@ router.get('/partners/:partnerId', async (req, res) => {
 });
 
 // Update partner details Route
-router.put('/partners/:id', async (req, res) => {
+// router.put('/partners/:id', async (req, res) => {
 
+//   try {
+//     const partnerId = req.params.id;
+//     const updatedData = req.body;
+
+//     const updatedPartner = await Partner.findByIdAndUpdate(
+//       partnerId,
+//       updatedData,
+//       { new: true }
+//     );
+
+//     res.status(200).json({ message: 'Partner updated successfully', updatedPartner });
+//   } catch (error) {
+//     res.status(500).json({ message: 'Failed to update partner', error });
+//   }
+// });
+
+router.put('/partners/:id', async (req, res) => {
   try {
     const partnerId = req.params.id;
     const updatedData = req.body;
@@ -169,8 +188,28 @@ router.put('/partners/:id', async (req, res) => {
       { new: true }
     );
 
-    res.status(200).json({ message: 'Partner updated successfully', updatedPartner });
+    if (!updatedPartner) {
+      return res.status(404).json({ message: 'Partner not found' });
+    }
+
+    // Sync product documents that reference this partner
+    await Product.updateMany(
+      { 'shop.shopId': updatedPartner._id },
+      {
+        $set: {
+          'shop.shopName': updatedPartner.businessName,
+          'shop.town': updatedPartner.town,
+          'shop.location': updatedPartner.location
+        }
+      }
+    );
+
+    res.status(200).json({
+      message: 'Partner and related products updated successfully',
+      updatedPartner
+    });
   } catch (error) {
+    console.error('Update failed:', error);
     res.status(500).json({ message: 'Failed to update partner', error });
   }
 });
@@ -208,6 +247,16 @@ router.post('/upload-profile-image', (req, res) => {
 });
 
 
+// Route to fetch all partners
+router.get('/partners', async (req, res) => {
+  try {
+    const partners = await Partner.find({ role: 'partner' }); // Fetch all partners
+    res.status(200).json(partners);
+  } catch (error) {
+    console.error('Error fetching partners:', error);
+    res.status(500).json({ message: 'Failed to fetch partners', error });
+  }
+});
 
 // Dealing with the user
 
@@ -843,6 +892,23 @@ router.get('/distance', async (req, res) => {
   }
 });
 
+// Route: /api/products-by-partner/:partnerId
+router.get('/products-by-partner/:partnerId', async (req, res) => {
+
+  const { partnerId } = req.params;
+  console.log(req.params);
+  try {
+    const products = await Product.find({ 'shop.shopId': partnerId });
+
+    res.status(200).json({ products });
+
+    console.log(products);
+  } catch (err) {
+    console.error('Error fetching partner products:', err);
+    res.status(500).json({ message: 'Failed to get products' });
+  }
+});
+
 
 // --- ORDERS SCHEMAS & MODELS ---
 const CounterSchema = new mongoose.Schema({
@@ -872,6 +938,7 @@ const OrderSchema = new mongoose.Schema({
     town: String,
     location: String,
     fee: Number,
+    option: { type: String, enum: ['platform', 'own'], required: true },
   },
   total: { type: Number, default: 0 },
   paymentMethod: { type: String, enum: ['COD', 'Mpesa', 'PayPal', 'Card'], required: true },
@@ -935,12 +1002,29 @@ const SubOrder = mongoose.models.SubOrder || mongoose.model('SubOrder', SubOrder
 // --- ROUTES ---
 
 router.post('/orders/place', async (req, res) => {
+
+
   const {
     userId,
     items,           // [{ productId, quantity, price, shop: { shopId, shopName } }, ...]
     delivery,
     paymentMethod
   } = req.body;
+
+  // Validate delivery object thoroughly
+  if (!delivery || !delivery.town || !delivery.location || typeof delivery.fee !== 'number' || !delivery.option) {
+    return res.status(400).json({ error: 'Incomplete delivery information.' });
+  }
+
+  // Enforce strict delivery rules
+  if (delivery.option === 'platform' && delivery.fee <= 0) {
+    return res.status(400).json({ error: 'Platform delivery must include a valid delivery fee.' });
+  }
+
+  if (delivery.option === 'own' && delivery.fee !== 0) {
+    return res.status(400).json({ error: 'Own delivery should not have a delivery fee.' });
+  }
+
 
   if (!items || items.length === 0) {
     return res.status(400).json({ error: 'No items in order.' });
@@ -985,6 +1069,20 @@ router.post('/orders/place', async (req, res) => {
         total
       }], { session });
 
+      notifyPartner(shopId, {
+        message: "New order received!",
+        subOrderId: subOrder[0]._id,
+        orderId: order[0]._id, // Add this
+        total,
+        timestamp: new Date(),
+      });
+
+      await partnerNotify(shopId, {
+        message: "New order received!",
+        subOrderId: subOrder[0]._id,
+        orderId: order[0]._id,
+      });
+
       subOrderIds.push(subOrder[0]._id);
     }
 
@@ -1014,7 +1112,7 @@ router.get('/orders/:orderId', authenticateToken, async (req, res) => {
     const order = await Order.findById(orderId)
       .populate('user', 'name email')  // Populating user details (name, email)
       .populate('items.product', 'name price')  // Populating product details
-      // .populate('items.shop.shopId', 'name')  // Populating shop details
+    // .populate('items.shop.shopId', 'name')  // Populating shop details
 
     // Log the order to check the structure
     console.log('Fetched order:', order);
@@ -1051,29 +1149,6 @@ router.get('/orders/:orderId', authenticateToken, async (req, res) => {
 
 
 
-// GET /api/partners/:partnerId/orders
-// router.get('/partners/:partnerId/orders', async (req, res) => {
-//   try {
-//     const { partnerId } = req.params;
-
-//     // Validate partnerId
-//     if (!mongoose.Types.ObjectId.isValid(partnerId)) {
-//       return res.status(400).json({ error: 'Invalid partner ID' });
-//     }
-
-//     // Fetch suborders for the partner
-//     const subOrders = await SubOrder.find({ shop: partnerId })
-//       .populate('parentOrder') // Populate parent order details
-//       .populate('items.product') // Populate product details
-//       .sort({ createdAt: -1 }); // Sort by most recent
-
-//     res.json(subOrders);
-//   } catch (error) {
-//     console.error('Error fetching suborders:', error);
-//     res.status(500).json({ error: 'Server error' });
-//   }
-// });
-
 router.get('/partners/:partnerId/orders', async (req, res) => {
   try {
     const { partnerId } = req.params;
@@ -1093,12 +1168,28 @@ router.get('/partners/:partnerId/orders', async (req, res) => {
       .sort({ createdAt: -1 }); // Sort by most recent
 
     res.json(subOrders);
-    
+
   } catch (error) {
     console.error('Error fetching suborders:', error);
     res.status(500).json({ error: 'Server error' });
   }
 });
+
+router.get('/suborders/:id', async (req, res) => {
+  try {
+    const subOrder = await SubOrder.findById(req.params.id)
+      .populate('items.product')
+      .populate('shop', 'shopName');
+
+    if (!subOrder) return res.status(404).json({ error: 'SubOrder not found.' });
+
+    res.json(subOrder);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Failed to fetch suborder.' });
+  }
+});
+
 
 router.put('/suborders/:id/status', async (req, res) => {
   try {
@@ -1135,6 +1226,68 @@ router.put('/suborders/:id/status', async (req, res) => {
     res.status(500).json({ error: 'Server error' });
   }
 });
+
+const PartnerNotificationSchema = new mongoose.Schema({
+  shop: { type: mongoose.Schema.Types.ObjectId, ref: 'Partner', required: true },
+  message: { type: String, required: true },
+  orderId: { type: mongoose.Schema.Types.ObjectId, ref: 'Order' },
+  subOrderId: { type: mongoose.Schema.Types.ObjectId, ref: 'SubOrder' },
+  isRead: { type: Boolean, default: false },
+  timestamp: { type: Date, default: Date.now },
+});
+
+const PartnerNotification = mongoose.models.PartnerNotification || mongoose.model('PartnerNotification', PartnerNotificationSchema);
+
+const partnerNotify = async (shopId, { message, subOrderId, orderId, timestamp }) => {
+  try {
+    await PartnerNotification.create({
+      shop: shopId,
+      message,
+      subOrderId,
+      orderId,
+      timestamp: timestamp || new Date()
+    });
+  } catch (err) {
+    console.error("Failed to notify partner:", err.message);
+  }
+};
+
+// Get all notifications for a partner
+router.get('/partner-notifications/:partnerId', async (req, res) => {
+  try {
+    const notifications = await PartnerNotification.find({ shop: req.params.partnerId }).sort({ timestamp: -1 });
+    res.json(notifications);
+  } catch (err) {
+    res.status(500).json({ error: 'Failed to fetch notifications' });
+  }
+});
+
+// Mark as read
+router.patch('/partner-notifications/:id/read', async (req, res) => {
+  try {
+    const notif = await PartnerNotification.findByIdAndUpdate(req.params.id, { isRead: true }, { new: true });
+    res.json(notif);
+  } catch (err) {
+    res.status(500).json({ error: 'Failed to mark notification as read' });
+  }
+});
+
+// Delete
+router.delete('/partner-notifications/:id', async (req, res) => {
+  try {
+    await PartnerNotification.findByIdAndDelete(req.params.id);
+    res.json({ success: true });
+  } catch (err) {
+    res.status(500).json({ error: 'Failed to delete notification' });
+  }
+});
+
+// router.get('/notifications/unread', authenticateToken, async (req, res) => {
+//   const partnerId = req.user.id; // Assuming JWT or session-based auth
+//   const unread = await PartnerNotification.find({ shop: partnerId, read: false }).sort({ timestamp: -1 });
+//   res.json(unread);
+// });
+
 
 
 function sendEmailNotification(email, message) {

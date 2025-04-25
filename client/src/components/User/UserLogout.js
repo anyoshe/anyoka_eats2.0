@@ -15,7 +15,7 @@ const Logout = () => {
     setIsLoggedIn(false);
 
     // Remove user data from localStorage
-    localStorage.removeItem('authToken');
+    localStorage.removeItem('userToken');
     localStorage.removeItem('user');
 
     // Redirect to the login or home page
