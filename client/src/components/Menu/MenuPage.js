@@ -137,6 +137,7 @@ const MenuPage = () => {
           {Object.keys(productsByCategory).map((category) => (
             <div key={category}>
               <h3 className={styles.categorySectiontitle}>{category}</h3>
+
               <section className={styles.categorySectionDisplay}>
                 {productsByCategory[category].map((product, index) => (
                   <div
@@ -153,21 +154,20 @@ const MenuPage = () => {
                       </div>
                     )}
 
+                    <img
+                      src={getImageSrc(product)}
+                      alt={product.name}
+                      className={styles.categorySectionImage}
 
-                            <img
-                              src={getImageSrc(product)}
-                              alt={product.name}
-                              className={styles.categorySectionImage}
+                      onError={(e) => {
+                        e.target.onerror = null;
+                        e.target.src = '/path/to/placeholder-image.jpg';
+                      }}
+                    />
 
-                              onError={(e) => {
-                                e.target.onerror = null;
-                                e.target.src = '/path/to/placeholder-image.jpg';
-                              }}
-                            />
-
-                            <p className={`${styles.categorySectionName} ${styles.categorySectionP}`}>
-                              {product.name}
-                            </p>
+                    <p className={`${styles.categorySectionName} ${styles.categorySectionP}`}>
+                      {product.name}
+                    </p>
 
                     <div className={styles.priceQuantityRow}>
                       {/* If there’s a discount, show original price with strikethrough */}
