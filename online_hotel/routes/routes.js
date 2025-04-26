@@ -12,7 +12,7 @@ const passport = require('passport');
 const jwt = require('jsonwebtoken');
 const LocalStrategy = require('passport-local').Strategy;
 const session = require('express-session');
-const { upload, uploadMultiple, uploadProfileImage, uploadBusinessPermit, uploadProductImages } = require('../config/multer');
+const { upload, uploadMultiple, uploadFiles, uploadProfileImage, uploadBusinessPermit, uploadProductImages } = require('../config/multer');
 const multer = require('multer');
 const path = require('path');
 const fs = require('fs');
@@ -61,7 +61,18 @@ const partnerSchema = new mongoose.Schema({
   idNumber: { type: String, required: true, unique: true },
   businessPermit: { type: String, required: false },
   description: { type: String, default: '' },
-  role: { type: String, enum: ['admin', 'partner'], default: 'partner' }
+  role: { type: String, enum: ['admin', 'partner'], default: 'partner' },
+  ratings: {
+    average: { type: Number, default: 0 },
+    reviews: [
+      {
+        user: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
+        rating: { type: Number, required: false },
+        comment: { type: String, required: false },
+        date: { type: Date, default: Date.now }
+      }
+    ]
+  }
 }, { timestamps: true });
 
 const Partner = mongoose.model('Partner', partnerSchema);
@@ -120,13 +131,28 @@ router.post('/signup', uploadBusinessPermit, async (req, res) => {
       role
     };
 
-    if (req.file) {
-      newPartnerData.businessPermit = req.file.filename;
+  
+
+    // Check if business permit is uploaded
+    if (req.file && req.file.fieldname === 'businessPermit') {
+      newPartnerData.businessPermit = `/uploads/business-permits/${req.file.filename}`;
     }
 
     const newPartner = new Partner(newPartnerData);
     await newPartner.save();
-    res.status(201).json(newPartner);
+
+
+    // Generate JWT token after partner is created
+    const token = jwt.sign(
+      { _id: newPartner._id, role: newPartner.role },
+      process.env.JWT_SECRET,
+      { expiresIn: '7d' }
+    );
+
+    res.status(201).json({
+      token,
+      partner: newPartner
+    });
 
   } catch (error) {
     console.error('Sign-up failed:', error);
@@ -159,23 +185,6 @@ router.get('/partners/:partnerId', async (req, res) => {
 });
 
 // Update partner details Route
-// router.put('/partners/:id', async (req, res) => {
-
-//   try {
-//     const partnerId = req.params.id;
-//     const updatedData = req.body;
-
-//     const updatedPartner = await Partner.findByIdAndUpdate(
-//       partnerId,
-//       updatedData,
-//       { new: true }
-//     );
-
-//     res.status(200).json({ message: 'Partner updated successfully', updatedPartner });
-//   } catch (error) {
-//     res.status(500).json({ message: 'Failed to update partner', error });
-//   }
-// });
 
 router.put('/partners/:id', async (req, res) => {
   try {
@@ -247,6 +256,8 @@ router.post('/upload-profile-image', (req, res) => {
 });
 
 
+
+
 // Route to fetch all partners
 router.get('/partners', async (req, res) => {
   try {
@@ -257,6 +268,108 @@ router.get('/partners', async (req, res) => {
     res.status(500).json({ message: 'Failed to fetch partners', error });
   }
 });
+
+//RATING SHOPS
+// GET /api/partners/:id/reviews
+router.get('/partners/:id/reviews', async (req, res) => {
+  try {
+    const partner = await Partner.findById(req.params.id).populate('ratings.reviews.user', 'username names');
+    if (!partner) return res.status(404).json({ message: 'Partner not found' });
+
+    res.json({ reviews: partner.ratings.reviews });
+  } catch (err) {
+    res.status(500).json({ message: 'Server error' });
+  }
+});
+
+
+// POST /api/partners/:id/comments
+router.post('/partners/:id/comments', async (req, res) => {
+  const { user: userId, comment } = req.body;
+ console.log(req.body);
+  if (!userId || !comment) {
+    return res.status(400).json({ message: 'User and comment are required' });
+  }
+
+  try {
+    const partner = await Partner.findById(req.params.id);
+    if (!partner) return res.status(404).json({ message: 'Partner not found' });
+
+    partner.ratings.reviews.push({ user: userId, comment });
+    await partner.save();
+
+    res.status(201).json({ message: 'Comment added successfully' });
+  } catch (err) {
+    console.error('Error adding comment:', err);
+    res.status(500).json({ message: 'Server error' });
+  }
+});
+
+
+// POST /api/partners/:id/rate
+router.post('/partners/:id/rate', async (req, res) => {
+  const { user, rating, comment } = req.body;
+console.log(req.body);
+  // Validate rating and user
+  if (!user || rating == null || isNaN(rating)) {
+    return res.status(400).json({ message: 'User and valid rating are required' });
+  }
+
+  if (rating < 1 || rating > 5) {
+    return res.status(400).json({ message: 'Rating must be between 1 and 5' });
+  }
+
+  try {
+    const partner = await Partner.findById(req.params.id);
+    if (!partner) return res.status(404).json({ message: 'Partner not found' });
+
+    // Ensure ratings object structure exists
+    if (!partner.ratings) {
+      partner.ratings = { average: 0, reviews: [] };
+    } else if (!Array.isArray(partner.ratings.reviews)) {
+      partner.ratings.reviews = [];
+    }
+
+    // Check if the user has already rated the shop
+    const existingReview = partner.ratings.reviews.find(
+      (review) => review.user.toString() === user
+    );
+
+    if (existingReview) {
+      // Update the existing rating and comment
+      existingReview.rating = rating;
+      existingReview.comment = comment || existingReview.comment;
+    } else {
+      // Add new review (with both rating and comment)
+      partner.ratings.reviews.push({ user, rating, comment });
+    }
+
+    // Recalculate the average rating considering only reviews with valid ratings
+    const validReviews = partner.ratings.reviews.filter(
+      (review) => review.rating != null && !isNaN(review.rating)
+    );
+
+    const totalRatings = validReviews.reduce((sum, review) => sum + review.rating, 0);
+    const reviewCount = validReviews.length;
+    const averageRating = reviewCount > 0 ? totalRatings / reviewCount : 0;
+
+    partner.ratings.average = averageRating;
+
+    await partner.save();
+
+    res.status(201).json({
+      message: 'Rating submitted successfully',
+      averageRating,
+    });
+  } catch (error) {
+    console.error('Error submitting rating:', error.message);
+    res.status(500).json({
+      message: 'Failed to submit rating',
+      error: error.message,
+    });
+  }
+});
+
 
 // Dealing with the user
 
@@ -314,7 +427,7 @@ router.post('/auth/userSignup', async (req, res) => {
     await newUser.save();
 
     // Generate a JWT token
-    const token = jwt.sign({ id: newUser._id }, JWT_SECRET, { expiresIn: '1h' });
+    const token = jwt.sign({ id: newUser._id }, JWT_SECRET, { expiresIn: '7d' });
 
     // Return the token and user details
     res.status(201).json({
@@ -424,7 +537,6 @@ router.post('/login', async (req, res) => {
     const token = jwt.sign(
       { _id: account._id, role },
       process.env.JWT_SECRET,
-      { expiresIn: '7d' }
     );
 
     // Respond with token and role
@@ -543,9 +655,6 @@ router.post('/products', uploadProductImages, async (req, res) => {
     } = req.body;
 
 
-    //     const images = req.files?.images?.map(file => file.path) || [];
-    // const primaryImageFile = req.files?.primaryImage?.[0]?.path;
-    // const primaryImage = primaryImageFile || req.body.primaryImage;
     const images = req.files?.images?.map((file) => `/uploads/products/${file.filename}`) || [];
     const primaryImageFile = req.files?.primaryImage?.[0]?.path;
     const primaryImage = primaryImageFile

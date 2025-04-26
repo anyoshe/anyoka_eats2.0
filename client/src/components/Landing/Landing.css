@@ -447,3 +447,34 @@
     color: var(--orange);
     outline: 1px solid var(--orange);
 }
+
+
+/* anyoka styles for landing body container*/
+
+.starIcon {
+    color: #d3d3d3; /* Light grey for empty stars */
+}
+
+.starIcon.filled {
+    color: #f39c12; /* Yellow for filled stars */
+}
+
+.storeDiv {
+    position: relative;
+}
+
+.storeLink {
+    display: block;
+    color: inherit;
+    text-decoration: none;
+}
+
+.storeLink .imageDiv,
+.storeLink .storeName {
+    cursor: pointer;
+}
+
+.reviewsLink {
+    cursor: pointer;
+    color: #007bff;
+}

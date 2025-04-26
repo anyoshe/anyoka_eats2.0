@@ -27,14 +27,14 @@ const StoreSignUpForm = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [showLoginPassword, setShowLoginPassword] = useState(false);
   const [mapCenter, setMapCenter] = useState({ lat: -1.286389, lng: 36.817223 }); // Default to Nairobi
-  const { setPartner } = useContext(PartnerContext);
+  const { setPartner,setToken } = useContext(PartnerContext);
   const navigate = useNavigate();
 
 
 
 
   useEffect(() => {
-    const token = localStorage.getItem('authToken');
+    const token = localStorage.getItem('partnerToken');
     if (token) {
       axios.get(`${config.backendUrl}/api/partner`, {
         headers: { Authorization: `Bearer ${token}` },
@@ -95,14 +95,20 @@ const StoreSignUpForm = () => {
 
 
       if (formData.businessPermit) data.append('businessPermit', formData.businessPermit);
-      if (formData.businessPermit) data.append('businessPermit', formData.businessPermit);
-
+      if (formData.profileImage) data.append('profileImage', formData.profileImage);
       const response = await axios.post(`${config.backendUrl}/api/signup`, data);
 
-      const partnerData = response.data;
-      setPartner(partnerData);
+      const { token, partner } = response.data;
+      setPartner(partner);
+      setToken(token);
+      
+       // Store partner token and details in localStorage
+    localStorage.setItem('partnerToken', token);
+    localStorage.setItem('partnerDetails', JSON.stringify(partner));
+
+
       alert('Sign up Successful, Welcome!');
-      navigate(partnerData.role === 'admin' ? '/superuserdashboard' : '/dashboard');
+      navigate(partner.role === 'admin' ? '/superuserdashboard' : '/dashboard');
     } catch (error) {
       console.error("Sign up error:", error);
       alert(
