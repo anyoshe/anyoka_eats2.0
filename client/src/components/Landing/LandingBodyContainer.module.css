@@ -1,0 +1,170 @@
+.landingBodyContainer {
+    position: relative;
+    width: 90%;
+    margin-bottom: 1rem;
+}
+
+.landingWrapper {
+    /* margin-top: 3em; */
+    width: 100%;
+}
+
+.topRestaurantH1 {
+    font-size: 1.8em;
+    margin-bottom: 2rem;
+    margin-left: 2rem;
+}
+
+.storeDivsWrapper {
+    display: flex;
+    flex-wrap: wrap;
+    column-gap: 1rem;
+    row-gap: 1.5rem;
+    justify-content: center;
+}
+
+.storeDiv {
+    width: 13rem;
+    background-color: var(--white);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 1rem;
+    border-radius: 2rem;
+    text-decoration: none;
+    box-shadow: 0 0 8px rgba(0, 0, 0, 0.1);
+    transition: transform 0.2s ease-in;
+}
+
+.storeDiv:hover {
+    transform: scale(1.05);
+}
+
+.imageDiv {
+    width: 8rem;
+    height: 8rem;
+    border-radius: 50%;
+    overflow: hidden;
+    margin-bottom: 1rem;
+}
+
+.storeImage {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.storeName {
+    font-weight: 600;
+    color: var(--green);
+    margin-bottom: 0.5rem;
+    text-align: center;
+}
+
+.ratingDiv {
+    display: flex;
+    justify-content: center;
+    margin-top: 0.5rem;
+}
+
+.starIcon {
+    color: var(--orange);
+    font-size: 1rem;
+    margin: 0 0.1rem;
+}
+
+.landingBodyContainer hr{
+  margin-top: 2rem;
+  margin-bottom: 0;
+}
+
+@media (max-width: 1024px) {
+    .landingBodyContainer{
+        margin: 0 3rem;
+    }
+
+    .storeDivsWrapper{
+        display: grid;
+        grid-template-columns:repeat(5,1fr) ;
+        width: 100%;
+        row-gap: 1rem;
+        padding-bottom: 1rem;
+    }
+    
+    .storeDiv {
+      width: 10rem;
+      padding: 0.8rem;
+    }
+  
+    .imageDiv {
+      width: 7rem;
+      height: 7rem;
+    }
+  
+    .topRestaurantH1 {
+      font-size: 1.6em;
+      margin-left: 1.5rem;
+    }
+  }
+  
+  @media (max-width: 768px) {
+    .storeDivsWrapper{
+        grid-template-columns:repeat(4,1fr) ;
+        width: 100%;
+    }
+    
+    .storeDiv {
+      width: 10rem;
+      padding: 0.7rem;
+    }
+  
+    .imageDiv {
+      width: 6.5rem;
+      height: 6.5rem;
+    }
+  
+    .topRestaurantH1 {
+      font-size: 1.5em;
+      margin-left: 1rem;
+      text-align: center;
+    }
+  
+    .storeDivsWrapper {
+      column-gap: 0.8rem;
+      row-gap: 1.2rem;
+    }
+  }
+  
+  @media (max-width: 480px) {
+    .storeDiv {
+      width: 9rem;
+      padding: 0.6rem;
+    }
+  
+    .imageDiv {
+      width: 6rem;
+      height: 6rem;
+    }
+  
+    .topRestaurantH1 {
+      font-size: 1.4em;
+      margin-left: 0;
+      text-align: center;
+    }
+  
+    .storeDivsWrapper {
+      grid-template-columns:repeat(2,1fr) ;
+      column-gap: 0.5rem;
+      row-gap: 0.5rem;
+    }
+
+    .landingBodyContainer{
+      margin: 0 0rem;
+    }
+
+    .storeDiv {
+        width: 100%;
+        padding: 0.7rem;
+      }
+  }
+  
