@@ -1,0 +1,184 @@
+/* ShopDetailModal.module.css */
+
+.shop-detail-modal {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background-color: white;
+    padding: 20px;
+    width: 80%;
+    max-width: 600px;
+    max-height: 90vh; /* LIMIT the modal height */
+    overflow-y: auto; /* SCROLL when content exceeds height */
+    border-radius: 8px;
+    z-index: 1000;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+  }
+  
+  
+  .shop-detail-modal-overlay {
+    position: fixed; /* Fixed position to overlay background */
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.5); /* Semi-transparent background */
+    z-index: 999; /* Ensure it's below the modal */
+  }
+  
+  
+  .modalContentWrapper {
+    position: relative;
+    padding: 20px;
+  }
+  
+  .closeButton {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    font-size: 25px;
+    color: #888;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+  }
+  
+  .closeButton:hover {
+    color: #000;
+  }
+  
+  .shopDetails {
+    text-align: center;
+    margin-bottom: 20px;
+  }
+  
+  .shopDetails h3 {
+    font-size: 24px;
+    color: #333;
+    font-weight: bold;
+  }
+  
+  .shopDetails p {
+    font-size: 16px;
+    color: #666;
+    margin-top: 10px;
+  }
+  
+  .reviewControls {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+  
+  .modalRating {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 20px;
+  }
+  
+  .modalRatingH3 {
+    font-size: 20px;
+    color: #333;
+    margin-bottom: 10px;
+  }
+  
+  .starIcon {
+    font-size: 30px;
+    color: #FFD700;
+    cursor: pointer;
+    margin: 0 5px;
+  }
+  
+  .starIcon:hover {
+    transform: scale(1.1);
+  }
+  
+  .modalComments {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+  
+  .commentBox {
+    width: 100%;
+    height: 100px;
+    padding: 10px;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+    font-size: 14px;
+    color: #333;
+    margin-bottom: 10px;
+    resize: none;
+  }
+  
+  .commentBox:focus {
+    border-color: #007bff;
+    outline: none;
+  }
+  
+  .submitComment {
+    padding: 10px 20px;
+    background-color: #007bff;
+    color: white;
+    font-size: 16px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+  }
+  
+  .submitComment:hover {
+    background-color: #0056b3;
+  }
+  
+  .addToCartButton {
+    padding: 10px 20px;
+    background-color: #28a745;
+    color: white;
+    font-size: 16px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    margin-top: 20px;
+  }
+  
+  .addToCartButton:hover {
+    background-color: #218838;
+  }
+  
+  .authPromptModal {
+    /* Style for the auth prompt modal */
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.6);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+  }
+  
+  .authPromptModal .modalContentWrapper {
+    background-color: white;
+    padding: 20px;
+    border-radius: 10px;
+    width: 400px;
+    text-align: center;
+  }
+  
+  .authPromptModal .authPromptButton {
+    margin-top: 15px;
+    padding: 10px 20px;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+  }
+  
+  .authPromptModal .authPromptButton:hover {
+    background-color: #0056b3;
+  }
+  

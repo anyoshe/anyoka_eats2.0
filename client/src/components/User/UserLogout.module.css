@@ -1,0 +1,13 @@
+.logoutIcon {
+  position: fixed;
+  top: 10px;
+  right: 10px;
+  cursor: pointer;
+  color: #333;
+  z-index: 1000;
+  transition: color 0.3s ease;
+}
+
+.logoutIcon:hover {
+  color: #ff0000; /* Change color on hover */
+}
