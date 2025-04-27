@@ -75,7 +75,7 @@
 }
 
 .platformPieceContent {
-    transform: translateY(50%);
+    transform: translateY(70%);
     padding-top: 1.2rem;
 }
 
@@ -198,6 +198,11 @@
   }
   
   @media (max-width: 768px) {
+    .platformPieceContent {
+      transform: translateY(50%);
+    }
+  
+
     .puzzlePiece {
       width: 16rem;
       padding: 0.6rem;

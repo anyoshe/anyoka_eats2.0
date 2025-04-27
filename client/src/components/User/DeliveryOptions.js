@@ -168,29 +168,32 @@ const DeliveryOptions = ({ cart, userLocation, deliveryTown, onDeliveryOptionSel
     <div className={styles.wrapper}>
       <h4 className={styles.heading}>Delivery Options</h4>
 
-      <label className={styles.option}>
-        <input
-          type="radio"
-          value="platform"
-          checked={option === 'platform'}
-          onChange={() => setOption('platform')}
-        />
-        Use our Delivery Service
-      </label>
+      <div className={styles.deliveryOptions}>
+        
+        <label className={styles.option}>
+            <input
+              type="radio"
+              value="platform"
+              checked={option === 'platform'}
+              onChange={() => setOption('platform')}
+            />
+            Use our Delivery Service
+          </label>
 
-      <label className={styles.option}>
-        <input
-          type="radio"
-          value="own"
-          checked={option === 'own'}
-          onChange={() => setOption('own')}
-        />
-        I’ll Send My Own Delivery Person
-      </label>
+          <label className={styles.option}>
+            <input
+              type="radio"
+              value="own"
+              checked={option === 'own'}
+              onChange={() => setOption('own')}
+            />
+            I’ll Send My Own Delivery Person
+          </label>
+      </div>
 
       {option === 'platform' && (
         <div className={styles.deliveryBreakdown}>
-          <h5>Delivery Cost: KSH {deliveryFee}</h5>
+          <h5 className={styles.deliveryBreakdownH5}>Delivery Cost: KSH {deliveryFee}</h5>
           {distanceInfo.map((info, idx) => (
             <div key={idx} className={styles.deliveryLine}>
               From: {info.shop} — {info.distance} km → KSH {info.fee}

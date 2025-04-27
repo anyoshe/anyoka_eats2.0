@@ -159,7 +159,7 @@ const StoreSignUpForm = () => {
 
 
           <div className={styles.formGroup}>
-            <label htmlFor="profileImage">Profile Image</label>
+            <label htmlFor="profileImage" className={styles.formSighUpLables}>Profile Image</label>
             <input
               type="file"
               id="profileImage"
@@ -219,7 +219,7 @@ const StoreSignUpForm = () => {
               id="businessPermit"
               name="businessPermit"
               onChange={handleInputChange}
-              className={`${styles.formSighUpInputs} ${styles.businessPermitO}`}
+              className={styles.businessPermitO}
             />
           </div>
 
