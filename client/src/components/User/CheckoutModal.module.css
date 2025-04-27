@@ -1,122 +1,19 @@
-/* .checkoutModalBackdrop {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background-color: rgba(0,0,0,0.5);
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    z-index: 999;
-  }
-  
-  .checkoutModalContent {
-    background: white;
-    padding: 2rem;
-    width: 90%;
-    max-width: 600px;
-    border-radius: 8px;
-    overflow-y: auto;
-  }
-  
-  .customerDetails,
-  .orderSummary,
-  .paymentOptions {
-    margin-top: 1rem;
-  }
-  
-  .orderItem {
-    margin-bottom: 0.5rem;
-  }
-  
-  .orderItem.total {
-    font-weight: bold;
-    font-size: 1.1rem;
-  }
-  
-  .changeLocationBtn,
-  .paymentOptions button,
-  .closeBtn {
-    margin-top: 0.8rem;
-    margin-right: 0.5rem;
-    padding: 0.5rem 1rem;
-    cursor: pointer;
-  }
-  
-  .locationInput {
-    margin-top: 0.5rem;
-    padding: 0.4rem;
-    width: 100%;
-    border-radius: 4px;
-    border: 1px solid #ccc;
-  }
+@import url('https://fonts.googleapis.com/css2?family=Winky+Sans:ital,wght@0,300..900;1,300..900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&family=Winky+Sans:ital,wght@0,300..900;1,300..900&display=swap');
 
+/* ======= Root & Global Reset ======= */
+:root {
+  --green: #1ea509;
+  --orange: #ffa500;
+  --white: #ffffff;
+}
 
-  
-  .checkoutModalBackdrop {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: rgba(0, 0, 0, 0.5);
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    z-index: 1000;
-    padding: 1rem;
-    box-sizing: border-box;
-  }
-  
-  .checkoutModalContent {
-    background: #fff;
-    border-radius: 10px;
-    width: 100%;
-    max-width: 600px;
-    max-height: 90vh;
-    overflow-y: auto;
-    padding: 2rem;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
-    position: relative;
-  }
-  
-  .customerDetails,
-  .orderSummary,
-  .paymentOptions {
-    margin-bottom: 1.5rem;
-  }
-  
-  .orderItem {
-    margin: 0.5rem 0;
-  }
-  
-  .orderItem.total {
-    font-weight: bold;
-  }
-  
-  .closeBtn {
-    position: sticky;
-    bottom: 0;
-    background-color: #d9534f;
-    color: white;
-    padding: 0.75rem 1.25rem;
-    border: none;
-    border-radius: 5px;
-    margin-top: 1rem;
-    cursor: pointer;
-  }
-  
-  .locationDropdown {
-    margin-top: 0.5rem;
-    margin-bottom: 0.5rem;
-    padding: 0.5rem;
-    width: 100%;
-  }
-   */
-
-
-   /* components/CheckoutModal.module.css */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: "Winky Sans", sans-serif;
+}
 
 .checkoutModalBackdrop {
   position: fixed;
@@ -135,27 +32,61 @@
 }
 
 .checkoutModalContent {
-  background: #fff;
+  background: #ffffff;
   border-radius: 12px;
   width: 100%;
-  max-width: 600px;
+  max-width: 58rem;
   max-height: 90vh;
   overflow-y: auto;
-  padding: 2rem;
+  padding: 0.8rem 2rem;
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
   position: relative;
   animation: slideUpModal 0.3s ease-in-out;
+  z-index: 1000;
+}
+
+.checkoutModalH2{
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: var(--green);
+  margin-bottom: 1rem;
+  /* text-align: center; */
+  text-decoration: underline;
 }
 
 .customerDetails,
 .orderSummary,
 .paymentOptions {
   margin-bottom: 1.5rem;
+  z-index: 1000;
+}
+
+.orderSummaryH4{
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: var(--green);
+  margin-bottom: 1rem;
+  text-decoration: underline;
+}
+
+.customerDetails{
+  /* border: 2px solid red; */
+
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
 }
 
 .orderItem {
   margin: 0.5rem 0;
   font-size: 0.95rem;
+}
+
+.orderItemDiv{
+  /* border: 2px solid red; */
+
+  display: grid;
+  grid-template-columns: repeat(2,1fr);
+  gap: 0.3rem;
 }
 
 .orderItem.total {
@@ -165,28 +96,34 @@
 }
 
 .closeBtn {
-  position: sticky;
-  bottom: 0;
+ 
   background-color: #d9534f;
   color: white;
-  padding: 0.75rem 1.25rem;
+  padding: 0rem 0.5rem;
+  border-radius: 50%;
   border: none;
-  border-radius: 5px;
-  margin-top: 1rem;
   cursor: pointer;
   transition: background-color 0.2s ease-in-out;
-  width: 100%;
+  z-index: 1000;
+  position: absolute;
+  align-items: center;
+  justify-content: center;
+  top: 1rem;
+  right: 1rem;
+  font-size: 1.7rem;
+  font-weight: bold;
 }
 
 .closeBtn:hover {
-  background-color: #c9302c;
+  background-color: var(--white);
+  color: red;
+  outline: 1px solid red;
 }
 
 .changeLocationBtn,
 .labelDropdown,
 .locationInput,
-.locationDropdown,
-.checkoutModalContent button {
+.locationDropdown {
   margin: 0.5rem 0;
   padding: 0.5rem;
   border-radius: 4px;
@@ -197,13 +134,19 @@
 }
 
 .changeLocationBtn {
-  background-color: #007bff;
+  background-color: var(--green);
   color: white;
   border: none;
+  grid-column: 1 / span 2;
+  border: none;
+  outline: none;
+  transition: 0.2s ease-in;
 }
 
 .changeLocationBtn:hover {
-  background-color: #0056b3;
+  background-color: var(--white);
+  color: var(--orange);
+  outline: 1px solid var(--orange);
 }
 
 .locationInput {

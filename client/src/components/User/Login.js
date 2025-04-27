@@ -68,7 +68,9 @@ const Login = () => {
 
   return (
     <form className={styles.form} onSubmit={handleSubmit}>
+
       <h2>Login</h2>
+      
       {error && <p className={styles.error}>{error}</p>}
 
       <div className={styles.field}>
