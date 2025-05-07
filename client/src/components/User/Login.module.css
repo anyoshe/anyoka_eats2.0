@@ -16,7 +16,9 @@
 
 .form h2 {
   font-size: 1.8rem;
-  color: #333;
+  color: var(--green);
+  font-weight: 700;
+  text-decoration: underline;
   text-align: center;
   margin-bottom: 1rem;
 }
@@ -56,16 +58,19 @@
 .form button {
   padding: 0.75rem;
   font-size: 1.2rem;
-  background-color: #007bff;
+  background-color: var(--green);
   color: white;
   border: none;
+  outline: none;
   border-radius: 5px;
   cursor: pointer;
   transition: background-color 0.3s ease, transform 0.2s ease-in-out;
 }
 
 .form button:hover {
-  background-color: #0056b3;
+  background-color: var(--white);
+  color: var(--orange);
+  outline: 1px solid var(--orange);
   transform: scale(1.05);
 }
 

@@ -1,0 +1,318 @@
+@import url('https://fonts.googleapis.com/css2?family=Winky+Sans:ital,wght@0,300..900;1,300..900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&family=Winky+Sans:ital,wght@0,300..900;1,300..900&display=swap');
+
+:root {
+  --green: #1ea509;
+  --orange: #ffa500;
+  --white: #ffffff;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: "Winky Sans", sans-serif;
+}
+
+.orderSummary {
+  max-width: 47rem; 
+  margin: 0.625rem auto;
+  padding: 1rem;
+  border: 0.0625rem solid #ddd; 
+  border-radius: 0.75rem; 
+  background: #fff;
+  box-shadow: 0 0 0.625rem rgba(0, 0, 0, 0.05); 
+}
+
+.heading {
+  color: var(--green);
+  margin-bottom: 0.5rem;
+  text-decoration: underline;
+  font-size: 1.3rem;
+}
+
+.subHeading {
+  color: var(--green);
+  text-decoration: underline;
+  margin-bottom: 0rem;
+  font-size: 1.3rem;
+}
+
+.orderDetailsGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  column-gap: 0.2rem; 
+  row-gap: 0.8rem;
+  margin-bottom: 1rem;
+}
+
+.detailItem{
+  margin-bottom: 0rem;
+}
+
+.itemList {
+  list-style: none;
+  padding-left: 0;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.2rem; 
+}
+
+.item {
+  padding: 0.2rem 0; 
+  border-bottom: 0.0625rem solid #eee;
+  padding-left: 0.2rem; 
+}
+
+.total {
+  font-size: 1.3rem;
+  font-weight: 600;
+  color: var(--orange);
+  margin-top: 1rem; 
+}
+
+.backLink {
+  display: inline-block;
+  background: var(--green);
+  color: var(--white);
+  padding: 0.625rem 1.25rem; 
+  border-radius: 0.5rem; 
+  text-decoration: none;
+  border: none;
+  outline: none;
+  transition: all 0.3s ease;
+}
+
+.backLink:hover {
+  background: var(--white);
+  color: var(--orange);
+  border: 0.0625rem solid var(--orange); 
+}
+
+
+@import url('https://fonts.googleapis.com/css2?family=Winky+Sans:ital,wght@0,300..900;1,300..900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap');
+
+:root {
+  --green: #1ea509;
+  --orange: #ffa500;
+  --white: #ffffff;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: "Winky Sans", sans-serif;
+}
+
+
+
+/* ======================== */
+/* BASE STYLES - Large screens (desktop) */
+/* ======================== */
+
+/* .orderSummary {
+  max-width: 47rem;
+  margin: 0.625rem auto;
+  padding: 2rem;
+  border: 0.0625rem solid #ddd;
+  border-radius: 0.75rem;
+  background: var(--white);
+  box-shadow: 0 0 0.625rem rgba(0, 0, 0, 0.05);
+}
+
+.heading {
+  color: var(--green);
+  margin-bottom: 1rem;
+  text-decoration: underline;
+  font-size: 2rem;
+}
+
+.subHeading {
+  color: var(--green);
+  margin-top: 2rem;
+  margin-bottom: 1rem;
+  text-decoration: underline;
+  font-size: 1.75rem;
+}
+
+.orderDetailsGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  column-gap: 1.5rem;
+  row-gap: 1rem;
+  margin-bottom: 2rem;
+}
+
+.detailItem {
+  font-size: 1.125rem;
+}
+
+.itemList {
+  list-style: none;
+  padding-left: 0;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+}
+
+.item {
+  padding: 0.5rem;
+  border-bottom: 0.0625rem solid #eee;
+  font-size: 1rem;
+}
+
+.total {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: var(--orange);
+  margin-top: 2rem;
+}
+
+.backLink {
+  display: inline-block;
+  background: var(--green);
+  color: var(--white);
+  padding: 0.75rem 2rem;
+  border-radius: 0.5rem;
+  text-decoration: none;
+  border: none;
+  outline: none;
+  transition: all 0.3s ease;
+  margin-top: 2rem;
+}
+
+.backLink:hover {
+  background: var(--white);
+  color: var(--orange);
+  border: 0.0625rem solid var(--orange);
+} */
+
+/* ======================== */
+/* 1440px ↓ */
+/* ======================== */
+
+@media (max-width: 1440px) {
+  .heading {
+    font-size: 1.8rem;
+  }
+  .subHeading {
+    font-size: 1.5rem;
+  }
+  .detailItem {
+    font-size: 1.05rem;
+  }
+  .item {
+    font-size: 0.95rem;
+  }
+}
+
+/* ======================== */
+/* 1024px ↓ */
+/* ======================== */
+
+@media (max-width: 1024px) {
+  .orderSummary {
+    padding: 1.5rem;
+  }
+  .heading {
+    font-size: 1.6rem;
+  }
+  .subHeading {
+    font-size: 1.4rem;
+  }
+  .detailItem {
+    font-size: 1rem;
+  }
+  .itemList {
+    gap: 0.75rem;
+  }
+  .item {
+    font-size: 0.9rem;
+  }
+}
+
+/* ======================== */
+/* 768px ↓ */
+/* ======================== */
+
+@media (max-width: 768px) {
+  .orderSummary {
+    padding: 1rem;
+  }
+  .orderDetailsGrid {
+    /* column-gap: 1rem; */
+    row-gap: 0.8rem;
+  }
+  .heading {
+    font-size: 1.5rem;
+  }
+  .subHeading {
+    font-size: 1.25rem;
+  }
+  .detailItem {
+    font-size: 0.95rem;
+  }
+  .item {
+    font-size: 0.85rem;
+  }
+  .backLink {
+    padding: 0.625rem 1.5rem;
+    font-size: 0.95rem;
+  }
+}
+
+/* ======================== */
+/* 425px ↓ (MOBILE) */
+/* ======================== */
+
+@media (max-width: 426px) {
+  .orderDetailsGrid {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .itemList {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .orderSummary {
+    padding: 1rem 0.75rem;
+  }
+
+  .heading {
+    font-size: 1.25rem;
+    margin-bottom: 0.75rem;
+  }
+
+  .subHeading {
+    font-size: 1.1rem;
+    margin-top: 1.5rem;
+    margin-bottom: 0.5rem;
+  }
+
+  .detailItem {
+    font-size: 0.9rem;
+  }
+
+  .item {
+    font-size: 0.85rem;
+    padding: 0.4rem;
+  }
+
+  .total {
+    font-size: 1.2rem;
+    margin-top: 1.5rem;
+  }
+
+  .backLink {
+    font-size: 0.9rem;
+    padding: 0.5rem 1rem;
+    margin-top: 1.5rem;
+  }
+}
+

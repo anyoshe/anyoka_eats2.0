@@ -3,92 +3,104 @@ import { Link } from 'react-router-dom';
 import logoImg from '../../assets/images/logo_on_white orange.png';
 import leftAd from '../../assets/images/adsExample.jpg';
 import rightAd from '../../assets/images/adExample.jpg';
-import './Landing.css';
+import styles from './HeroHeader.module.css';
 import InstallPrompt from '../Header/InstallPrompt';
+
 const HeroHeader = () => {
     return (
-        <header className="heroHeader">
-            <nav className="landingNav">
-                <a href="/" className="homeLogoPic">
-                    <img src={logoImg} alt="Logo" className="logoImg" />
+        <header className={styles.heroHeader}>
+            <nav className={styles.landingNav}>
+                <a href="/" className={styles.homeLogoPic}>
+                    <img src={logoImg} alt="Logo" className={styles.logoImg} />
                 </a>
-                <Link to="/sign-in">
-                    <button className="logInButton">
-                        <i className="fas fa-sign-in-alt"></i> LOG IN
-                    </button></Link>
+
+                <div className={styles.installLogIn}>
+                    <InstallPrompt />
+
+                    <Link to="/sign-in">
+                        <button className={styles.logInButton}>
+                            <i className="fas fa-sign-in-alt"></i> LOG IN
+                        </button>
+                    </Link>
+                </div>
             </nav>
 
-            <div className="heroAdsDiv">
-                <div className="leftAd adsDiv">
-                    <p className="adtext">Lorem ipsum dolor sit, amet consectetur adipisicing elit. Placeat iure suscipit neque assumenda quis quo iste atque recusandae odit quidem? Dolore necessitatibus pariatur ipsum qui possimus voluptatibus labore, assumenda recusandae.Lorem ipsum dolor sit, amet consectetur adipisicing elit. Placeat iure suscipit neque assumenda quis quo iste atque recusandae odit quidem?</p>
+            <div className={styles.heroAdsDiv}>
+                <div className={`${styles.leftAd} ${styles.adsDiv}`}>
+                    {/* <p className={styles.adtext}>
+                        Lorem ipsum dolor sit, amet consectetur adipisicing elit. Placeat iure suscipit neque assumenda quis quo iste atque recusandae odit quidem? Dolore necessitatibus pariatur ipsum qui possimus voluptatibus labore, assumenda recusandae.Lorem ipsum dolor sit, amet consectetur adipisicing elit. Placeat iure suscipit neque assumenda quis quo iste atque recusandae odit quidem?
+                    </p>
 
-                    <img src={leftAd} alt="Left Ad" className="adImage" />
-
+                    <img src={leftAd} alt="Left Ad" className={styles.adImage} /> */}
                 </div>
 
-                <div className="rightAd adsDiv">
-                    <img src={rightAd} alt="Right Ad" className="adImage" />
+                <div className={`${styles.rightAd} ${styles.adsDiv}`}>
+                    {/* <img src={rightAd} alt="Right Ad" className={styles.adImage} />
 
-                    <p className="adtext">Lorem ipsum dolor sit amet consectetur adipisicing elit. Porro aperiam vitae quibusdam aliquam, numquam officiis. Asperiores deleniti doloremque nisi impedit quasi delectus, enim, nam consequuntur rerum repellat incidunt, sit commodi?Lorem ipsum dolor sit, amet consectetur adipisicing elit. Placeat iure suscipit neque assumenda quis quo iste atque recusandae odit quidem?</p>
+                    <p className={styles.adtext}>
+                        Lorem ipsum dolor sit amet consectetur adipisicing elit. Porro aperiam vitae quibusdam aliquam, numquam officiis. Asperiores deleniti doloremque nisi impedit quasi delectus, enim, nam consequuntur rerum repellat incidunt, sit commodi?Lorem ipsum dolor sit, amet consectetur adipisicing elit. Placeat iure suscipit neque assumenda quis quo iste atque recusandae odit quidem?
+                    </p> */}
                 </div>
             </div>
 
-            <section className="categorySection">
-
-                {/* <h2 className="categoryListH2">Top Categories</h2> */}
-
-                <div className="searchContainer">
-                    <input type="text" className="searchInput" placeholder="Search Top Categories ..." />
-                    <i className="fas fa-search searchIcon"></i>
-                </div>
-                <InstallPrompt />
-
-                <div className="categoryDivs">
-                    <Link to="/menu?category=Food">
-                        <div className="categoryDiv">
-                            <i className="fas fa-utensils fa-bounce slow1 categoryPic"></i>
-                            <p className="categoryText">Food</p>
-                        </div>
-                    </Link>
-                    <Link to="/menu?category=Fashion">
-                        <div class="categoryDiv">
-                            <i class="fas fa-shirt fa-shake slow2 categoryPic"></i>
-                            <p class="categoryText">Fashion</p>
-                        </div>
-                    </Link>
-                    <Link to="/menu?category=Pet Supplies">
-                        <div class="categoryDiv">
-                            <i class="fas fa-dog fa-beat slow3 categoryPic"></i>
-                            <p class="categoryText">Pet supplies</p>
-                        </div>
-                    </Link>
-                    <Link to="/menu?category=Toys & games">
-                        <div class="categoryDiv">
-                            <i class="fas fa-puzzle-piece fa-bounce slow4 categoryPic"></i>
-                            <p class="categoryText">Toys & games</p>
-                        </div>
-                    </Link>
-                    <Link to="/menu?category=Electronics">
-                        <div class="categoryDiv">
-                            <i class="fas fa-microchip fa-spin-pulse slow5 categoryPic"></i>
-                            <p class="categoryText">Electronics</p>
-                        </div>
-                    </Link>
-
-                    <Link to="/menu?category=Health">
-                        <div class="categoryDiv">
-                            <i class="fas fa-heartbeat fa-beat slow6 categoryPic"></i>
-                            <p class="categoryText">Health</p>
-                        </div>
-                    </Link>
-                    <Link to="/menu?category=Beauty & Personal Care">
-                        <div class="categoryDiv">
-                            <i className="fas fa-spa fa-flip slow7 categoryPic"></i>
-                            <p class="categoryText">Beauty</p>
-                        </div>
-                    </Link>
+            <section className={styles.categorySection}>
+                <div className={styles.searchContainer}>
+                    <input type="text" className={styles.searchInput} placeholder="Search Top Categories ..." />
+                    <i className={`fas fa-search ${styles.searchIcon}`}></i>
                 </div>
 
+                <div className={styles.categoryDivs}>
+                    <Link to="/menu?category=Food" className={styles.categoryLinks}>
+                    <div className={styles.categoryDiv}>
+                        <i className={`fas fa-utensils fa-bounce ${styles.slow1} ${styles.categoryPic}`}></i>
+                        <p className={styles.categoryText}>Food</p>
+                    </div>
+                    </Link>
+
+                    <Link to="/menu?category=Fashion" className={styles.categoryLinks}>
+                    <div className={styles.categoryDiv}>
+                        <i className={`fas fa-shirt fa-shake ${styles.slow2} ${styles.categoryPic}`}></i>
+                        <p className={styles.categoryText}>Fashion</p>
+                    </div>
+                    </Link>
+
+                    <Link to="/menu?category=Pet supplies" className={styles.categoryLinks}>
+                    <div className={styles.categoryDiv}>
+                        <i className={`fas fa-dog fa-beat ${styles.slow3} ${styles.categoryPic}`}></i>
+                        <p className={styles.categoryText}>Pet supplies</p>
+                    </div>
+                    </Link>
+
+                    <Link to="/menu?category=Toys & games" className={styles.categoryLinks}>
+                    <div className={styles.categoryDiv}>
+                        <i className={`fas fa-puzzle-piece fa-bounce ${styles.slow4} ${styles.categoryPic}`}></i>
+                        <p className={styles.categoryText}>Toys & games</p>
+                    </div>
+                    </Link>
+
+                    <Link to="/menu?category=Electronics" className={styles.categoryLinks}>
+                    <div className={styles.categoryDiv}>
+                        <i className={`fas fa-microchip fa-spin-pulse ${styles.slow5} ${styles.categoryPic}`}></i>
+                        <p className={styles.categoryText}>Electronics</p>
+                    </div>
+                    </Link>
+
+                    <Link to="/menu?category=Health" className={styles.categoryLinks}>
+                    <div className={styles.categoryDiv}>
+                        <i className={`fas fa-heartbeat fa-beat ${styles.slow6} ${styles.categoryPic}`}></i>
+                        <p className={styles.categoryText}>Health</p>
+                    </div>
+                    </Link>
+
+                    <Link to="/menu?category=Beauty" className={styles.categoryLinks}>
+                    <div className={styles.categoryDiv}>
+                        <i className={`fas fa-spa fa-flip ${styles.slow7} ${styles.categoryPic}`}></i>
+                        <p className={styles.categoryText}>Beauty</p>
+                    </div>
+                    </Link>
+                </div>
+
+                <hr></hr>
             </section>
         </header>
     );

@@ -9,16 +9,6 @@ import LandingBodyContainer from './LandingBodyContainer';
 import PartnershipSection from './PartnershipSection';
 
 const LandingPage = () => {
-
-
-
-
-
-
-
-
-
-
     return (
         <div className="containerDiv">
             <HeroHeader />
