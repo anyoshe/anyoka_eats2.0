@@ -1,0 +1,417 @@
+:root {
+    --green: #1ea509;
+    --orange: #ffa500;
+    --white: #ffffff;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: "Winky Sans", sans-serif;
+}
+
+.heroHeader {
+    position: relative;
+    width: 100%;
+    /* height: 100vh; */
+    min-height: 100vh;
+    height: auto;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    /* margin-bottom: 1rem; */
+    /* padding-top: 4rem; */
+}
+
+.landingNav {
+    position: fixed;
+    z-index: 1000;
+    /* width: inherit; */
+    width: 100%;
+    padding: 0.3em 2.5em;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background-color: var(--orange);
+}
+
+.homeLogoPic {
+    background-color: var(--white);
+    display: flex;
+    align-items: center;
+    border-radius: 50%;
+}
+
+.logoImg {
+    border-radius: 50%;
+    width: 2.5em;
+    height: 2.5em;
+    background-color: var(--orange);
+    margin: 0.1rem;
+}
+
+.installLogIn{
+    width: 19%;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+}
+
+.logInButton {
+    padding: 0.5rem 1rem;
+    font-size: 1em;
+    border-radius: 60rem;
+    border: none;
+    outline: none;
+    background-color: var(--green);
+    color: var(--white);
+    cursor: pointer;
+    transition: 0.2s ease-in;
+}
+
+.logInButton:hover {
+    background-color: white;
+    color: var(--orange);
+    outline: 1px solid var(--orange);
+    font-size: 1.1rem;
+}
+
+.fa-sign-in-alt {
+    padding-right: 0.5rem;
+}
+
+.heroAdsDiv {
+    margin-top: 2.5em;
+    display: flex;
+    gap: 1em;
+    padding: 1em;
+}
+
+.adsDiv {
+    display: flex;
+    align-items: center;
+    padding: 1rem;
+    gap: 2rem;
+    border-radius: 1rem;
+    height: 16rem;
+    width: 30rem;
+}
+
+.leftAd {
+    background-color: var(--orange);
+}
+
+.rightAd {
+    background-color: var(--orange);
+}
+
+.adtext {
+    width: 80%;
+    text-align: justify;
+    font-size: 0.9em;
+}
+
+.adImage {
+    width: 15em;
+    height: 15em;
+    border-radius: 50%;
+}
+
+.categorySection {
+    position: relative;
+    width: 80%;
+}
+
+.searchContainer {
+    position: relative;
+    width: 100%;
+    max-width: 20rem;
+    margin: 1rem auto;
+}
+
+.searchInput {
+    width: 100%;
+    padding: 0.7rem 2.5rem 0.7rem 1rem;
+    border-radius: 2rem;
+    border: none;
+    outline: 1px solid #ccc;
+    font-size: 1rem;
+    cursor: pointer;
+}
+
+.searchInput:hover {
+    outline: 1px solid var(--orange);
+}
+
+.searchIcon {
+    position: absolute;
+    right: 1rem;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--green);
+    font-size: 1.2rem;
+    cursor: pointer;
+}
+
+.searchContainer:hover .searchIcon {
+    color: var(--orange);
+}
+
+.categoryDivs {
+    display: flex;
+    overflow: hidden;
+    width: 100%;
+    justify-content: space-around;
+    padding: 0.5rem;
+}
+
+.categoryLinks{
+    text-decoration: none;
+}
+
+.categoryDiv {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding-top: 1rem;
+}
+
+.categoryPic {
+    border-radius: 50%;
+    padding: 1.2rem;
+    font-size: 2.2rem;
+    display: block;
+    margin: 0 auto 0.5rem auto;
+    color: var(--orange);
+}
+
+.slow1 { --fa-animation-duration: 2.5s; }
+.slow2 { --fa-animation-duration: 4s; }
+.slow3 { --fa-animation-duration: 3.2s; }
+.slow4 { --fa-animation-duration: 2s; }
+.slow5 { --fa-animation-duration: 5s; }
+.slow6 { --fa-animation-duration: 3s; }
+.slow7 { --fa-animation-duration: 5s; }
+
+.categoryText {
+    font-size: 0.9rem;
+    padding: 0.2rem;
+    font-weight: 500;
+    color: var(--white);
+    border-radius: 0.5rem;
+    width: 7rem;
+    text-align: center;
+    margin-top: 1rem;
+    background-color: var(--green);
+    border: none;
+    outline: none;
+    cursor: pointer;
+    transition: 0.2s ease-in;
+}
+
+.categoryText:hover {
+    color: var(--orange);
+    background-color: var(--white);
+    outline: 1px solid var(--orange);
+}
+
+.categoryText:active {
+    transform: scale(0.96);
+    box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.2);
+    transition: transform 0.05s ease;
+}
+
+
+@media (max-width: 1440px) {  
+    .adsDiv {
+        width: 38rem;
+    }
+}
+
+@media (max-width: 1024px) {
+    .adsDiv {
+        width: 31rem;
+    }
+
+    /* .adtext {
+        width: 90%;
+        font-size: 0.9em;
+    }
+
+    .adImage {
+        width: 12em;
+        height: 12em;
+    } */
+
+    .installLogIn {
+        width: 23%;
+    }
+
+    .categorySection{
+        width: 85%;
+    }
+}
+
+@media (max-width: 768px) {
+    .logoImg {
+        width: 2.6em;
+        height: 2.6em;
+    }
+
+    .installLogIn {
+        gap: 0.5rem;
+        width: auto;
+    }
+
+    .heroAdsDiv {
+        gap: 0.8rem;
+        margin-top: 3em;
+        padding: 0.5em;
+        padding-bottom: 0rem;
+    }
+
+    .adsDiv{
+        padding: 0.5rem;
+        gap: 0.5rem;
+        flex-direction: column;
+        height: 14rem;
+        width: 38rem;
+    }
+
+    .adImage {
+        width: 10em;
+        height: 10em;
+    }
+    .searchContainer{
+        margin-bottom: 0.5rem;
+    }
+
+    .searchInput {
+        font-size: 0.9rem;
+    }
+
+    .categorySection {
+        width: 100%;
+    }
+
+    .categoryDivs {
+        display: grid;
+        grid-template-columns: repeat(7,1fr);
+        gap: 0.2rem;
+    }
+
+    .categoryDiv {
+        padding-top: 0.5rem;
+    }
+
+    .categoryText{
+        width: 6rem;
+        font-size: 0.8rem;
+        margin: 0.3rem 0rem;
+    }
+}
+
+@media (max-width: 426px) {
+    .landingNav {
+        padding: 0.4em;
+        gap: 0.2rem;
+    }
+
+    .installLogIn {
+        width: 100%;
+        justify-content: center;
+        width: 40%;
+    }
+
+    .logInButton{
+        font-size: 0.5em;
+    }
+
+    .heroAdsDiv {
+        padding: 0.3rem;
+        width: 100%;
+        margin-top: 3.5em;
+        gap: 0.3rem;
+    }
+
+    .adsDiv{
+        height: 10rem;
+        width: 38rem;
+    }
+
+    .adtext {
+        font-size: 0.8em;
+        width: 95%;
+    }
+
+    .adImage {
+        width: 8em;
+        height: 8em;
+    }
+
+    .searchContainer{
+        margin-top: 0.5rem;
+    }
+
+    .searchInput {
+        font-size: 0.85rem;
+        padding: 0.5rem 2.2rem 0.5rem 1rem;
+    }
+
+    .categoryDivs {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 0.2rem;
+    }
+}
+
+@media (max-width: 376px) {
+    .searchInput {
+        padding: 0.5rem 2rem 0.5rem 1rem;
+    }
+
+    .searchIcon {
+        font-size: 1rem;
+    }
+
+    .categoryText {
+        font-size: 0.8rem;
+    }
+}
+
+@media (max-width: 321px) {
+    .landingNav{
+        padding: 0.2rem;
+    }
+
+    .logoImg {
+        width: 2.4em;
+        height: 2.4em;
+    }
+
+    .installLogIn {
+        width: 48%;
+    }
+
+    .heroAdsDiv {
+        padding: 0.2rem;
+        margin-top: 3em;
+        gap: 0.2rem;
+        flex-direction: column;
+    }
+
+    .searchContainer{
+        padding: 0rem 0.2rem;
+    }
+
+    .categoryDivs{
+        grid-template-columns: repeat(2, 1fr);
+        gap: 0.2rem;
+    }
+    
+    .categoryText {
+        width: 6rem;
+    }
+}

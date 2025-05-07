@@ -1,0 +1,249 @@
+@import url('https://fonts.googleapis.com/css2?family=Winky+Sans:ital,wght@0,300..900;1,300..900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&family=Winky+Sans:ital,wght@0,300..900;1,300..900&display=swap');
+
+/* ======= Root & Global Reset ======= */
+:root {
+    --green: #1ea509;
+    --orange: #ffa500;
+    --white: #ffffff;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: "Winky Sans", sans-serif;
+}
+
+.partnershipSection {
+    /* border: 2px solid red; */
+
+    width: 100%;
+    min-height: 96vh;
+    display: flex;
+    flex-direction: column;
+    /* justify-content: center; */
+    align-items: center;
+    padding: 1rem 0rem;
+    /* text-align: center; */
+    /* background-color: #f9f9f9; */
+}
+
+.sectionTitle {
+    font-size: 2rem;
+    margin-bottom: 2rem;
+}
+
+.puzzleContainer {
+    display: flex;
+    justify-content: center;
+    align-items: stretch;
+    gap: 0;
+    flex-wrap: wrap;
+}
+
+.puzzlePiece {
+    width: 23rem;
+    margin: -0.625rem;
+    padding: 1rem;
+    background-color: #ccc;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    opacity: 0;
+    transform: translateY(3.125rem);
+    animation: snapIn 0.8s ease forwards;
+    text-align: center;
+    overflow: hidden;
+    box-sizing: border-box;
+}
+
+.promoImg {
+    width: 10rem;
+    height: 10rem;
+    border-radius: 50%;
+    object-fit: cover;
+    margin-bottom: 0.2rem;
+}
+
+.pieceContent {
+    padding: 0.5rem;
+    color: #fff;
+    z-index: 2;
+}
+
+.platformPieceContent {
+    transform: translateY(70%);
+    padding-top: 1.2rem;
+}
+
+.pieceContent h3 {
+    font-size: 1.5rem;
+    margin-bottom: 0.1rem;
+}
+
+.pieceContent p {
+    font-size: 1rem;
+    line-height: 1.5;
+}
+
+.vendor {
+    background-color: #f39c12;
+    animation-delay: 0s;
+}
+
+.platform {
+    background-color: #3498db;
+    clip-path: polygon(
+        0% 0%, 10% 0%, 10% 30%, 0% 30%, 0% 70%, 10% 70%, 10% 100%, 90% 100%, 
+        90% 70%, 100% 70%, 100% 30%, 90% 30%, 90% 0%, 0% 0%
+    );
+    animation-delay: 0.4s;
+    z-index: 5;
+    transform: translateY(50%);
+    padding-top: 3.5rem;
+}
+
+.driver {
+    background-color: #2ecc71;
+    animation-delay: 0.8s;
+}
+
+@keyframes snapIn {
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.puzzlePiece:hover {
+    transform: scale(1.03);
+    transition: transform 0.3s ease;
+}
+
+.vendorCta,
+.deliveryCta {
+    display: inline-block;
+    margin-top: 0.5rem;
+    padding: 0.4rem 2rem;
+    font-size: 1rem;
+    color: var(--white);
+    text-decoration: none;
+    border-radius: 0.5rem;
+    transition: background-color 0.3s ease;
+}
+
+.vendorCta {
+    background-color: var(--green);
+    border: none;
+}
+
+.vendorCta:hover {
+    background-color: var(--white);
+    color: var(--orange);
+    outline: 1px solid var(--orange);
+}
+
+.deliveryCta {
+    background-color: var(--orange);
+}
+
+.deliveryCta:hover {
+    background-color: var(--white);
+    color: var(--orange);
+    outline: 1px solid var(--orange);
+}
+
+
+
+@media (max-width: 1440px) {
+    .puzzlePiece {
+      width: 20rem; /* smaller width but still horizontal */
+      margin: -0.5rem;
+      padding: 0.8rem;
+    }
+  
+    .promoImg {
+      width: 8rem;
+      height: 8rem;
+    }
+  
+    .pieceContent h3 {
+      font-size: 1.3rem;
+    }
+  
+    .pieceContent p {
+      font-size: 0.9rem;
+    }
+  
+    .vendorCta,
+    .deliveryCta {
+      font-size: 0.9rem;
+      padding: 0.4rem 1.5rem;
+    }
+  }
+  
+  @media (max-width: 1024px) {
+    .puzzlePiece {
+      width: 18rem; 
+      padding: 0.7rem;
+    }
+  
+    .promoImg {
+      width: 7rem;
+      height: 7rem;
+    }
+  }
+  
+  @media (max-width: 768px) {
+    .platformPieceContent {
+      transform: translateY(50%);
+    }
+  
+
+    .puzzlePiece {
+      width: 16rem;
+      padding: 0.6rem;
+    }
+  
+    .promoImg {
+      width: 6rem;
+      height: 6rem;
+    }
+  }
+  
+  @media (max-width: 426px) {
+    .platformPieceContent {
+        transform: none !important; /* ✅ remove weird vertical push */
+        padding-top: 0 !important; /* ✅ fix extra top space */
+    }
+      
+    .platform {
+        transform: none !important; 
+        padding-top: 1rem !important; 
+        clip-path: none !important; 
+    }
+      
+    .puzzleContainer {
+      flex-direction: column;
+      align-items: center;
+      gap: 1rem;
+    }
+  
+    .puzzlePiece {
+      width: 90%; /* full width but nicely padded */
+      max-width: 22rem;
+      margin: 0;
+      transform: none !important; /* ✅ reset the weird movement */
+      opacity: 1 !important; /* ✅ make sure they show up */
+      animation: none !important;
+    }
+  
+    .promoImg {
+      width: 8rem;
+      height: 8rem;
+    }
+  }
+  
