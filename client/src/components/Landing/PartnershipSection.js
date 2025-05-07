@@ -38,7 +38,7 @@ const PartnershipSection = () => {
                 <p> 
                     Want to earn on schedule? Sign up with no upfront costs.We partner with trusted local vendors and provide you with a steady flow of delivery orders.
                 </p>
-            <a href="/signup" className="ctaButton deliveryCta">Start delivering</a>
+            <a href="/driver-signup" className="ctaButton deliveryCta">Start delivering</a>
           </div>
         </div>
       </div>

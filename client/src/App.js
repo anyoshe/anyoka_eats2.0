@@ -15,7 +15,10 @@ import Logout from './components/User/UserLogout';
 import Login from './components/User/Login';
 import OrderSummaryPage from './components/User/OrderSummaryPage';
 import StoreMenuPage from './components/Menu/StoreMenuPage';
-
+import DriverSignup from './components/Menu/DriverDashboard/DriverSignup';
+import { DriverProvider } from './contexts/DriverContext';
+import ProfileSetupPage from './components/Menu/DriverDashboard/ProfileSetupPage';
+import DriverDashboard from './components/Menu/DriverDashboard/DriverDashboard';
 
 
 function App() {
@@ -23,7 +26,10 @@ function App() {
 
 
         <Router>
+            
+            <DriverProvider>
 
+            
             <PartnerProvider>
                
                 <CartProvider>
@@ -36,6 +42,9 @@ function App() {
                         <Route path="/reset-password" element={<ResetPassword />} />
                         <Route path="/product/:id" element={<ProductCard />} />
                         <Route path="/signup" element={<SignupPage />} />
+                        <Route path="/driver-signup" element={<DriverSignup />} />
+                        <Route path="/driver/profile-setup" element={<ProfileSetupPage />} />
+                        <Route path="/driver/dashboard" element={<DriverDashboard />} />
                         <Route path="/reset-partner-password" element={<ResetPartnerPassword />} />
                         <Route path="/dashboard" element={<AccountPage />} />
                         
@@ -60,6 +69,8 @@ function App() {
                 </CartProvider>
 
             </PartnerProvider>
+
+            </DriverProvider>
 
         </Router>
 

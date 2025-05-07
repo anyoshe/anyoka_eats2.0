@@ -10,7 +10,6 @@ const path = require('path');
 const LocalStrategy = require('passport-local').Strategy;
 const jwt = require('jsonwebtoken');
 const routes = require('./routes/routes.js'); 
-const appRoutes = require('./routes/appRouter.js');
 const bodyParser = require('body-parser');
 
 const app = express();
@@ -61,7 +60,6 @@ app.use(passport.session());
 
 // Routes
 app.use('/api', routes);
-app.use('/api', appRoutes);
 
 // File Uploads
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
