@@ -3,8 +3,7 @@ import styles from './DriverDashboard.module.css';
 import { DriverContext } from '../../../contexts/DriverContext';
 import DriverProfileDisplay from './DriverProfileDisplay';
 import Orders from '../../User/Orders';
-// import VehicleSection from './VehicleSection';
-import NotificationComponent from '../../User/NotificationComponent';
+import DriverNotification from "./DriverNotification";
 import DriverLogout from './DriverLogout';
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faBell, faBars } from "@fortawesome/free-solid-svg-icons";
@@ -51,7 +50,7 @@ const DriverDashboard = () => {
 
         {/* Notification Dropdown */}
         {showNotifications && (
-          <NotificationComponent
+          <DriverNotification
             notifications={notifications}
             onView={handleViewOrder}
           />

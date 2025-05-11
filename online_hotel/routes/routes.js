@@ -20,8 +20,8 @@ const axios = require('axios');
 const { type } = require("os");
 require('dotenv').config();
 const nodemailer = require('nodemailer');
-const { notifyPartner } = require('../socketServer');
-// const { notifyPartner: emitSocketNotification } = require('../socketServer');
+const { notifyPartner, notifyDriver } = require('../socketServer');
+const geolib = require('geolib');
 
 
 
@@ -43,6 +43,35 @@ function authenticateToken(req, res, next) {
   } catch (err) {
     console.log('Token verification failed:', err.message);
     res.status(400).send('Invalid Token');
+  }
+}
+
+
+
+async function parsePlusCodeToLatLng(plusCode) {
+  try {
+    const apiKey = process.env.GOOGLE_API_KEY; // Ensure your Google API key is set in the environment variables
+    if (!apiKey) {
+      throw new Error('Google API key is missing. Set GOOGLE_API_KEY in your environment variables.');
+    }
+
+    const response = await axios.get('https://maps.googleapis.com/maps/api/geocode/json', {
+      params: {
+        address: plusCode,
+        key: apiKey,
+      },
+    });
+
+    if (response.data.status === 'OK' && response.data.results.length > 0) {
+      const location = response.data.results[0].geometry.location;
+      return { lat: location.lat, lng: location.lng };
+    } else {
+      console.error('Failed to parse Plus Code:', response.data.status, response.data.error_message);
+      return null;
+    }
+  } catch (error) {
+    console.error('Error in parsePlusCodeToLatLng:', error.message);
+    return null;
   }
 }
 
@@ -1116,7 +1145,7 @@ router.post('/orders/place', async (req, res) => {
 
   const {
     userId,
-    items,           // [{ productId, quantity, price, shop: { shopId, shopName } }, ...]
+    items,          
     delivery,
     paymentMethod
   } = req.body;
@@ -1301,12 +1330,48 @@ router.get('/suborders/:id', async (req, res) => {
 });
 
 
+// router.put('/suborders/:id/status', async (req, res) => {
+//   try {
+//     const { id } = req.params;
+//     const { status } = req.body;
+
+//     // Validate status
+//     const validStatuses = [
+//       'Pending',
+//       'OrderReceived',
+//       'Preparing',
+//       'ReadyForPickup',
+//       'PickedUp',
+//       'OutForDelivery',
+//       'Delivered',
+//     ];
+//     if (!validStatuses.includes(status)) {
+//       return res.status(400).json({ error: 'Invalid status' });
+//     }
+
+//     const subOrder = await SubOrder.findByIdAndUpdate(
+//       id,
+//       { status },
+//       { new: true }
+//     );
+
+//     if (!subOrder) {
+//       return res.status(404).json({ error: 'SubOrder not found' });
+//     }
+
+//     res.json(subOrder);
+//   } catch (error) {
+//     console.error('Error updating suborder status:', error);
+//     res.status(500).json({ error: 'Server error' });
+//   }
+// });
+
+
 router.put('/suborders/:id/status', async (req, res) => {
   try {
     const { id } = req.params;
     const { status } = req.body;
 
-    // Validate status
     const validStatuses = [
       'Pending',
       'OrderReceived',
@@ -1316,18 +1381,76 @@ router.put('/suborders/:id/status', async (req, res) => {
       'OutForDelivery',
       'Delivered',
     ];
+
     if (!validStatuses.includes(status)) {
       return res.status(400).json({ error: 'Invalid status' });
     }
 
+    // Update the suborder status
     const subOrder = await SubOrder.findByIdAndUpdate(
       id,
       { status },
       { new: true }
-    );
+    ).populate('shop parentOrder');
 
     if (!subOrder) {
       return res.status(404).json({ error: 'SubOrder not found' });
+    }
+
+    // Check if all sibling suborders of the parent order are in ReadyForPickup status
+    const parentOrder = await Order.findById(subOrder.parentOrder._id).populate({
+      path: 'subOrders',
+      populate: {
+        path: 'shop', // Populate the shop field in each suborder
+        select: 'businessName location', // Only fetch the required fields
+      },
+      select: 'status shop', // Fetch the status and shop fields for suborders
+    });
+
+    const allReady = parentOrder.subOrders.every((so) => so.status === 'ReadyForPickup');
+
+    if (allReady) {
+      const shop = await Partner.findById(subOrder.shop._id);
+      if (!shop || !shop.location) {
+        return res.status(400).json({ error: 'Shop location is missing' });
+      }
+    
+      const shopCoords = await parsePlusCodeToLatLng(shop.location); // Ensure this helper works
+      const drivers = await Driver.find({ status: 'Available', currentLocation: { $exists: true } });
+    
+      for (const driver of drivers) {
+        const driverCoords = await parsePlusCodeToLatLng(driver.currentLocation?.location);
+        if (!driverCoords) {
+          console.error(`Invalid driver location for driver ID: ${driver._id}`);
+          continue;
+        }
+    
+        const distance = geolib.getDistance(shopCoords, driverCoords); // in meters
+        if (distance <= 5000) { // 5km radius
+          // Notify the driver
+          notifyDriver(driver._id.toString(), {
+            type: 'AllSubOrdersReady',
+            message: 'All suborders for an order are ready for pickup',
+            orderId: parentOrder.orderId,
+            shops: parentOrder.subOrders.map((so) => ({
+              shopName: so.shop.businessName,
+              location: so.shop.location,
+            })),
+          });
+    
+          // Save notification for the parent order in the database
+          try {
+            await DriverNotification.create({
+              driver: driver._id,
+              orderId: parentOrder._id,
+              message: 'All suborders for an order are ready for pickup',
+              status: 'ReadyForPickup',
+            });
+          } catch (err) {
+            console.error('Failed to create driver notification:', err.message);
+          }
+        }
+      }
     }
 
     res.json(subOrder);
@@ -1336,6 +1459,7 @@ router.put('/suborders/:id/status', async (req, res) => {
     res.status(500).json({ error: 'Server error' });
   }
 });
+
 
 const PartnerNotificationSchema = new mongoose.Schema({
   shop: { type: mongoose.Schema.Types.ObjectId, ref: 'Partner', required: true },
@@ -1710,6 +1834,26 @@ router.put('/driver/update-profile', authenticateToken, uploadProfileImage, asyn
   }
 });
 
+const DriverNotificationSchema = new mongoose.Schema({
+  driver: { type: mongoose.Schema.Types.ObjectId, ref: 'Driver', required: true },
+  orderId: { type: mongoose.Schema.Types.ObjectId, ref: 'Order', required: true },
+  subOrderId: { type: mongoose.Schema.Types.ObjectId, ref: 'SubOrder', required: false },
+  message: { type: String, required: true },
+  status: { type: String, enum: ['ReadyForPickup', 'PickedUp', 'OutForDelivery', 'Delivered'], required: true },
+  isRead: { type: Boolean, default: false },
+  timestamp: { type: Date, default: Date.now },
+});
+const DriverNotification = mongoose.models.DriverNotification || mongoose.model('DriverNotification', DriverNotificationSchema);
+
+router.get('/driver-notifications/:driverId', async (req, res) => {
+  try {
+    const notifications = await DriverNotification.find({ driver: req.params.driverId }).sort({ timestamp: -1 });
+    res.json(notifications);
+  } catch (err) {
+    console.error('Failed to fetch driver notifications:', err);
+    res.status(500).json({ error: 'Failed to fetch notifications' });
+  }
+});
 
 // Mock notifier function
 async function notifyDriversInTown(town, orderId) {
@@ -1724,47 +1868,6 @@ async function notifyDriversInTown(town, orderId) {
   }
 }
 
-// Route to update suborder status
-router.put('/suborders/:id/status', async (req, res) => {
-  try {
-    const { id } = req.params;
-    const { status } = req.body;
-
-    const updatedSubOrder = await SubOrder.findByIdAndUpdate(id, { status }, { new: true });
-
-    if (!updatedSubOrder) {
-      return res.status(404).json({ error: 'SubOrder not found' });
-    }
-
-    // If status is ReadyForPickup, check all siblings
-    if (status === 'ReadyForPickup') {
-      const siblingSubOrders = await SubOrder.find({ parentOrder: updatedSubOrder.parentOrder });
-      const allReady = siblingSubOrders.every(so => so.status === 'ReadyForPickup');
-
-      if (allReady) {
-        const parentOrder = await Order.findById(updatedSubOrder.parentOrder).populate('items.shop.shopId');
-
-        // Get unique towns of shops in the order
-        const towns = [
-          ...new Set(
-            parentOrder.items
-              .map(item => item.shop?.shopId?.town)
-              .filter(Boolean)
-          )
-        ];
-
-        for (const town of towns) {
-          await notifyDriversInTown(town, parentOrder.orderId);
-        }
-      }
-    }
-
-    res.json({ message: 'SubOrder status updated', subOrder: updatedSubOrder });
-  } catch (err) {
-    console.error(err);
-    res.status(500).json({ error: 'Server error' });
-  }
-});
 
 
 function sendEmailNotification(email, message) {
