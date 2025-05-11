@@ -1286,6 +1286,30 @@ router.get('/orders/:orderId', authenticateToken, async (req, res) => {
   }
 });
 
+router.get('/driver-orders/:orderId', authenticateToken, async (req, res) => {
+  const { orderId } = req.params;
+  try {
+    const order = await Order.findById(orderId)
+      .populate({
+        path: 'subOrders',
+        populate: {
+          path: 'shop', // Populate the shop field in each suborder
+          select: 'businessName location', // Only fetch the required fields
+        },
+        select: 'status shop', // Fetch the status and shop fields for suborders
+      })
+      .populate('user', 'name email'); // Populate user details
+
+    if (!order) {
+      return res.status(404).json({ error: 'Order not found' });
+    }
+
+    res.json(order);
+  } catch (err) {
+    console.error('Error fetching order:', err.message);
+    res.status(500).json({ error: 'Server error fetching order' });
+  }
+});
 
 
 router.get('/partners/:partnerId/orders', async (req, res) => {
