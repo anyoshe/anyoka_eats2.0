@@ -16,7 +16,14 @@ function initSocket(server) {
       socket.join(partnerId);
       console.log(`Partner ${partnerId} joined`);
     });
+  
+
+  socket.on("joinDriverRoom", (driverId) => {
+    socket.join(driverId);
+    console.log(`Driver ${driverId} joined`);
   });
+});
+
 }
 
 function notifyPartner(partnerId, data) {
@@ -25,4 +32,12 @@ function notifyPartner(partnerId, data) {
   }
 }
 
-module.exports = { initSocket, notifyPartner };
+function notifyDriver(driverId, data) {
+  if (io) {
+    console.log(`Notifying driver ${driverId} with data:`, data);
+    io.to(driverId).emit("newOrderAvailable", data);
+  }
+}
+
+
+module.exports = { initSocket, notifyPartner, notifyDriver };

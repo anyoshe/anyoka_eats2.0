@@ -13,24 +13,6 @@ export const PartnerProvider = ({ children }) => {
   const [notifications, setNotifications] = useState([]);
   const [token, setToken] = useState(() => localStorage.getItem('partnerToken') || null);
 
-  // useEffect(() => {
-  //   const fetchMissedNotifications = async () => {
-  //     try {
-  //       const res = await axios.get(`${config.backendUrl}/api/notifications/unread`);
-  //       res.data.forEach(notification => {
-  //         addNotification(notification);
-  //         playNotificationSound();
-  //       });
-  //     } catch (err) {
-  //       console.error("Error fetching missed notifications:", err);
-  //     }
-  //   };
-  
-  //   if (partner) {
-  //     fetchMissedNotifications();
-  //   }
-  // }, [partner]);
-  
   
   
   // Fetch notifications for the logged-in partner
