@@ -161,7 +161,7 @@ router.post('/signup', uploadBusinessPermit, async (req, res) => {
       role
     };
 
-  
+
 
     // Check if business permit is uploaded
     if (req.file && req.file.fieldname === 'businessPermit') {
@@ -316,7 +316,7 @@ router.get('/partners/:id/reviews', async (req, res) => {
 // POST /api/partners/:id/comments
 router.post('/partners/:id/comments', async (req, res) => {
   const { user: userId, comment } = req.body;
- console.log(req.body);
+  console.log(req.body);
   if (!userId || !comment) {
     return res.status(400).json({ message: 'User and comment are required' });
   }
@@ -339,7 +339,7 @@ router.post('/partners/:id/comments', async (req, res) => {
 // POST /api/partners/:id/rate
 router.post('/partners/:id/rate', async (req, res) => {
   const { user, rating, comment } = req.body;
-console.log(req.body);
+  console.log(req.body);
   // Validate rating and user
   if (!user || rating == null || isNaN(rating)) {
     return res.status(400).json({ message: 'User and valid rating are required' });
@@ -1082,7 +1082,8 @@ const OrderSchema = new mongoose.Schema({
   total: { type: Number, default: 0 },
   paymentMethod: { type: String, enum: ['COD', 'Mpesa', 'PayPal', 'Card'], required: true },
   paymentStatus: { type: String, enum: ['Pending', 'Paid'], default: 'Pending' },
-  createdAt: { type: Date, default: Date.now }
+  createdAt: { type: Date, default: Date.now },
+  assignedDriver: { type: mongoose.Schema.Types.ObjectId, ref: 'Driver', default: null },
 });
 // Hook must be BEFORE model is compiled
 OrderSchema.pre('save', async function (next) {
@@ -1145,7 +1146,7 @@ router.post('/orders/place', async (req, res) => {
 
   const {
     userId,
-    items,          
+    items,
     delivery,
     paymentMethod
   } = req.body;
@@ -1354,47 +1355,11 @@ router.get('/suborders/:id', async (req, res) => {
 });
 
 
-// router.put('/suborders/:id/status', async (req, res) => {
-//   try {
-//     const { id } = req.params;
-//     const { status } = req.body;
-
-//     // Validate status
-//     const validStatuses = [
-//       'Pending',
-//       'OrderReceived',
-//       'Preparing',
-//       'ReadyForPickup',
-//       'PickedUp',
-//       'OutForDelivery',
-//       'Delivered',
-//     ];
-//     if (!validStatuses.includes(status)) {
-//       return res.status(400).json({ error: 'Invalid status' });
-//     }
-
-//     const subOrder = await SubOrder.findByIdAndUpdate(
-//       id,
-//       { status },
-//       { new: true }
-//     );
-
-//     if (!subOrder) {
-//       return res.status(404).json({ error: 'SubOrder not found' });
-//     }
-
-//     res.json(subOrder);
-//   } catch (error) {
-//     console.error('Error updating suborder status:', error);
-//     res.status(500).json({ error: 'Server error' });
-//   }
-// });
-
 
 router.put('/suborders/:id/status', async (req, res) => {
   try {
     const { id } = req.params;
-    const { status } = req.body;
+    const { status, driverId } = req.body;
 
     const validStatuses = [
       'Pending',
@@ -1421,6 +1386,11 @@ router.put('/suborders/:id/status', async (req, res) => {
       return res.status(404).json({ error: 'SubOrder not found' });
     }
 
+    // Assign the driver to the parent order if not already assigned
+    if (status === 'PickedUp' && !subOrder.parentOrder.assignedDriver) {
+      await Order.findByIdAndUpdate(subOrder.parentOrder._id, { assignedDriver: driverId });
+    }
+
     // Check if all sibling suborders of the parent order are in ReadyForPickup status
     const parentOrder = await Order.findById(subOrder.parentOrder._id).populate({
       path: 'subOrders',
@@ -1438,17 +1408,17 @@ router.put('/suborders/:id/status', async (req, res) => {
       if (!shop || !shop.location) {
         return res.status(400).json({ error: 'Shop location is missing' });
       }
-    
+
       const shopCoords = await parsePlusCodeToLatLng(shop.location); // Ensure this helper works
       const drivers = await Driver.find({ status: 'Available', currentLocation: { $exists: true } });
-    
+
       for (const driver of drivers) {
         const driverCoords = await parsePlusCodeToLatLng(driver.currentLocation?.location);
         if (!driverCoords) {
           console.error(`Invalid driver location for driver ID: ${driver._id}`);
           continue;
         }
-    
+
         const distance = geolib.getDistance(shopCoords, driverCoords); // in meters
         if (distance <= 5000) { // 5km radius
           // Notify the driver
@@ -1461,7 +1431,7 @@ router.put('/suborders/:id/status', async (req, res) => {
               location: so.shop.location,
             })),
           });
-    
+
           // Save notification for the parent order in the database
           try {
             await DriverNotification.create({
@@ -1625,7 +1595,7 @@ router.post('/driver/signup', async (req, res) => {
         { driverLicenseNumber }
       ]
     });
-    
+
     if (existingDriver) {
       return res.status(400).json({ message: 'Driver already exists with provided details' });
     }
@@ -1714,7 +1684,7 @@ router.post('/driver/login', async (req, res) => {
 router.get('/driver/profile', authenticateToken, async (req, res) => {
   try {
     const driver = await Driver.findById(req.user.driverId);
-  
+
     console.log(driver);
 
     if (!driver) {
@@ -1752,7 +1722,7 @@ router.put('/driver/updates-profile', authenticateToken, uploadProfileImage, asy
   try {
     console.log("Received data:", req.body);
     const driverId = req.user.driverId;  // <-- Use driverId from the JWT payload
-    console.log('Driver ID from JWT:', driverId); 
+    console.log('Driver ID from JWT:', driverId);
     // Check if formData is provided in the request
     let parsedFormData = {};
     if (req.body.formData) {
@@ -1892,7 +1862,51 @@ async function notifyDriversInTown(town, orderId) {
   }
 }
 
+router.put('/orders/:orderId/assign-driver', authenticateToken, async (req, res) => {
+  const { orderId } = req.params;
+  const { driverId, action } = req.body; // `action` can be 'accept' or 'decline'
 
+  try {
+    const order = await Order.findById(orderId);
+
+    if (!order) {
+      return res.status(404).json({ error: 'Order not found' });
+    }
+
+    if (action === 'accept') {
+      order.assignedDriver = driverId; // Assign the driver
+    } else if (action === 'decline') {
+      order.assignedDriver = null; // Unassign the driver
+    }
+
+    await order.save();
+    res.json(order);
+  } catch (error) {
+    console.error('Error updating order assignment:', error.message);
+    res.status(500).json({ error: 'Server error updating order assignment' });
+  }
+});
+
+router.get('/driver-active-orders/:driverId', authenticateToken, async (req, res) => {
+  const { driverId } = req.params;
+  try {
+    const orders = await Order.find({ assignedDriver: driverId })
+      .populate({
+        path: 'subOrders',
+        populate: {
+          path: 'shop',
+          select: 'businessName location',
+        },
+        select: 'status shop',
+      })
+      .populate('user', 'name email');
+
+    res.json(orders);
+  } catch (err) {
+    console.error('Error fetching active driver orders:', err.message);
+    res.status(500).json({ error: 'Server error fetching active orders' });
+  }
+});
 
 function sendEmailNotification(email, message) {
   const mailOptions = {
