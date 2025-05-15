@@ -28,9 +28,7 @@ const DriverOrders = () => {
         // Filter out orders that are already assigned to another driver
         const availableOrders = orderResponses
           .map((res) => res.data)
-          // .filter((order) => !order.assignedDriver || order.assignedDriver === driver._id);
-          .filter((order) => !order.assignedDriver)
-
+          .filter((order) => !order.assignedDriver);
 
         setOrders(availableOrders);
       } catch (error) {
@@ -58,9 +56,6 @@ const DriverOrders = () => {
     }
   };
 
-
-  if (loading) return <p>Loading driver orders...</p>;
-  if (orders.length === 0) return <p>No orders found.</p>;
   const handleStatusChange = async (subOrderId, newStatus) => {
     try {
       await axiosInstance.put(`${config.backendUrl}/api/suborders/${subOrderId}/status`, {
@@ -80,6 +75,9 @@ const DriverOrders = () => {
     }
   };
 
+  if (loading) return <p>Loading driver orders...</p>;
+  if (orders.length === 0) return <p>No orders found.</p>;
+
   return (
     <div className="driver-orders-container">
       <h2>Driver Orders</h2>
@@ -89,6 +87,10 @@ const DriverOrders = () => {
             <h3>Order ID: {order.orderId || 'N/A'}</h3>
             <p>Delivery Location: {order.delivery?.location || 'N/A'}</p>
             <p>Delivery Charges (80%): KES {((order.delivery?.fee || 0) * 0.8).toFixed(2)}</p>
+            <p>
+              <strong>Customer:</strong> {order.user?.username || 'N/A'} —{' '}
+              <strong>Phone:</strong> {order.user?.phoneNumber || 'N/A'}
+            </p>
 
             <h4>SubOrders</h4>
             <ul>
@@ -100,7 +102,7 @@ const DriverOrders = () => {
                   </p>
                   <p>
                     <strong>Status:</strong> {subOrder.status}
-                  </p><p><strong>Status:</strong> {subOrder.status}</p>
+                  </p>
                   {(() => {
                     const statusFlow = ['ReadyForPickup', 'PickedUp', 'OutForDelivery', 'Delivered'];
                     const currentIndex = statusFlow.indexOf(subOrder.status);
@@ -118,7 +120,6 @@ const DriverOrders = () => {
                     }
                     return null;
                   })()}
-
                 </li>
               ))}
             </ul>

@@ -622,6 +622,126 @@ router.get('/users/getSavedLocations/:userId', async (req, res) => {
   }
 });
 
+router.get('/users/profile', async (req, res) => {
+  const userId = req.query.userId;
+  if (!userId) return res.status(400).json({ error: 'User ID is required.' });
+
+  try {
+    const user = await User.findById(userId).select('-password');
+    if (!user) return res.status(404).json({ error: 'User not found' });
+
+    res.json(user);
+  } catch (error) {
+    console.error('Error fetching user profile:', error);
+    res.status(500).json({ error: 'Server error' });
+  }
+});
+
+router.put('/users/update-profile', uploadProfileImage, async (req, res) => {
+  try {
+    const { userId, formData } = req.body;
+    if (!userId || !formData) return res.status(400).json({ error: 'User ID and formData are required.' });
+
+    const parsedData = JSON.parse(formData);
+    const { username, names, email, phoneNumber, town, location } = parsedData;
+
+    const user = await User.findById(userId);
+    if (!user) return res.status(404).json({ error: 'User not found' });
+
+    // Update user fields
+    user.username = username || user.username;
+    user.names = names || user.names;
+    user.email = email || user.email;
+    user.phoneNumber = phoneNumber || user.phoneNumber;
+    user.town = town || user.town;
+    user.location = location || user.location;
+
+    // If a new profile image is uploaded
+    if (req.file) {
+      // Remove old file if it exists
+      if (user.profilePhotoUrl) {
+        const oldFile = path.join(__dirname, '../uploads/profile-images', path.basename(user.profilePhotoUrl));
+        if (fs.existsSync(oldFile)) fs.unlinkSync(oldFile);
+      }
+
+      user.profilePhotoUrl = `/uploads/profile-images/${req.file.filename}`;
+    }
+
+    await user.save();
+    res.status(200).json({ message: 'Profile updated successfully', user });
+
+  } catch (error) {
+    console.error('Error updating user profile:', error);
+    res.status(500).json({ error: 'Server error' });
+  }
+});
+
+// router.get('/orders/my-orders', authenticateToken, async (req, res) => {
+//   try {
+//     const userId = req.user._id;
+//     console.log('User ID:', userId);
+
+//     if (!mongoose.Types.ObjectId.isValid(userId)) {
+//       return res.status(400).json({ error: 'Invalid user ID' });
+//     }
+
+//     const orders = await Order.find({ user: userId })
+//       .populate('items.product')
+//       .populate({
+//         path: 'items.shop.shopId',
+//         select: 'name', // or use 'shopName' if you store it on shopId
+//       })
+//       .populate({
+//         path: 'subOrders',
+//         populate: [
+//           { path: 'shop', select: 'name' }, // or 'shopName'
+//           { path: 'items.product' },
+//         ],
+//       })
+//       .sort({ createdAt: -1 });
+
+//       console.log('Orders:', orders)
+
+//     res.json(orders);
+
+//   } catch (error) {
+//     console.error('Error fetching user orders:', error);
+//     res.status(500).json({ error: 'Server error' });
+//   }
+// });
+router.get('/orders/my-orders', authenticateToken, async (req, res) => {
+  try {
+    const userId = req.user._id;
+    console.log('User ID:', userId);
+
+    if (!mongoose.Types.ObjectId.isValid(userId)) {
+      return res.status(400).json({ error: 'Invalid user ID' });
+    }
+
+    const orders = await Order.find({ user: userId })
+      .populate('items.product')
+      .populate({
+        path: 'items.shop.shopId',
+        select: 'businessName', // Use 'businessName' for shop name
+      })
+      .populate({
+        path: 'subOrders',
+        populate: [
+          { path: 'shop', select: 'businessName' }, // Use 'businessName' for shop name
+          { path: 'items.product' },
+        ],
+      })
+      .sort({ createdAt: -1 });
+
+    console.log('Orders:', orders);
+
+    res.json(orders);
+  } catch (error) {
+    console.error('Error fetching user orders:', error);
+    res.status(500).json({ error: 'Server error' });
+  }
+});
+
 //PRODUCTS MANAGEMEMENT
 
 //Product schema
@@ -1084,6 +1204,10 @@ const OrderSchema = new mongoose.Schema({
   paymentStatus: { type: String, enum: ['Pending', 'Paid'], default: 'Pending' },
   createdAt: { type: Date, default: Date.now },
   assignedDriver: { type: mongoose.Schema.Types.ObjectId, ref: 'Driver', default: null },
+  deliveredAt: { type: Date }, 
+  deliveredBy: { type: String }, 
+  deliveredByPhone: { type: String },
+  status: { type: String, enum: ['Pending', 'Delivered', 'Confirmed Delivered'], default: 'Pending' },
 });
 // Hook must be BEFORE model is compiled
 OrderSchema.pre('save', async function (next) {
@@ -1237,7 +1361,7 @@ router.post('/orders/place', async (req, res) => {
   } catch (err) {
     await session.abortTransaction();
     session.endSession();
-    console.error(err);
+    console.error(err);n
     res.status(500).json({ error: 'Failed to place order.' });
   }
 });
@@ -1287,6 +1411,8 @@ router.get('/orders/:orderId', authenticateToken, async (req, res) => {
   }
 });
 
+
+
 router.get('/driver-orders/:orderId', authenticateToken, async (req, res) => {
   const { orderId } = req.params;
   try {
@@ -1299,7 +1425,7 @@ router.get('/driver-orders/:orderId', authenticateToken, async (req, res) => {
         },
         select: 'status shop', // Fetch the status and shop fields for suborders
       })
-      .populate('user', 'name email'); // Populate user details
+      .populate('user', 'username phoneNumber'); // Populate user details (username, phoneNumber)
 
     if (!order) {
       return res.status(404).json({ error: 'Order not found' });
@@ -1311,6 +1437,7 @@ router.get('/driver-orders/:orderId', authenticateToken, async (req, res) => {
     res.status(500).json({ error: 'Server error fetching order' });
   }
 });
+
 
 
 router.get('/partners/:partnerId/orders', async (req, res) => {
@@ -1899,12 +2026,60 @@ router.get('/driver-active-orders/:driverId', authenticateToken, async (req, res
         },
         select: 'status shop',
       })
-      .populate('user', 'name email');
+      .populate('user', 'username phoneNumber'); // Populate user details (username, phoneNumber)
 
     res.json(orders);
   } catch (err) {
     console.error('Error fetching active driver orders:', err.message);
     res.status(500).json({ error: 'Server error fetching active orders' });
+  }
+});
+
+router.put('/orders/:orderId/mark-delivered', authenticateToken, async (req, res) => {
+  const { orderId } = req.params;
+  const { driverName, driverPhone } = req.body;
+
+  try {
+    const order = await Order.findByIdAndUpdate(
+      orderId,
+      {
+        status: 'Delivered',
+        deliveredAt: new Date(),
+        deliveredBy: driverName,
+        deliveredByPhone: driverPhone,
+      },
+      { new: true }
+    );
+
+    if (!order) {
+      return res.status(404).json({ error: 'Order not found' });
+    }
+
+    res.json({ message: 'Order marked as delivered', order });
+  } catch (error) {
+    console.error('Error marking order as delivered:', error.message);
+    res.status(500).json({ error: 'Server error' });
+  }
+});
+
+router.put('/orders/:orderId/confirm-delivery', authenticateToken, async (req, res) => {
+  const { orderId } = req.params;
+
+  try {
+    const order = await Order.findByIdAndUpdate(
+      orderId,
+      { status: 'Confirmed Delivered' },
+      { new: true }
+    );
+
+    if (!order) {
+      return res.status(404).json({ error: 'Order not found' });
+    }
+
+    res.json({ message: 'Order confirmed as delivered', order });
+  } catch (error) {
+    console.error('Error confirming delivery:', error.message);
+    res.status(500).json({ error: 'Server error' });
   }
 });
 
