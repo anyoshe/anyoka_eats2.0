@@ -1,10 +1,12 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
+import { User } from 'lucide-react';
 import logoImg from '../../assets/images/logo_on_white orange.png';
 import leftAd from '../../assets/images/adsExample.jpg';
 import rightAd from '../../assets/images/adExample.jpg';
 import styles from './HeroHeader.module.css';
 import InstallPrompt from '../Header/InstallPrompt';
+
 
 const HeroHeader = () => {
     return (
@@ -21,6 +23,9 @@ const HeroHeader = () => {
                         <button className={styles.logInButton}>
                             <i className="fas fa-sign-in-alt"></i> LOG IN
                         </button>
+                    </Link>
+                    <Link to="/customer-dashboard" className="hover:text-blue-600">
+                        <User className="w-6 h-6" />
                     </Link>
                 </div>
             </nav>
@@ -51,52 +56,52 @@ const HeroHeader = () => {
 
                 <div className={styles.categoryDivs}>
                     <Link to="/menu?category=Food" className={styles.categoryLinks}>
-                    <div className={styles.categoryDiv}>
-                        <i className={`fas fa-utensils fa-bounce ${styles.slow1} ${styles.categoryPic}`}></i>
-                        <p className={styles.categoryText}>Food</p>
-                    </div>
+                        <div className={styles.categoryDiv}>
+                            <i className={`fas fa-utensils fa-bounce ${styles.slow1} ${styles.categoryPic}`}></i>
+                            <p className={styles.categoryText}>Food</p>
+                        </div>
                     </Link>
 
                     <Link to="/menu?category=Fashion" className={styles.categoryLinks}>
-                    <div className={styles.categoryDiv}>
-                        <i className={`fas fa-shirt fa-shake ${styles.slow2} ${styles.categoryPic}`}></i>
-                        <p className={styles.categoryText}>Fashion</p>
-                    </div>
+                        <div className={styles.categoryDiv}>
+                            <i className={`fas fa-shirt fa-shake ${styles.slow2} ${styles.categoryPic}`}></i>
+                            <p className={styles.categoryText}>Fashion</p>
+                        </div>
                     </Link>
 
                     <Link to="/menu?category=Pet supplies" className={styles.categoryLinks}>
-                    <div className={styles.categoryDiv}>
-                        <i className={`fas fa-dog fa-beat ${styles.slow3} ${styles.categoryPic}`}></i>
-                        <p className={styles.categoryText}>Pet supplies</p>
-                    </div>
+                        <div className={styles.categoryDiv}>
+                            <i className={`fas fa-dog fa-beat ${styles.slow3} ${styles.categoryPic}`}></i>
+                            <p className={styles.categoryText}>Pet supplies</p>
+                        </div>
                     </Link>
 
                     <Link to="/menu?category=Toys & games" className={styles.categoryLinks}>
-                    <div className={styles.categoryDiv}>
-                        <i className={`fas fa-puzzle-piece fa-bounce ${styles.slow4} ${styles.categoryPic}`}></i>
-                        <p className={styles.categoryText}>Toys & games</p>
-                    </div>
+                        <div className={styles.categoryDiv}>
+                            <i className={`fas fa-puzzle-piece fa-bounce ${styles.slow4} ${styles.categoryPic}`}></i>
+                            <p className={styles.categoryText}>Toys & games</p>
+                        </div>
                     </Link>
 
                     <Link to="/menu?category=Electronics" className={styles.categoryLinks}>
-                    <div className={styles.categoryDiv}>
-                        <i className={`fas fa-microchip fa-spin-pulse ${styles.slow5} ${styles.categoryPic}`}></i>
-                        <p className={styles.categoryText}>Electronics</p>
-                    </div>
+                        <div className={styles.categoryDiv}>
+                            <i className={`fas fa-microchip fa-spin-pulse ${styles.slow5} ${styles.categoryPic}`}></i>
+                            <p className={styles.categoryText}>Electronics</p>
+                        </div>
                     </Link>
 
                     <Link to="/menu?category=Health" className={styles.categoryLinks}>
-                    <div className={styles.categoryDiv}>
-                        <i className={`fas fa-heartbeat fa-beat ${styles.slow6} ${styles.categoryPic}`}></i>
-                        <p className={styles.categoryText}>Health</p>
-                    </div>
+                        <div className={styles.categoryDiv}>
+                            <i className={`fas fa-heartbeat fa-beat ${styles.slow6} ${styles.categoryPic}`}></i>
+                            <p className={styles.categoryText}>Health</p>
+                        </div>
                     </Link>
 
                     <Link to="/menu?category=Beauty" className={styles.categoryLinks}>
-                    <div className={styles.categoryDiv}>
-                        <i className={`fas fa-spa fa-flip ${styles.slow7} ${styles.categoryPic}`}></i>
-                        <p className={styles.categoryText}>Beauty</p>
-                    </div>
+                        <div className={styles.categoryDiv}>
+                            <i className={`fas fa-spa fa-flip ${styles.slow7} ${styles.categoryPic}`}></i>
+                            <p className={styles.categoryText}>Beauty</p>
+                        </div>
                     </Link>
                 </div>
 

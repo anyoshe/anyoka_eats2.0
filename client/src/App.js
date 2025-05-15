@@ -19,6 +19,8 @@ import DriverSignup from './components/Menu/DriverDashboard/DriverSignup';
 import { DriverProvider } from './contexts/DriverContext';
 import ProfileSetupPage from './components/Menu/DriverDashboard/ProfileSetupPage';
 import DriverDashboard from './components/Menu/DriverDashboard/DriverDashboard';
+import CustomerProfileDisplay from './components/Customer/CustomerProfileDisplay';
+import CustomerDashboard from './components/Customer/CustomerDashboard';
 
 
 function App() {
@@ -47,6 +49,7 @@ function App() {
                         <Route path="/driver/dashboard" element={<DriverDashboard />} />
                         <Route path="/reset-partner-password" element={<ResetPartnerPassword />} />
                         <Route path="/dashboard" element={<AccountPage />} />
+                        <Route path="/customer-dashboard" element={<CustomerDashboard />} />
                         
                         <Route path="/menu" element={
                             <CartProvider>

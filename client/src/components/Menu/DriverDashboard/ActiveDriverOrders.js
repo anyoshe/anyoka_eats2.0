@@ -26,36 +26,42 @@
 //         fetchActiveOrders();
 //     }, [driver]);
 
-//     const handleStatusChange = async (subOrderId, newStatus) => {
+//     const handleStatusChange = async (subOrderId, newStatus, orderId) => {
 //         try {
 //             await axiosInstance.put(`${config.backendUrl}/api/suborders/${subOrderId}/status`, { status: newStatus });
-//             setOrders((prevOrders) =>
-//                 prevOrders.map((order) => ({
-//                     ...order,
-//                     subOrders: order.subOrders.map((subOrder) =>
+
+//             setOrders((prevOrders) => {
+//                 return prevOrders.map((order) => {
+//                     if (order._id !== orderId) return order;
+
+//                     const updatedSubOrders = order.subOrders.map((subOrder) =>
 //                         subOrder._id === subOrderId ? { ...subOrder, status: newStatus } : subOrder
-//                     ),
-//                 }))
-//             );
+//                     );
+
+//                     return {
+//                         ...order,
+//                         subOrders: updatedSubOrders,
+//                     };
+//                 });
+//             });
 //         } catch (error) {
 //             console.error('Error updating suborder status:', error);
 //         }
 //     };
 
-//     const handleDeclineOrder = async (orderId) => {
+//     const handleMarkAsDelivered = async (order) => {
 //         try {
-//             await axiosInstance.put(`${config.backendUrl}/api/orders/${orderId}/assign-driver`, {
-//                 driverId: driver._id,
-//                 action: 'decline',
-//             });
-//             setOrders((prevOrders) => prevOrders.filter((order) => order._id !== orderId));
+//             for (const subOrder of order.subOrders) {
+//                 await axiosInstance.put(`${config.backendUrl}/api/suborders/${subOrder._id}/status`, {
+//                     status: 'Delivered',
+//                 });
+//             }
+
+//             setOrders((prevOrders) => prevOrders.filter((o) => o._id !== order._id));
 //         } catch (error) {
-//             console.error('Error declining order:', error);
+//             console.error('Error marking suborders as delivered:', error);
 //         }
 //     };
-
-//     const isDeclineDisabled = (order) =>
-//         order.subOrders.some((subOrder) => subOrder.status === 'PickedUp');
 
 //     if (loading) return <p>Loading active orders...</p>;
 //     if (orders.length === 0) return <p>No active orders found.</p>;
@@ -64,53 +70,92 @@
 //         <div className="active-driver-orders-container">
 //             <h2>Active Orders</h2>
 //             <div className="active-driver-orders-list">
-//                 {orders.map((order) => (
-//                     <div key={order._id} className="order-card">
-//                         <h3>Order ID: {order.orderId || 'N/A'}</h3>
-//                         <p>Delivery Location: {order.delivery?.location || 'N/A'}</p>
-//                         <p>Delivery Charges (80%): KES {((order.delivery?.fee || 0) * 0.8).toFixed(2)}</p>
+//                 {orders.map((order) => {
+//                     const allOutForDelivery = order.subOrders.every(
+//                         (subOrder) => subOrder.status === 'OutForDelivery'
+//                     );
 
-//                         <h4>SubOrders</h4>
-//                         <ul>
-//                             {order.subOrders.map((subOrder) => (
-//                                 <li key={subOrder._id}>
-//                                     <p>
-//                                         <strong>Shop:</strong> {subOrder.shop?.businessName || 'N/A'} —{' '}
-//                                         <strong>Location:</strong> {subOrder.shop?.location || 'N/A'}
-//                                     </p>
-//                                     <p>
-//                                         <strong>Status:</strong> {subOrder.status}
-//                                     </p>
-//                                     {(() => {
-//                                         const statusFlow = ['ReadyForPickup', 'PickedUp', 'OutForDelivery', 'Delivered'];
-//                                         const currentIndex = statusFlow.indexOf(subOrder.status);
-//                                         const nextStatus = statusFlow[currentIndex + 1];
+//                     return (
+//                         <div key={order._id} className="order-card">
+//                             <h3>Order ID: {order.orderId || 'N/A'}</h3>
+//                             <p>Delivery Location: {order.delivery?.location || 'N/A'}</p>
+//                             <p>Delivery Charges (80%): KES {((order.delivery?.fee || 0) * 0.8).toFixed(2)}</p>
+//                             <p>
+//                                 <strong>Customer:</strong> {order.user?.username || 'N/A'} —{' '}
+//                                 <strong>Phone:</strong> {order.user?.phoneNumber || 'N/A'}
+//                             </p>
 
-//                                         if (nextStatus) {
-//                                             return (
-//                                                 <button
-//                                                     onClick={() => handleStatusChange(subOrder._id, nextStatus)}
-//                                                 >
-//                                                     Mark as {nextStatus.replace(/([A-Z])/g, ' $1').trim()}
-//                                                 </button>
-//                                             );
-//                                         }
+//                             <h4>SubOrders</h4>
+//                             <ul>
+//                                 {order.subOrders.map((subOrder) => (
+//                                     <li key={subOrder._id}>
+//                                         <p>
+//                                             <strong>Shop:</strong> {subOrder.shop?.businessName || 'N/A'} —{' '}
+//                                             <strong>Location:</strong> {subOrder.shop?.location || 'N/A'}
+//                                         </p>
+//                                         <p>
+//                                             <strong>Status:</strong> {subOrder.status}
+//                                         </p>
+//                                         {subOrder.status === 'ReadyForPickup' && (
+//                                             <button
+//                                                 onClick={() =>
+//                                                     handleStatusChange(subOrder._id, 'OutForDelivery', order._id)
+//                                                 }
+//                                             >
+//                                                 Mark as Picked Up
+//                                             </button>
+//                                         )}
+//                                         {subOrder.status === 'OutForDelivery' && (
+//                                             <button
+//                                                 disabled
+//                                                 style={{
+//                                                     backgroundColor: '#ccc',
+//                                                     color: '#666',
+//                                                     border: 'none',
+//                                                     padding: '0.5rem 1rem',
+//                                                     borderRadius: '5px',
+//                                                     cursor: 'not-allowed',
+//                                                 }}
+//                                             >
+//                                                 OutForDelivery
+//                                             </button>
+//                                         )}
+//                                     </li>
+//                                 ))}
+//                             </ul>
 
-//                                         return null;
-//                                     })()}
-
-//                                 </li>
-//                             ))}
-//                         </ul>
-
-//                         <button
-//                             onClick={() => handleDeclineOrder(order._id)}
-//                             disabled={isDeclineDisabled(order)}
-//                         >
-//                             Decline Order
-//                         </button>
-//                     </div>
-//                 ))}
+//                             {allOutForDelivery ? (
+//                                 <button
+//                                     onClick={() => handleMarkAsDelivered(order)}
+//                                     style={{
+//                                         backgroundColor: '#28a745',
+//                                         color: '#fff',
+//                                         border: 'none',
+//                                         padding: '0.5rem 1rem',
+//                                         borderRadius: '5px',
+//                                         cursor: 'pointer',
+//                                     }}
+//                                 >
+//                                     Mark as Delivered
+//                                 </button>
+//                             ) : (
+//                                 <button
+//                                     disabled
+//                                     style={{
+//                                         backgroundColor: '#ccc',
+//                                         color: '#666',
+//                                         border: 'none',
+//                                         padding: '0.5rem 1rem',
+//                                         borderRadius: '5px',
+//                                         cursor: 'not-allowed',
+//                                     }}
+//                                 >
+//                                     Decline Order
+//                                 </button>
+//                             )}
+//                         </div>
+//                     );
+//                 })}
 //             </div>
 //         </div>
 //     );
@@ -148,10 +193,8 @@ const ActiveDriverOrders = () => {
 
     const handleStatusChange = async (subOrderId, newStatus, orderId) => {
         try {
-            // Update the single suborder status
             await axiosInstance.put(`${config.backendUrl}/api/suborders/${subOrderId}/status`, { status: newStatus });
 
-            // Update local state
             setOrders((prevOrders) => {
                 return prevOrders.map((order) => {
                     if (order._id !== orderId) return order;
@@ -159,23 +202,6 @@ const ActiveDriverOrders = () => {
                     const updatedSubOrders = order.subOrders.map((subOrder) =>
                         subOrder._id === subOrderId ? { ...subOrder, status: newStatus } : subOrder
                     );
-
-                    // If all suborders are now PickedUp, auto update them to OutForDelivery
-                    const allPicked = updatedSubOrders.every((s) => s.status === 'PickedUp');
-
-                    if (allPicked) {
-                        updatedSubOrders.forEach(async (s) => {
-                            await axiosInstance.put(`${config.backendUrl}/api/suborders/${s._id}/status`, {
-                                status: 'OutForDelivery',
-                            });
-                        });
-
-                        // Update local state to reflect OutForDelivery
-                        return {
-                            ...order,
-                            subOrders: updatedSubOrders.map((s) => ({ ...s, status: 'OutForDelivery' })),
-                        };
-                    }
 
                     return {
                         ...order,
@@ -190,29 +216,16 @@ const ActiveDriverOrders = () => {
 
     const handleMarkAsDelivered = async (order) => {
         try {
-            // Set all suborders to Delivered
-            for (const subOrder of order.subOrders) {
-                await axiosInstance.put(`${config.backendUrl}/api/suborders/${subOrder._id}/status`, {
-                    status: 'Delivered',
-                });
-            }
+            // Update the order status to "Delivered" in the backend
+            await axiosInstance.put(`${config.backendUrl}/api/orders/${order._id}/mark-delivered`, {
+                driverName: driver.username,
+                driverPhone: driver.phoneNumber,
+            });
 
-            // Remove order from UI
+            // Remove the order from the active orders list
             setOrders((prevOrders) => prevOrders.filter((o) => o._id !== order._id));
         } catch (error) {
-            console.error('Error marking suborders as delivered:', error);
-        }
-    };
-
-    const handleDeclineOrder = async (orderId) => {
-        try {
-            await axiosInstance.put(`${config.backendUrl}/api/orders/${orderId}/assign-driver`, {
-                driverId: driver._id,
-                action: 'decline',
-            });
-            setOrders((prevOrders) => prevOrders.filter((order) => order._id !== orderId));
-        } catch (error) {
-            console.error('Error declining order:', error);
+            console.error('Error marking order as delivered:', error);
         }
     };
 
@@ -233,6 +246,10 @@ const ActiveDriverOrders = () => {
                             <h3>Order ID: {order.orderId || 'N/A'}</h3>
                             <p>Delivery Location: {order.delivery?.location || 'N/A'}</p>
                             <p>Delivery Charges (80%): KES {((order.delivery?.fee || 0) * 0.8).toFixed(2)}</p>
+                            <p>
+                                <strong>Customer:</strong> {order.user?.username || 'N/A'} —{' '}
+                                <strong>Phone:</strong> {order.user?.phoneNumber || 'N/A'}
+                            </p>
 
                             <h4>SubOrders</h4>
                             <ul>
@@ -248,10 +265,25 @@ const ActiveDriverOrders = () => {
                                         {subOrder.status === 'ReadyForPickup' && (
                                             <button
                                                 onClick={() =>
-                                                    handleStatusChange(subOrder._id, 'PickedUp', order._id)
+                                                    handleStatusChange(subOrder._id, 'OutForDelivery', order._id)
                                                 }
                                             >
                                                 Mark as Picked Up
+                                            </button>
+                                        )}
+                                        {subOrder.status === 'OutForDelivery' && (
+                                            <button
+                                                disabled
+                                                style={{
+                                                    backgroundColor: '#ccc',
+                                                    color: '#666',
+                                                    border: 'none',
+                                                    padding: '0.5rem 1rem',
+                                                    borderRadius: '5px',
+                                                    cursor: 'not-allowed',
+                                                }}
+                                            >
+                                                OutForDelivery
                                             </button>
                                         )}
                                     </li>
@@ -259,13 +291,30 @@ const ActiveDriverOrders = () => {
                             </ul>
 
                             {allOutForDelivery ? (
-                                <button onClick={() => handleMarkAsDelivered(order)}>
+                                <button
+                                    onClick={() => handleMarkAsDelivered(order)}
+                                    style={{
+                                        backgroundColor: '#28a745',
+                                        color: '#fff',
+                                        border: 'none',
+                                        padding: '0.5rem 1rem',
+                                        borderRadius: '5px',
+                                        cursor: 'pointer',
+                                    }}
+                                >
                                     Mark as Delivered
                                 </button>
                             ) : (
                                 <button
-                                    onClick={() => handleDeclineOrder(order._id)}
-                                    disabled={order.subOrders.some((s) => s.status === 'PickedUp')}
+                                    disabled
+                                    style={{
+                                        backgroundColor: '#ccc',
+                                        color: '#666',
+                                        border: 'none',
+                                        padding: '0.5rem 1rem',
+                                        borderRadius: '5px',
+                                        cursor: 'not-allowed',
+                                    }}
                                 >
                                     Decline Order
                                 </button>
