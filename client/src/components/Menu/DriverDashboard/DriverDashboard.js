@@ -4,14 +4,15 @@ import { DriverContext } from '../../../contexts/DriverContext';
 import DriverProfileDisplay from './DriverProfileDisplay';
 import DriverNotification from "./DriverNotification";
 import DriverLogout from './DriverLogout';
-import DriverOrders from './DriverOrders'; // Import the DriverOrders component
-import ActiveDriverOrders from './ActiveDriverOrders'; // Import the ActiveDriverOrders component
+import DriverOrders from './DriverOrders'; 
+import ActiveDriverOrders from './ActiveDriverOrders'; 
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faBell, faBars } from "@fortawesome/free-solid-svg-icons";
+import CompletedDriverOrders from "./CompletedDriverOrders";
 
 const DriverDashboard = () => {
   const [menuOpen, setMenuOpen] = useState(false);
-  const [activeTab, setActiveTab] = useState("available"); // Default tab is 'available'
+  const [activeTab, setActiveTab] = useState("available"); 
   const [showNotifications, setShowNotifications] = useState(false);
   const { driver, notifications } = useContext(DriverContext);
 
@@ -25,9 +26,11 @@ const DriverDashboard = () => {
       case "profile":
         return <DriverProfileDisplay />;
       case "available":
-        return <DriverOrders />; // Render the DriverOrders component
+        return <DriverOrders />; 
       case "active":
-        return <ActiveDriverOrders />; // Render the ActiveDriverOrders component
+        return <ActiveDriverOrders />; 
+        case "completed":
+        return <CompletedDriverOrders />; 
       default:
         return null;
     }
@@ -59,6 +62,7 @@ const DriverDashboard = () => {
             <div onClick={() => handleTabChange("profile")}>Profile</div>
             <div onClick={() => handleTabChange("available")}>Available Orders</div>
             <div onClick={() => handleTabChange("active")}>Active Orders</div>
+            <div onClick={() => handleTabChange("completed")}>Completed Orders</div>
           </div>
         )}
 
@@ -81,6 +85,12 @@ const DriverDashboard = () => {
             onClick={() => handleTabChange("active")}
           >
             Active Orders
+          </div>
+          <div
+            className={`${styles.tab} ${activeTab === "completed" ? styles.active : ""}`}
+            onClick={() => handleTabChange("completed")}
+          >
+            Completed Orders
           </div>
 
           <div className={styles.headerNavIcons}>

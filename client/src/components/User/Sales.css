@@ -1,0 +1,27 @@
+.sales-container {
+    padding: 1rem;
+  }
+  
+  .sales-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  
+  .sales-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 1rem;
+  }
+  
+  .sales-table th,
+  .sales-table td {
+    border: 1px solid #ddd;
+    padding: 0.5rem;
+    text-align: left;
+  }
+  
+  .sales-table th {
+    background-color: #f4f4f4;
+  }
+  
