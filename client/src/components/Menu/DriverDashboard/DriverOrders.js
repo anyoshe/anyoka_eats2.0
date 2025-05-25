@@ -18,26 +18,53 @@ const DriverOrders = () => {
         const response = await axiosInstance.get(`${config.backendUrl}/api/driver-notifications/${driver._id}`);
         const notifications = response.data.filter((notif) => notif.status === 'ReadyForPickup');
         setNotifications(notifications);
-
+    
         // Fetch orders for each notification
         const orderPromises = notifications.map((notif) =>
           axiosInstance.get(`${config.backendUrl}/api/driver-orders/${notif.orderId}`)
         );
         const orderResponses = await Promise.all(orderPromises);
-
-        // Filter out orders that are already assigned to another driver
+    
+        orderResponses.forEach((res, i) => {
+          const order = res.status === 'fulfilled' ? res.value.data : null;
+          if (!order) return;
+        
+          console.log(`Order ${i}:`, order);
+        
+          if (!Array.isArray(order.subOrders)) {
+            console.warn(`Order ${order._id} has no subOrders array`);
+          } else {
+            order.subOrders.forEach((so, j) => {
+              console.log(`SubOrder ${j} of Order ${i}:`, so);
+            });
+          }
+        });
+        
+        
         const availableOrders = orderResponses
-          .map((res) => res.data)
-          .filter((order) => !order.assignedDriver);
-
+        .map((res) => res.data)
+        .filter((order) => {
+          const allSubOrdersReady =
+            Array.isArray(order.subOrders) &&
+            order.subOrders.length > 0 &&
+            order.subOrders.every((so) => so.status === 'ReadyForPickup');
+      
+          return (
+            !order.assignedDriver &&
+            !(order.delivery?.fee === 0 && order.delivery?.option === 'own') &&
+            allSubOrdersReady
+          );
+        });
+      
         setOrders(availableOrders);
       } catch (error) {
         console.error('Error fetching driver notifications or orders:', error);
-        setOrders([]); // Ensure orders is set to an empty array on error
+        setOrders([]);
       } finally {
         setLoading(false);
       }
     };
+    
 
     fetchNotifications();
   }, [driver]);

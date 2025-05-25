@@ -1257,6 +1257,9 @@ const SubOrderSchema = new mongoose.Schema({
     ],
     default: 'Pending'
   },
+  assignedDriver: { type: mongoose.Schema.Types.ObjectId, ref: 'Driver', default: null },
+  deliveredBy: { type: String },
+  deliveredByPhone: { type: String },
   createdAt: { type: Date, default: Date.now }
 });
 
@@ -2014,6 +2017,65 @@ router.put('/orders/:orderId/assign-driver', authenticateToken, async (req, res)
   }
 });
 
+// router.put('/orders/:orderId/assign-driver', authenticateToken, async (req, res) => {
+//   const { orderId } = req.params;
+//   const { driverId, action } = req.body; // `action` can be 'accept' or 'decline'
+
+//   try {
+//     const order = await Order.findById(orderId).populate('subOrders');
+
+//     if (!order) {
+//       return res.status(404).json({ error: 'Order not found' });
+//     }
+
+//     if (action === 'accept') {
+//       const driver = await Driver.findById(driverId);
+
+//       if (!driver) {
+//         return res.status(404).json({ error: 'Driver not found' });
+//       }
+
+//       // Assign the driver to the order
+//       order.assignedDriver = driverId;
+//       await order.save();
+
+//       // Update all suborders with the driver's details
+//       await Promise.all(
+//         order.subOrders.map(async (subOrderId) => {
+//           await SubOrder.findByIdAndUpdate(subOrderId, {
+//             driverName: driver.username,
+//             driverPhone: driver.phoneNumber,
+//           });
+//         })
+//       );
+
+//       res.json({ message: 'Driver assigned to order', order });
+//     } else if (action === 'decline') {
+//       // Remove the driver from the order
+//       order.assignedDriver = null;
+//       await order.save();
+
+//       // Remove the driver's details from all suborders
+//       await Promise.all(
+//         order.subOrders.map(async (subOrderId) => {
+//           await SubOrder.findByIdAndUpdate(subOrderId, {
+//             $unset: { driverName: '', driverPhone: '' },
+//           });
+//         })
+//       );
+
+//       res.json({ message: 'Driver removed from order', order });
+//     } else {
+//       res.status(400).json({ error: 'Invalid action' });
+//     }
+//   } catch (error) {
+//     console.error('Error updating order assignment:', error.message);
+//     res.status(500).json({ error: 'Server error updating order assignment' });
+//   }
+// });
+
+
+
 router.get('/driver-active-orders/:driverId', authenticateToken, async (req, res) => {
   const { driverId } = req.params;
   try {
@@ -2083,6 +2145,67 @@ router.put('/orders/:orderId/confirm-delivery', authenticateToken, async (req, r
   }
 });
 
+// In routes/order.js
+router.get('/driver-completed-orders/:driverId', authenticateToken, async (req, res) => {
+  const { driverId } = req.params;
+  try {
+    const orders = await Order.find({
+      assignedDriver: driverId,
+      status: 'Confirmed Delivered', // Only fetch orders with status "Confirmed Delivered"
+    })
+      .populate({
+        path: 'subOrders',
+        populate: {
+          path: 'shop',
+          select: 'businessName location',
+        },
+        select: 'status shop',
+      })
+      .populate('user', 'username phoneNumber'); // Populate user details
+
+    res.json(orders);
+  } catch (err) {
+    console.error('Error fetching completed driver orders:', err.message);
+    res.status(500).json({ error: 'Server error fetching completed orders' });
+  }
+});
+
+// GET /api/orders/:orderId/status
+router.get('/orders/:orderId/status', async (req, res) => {
+  try {
+    const order = await Order.findById(req.params.orderId).select('status');
+
+    if (!order) {
+      return res.status(404).json({ message: 'Order not found' });
+    }
+
+    res.json({ status: order.status });
+  } catch (err) {
+    console.error('Error fetching parent order status:', err);
+    res.status(500).json({ message: 'Server error' });
+  }
+});
+
+router.get('/order/:orderId/status', authenticateToken, async (req, res) => {
+  const { orderId } = req.params;
+
+  try {
+    const order = await Order.findById(orderId).select('status user');
+
+    if (!order) {
+      return res.status(404).json({ error: 'Order not found' });
+    }
+
+    if (!order.user || order.user.toString() !== req.user._id.toString()) {
+      return res.status(403).json({ error: 'Unauthorized access to order status' });
+    }
+
+    res.json({ status: order.status });
+  } catch (err) {
+    console.error('Error fetching order status:', err.message);
+    res.status(500).json({ error: 'Server error fetching order status' });
+  }
+});
 function sendEmailNotification(email, message) {
   const mailOptions = {
     from: email,

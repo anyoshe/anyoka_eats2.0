@@ -11,6 +11,7 @@ import Orders from './Orders';
 import { faBars } from "@fortawesome/free-solid-svg-icons";
 import axios from 'axios';
 import config from '../../config';
+import Sales from "./Sales";
 
 
 const AccountPage = () => {
@@ -60,7 +61,7 @@ const AccountPage = () => {
       case "orders":
         return <Orders />;
       case "sales":
-        return <div>Sales content coming soon...</div>;
+        return <Sales />;
       default:
         return null;
     }

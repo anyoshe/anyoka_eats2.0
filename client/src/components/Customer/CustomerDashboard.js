@@ -8,6 +8,7 @@ import { faBars, faSignOutAlt } from "@fortawesome/free-solid-svg-icons";
 import { useLocation } from 'react-router-dom';
 import { useNavigate } from 'react-router-dom';
 import CustomerOrders from './CustomerOrders';
+import CustomerPastOrders from './CustomerPastOrders';
 
 
 const CustomerDashboard = () => {
@@ -41,6 +42,8 @@ const CustomerDashboard = () => {
         return <CustomerProfileDisplay />;
       case "orders":
         return <CustomerOrders />;
+        case "past-orders":
+        return <CustomerPastOrders />;
       default:
         return null;
     }
@@ -69,6 +72,9 @@ const CustomerDashboard = () => {
               <div className={styles.mobileTab} onClick={() => handleTabChange("orders")}>
                 My Orders
               </div>
+              <div className={styles.mobileTab} onClick={() => handleTabChange("past-orders")}>
+                My Past Orders
+              </div>
               <div className={styles.mobileTab} onClick={handleLogout}>
                 Logout
               </div>
@@ -88,6 +94,12 @@ const CustomerDashboard = () => {
               onClick={() => handleTabChange("orders")}
             >
               My Orders
+            </div>
+            <div
+              className={`${styles.tab} ${activeTab === "past-orders" ? styles.active : ""}`}
+              onClick={() => handleTabChange("past-orders")}
+            >
+              My Past Orders
             </div>
             <div
               className={`${styles.tab}`}
