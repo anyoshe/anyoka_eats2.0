@@ -10,6 +10,8 @@ const Sales = () => {
   const [filteredSales, setFilteredSales] = useState([]);
   const [loading, setLoading] = useState(true);
   const [selectedDate, setSelectedDate] = useState('');
+  const [selectedOrder, setSelectedOrder] = useState(null); // State for the selected order
+  const [showModal, setShowModal] = useState(false); // State to control modal visibility
 
   useEffect(() => {
     if (!partner?._id) return;
@@ -39,8 +41,8 @@ const Sales = () => {
 
     if (date) {
       const filtered = sales.filter((order) => {
-        const orderDate = new Date(order.createdAt).toISOString().split('T')[0];
-        return orderDate === date;
+        const deliveredDate = new Date(order.parentOrder?.deliveredAt).toISOString().split('T')[0];
+        return deliveredDate === date;
       });
       setFilteredSales(filtered);
     } else {
@@ -60,6 +62,7 @@ const Sales = () => {
       customer: order.parentOrder?.user?.names || 'N/A',
       total: order.total || 0,
       driver: order.deliveredBy || 'N/A',
+      deliveredAt: new Date(order.parentOrder?.deliveredAt).toLocaleDateString(), // Include delivered date in CSV
     }));
 
     const headers = Object.keys(csvData[0]).join(',');
@@ -74,6 +77,16 @@ const Sales = () => {
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
+  };
+
+  const handleViewOrder = (order) => {
+    setSelectedOrder(order); // Set the selected order
+    setShowModal(true); // Show the modal
+  };
+
+  const closeModal = () => {
+    setShowModal(false); // Hide the modal
+    setSelectedOrder(null); // Clear the selected order
   };
 
   if (loading) return <p>Loading sales data...</p>;
@@ -105,6 +118,7 @@ const Sales = () => {
                 <th>Customer</th>
                 <th>Total (KES)</th>
                 <th>Delivered By</th>
+                <th>Delivered At</th>
                 <th>Actions</th>
               </tr>
             </thead>
@@ -115,15 +129,9 @@ const Sales = () => {
                   <td>{order.parentOrder?.user?.names || 'N/A'}</td>
                   <td>{order.total}</td>
                   <td>{order.parentOrder?.deliveredBy || 'N/A'}</td>
+                  <td>{new Date(order.parentOrder?.deliveredAt).toLocaleDateString()}</td>
                   <td>
-                    <button
-                      onClick={() => {
-                        // Logic to view the whole suborder
-                        alert(`Viewing suborder: ${order._id}`);
-                      }}
-                    >
-                      View Suborder
-                    </button>
+                    <button onClick={() => handleViewOrder(order)}>View Suborder</button>
                   </td>
                 </tr>
               ))}
@@ -133,6 +141,32 @@ const Sales = () => {
             <h3>Total Sales: KES {calculateTotalSales()}</h3>
           </div>
         </>
+      )}
+
+      {/* Modal for viewing suborder details */}
+      {showModal && selectedOrder && (
+        <div className="modal-suborder">
+          <div className="modal-content-suborder">
+            <span className="close-suborder" onClick={closeModal}>
+              &times;
+            </span>
+            <h3>Suborder Details</h3>
+            <p><strong>Order ID:</strong> {selectedOrder.parentOrder?.orderId || 'N/A'}</p>
+            <p><strong>Customer Name:</strong> {selectedOrder.parentOrder?.user?.names || 'N/A'}</p>
+            <p><strong>Total:</strong> KES {selectedOrder.total}</p>
+            <p><strong>Delivered By:</strong> {selectedOrder.parentOrder?.deliveredBy || 'N/A'}</p>
+            <p><strong>Delivered At:</strong> {new Date(selectedOrder.parentOrder?.deliveredAt).toLocaleString()}</p>
+
+            <h4>Items</h4>
+            <ul>
+              {selectedOrder.items.map((item) => (
+                <li key={item._id}>
+                  <strong>{item.product?.name || 'Product'}</strong> — Qty: {item.quantity} — Price: KES {item.price}
+                </li>
+              ))}
+            </ul>
+          </div>
+        </div>
       )}
     </div>
   );
