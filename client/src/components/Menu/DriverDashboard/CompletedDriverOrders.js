@@ -2,7 +2,7 @@ import React, { useEffect, useState, useContext } from 'react';
 import axiosInstance from '../../utils/axiosInstance';
 import { DriverContext } from '../../../contexts/DriverContext';
 import config from '../../../config';
-import './CompletedDriverOrders.css';
+import styles from './CompletedDriverOrders.module.css';
 
 const CompletedDriverOrders = () => {
     const { driver } = useContext(DriverContext);
@@ -53,10 +53,10 @@ const CompletedDriverOrders = () => {
     if (completedOrders.length === 0) return <p>No completed orders found.</p>;
 
     return (
-        <div className="completed-driver-orders-container">
+        <div className={styles["completed-driver-orders-container"]}>
             <h2>Completed Orders</h2>
 
-            <div className="filter-section">
+            <div className={styles["filter-section"]}>
                 <label htmlFor="dateFilter">Filter by Date:</label>
                 <input
                     type="date"
@@ -66,7 +66,7 @@ const CompletedDriverOrders = () => {
                 />
             </div>
 
-            <table className="completed-orders-table">
+            <table className={styles["completed-orders-table"]}>
                 <thead>
                     <tr>
                         <th>Date Completed</th>

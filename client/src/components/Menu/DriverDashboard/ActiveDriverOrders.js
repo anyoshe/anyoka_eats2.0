@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useContext } from 'react';
 import axiosInstance from '../../utils/axiosInstance';
 import { DriverContext } from '../../../contexts/DriverContext';
-import './ActiveDriverOrders.css';
+import styles from './ActiveDriverOrders.module.css';
 import config from '../../../config';
 
 const ActiveDriverOrders = () => {
@@ -87,9 +87,9 @@ const ActiveDriverOrders = () => {
     if (orders.length === 0) return <p>No active orders found.</p>;
 
     return (
-        <div className="active-driver-orders-container">
+        <div className={styles["active-driver-orders-container"]}>
             <h2>Active Orders</h2>
-            <div className="active-driver-orders-list">
+            <div className={styles["active-driver-orders-list"]}>
                 {orders.map((order) => {
                     const allOutForDelivery = order.subOrders.every(
                         (subOrder) => subOrder.status === 'OutForDelivery'
@@ -100,7 +100,7 @@ const ActiveDriverOrders = () => {
                     );
 
                     return (
-                        <div key={order._id} className="order-card">
+                        <div key={order._id} className={styles["order-card"]}>
                             <h3>Order ID: {order.orderId || 'N/A'}</h3>
                             <p>Delivery Location: {order.delivery?.location || 'N/A'}</p>
                             <p>Delivery Charges (80%): KES {((order.delivery?.fee || 0) * 0.8).toFixed(2)}</p>

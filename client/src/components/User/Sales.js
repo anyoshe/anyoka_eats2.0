@@ -2,7 +2,8 @@ import React, { useEffect, useState, useContext } from 'react';
 import axios from 'axios';
 import config from '../../config';
 import { PartnerContext } from '../../contexts/PartnerContext';
-import './Sales.css'; // Optional: style file
+import styles from './Sales.module.css';
+
 
 const Sales = () => {
   const { partner } = useContext(PartnerContext);
@@ -92,10 +93,10 @@ const Sales = () => {
   if (loading) return <p>Loading sales data...</p>;
 
   return (
-    <div className="sales-container">
-      <div className="sales-header">
+    <div className={styles['sales-container']}>
+      <div className={styles["sales-header"]}>
         <h2>Completed Sales</h2>
-        <div className="sales-filters">
+        <div className={styles["sales-filters"]}>
           <label htmlFor="dateFilter">Filter by Date:</label>
           <input
             type="date"
@@ -111,7 +112,7 @@ const Sales = () => {
         <p>No completed sales found for the selected date.</p>
       ) : (
         <>
-          <table className="sales-table">
+          <table className={styles["sales-table"]}>
             <thead>
               <tr>
                 <th>Order ID</th>
@@ -137,7 +138,7 @@ const Sales = () => {
               ))}
             </tbody>
           </table>
-          <div className="sales-total">
+          <div className={styles["sales-total"]}>
             <h3>Total Sales: KES {calculateTotalSales()}</h3>
           </div>
         </>
@@ -145,9 +146,9 @@ const Sales = () => {
 
       {/* Modal for viewing suborder details */}
       {showModal && selectedOrder && (
-        <div className="modal-suborder">
-          <div className="modal-content-suborder">
-            <span className="close-suborder" onClick={closeModal}>
+        <div className={styles["modal-suborder"]}>
+          <div className={styles["modal-content-suborder"]}>
+            <span className={styles["close-suborder"]} onClick={closeModal}>
               &times;
             </span>
             <h3>Suborder Details</h3>

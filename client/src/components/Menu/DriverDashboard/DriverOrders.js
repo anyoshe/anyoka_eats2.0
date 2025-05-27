@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useContext } from 'react';
 import axiosInstance from '../../utils/axiosInstance';
 import { DriverContext } from '../../../contexts/DriverContext';
-import './DriverOrders.css';
+import styles from './DriverOrders.module.css';
 import config from '../../../config';
 
 const DriverOrders = () => {
@@ -106,11 +106,11 @@ const DriverOrders = () => {
   if (orders.length === 0) return <p>No orders found.</p>;
 
   return (
-    <div className="driver-orders-container">
+    <div className={styles["driver-orders-container"]}>
       <h2>Driver Orders</h2>
-      <div className="driver-orders-list">
+      <div className={styles["driver-orders-list"]}>
         {orders?.map((order) => (
-          <div key={order._id} className="order-card">
+          <div key={order._id} className={styles["order-card"]}>
             <h3>Order ID: {order.orderId || 'N/A'}</h3>
             <p>Delivery Location: {order.delivery?.location || 'N/A'}</p>
             <p>Delivery Charges (80%): KES {((order.delivery?.fee || 0) * 0.8).toFixed(2)}</p>
