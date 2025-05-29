@@ -74,9 +74,16 @@
     color: #666;
     font-size: 0.9rem;
   }
-  
-  /* NotificationComponent.module.css */
+
+.notification {
+  padding: 10px;
+  border-bottom: 1px solid #ccc;
+  cursor: pointer;
+  background-color: white;
+  transition: background-color 0.3s;
+}
+
 .unread {
-  background-color: #f2f6ff;
-  font-weight: 600;
+  background-color: #f0f8ff; /* Light blue background for unread */
+  font-weight: bold;
 }

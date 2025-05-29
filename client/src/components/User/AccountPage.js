@@ -16,9 +16,9 @@ import Sales from "./Sales";
 
 const AccountPage = () => {
   const [menuOpen, setMenuOpen] = useState(false);
-  const [activeTab, setActiveTab] = useState("profile");
+  const [activeTab, setActiveTab] = useState("profile")
   const [showNotifications, setShowNotifications] = useState(false);
-  const { notifications, addNotification, markAsRead } = useContext(PartnerContext);
+  const { notifications, addNotification, markAsRead, unreadCount } = useContext(PartnerContext);
   const [orderDetails, setOrderDetails] = useState(null);
 
 
@@ -50,7 +50,7 @@ const AccountPage = () => {
       console.error('Failed to fetch suborder:', err);
     }
   };
-  
+
 
   const renderTabContent = () => {
     switch (activeTab) {
@@ -74,15 +74,15 @@ const AccountPage = () => {
         {/* Notification Dropdown */}
         {showNotifications && (
           <NotificationComponent
-          onView={(id, isSubOrder) => {
-            if (isSubOrder) {
-              handleViewSubOrder(id);
-            } else {
-              handleViewOrder(id);
-            }
-          }}
-        />
-              
+            onView={(id, isSubOrder) => {
+              if (isSubOrder) {
+                handleViewSubOrder(id);
+              } else {
+                handleViewOrder(id);
+              }
+            }}
+          />
+
 
         )}
 
@@ -134,13 +134,17 @@ const AccountPage = () => {
           </div>
 
           <div className={styles.headerNavIcons}>
+            <div className={`${styles.notificationIconWrapper}`}>
+              <FontAwesomeIcon
+                icon={faBell}
+                className={`${styles.icon} ${styles.notificationIcon} ${styles.profileNotification}`}
+                onClick={() => setShowNotifications(!showNotifications)}
+              />
+              {unreadCount > 0 && (
+                <div className={styles.notificationBadge}>{unreadCount}</div>
+              )}
+            </div>
 
-            <FontAwesomeIcon
-              icon={faBell}
-              className={`${styles.icon} ${styles.notificationIcon} ${styles.profileNotification}`}
-              data-count={notifications.length}
-              onClick={() => setShowNotifications(!showNotifications)}
-            />
 
             {/* Logout Icon */}
             <LogoutComponent />
@@ -170,7 +174,7 @@ const OrderDetailsModal = ({ order, onClose }) => {
     <div className={styles.modalOverlay}>
       <div className={styles.modalContent}>
         <h2>{isSubOrder ? 'SubOrder Summary' : 'Order Details'}</h2>
-        
+
         {isSubOrder ? (
           <>
             <p><strong>SubOrder ID:</strong> {order._id}</p>
@@ -200,7 +204,7 @@ const OrderDetailsModal = ({ order, onClose }) => {
             </ul>
           </>
         )}
-        
+
         <button className={styles.closeBtn} onClick={onClose}>Close</button>
       </div>
     </div>

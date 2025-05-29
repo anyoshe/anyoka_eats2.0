@@ -12,6 +12,17 @@ const DriverNotification = ({ onView }) => {
   const [notifications, setNotifications] = useState([]);
 
   useEffect(() => {
+    const enableAudioPlayback = () => {
+      window.__audioAllowed = true;
+      document.removeEventListener('click', enableAudioPlayback);
+    };
+  
+    document.addEventListener('click', enableAudioPlayback);
+  }, []);
+  
+
+  useEffect(() => {
+    
     const fetchNotifications = async () => {
       try {
         const res = await fetch(`${config.backendUrl}/api/driver-notifications/${driver._id}`);
@@ -30,9 +41,12 @@ const DriverNotification = ({ onView }) => {
     socket.emit('joinDriverRoom', driver._id);
 
     socket.on('newOrderAvailable', (data) => {
-      playNotificationSound(); // Play sound when a new notification is received
+      if (window.__audioAllowed) {
+        playNotificationSound();
+      }
       setNotifications((prev) => [data, ...prev]);
     });
+    
 
     return () => {
       socket.disconnect();
