@@ -154,7 +154,6 @@ const Orders = () => {
                 subOrderId={order._id}
                 currentStatus={order.status}
                 parentOrderId={order.parentOrder?._id}
-                deliveredBy={order.parentOrder?.assignedDriver}
                 onStatusChange={(newStatus) => {
                   setOrders((prevOrders) =>
                     prevOrders.map((o) =>
