@@ -21,10 +21,15 @@ const DeliveryOptions = ({ cart, userLocation, deliveryTown, onDeliveryOptionSel
 
 
   const geocodeAddress = async (address) => {
+  try {
     const response = await fetch(
       `https://maps.googleapis.com/maps/api/geocode/json?address=${encodeURIComponent(address)}&key=${process.env.REACT_APP_GOOGLE_API_KEY}`
     );
     const data = await response.json();
+
+    if (data.status !== 'OK') {
+      console.error('Geocoding error response:', data);
+    }
 
     if (data.status === 'OK' && data.results.length > 0) {
       const { lat, lng } = data.results[0].geometry.location;
@@ -43,7 +48,12 @@ const DeliveryOptions = ({ cart, userLocation, deliveryTown, onDeliveryOptionSel
     } else {
       throw new Error(`Geocoding failed for: ${address}`);
     }
-  };
+  } catch (error) {
+    console.error('Error in geocodeAddress:', error);
+    throw error;
+  }
+};
+
 
   const calculateDeliveryFee = async () => {
     if (!userLocation || cart.length === 0) return;

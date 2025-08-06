@@ -1138,16 +1138,54 @@ router.post('/products/:id/rate', async (req, res) => {
 });
 
 //Handling distance calculations.
+// router.get('/distance', async (req, res) => {
+//   const { origins, destinations } = req.query;
+ 
+//   try {
+//     const response = await fetch(`https://maps.googleapis.com/maps/api/distancematrix/json?origins=${origins}&destinations=${destinations}&key=${process.env.GOOGLE_API_KEY}`);
+//     const data = await response.json();
+//     res.json(data);
+//   } catch (err) {
+//     console.error('Error fetching from Google:', err);
+//     res.status(500).json({ error: 'Google API fetch failed' });
+//   }
+// });
+
+const fetch = require('node-fetch');
 router.get('/distance', async (req, res) => {
   const { origins, destinations } = req.query;
+const orsApiKey = process.env.ORS_API_KEY; // Add this to your .env
 
   try {
-    const response = await fetch(`https://maps.googleapis.com/maps/api/distancematrix/json?origins=${origins}&destinations=${destinations}&key=${process.env.GOOGLE_API_KEY}`);
-    const data = await response.json();
-    res.json(data);
+    const originArr = origins.split('|');
+    const [destLat, destLng] = destinations.split(',').map(Number);
+
+    const results = await Promise.all(originArr.map(async (origin) => {
+      const [origLat, origLng] = origin.split(',').map(Number);
+      const url = `https://api.openrouteservice.org/v2/directions/driving-car?api_key=${orsApiKey}&start=${origLng},${origLat}&end=${destLng},${destLat}`;
+      const orsRes = await fetch(url);
+      const orsData = await orsRes.json();
+
+      if (orsData && orsData.features && orsData.features[0]) {
+        return {
+          elements: [{
+            status: 'OK',
+            distance: { value: orsData.features[0].properties.summary.distance }, // meters
+            duration: { value: orsData.features[0].properties.summary.duration }, // seconds
+          }]
+        };
+      } else {
+        return { elements: [{ status: 'ZERO_RESULTS' }] };
+      }
+    }));
+
+    res.json({
+      status: 'OK',
+      rows: results
+    });
   } catch (err) {
-    console.error('Error fetching from Google:', err);
-    res.status(500).json({ error: 'Google API fetch failed' });
+    console.error('ORS error:', err);
+    res.status(500).json({ status: 'ERROR', error: err.message });
   }
 });
 
