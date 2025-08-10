@@ -1,8 +1,14 @@
 import { useContext, useState } from 'react';
 import { DriverContext } from '../../../contexts/DriverContext';
 import styles from './DriverSignup.module.css';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faCartShopping, faCaretDown } from '@fortawesome/free-solid-svg-icons';
+import { useNavigate } from 'react-router-dom';
+
 
 const DriverSignup = () => {
+  const navigate = useNavigate();
+
   const { signupDriver, loginDriver } = useContext(DriverContext);
 
   const [formData, setFormData] = useState({
@@ -21,8 +27,8 @@ const DriverSignup = () => {
 
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
-  const [isLogin, setIsLogin] = useState(false);  // Toggle between login and signup form
-  const [showModal, setShowModal] = useState(false);  // For showing the login modal
+  const [isLogin, setIsLogin] = useState(false); 
+  const [showModal, setShowModal] = useState(false); 
 
   const handleChange = (e, isLoginForm = false) => {
     const targetData = isLoginForm ? setLoginData : setFormData;
@@ -69,7 +75,13 @@ const DriverSignup = () => {
 
   return (
     <div className={styles.signupContainer}>
+
+      <div className={styles.backButton} onClick={() => navigate(-1)}>
+        <FontAwesomeIcon icon={faCaretDown} rotation={90} /> Back
+      </div>
+
       <h1 className={styles.signupTitle}>{isLogin ? 'Driver Login' : 'Driver Signup'}</h1>
+
       <form onSubmit={handleSubmit} className={styles.signupForm}>
         {isLogin ? (
           <>
@@ -120,14 +132,14 @@ const DriverSignup = () => {
 
       <div className={styles.switchForm}>
         {isLogin ? (
-          <p>
+          <p className={styles.toggleButtonP}>
             Don't have an account?{' '}
             <button type="button" onClick={toggleForm} className={styles.toggleButton}>
               Sign Up
             </button>
           </p>
         ) : (
-          <p>
+          <p className={styles.toggleButtonP}>
             Already have an account?{' '}
             <button type="button" onClick={toggleForm} className={styles.toggleButton}>
               Login
@@ -139,12 +151,19 @@ const DriverSignup = () => {
       {/* Login Modal */}
       {showModal && (
         <div className={styles.modal}>
+
           <div className={styles.modalContent}>
+
             <span className={styles.closeModal} onClick={closeModal}>&times;</span>
+
             <h2>Login</h2>
+
             <form onSubmit={handleSubmit}>
+
               <div className={styles.formGroup}>
+
                 <label>Username / Phone Number</label>
+            
                 <input
                   type="text"
                   name="username"
@@ -152,6 +171,7 @@ const DriverSignup = () => {
                   onChange={(e) => handleChange(e, true)}
                   required
                 />
+
               </div>
 
               <div className={styles.formGroup}>

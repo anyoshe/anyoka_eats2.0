@@ -5,6 +5,8 @@ import { AuthContext } from '../../contexts/AuthContext';
 import { PartnerContext } from '../../contexts/PartnerContext';
 import config from '../../config';
 import styles from './Login.module.css';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faCartShopping, faCaretDown } from '@fortawesome/free-solid-svg-icons';
 
 const Login = () => {
   const [identifier, setIdentifier] = useState('');
@@ -67,34 +69,40 @@ const Login = () => {
   };
 
   return (
-    <form className={styles.form} onSubmit={handleSubmit}>
-
-      <h2>Login</h2>
-      
-      {error && <p className={styles.error}>{error}</p>}
-
-      <div className={styles.field}>
-        <label>Username / Phone / Business Name:</label>
-        <input
-          type="text"
-          value={identifier}
-          onChange={(e) => setIdentifier(e.target.value)}
-          required
-        />
+   <div className='loginBackDiv'>
+      <div className={styles.backButton} onClick={() => navigate(-1)}>
+        <FontAwesomeIcon icon={faCaretDown} rotation={90} /> Back
       </div>
 
-      <div className={styles.field}>
-        <label>Password:</label>
-        <input
-          type="password"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          required
-        />
-      </div>
+      <form className={styles.form} onSubmit={handleSubmit}>
 
-      <button type="submit">Login</button>
-    </form>
+        <h2>Login</h2>
+        
+        {error && <p className={styles.error}>{error}</p>}
+
+        <div className={styles.field}>
+          <label>Username / Phone / Business Name:</label>
+          <input
+            type="text"
+            value={identifier}
+            onChange={(e) => setIdentifier(e.target.value)}
+            required
+          />
+        </div>
+
+        <div className={styles.field}>
+          <label>Password:</label>
+          <input
+            type="password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            required
+          />
+        </div>
+
+        <button type="submit">Login</button>
+      </form>
+   </div>
   );
 };
 

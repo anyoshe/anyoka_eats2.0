@@ -21,12 +21,14 @@ const HeroHeader = () => {
 
                     <Link to="/sign-in">
                         <button className={styles.logInButton}>
-                            <i className="fas fa-sign-in-alt"></i> LOG IN
+                            {/* <i className="fas fa-sign-in-alt"></i> */}
+                            LOG IN 
                         </button>
                     </Link>
-                    <Link to="/customer-dashboard" className="hover:text-blue-600">
+                    
+                    {/* <Link to="/customer-dashboard" className="hover:text-blue-600">
                         <User className="w-6 h-6" />
-                    </Link>
+                    </Link> */}
                 </div>
             </nav>
 
