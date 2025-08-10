@@ -235,6 +235,11 @@
         width: 31rem;
     }
 
+    .logInButton {
+        padding: 0.5rem 0.7rem;
+        font-size: 0.8em;
+    }
+
     /* .adtext {
         width: 90%;
         font-size: 0.9em;

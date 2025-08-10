@@ -86,7 +86,7 @@ const CartSection = () => {
               </div>
 
               <div className={styles.cartQuantityControls}>
-                <button onClick={() => handleDecrement(index)} className=       {styles.quantityBtn}>
+                <button onClick={() => handleDecrement(index)} className={styles.quantityBtn}>
                   <FontAwesomeIcon icon={faMinus} />
                 </button>
 

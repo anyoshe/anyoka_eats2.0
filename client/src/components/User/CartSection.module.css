@@ -29,11 +29,11 @@
 
 .deliveryTruck {
   margin-right: 0.5rem;
-  color: var(--orange);
+  color: var(--white);
 }
 
 .locationChoice {
-  color: var(--orange);
+  color: var(--white);
   margin-left: 0.2rem;
 }
 
@@ -102,22 +102,25 @@
 }
 
 .quantityBtn {
-  background-color: #f0f0f0;
+  background-color: var(--green);
   border: none;
   cursor: pointer;
   border-radius: 4px;
   font-size: 0.8rem;
   padding: 0.2rem 0.5rem;
   transition: background-color 0.2s;
+
 }
 
 .quantityBtn:hover {
-  background-color: #ddd;
+  background-color: var(--white);
+  color: var(--orange);
+  outline: 1px solid var(--orange);
 }
 
 .removeBtn {
   background-color: #ffe5e5;
-  color: #ff4d4f;
+  color: #f1181b;
 }
 
 .removeBtn:hover {

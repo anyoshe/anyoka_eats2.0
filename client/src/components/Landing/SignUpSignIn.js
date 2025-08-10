@@ -7,6 +7,8 @@ import MapSelector from '../User/MapSelector';
 import styles from './SignUpSignIn.module.css';
 import { FaMapMarkerAlt } from 'react-icons/fa';
 import { FaEye, FaEyeSlash } from 'react-icons/fa';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faCartShopping, faCaretDown } from '@fortawesome/free-solid-svg-icons';
 
 const StoreSignUpForm = () => {
   const [formData, setFormData] = useState({
@@ -121,6 +123,11 @@ const StoreSignUpForm = () => {
 
   return (
     <section className={styles.signUpContainer}>
+      
+      <div className={styles.backButton} onClick={() => navigate(-1)}>
+        <FontAwesomeIcon icon={faCaretDown} rotation={90} /> Back
+      </div>
+
       <div className={styles.signUpWrapper}>
         <h2 className={styles.signUpWrapperH2}>Create Store Account</h2>
 
@@ -276,7 +283,7 @@ const StoreSignUpForm = () => {
                       handleLocationSelect(location);
                       setShowMap(false);
                     }}
-                    center={mapCenter} // 👈 pass the current map center
+                    center={mapCenter} 
                   />
                 </div>
               </div>
