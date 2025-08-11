@@ -22,6 +22,7 @@ require('dotenv').config();
 const nodemailer = require('nodemailer');
 const { notifyPartner, notifyDriver } = require('../socketServer');
 const geolib = require('geolib');
+const fetch = require('node-fetch');
 
 
 
@@ -1151,27 +1152,53 @@ router.post('/products/:id/rate', async (req, res) => {
 //   }
 // });
 
-const fetch = require('node-fetch');
 router.get('/distance', async (req, res) => {
   const { origins, destinations } = req.query;
-const orsApiKey = process.env.ORS_API_KEY; // Add this to your .env
+  const orsApiKey = process.env.ORS_API_KEY;
 
   try {
     const originArr = origins.split('|');
-    const [destLat, destLng] = destinations.split(',').map(Number);
+    const [destLng, destLat] = destinations.split(',').map(Number);
 
     const results = await Promise.all(originArr.map(async (origin) => {
-      const [origLat, origLng] = origin.split(',').map(Number);
+      const [origLng, origLat] = origin.split(',').map(Number);
+
+      // Validate coordinates
+      if (
+        isNaN(origLng) || isNaN(origLat) ||
+        isNaN(destLng) || isNaN(destLat)
+      ) {
+        return { elements: [{ status: 'ERROR', message: 'Invalid coordinates' }] };
+      }
+
+      // Calculate straight-line distance first
+      const straightDistance = geolib.getDistance(
+        { latitude: origLat, longitude: origLng },
+        { latitude: destLat, longitude: destLng }
+      );
+
+      // If distance > 6000km, skip ORS call
+      if (straightDistance > 6000000) {
+        return { elements: [{ status: 'ERROR', message: 'Distance exceeds ORS limit' }] };
+      }
+
       const url = `https://api.openrouteservice.org/v2/directions/driving-car?api_key=${orsApiKey}&start=${origLng},${origLat}&end=${destLng},${destLat}`;
       const orsRes = await fetch(url);
+
+      if (!orsRes.ok) {
+        const errorText = await orsRes.text();
+        console.error(`ORS API error (${orsRes.status}):`, errorText);
+        return { elements: [{ status: 'ERROR', message: errorText }] };
+      }
+
       const orsData = await orsRes.json();
 
-      if (orsData && orsData.features && orsData.features[0]) {
+      if (orsData?.features?.[0]) {
         return {
           elements: [{
             status: 'OK',
-            distance: { value: orsData.features[0].properties.summary.distance }, // meters
-            duration: { value: orsData.features[0].properties.summary.duration }, // seconds
+            distance: { value: orsData.features[0].properties.summary.distance },
+            duration: { value: orsData.features[0].properties.summary.duration },
           }]
         };
       } else {
@@ -1179,15 +1206,60 @@ const orsApiKey = process.env.ORS_API_KEY; // Add this to your .env
       }
     }));
 
-    res.json({
-      status: 'OK',
-      rows: results
-    });
+    res.json({ status: 'OK', rows: results });
+
   } catch (err) {
     console.error('ORS error:', err);
     res.status(500).json({ status: 'ERROR', error: err.message });
   }
 });
+
+
+// router.get('/distance', async (req, res) => {
+//   const { origins, destinations } = req.query;
+//   const orsApiKey = process.env.ORS_API_KEY;
+
+//   try {
+//     // Split and keep in lng,lat order (frontend already sends correct format)
+//     const originArr = origins.split('|');
+//     const [destLng, destLat] = destinations.split(',').map(Number); // fixed order
+
+//     const results = await Promise.all(originArr.map(async (origin) => {
+//       const [origLng, origLat] = origin.split(',').map(Number); // fixed order
+
+//       const url = `https://api.openrouteservice.org/v2/directions/driving-car?api_key=${orsApiKey}&start=${origLng},${origLat}&end=${destLng},${destLat}`;
+      
+//       const orsRes = await fetch(url);
+      
+//       if (!orsRes.ok) {
+//         // Log exact ORS error body
+//         const errorText = await orsRes.text();
+//         console.error(`ORS API error (${orsRes.status}):`, errorText);
+//         return { elements: [{ status: 'ERROR', message: errorText }] };
+//       }
+
+//       const orsData = await orsRes.json();
+
+//       if (orsData?.features?.[0]) {
+//         return {
+//           elements: [{
+//             status: 'OK',
+//             distance: { value: orsData.features[0].properties.summary.distance }, // meters
+//             duration: { value: orsData.features[0].properties.summary.duration }, // seconds
+//           }]
+//         };
+//       } else {
+//         return { elements: [{ status: 'ZERO_RESULTS' }] };
+//       }
+//     }));
+
+//     res.json({ status: 'OK', rows: results });
+
+//   } catch (err) {
+//     console.error('ORS error:', err);
+//     res.status(500).json({ status: 'ERROR', error: err.message });
+//   }
+// });
 
 // Route: /api/products-by-partner/:partnerId
 router.get('/products-by-partner/:partnerId', async (req, res) => {
