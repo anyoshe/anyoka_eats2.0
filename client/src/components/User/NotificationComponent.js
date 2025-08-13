@@ -62,7 +62,8 @@ const NotificationComponent = ({ onView }) => {
                     deleteNotification(notif._id);
                   }}
                 >
-                  🗑
+                  {/* 🗑 */}
+                  <i class="fas fa-trash"></i> 
                 </button>
               </div>
             {/* </div> */}

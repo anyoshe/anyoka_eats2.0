@@ -1,30 +1,61 @@
+:root {
+  --green: #1ea509;
+  --orange: #ffa500;
+  --white: #ffffff;
+}
+
 .orders-container {
-    padding: 20px;
-  }
-  
-  .export-button {
-    background-color: #007bff;
-    color: #fff;
-    border: none;
-    padding: 10px 15px;
-    margin-bottom: 20px;
-    cursor: pointer;
-  }
-  
-  .order-card {
-    border: 1px solid #ccc;
-    padding: 15px;
-    margin-bottom: 20px;
-    border-radius: 5px;
-  }
-  
-  .order-card h3 {
-    margin-top: 0;
-  }
-  
-  .order-card p {
-    margin: 5px 0;
-  }
+  padding: 20px;
+}
+
+.yourOrderTitle{
+  color: var(--green);
+  text-decoration: underline;
+}
+
+/* .export-button {
+  background-color: #007bff;
+  color: #fff;
+  border: none;
+  padding: 10px 15px;
+  margin-bottom: 20px;
+  cursor: pointer;
+} */
+
+.CSVbuttton{
+  background: var(--orange);
+  color: var(--white);
+  margin-bottom: 0.3rem;
+  padding: 0.5rem 1rem;
+  border: none;
+}
+
+.CSVbuttton:hover{
+  background: var(--white);
+  color: var(--orange);
+  outline: 1px solid var(--orange);
+}
+
+.orders-list{
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+}
+
+.order-card {
+  border: 1px solid #ccc;
+  padding: 15px;
+  margin-bottom: 20px;
+  border-radius: 5px;
+}
+
+.order-card h3 {
+  margin-top: 0;
+}
+
+.order-card p {
+  margin: 5px 0;
+}
   
   .order-card ul {
     list-style-type: none;

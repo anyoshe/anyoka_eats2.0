@@ -1,58 +1,95 @@
+:root {
+  --green: #1ea509;
+  --orange: #ffa500;
+  --white: #ffffff;
+}
+
+.salesExport{
+  color: var(--white);
+  background: var(--green);
+  border: none;
+  padding: 0.5rem 1rem;
+  margin-left: 0.2rem;
+}
+
+.salesExport:hover{
+  color: var(--orange);
+  background: var(--white);
+  outline: 1px solid var(--orange);
+}
+
+.suborderBtn{
+  color: var(--white);
+  background: var(--green);
+  border: none;
+  padding: 0.5rem 1rem;
+}
+
+.suborderBtn:hover{
+  color: var(--orange);
+  background: var(--white);
+  outline: 1px solid var(--orange);
+}
+
+.salesTotalH3{
+  margin-top: 1rem;
+}
+
 .sales-container {
-    padding: 1rem;
-  }
-  
-  .sales-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-  }
-  
-  .sales-table {
-    width: 100%;
-    border-collapse: collapse;
-    margin-top: 1rem;
-  }
-  
-  .sales-table th,
-  .sales-table td {
-    border: 1px solid #ddd;
-    padding: 0.5rem;
-    text-align: left;
-  }
-  
-  .sales-table th {
-    background-color: #f4f4f4;
-  }
-  /* Sales.css */
-.modal-suborder {
-  position: fixed;
-  z-index: 1000;
-  left: 0;
-  top: 0;
-  width: 100%;
-  height: 100%;
-  overflow: auto;
-  background-color: rgba(0, 0, 0, 0.5);
+  padding: 1rem;
+}
+
+.sales-header {
   display: flex;
-  justify-content: center;
+  justify-content: space-between;
   align-items: center;
 }
 
+.sales-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 1rem;
+}
+
+.sales-table th,
+.sales-table td {
+  border: 1px solid #ddd;
+  padding: 0.5rem;
+  text-align: left;
+}
+
+.sales-table th {
+  background-color: #f4f4f4;
+}
+/* Sales.css */
+.modal-suborder {
+position: fixed;
+z-index: 1000;
+left: 0;
+top: 0;
+width: 100%;
+height: 100%;
+overflow: auto;
+background-color: rgba(0, 0, 0, 0.5);
+display: flex;
+justify-content: center;
+align-items: center;
+}
+
 .modal-content-suborder {
-  background-color: #fff;
-  padding: 20px;
-  border-radius: 8px;
-  width: 80%;
-  max-width: 600px;
-  position: relative;
+background-color: #fff;
+padding: 20px;
+border-radius: 8px;
+width: 80%;
+max-width: 600px;
+position: relative;
 }
 
 .close-suborder {
-  position: absolute;
-  top: 10px;
-  right: 20px;
-  font-size: 24px;
-  font-weight: bold;
-  cursor: pointer;
+position: absolute;
+top: 10px;
+right: 20px;
+font-size: 24px;
+font-weight: bold;
+cursor: pointer;
 }

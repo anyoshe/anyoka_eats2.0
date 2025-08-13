@@ -11,6 +11,76 @@
     font-family: "Winky Sans", sans-serif;
 }
 
+.userDropdown {
+  position: relative;
+  display: inline-block;
+  /* background-color: red; */
+  height: 2.5rem;
+}
+
+.userIconButton {
+  background: none;
+  border: none;
+  cursor: pointer;
+  /* background-color: green; */
+  height: inherit;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  transition: background-color 0.2s ease-in-out;
+}
+
+.userIconButton:hover{
+    background-color: var(--white);
+}
+
+.userIcon {
+    color: var(--green);
+    transition: color 0.2s ease-in-out;
+    background-color: var(--white);
+    border-radius: 50%;
+}
+
+.dropdownMenu {
+  position: absolute;
+  right: -2rem;
+  top: 100%;
+  border: none;
+  border-radius: 4px;
+  min-width: 90px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.12);
+  z-index: 10;
+}
+
+.dropdownItem {
+  display: block;
+  padding: 8px 16px;
+  color: var(--white);
+  background-color: var(--green);
+  text-decoration: none;
+  cursor: pointer;
+  width: 100%;
+}
+
+.dropdownItem:hover {
+  background: var(--white);
+  color: var(--orange);
+  outline: var(--orange) 1px solid;
+}
+
+
+/* .userDropdown {
+  position: relative;
+  display: inline-block;
+  background-color: red;
+}
+
+.userIconButton {
+  background: none;
+  border: none;
+  cursor: pointer;
+} */
+
 .heroHeader {
     position: relative;
     width: 100%;
@@ -222,6 +292,7 @@
     box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.2);
     transition: transform 0.05s ease;
 }
+
 
 
 @media (max-width: 1440px) {  

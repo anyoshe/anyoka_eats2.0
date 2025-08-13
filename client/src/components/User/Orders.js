@@ -110,8 +110,10 @@ const Orders = () => {
   return (
     <div className={styles["orders-container"]}>
       <div className={styles["orders-header"]}>
-        <h2>Your Orders</h2>
-        <button onClick={exportCSV}>Export CSV</button>
+        <h2 className={styles.yourOrderTitle}>Your Orders</h2>
+
+        <button onClick={exportCSV} className={styles.CSVbuttton}>Export CSV</button>
+
       </div>
       <div className={styles["orders-list"]}>
         {orders

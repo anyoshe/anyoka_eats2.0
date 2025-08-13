@@ -104,7 +104,7 @@ const Sales = () => {
             value={selectedDate}
             onChange={handleDateFilter}
           />
-          <button onClick={exportCSV}>Export CSV</button>
+          <button onClick={exportCSV} className={styles.salesExport}>Export CSV</button>
         </div>
       </div>
 
@@ -132,14 +132,14 @@ const Sales = () => {
                   <td>{order.parentOrder?.deliveredBy || 'N/A'}</td>
                   <td>{new Date(order.parentOrder?.deliveredAt).toLocaleDateString()}</td>
                   <td>
-                    <button onClick={() => handleViewOrder(order)}>View Suborder</button>
+                    <button onClick={() => handleViewOrder(order)} className={styles.suborderBtn}>View Suborder</button>
                   </td>
                 </tr>
               ))}
             </tbody>
           </table>
           <div className={styles["sales-total"]}>
-            <h3>Total Sales: KES {calculateTotalSales()}</h3>
+            <h3 className={styles.salesTotalH3}>Total Sales: KES {calculateTotalSales()}</h3>
           </div>
         </>
       )}
