@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import axios from 'axios';
 import config from '../../config';
+import styles from './OrderStatusUpdater.module.css';
 
 const statusFlow = [
   'Pending',
@@ -100,6 +101,7 @@ const OrderStatusUpdater = ({
         <button
           onClick={handleStatusUpdate}
           disabled={loading || (currentStatus === 'OutForDelivery' && deliveredBy)}
+          className={styles.statusButtonOrder}
         >
           {loading
             ? 'Updating...'

@@ -1,3 +1,9 @@
+:root {
+  --green: #1ea509;
+  --orange: #ffa500;
+  --white: #ffffff;
+}
+
 
 .accountPageWrapper{
     /* border: 3px solid red; */
@@ -293,11 +299,16 @@
   
   .closeBtn {
     margin-top: 1rem;
-    background: #f44336;
-    color: white;
+    background: var(--green);
+    color: var(--white);
     border: none;
     padding: 0.6rem 1.2rem;
     border-radius: 8px;
     cursor: pointer;
   }
   
+ .closeBtn:hover{
+  background-color: var(--white);
+  color: var(--orange);
+  outline: 1px solid var(--orange);
+ } 

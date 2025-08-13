@@ -1,3 +1,9 @@
+:root {
+  --green: #1ea509;
+  --orange: #ffa500;
+  --white: #ffffff;
+}
+
 .container {
     position: absolute;
     top: 60px;
@@ -17,7 +23,8 @@
     font-size: 1.1rem;
     font-weight: 600;
     margin-bottom: 0.5rem;
-    color: #333;
+    text-decoration: underline;
+    color: var(--green);
   }
   
   .list {
@@ -54,7 +61,7 @@
     color: #888;
   }
   
-  .viewBtn {
+  /* .viewBtn {
     background-color: #4f46e5;
     color: white;
     border: none;
@@ -67,7 +74,7 @@
   
   .viewBtn:hover {
     background-color: #3730a3;
-  }
+  } */
   
   .emptyText {
     text-align: center;
@@ -84,6 +91,22 @@
 }
 
 .unread {
-  background-color: #f0f8ff; /* Light blue background for unread */
+  background-color: #f0f8ff; 
   font-weight: bold;
+}
+
+.deleteBtn{
+  background-color: var(--green);
+  color: var(--white);
+  /* display: flex;
+  justify-content: center;
+  align-items: center; */
+  border: none;
+  padding: 0.3rem 0.5rem;
+}
+
+.deleteBtn:hover {
+  background-color: var(--white);
+  color: var(--orange);
+  outline: 1px solid var(--orange);
 }

@@ -161,11 +161,6 @@ const StoreMenuPage = () => {
                                             <div key={index} className={styles.categorySectionDisplayDivs}
                                                 onClick={() => handleProductClick(product)}
                                             >
-                                                {/* {product.discountedPrice && (
-                                                    <p className="product-price discounted-now">
-                                                        Ksh {product.discountedPrice.toFixed(2)}
-                                                    </p>
-                                                )} */}
 
                                                  {typeof product.discountedPrice === 'number' && product.discountedPrice > 0 && (
                                                                       <div className={styles.discountBadge}>
@@ -190,31 +185,6 @@ const StoreMenuPage = () => {
                                                     {product.name}
                                                 </p>
 
-                                                {/* <div className="priceQuantityRow">
-                                                
-                                                    {product.discountedPrice ? (
-                                                        <span className="original-price-offer">
-                                                            Was{' '}
-                                                            <span className="diagonal-strikethrough linePrice">
-                                                                Ksh {product.price.toFixed(2)}
-                                                            </span>
-                                                        </span>
-                                                    ) : (
-                                                        
-                                                        <p className="product-price">Price: Ksh {product.price.toFixed(2)}</p>
-                                                    )}
-                                                </div>
-
-
-                                                <div className={styles.priceQuantityRow}>
-                                                    <p className={`${styles.categorySectionPrice} ${styles.categorySectionP}`}>
-                                                        KSH:{product.price}
-                                                    </p>
-                                                    <p className={`${styles.categorySectionQuantity} ${styles.categorySectionP}`}>
-                                                        <span>{product.quantity}</span>
-                                                        {product.unit}
-                                                    </p>
-                                                </div> */}
 
                                                 <div className={styles.priceQuantityRow}>
                                                     {/* If there’s a discount, show original price with strikethrough */}
