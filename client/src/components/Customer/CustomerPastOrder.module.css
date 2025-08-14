@@ -1,0 +1,237 @@
+@import url('https://fonts.googleapis.com/css2?family=Winky+Sans:ital,wght@0,300..900;1,300..900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900&display=swap');
+
+:root {
+  --green: #1ea509;
+  --orange: #ffa500;
+  --white: #fff;
+  --border: #ddd;
+  --muted: #888;
+  --bg: #fff;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: "Winky Sans", "Poppins", sans-serif;
+}
+
+.container {
+  /* max-width: 47rem; */
+  margin: 1.5rem auto;
+  padding: 1rem;
+  background: var(--bg);
+  border-radius: 0.75rem;
+  border: 1px solid var(--border);
+  box-shadow: 0 0 10px rgba(0,0,0,0.05);
+}
+
+.title {
+  color: var(--green);
+  font-size: 1.3rem;
+  font-weight: 700;
+  margin-bottom: 1.5rem;
+  text-align: center;
+  text-decoration: underline;
+}
+
+.noOrders {
+  color: var(--muted);
+  text-align: center;
+  margin: 2rem 0;
+}
+
+.loading {
+  color: var(--orange);
+  text-align: center;
+  margin: 2rem 0;
+}
+
+
+.ordersList{
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 1rem;
+}
+
+.orderCard {
+  border: 1px solid var(--border);
+  border-radius: 0.75rem;
+  margin-bottom: 1.5rem;
+  padding: 1rem;
+  background: #fff;
+  box-shadow: 0 0 10px rgba(0,0,0,0.03);
+}
+
+.orderHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.orderSummary {
+  flex: 1;
+}
+
+.orderInfo {
+  color: #222;
+  margin-bottom: 0.3rem;
+  font-size: 1rem;
+}
+
+.button {
+  padding: 0.45rem 1.1rem;
+  border-radius: 0.5rem;
+  border: none;
+  font-size: 1rem;
+  font-weight: 500;
+  cursor: pointer;
+  background: var(--orange);
+  color: #fff;
+  transition: background 0.2s, color 0.2s, opacity 0.2s;
+}
+
+.button:hover {
+  background: var(--white);
+  color: var(--orange);
+  outline: 1px solid var(--orange);
+}
+
+.expandedSection {
+  margin-top: 1rem;
+  background: #faf9f7;
+  border-radius: 0.5rem;
+  padding: 1rem;
+  border: 1px solid #eee;
+}
+
+.orderDetail {
+  margin-bottom: 0.5rem;
+  color: var(--muted);
+}
+
+.itemsTitle {
+  margin-top: 1rem;
+  color: var(--green);
+  font-size: 1.05rem;
+  font-weight: 600;
+  text-decoration: underline;
+}
+
+.itemsList {
+  list-style: none;
+  padding: 0;
+  margin: 0.5rem 0 0 0;
+}
+
+.item {
+  color: #222;
+  font-size: 0.98rem;
+  margin-bottom: 0.5rem;
+  padding: 0.2rem 0;
+  border-bottom: 1px solid #eee;
+}
+
+/* Add these at the end of your CustomerPastOrder.module.css */
+
+/* 1024px and below */
+@media (max-width: 1024px) {
+  .container {
+    padding: 0.8rem;
+  }
+  .ordersList {
+    grid-template-columns: 1fr 1fr;
+    gap: 0.8rem;
+  }
+  .orderCard {
+    padding: 0.8rem;
+  }
+}
+
+/* 768px and below */
+@media (max-width: 768px) {
+  .container {
+    padding: 0.5rem;
+  }
+  .ordersList {
+    grid-template-columns: 1fr;
+    gap: 0.5rem;
+  }
+  .orderCard {
+    padding: 0.5rem;
+  }
+  .title {
+    font-size: 1.1rem;
+  }
+}
+
+/* 425px and below */
+@media (max-width: 426px) {
+  .container {
+    padding: 0.3rem;
+  }
+  .orderCard {
+    padding: 0.3rem;
+    margin-bottom: 0.3rem;
+  }
+  .title {
+    font-size: 1rem;
+  }
+  .ordersList {
+    gap: 0.3rem;
+  }
+
+  .orderHeader {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  .button {
+    margin-top: 0.7rem;
+    margin-left: 0;
+    width: 100%;
+  }
+}
+
+/* 375px and below */
+@media (max-width: 375px) {
+  .container {
+    padding: 0.15rem;
+  }
+  .orderCard {
+    padding: 0.15rem;
+  }
+  .title {
+    font-size: 0.95rem;
+  }
+  .ordersList {
+    gap: 0.15rem;
+  }
+}
+
+/* 320px and below */
+@media (max-width: 320px) {
+  .container {
+    padding: 0.2rem;
+  }
+
+  .orderCard {
+    padding: 0.5rem;
+  }
+  .title {
+    font-size: 0.9rem;
+  }
+  .ordersList {
+    gap: 0.05rem;
+  }
+
+  .orderHeader {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  .button {
+    margin-top: 0.7rem;
+    margin-left: 0;
+    width: 100%;
+  }
+}

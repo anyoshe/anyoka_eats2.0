@@ -164,13 +164,16 @@ const HeroHeader = () => {
                         </Link>
                     ) : (
                         <div ref={dropdownRef} className={styles.userDropdown}>
-                            <button
-                                className={styles.userIconButton}
-                                onClick={() => setDropdownOpen((open) => !open)}
-                            >
-                                <User className={styles.userIcon} />
-                            </button>
-                            {dropdownOpen && (
+                            <Link to="/customer-dashboard">
+                                <button
+                                    className={styles.userIconButton}
+                                    onClick={() => setDropdownOpen((open) => !open)}
+                                >
+                                    <User className={styles.userIcon} />
+                                </button>
+                            </Link>
+
+                            {/* {dropdownOpen && (
                                 <div className={styles.dropdownMenu}>
                                     <button
                                         className={styles.dropdownItem}
@@ -179,7 +182,7 @@ const HeroHeader = () => {
                                         Log out
                                     </button>
                                 </div>
-                            )}
+                            )} */}
                         </div>
                     )}
                 </div>

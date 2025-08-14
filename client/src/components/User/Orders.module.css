@@ -13,15 +13,6 @@
   text-decoration: underline;
 }
 
-/* .export-button {
-  background-color: #007bff;
-  color: #fff;
-  border: none;
-  padding: 10px 15px;
-  margin-bottom: 20px;
-  cursor: pointer;
-} */
-
 .CSVbuttton{
   background: var(--orange);
   color: var(--white);
@@ -57,12 +48,57 @@
   margin: 5px 0;
 }
   
-  .order-card ul {
-    list-style-type: none;
-    padding-left: 0;
-  }
+.order-card ul {
+  list-style-type: none;
+  padding-left: 0;
+}
+
+.order-card li {
+  margin: 5px 0;
+}
   
-  .order-card li {
-    margin: 5px 0;
+@media screen and (max-width: 320px) {
+  .orders-container {
+    padding: 0rem;
   }
-  
+
+  .order-card{
+    margin-bottom: 0rem;
+    padding: 0.3rem;
+  }
+
+  .orders-list {
+    /* gap: 0.2rem; */
+    grid-template-columns: 1fr;
+  }
+}
+
+/* @media screen and (min-width: 321px) and (max-width: 375px) {
+  .orders-container {
+    padding: 0rem;
+  }
+
+  .orders-list {
+    gap: 0.2rem;
+  }
+
+  .order-card {
+    padding: 0.4rem;
+    margin-bottom: 0.3rem;
+    border-radius: 5px;
+  }
+} */
+
+@media screen and (min-width: 321px) and (max-width: 426px) {
+  .orders-container {
+    padding: 0.5rem;
+  }
+  .orders-list {
+    gap: 0.2rem;
+  }
+  .order-card {
+    padding: 0.4rem;
+    margin-bottom: 0.3rem;
+    border-radius: 5px;
+  }
+}
