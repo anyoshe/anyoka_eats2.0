@@ -1,4 +1,19 @@
 /* ========== BASE STYLES ========== */
+@import url('https://fonts.googleapis.com/css2?family=Winky+Sans:ital,wght@0,300..900;1,300..900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap');
+
+:root {
+  --green: #1ea509;
+  --orange: #ffa500;
+  --white: #ffffff;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: "Winky Sans", "Poppins", sans-serif;
+}
 
 .profile_wrapper {
   display: flex;
@@ -16,7 +31,7 @@
   padding: 1.5rem;
   border-radius: 0.5rem;
   border: 1px solid #ddd;
-  background-color: #fff;
+  background-color: var(--white);
 }
 
 /* Profile layout grid */

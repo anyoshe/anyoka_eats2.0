@@ -11,9 +11,8 @@ const Sales = () => {
   const [filteredSales, setFilteredSales] = useState([]);
   const [loading, setLoading] = useState(true);
   const [selectedDate, setSelectedDate] = useState('');
-  const [selectedOrder, setSelectedOrder] = useState(null); // State for the selected order
-  const [showModal, setShowModal] = useState(false); // State to control modal visibility
-
+  const [selectedOrder, setSelectedOrder] = useState(null); 
+  const [showModal, setShowModal] = useState(false); 
   useEffect(() => {
     if (!partner?._id) return;
 
