@@ -2,7 +2,7 @@ import React, { useEffect, useState, useContext } from 'react';
 import axios from 'axios';
 import config from '../../config';
 import { PartnerContext } from '../../contexts/PartnerContext';
-import styles from './Orders.module.css'; 
+import styles from './Orders.module.css';
 import OrderStatusUpdater from './OrderStatusUpdater';
 
 const Orders = () => {
@@ -23,29 +23,39 @@ const Orders = () => {
           ) {
             const response = await axios.get(`${config.backendUrl}/api/orders/${order.parentOrder._id}/status`);
             const parentStatus = response.data.status;
-  
-            if (parentStatus && parentStatus !== order.status) {
-              // Update the suborder's status to match the parent order's status
+            const statusFlow = [
+              'Pending',
+              'OrderReceived',
+              'Preparing',
+              'ReadyForPickup',
+              'PickedUp',
+              'OutForDelivery',
+              'Delivered',
+              'Confirmed Delivered',
+            ];
+
+            const subOrderIndex = statusFlow.indexOf(order.status);
+            const parentIndex = statusFlow.indexOf(parentStatus);
+
+            // Only sync if parent is ahead of suborder
+            if (parentStatus && parentIndex > subOrderIndex) {
               await axios.put(`${config.backendUrl}/api/suborders/${order._id}/status`, {
                 status: parentStatus,
               });
-  
               return { ...order, status: parentStatus };
             }
+
+            // Otherwise, keep the suborder's status as is
+            return order;
           }
           return order;
         })
       );
-  
+
       // Filter out suborders whose parent order is at 'Confirmed Delivered'
       const filteredOrders = updatedOrders.filter(
-        (order) =>
-          !(
-            order.parentOrder?.status === 'Confirmed Delivered' &&
-            order.parentOrder?.deliveredBy
-          )
+        (order) => order.parentOrder?.status !== 'Confirmed Delivered'
       );
-  
       setOrders(filteredOrders);
     } catch (error) {
       console.error('Error syncing suborders with parent orders:', error);
@@ -117,25 +127,20 @@ const Orders = () => {
       </div>
       <div className={styles["orders-list"]}>
         {orders
-          .filter(
-            (order) =>
-              !(
-                order.parentOrder?.status === 'Confirmed Delivered' &&
-                order.parentOrder?.deliveredBy
-              )
-          )
+          .filter(order => order.parentOrder?.status !== 'Confirmed Delivered')
+
           .map((order) => (
             <div key={order._id} className={styles["order-card"]}>
               <h3>Order ID: {order.parentOrder?.orderId || 'N/A'}</h3>
               <p>Status: <strong>{order.status}</strong></p>
               <p>Total: <strong>KES {order.total}</strong></p>
               <p>Created At: {new Date(order.createdAt).toLocaleString()}</p>
-  
+
               <h4>Delivery Info</h4>
               <p>Customer Name: {order.parentOrder?.user?.names || 'N/A'}</p>
               <p>Location: {order.parentOrder?.delivery?.location || 'N/A'}</p>
               <p>Shipping Fee: KES {order.parentOrder?.delivery?.fee || 0}</p>
-  
+
               <h4>Items</h4>
               <ul>
                 {order.items.map((item) => (
@@ -144,14 +149,14 @@ const Orders = () => {
                   </li>
                 ))}
               </ul>
-  
+
               {['OutForDelivery', 'Delivered'].includes(order.status) && order.deliveredBy && (
                 <div>
                   <p><strong>Driver:</strong> {order.deliveredBy}</p>
                   <p><strong>Phone:</strong> {order.deliveredByPhone}</p>
                 </div>
               )}
-  
+
               <OrderStatusUpdater
                 subOrderId={order._id}
                 currentStatus={order.status}
@@ -163,6 +168,8 @@ const Orders = () => {
                     )
                   );
                 }}
+                deliveredBy={order.deliveredBy}
+                deliveryOption={order.parentOrder?.delivery?.option} // <-- ADD THIS LINE
               />
             </div>
           ))}

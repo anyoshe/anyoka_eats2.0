@@ -11,8 +11,8 @@ const Sales = () => {
   const [filteredSales, setFilteredSales] = useState([]);
   const [loading, setLoading] = useState(true);
   const [selectedDate, setSelectedDate] = useState('');
-  const [selectedOrder, setSelectedOrder] = useState(null); 
-  const [showModal, setShowModal] = useState(false); 
+  const [selectedOrder, setSelectedOrder] = useState(null);
+  const [showModal, setShowModal] = useState(false);
   useEffect(() => {
     if (!partner?._id) return;
 
@@ -61,8 +61,12 @@ const Sales = () => {
       orderId: order.parentOrder?.orderId || '',
       customer: order.parentOrder?.user?.names || 'N/A',
       total: order.total || 0,
-      driver: order.deliveredBy || 'N/A',
-      deliveredAt: new Date(order.parentOrder?.deliveredAt).toLocaleDateString(), // Include delivered date in CSV
+      driver: order.parentOrder?.delivery?.option === 'own'
+        ? 'Own'
+        : order.parentOrder?.deliveredBy || 'N/A',
+      deliveredAt: order.parentOrder?.deliveredAt
+        ? new Date(order.parentOrder.deliveredAt).toLocaleDateString()
+        : 'N/A' // Include delivered date in CSV
     }));
 
     const headers = Object.keys(csvData[0]).join(',');
@@ -128,8 +132,16 @@ const Sales = () => {
                   <td>{order.parentOrder?.orderId || 'N/A'}</td>
                   <td>{order.parentOrder?.user?.names || 'N/A'}</td>
                   <td>{order.total}</td>
-                  <td>{order.parentOrder?.deliveredBy || 'N/A'}</td>
-                  <td>{new Date(order.parentOrder?.deliveredAt).toLocaleDateString()}</td>
+                  <td>
+                    {order.parentOrder?.delivery?.option === 'own'
+                      ? 'Own'
+                      : order.parentOrder?.deliveredBy || 'N/A'}
+                  </td>
+                  <td>
+                    {order.parentOrder?.deliveredAt
+                      ? new Date(order.parentOrder.deliveredAt).toLocaleDateString()
+                      : 'N/A'}
+                  </td>
                   <td>
                     <button onClick={() => handleViewOrder(order)} className={styles.suborderBtn}>View Suborder</button>
                   </td>

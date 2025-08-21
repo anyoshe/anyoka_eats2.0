@@ -677,39 +677,7 @@ router.put('/users/update-profile', uploadProfileImage, async (req, res) => {
   }
 });
 
-// router.get('/orders/my-orders', authenticateToken, async (req, res) => {
-//   try {
-//     const userId = req.user._id;
-//     console.log('User ID:', userId);
 
-//     if (!mongoose.Types.ObjectId.isValid(userId)) {
-//       return res.status(400).json({ error: 'Invalid user ID' });
-//     }
-
-//     const orders = await Order.find({ user: userId })
-//       .populate('items.product')
-//       .populate({
-//         path: 'items.shop.shopId',
-//         select: 'name', // or use 'shopName' if you store it on shopId
-//       })
-//       .populate({
-//         path: 'subOrders',
-//         populate: [
-//           { path: 'shop', select: 'name' }, // or 'shopName'
-//           { path: 'items.product' },
-//         ],
-//       })
-//       .sort({ createdAt: -1 });
-
-//       console.log('Orders:', orders)
-
-//     res.json(orders);
-
-//   } catch (error) {
-//     console.error('Error fetching user orders:', error);
-//     res.status(500).json({ error: 'Server error' });
-//   }
-// });
 router.get('/orders/my-orders', authenticateToken, async (req, res) => {
   try {
     const userId = req.user._id;
@@ -1141,7 +1109,7 @@ router.post('/products/:id/rate', async (req, res) => {
 //Handling distance calculations.
 // router.get('/distance', async (req, res) => {
 //   const { origins, destinations } = req.query;
- 
+
 //   try {
 //     const response = await fetch(`https://maps.googleapis.com/maps/api/distancematrix/json?origins=${origins}&destinations=${destinations}&key=${process.env.GOOGLE_API_KEY}`);
 //     const data = await response.json();
@@ -1152,6 +1120,8 @@ router.post('/products/:id/rate', async (req, res) => {
 //   }
 // });
 
+
+
 router.get('/distance', async (req, res) => {
   const { origins, destinations } = req.query;
   const orsApiKey = process.env.ORS_API_KEY;
@@ -1159,6 +1129,22 @@ router.get('/distance', async (req, res) => {
   try {
     const originArr = origins.split('|');
     const [destLng, destLat] = destinations.split(',').map(Number);
+
+    const snapToRoad = async (lng, lat) => {
+      const nearestUrl = `https://api.openrouteservice.org/v2/snap/driving-car?api_key=${orsApiKey}&point=${lat},${lng}`;
+      const snapRes = await fetch(nearestUrl);
+
+      if (!snapRes.ok) return { lng, lat }; // fallback to original
+      const snapData = await snapRes.json();
+
+      if (snapData?.coordinates) {
+        return {
+          lng: snapData.coordinates[0],
+          lat: snapData.coordinates[1]
+        };
+      }
+      return { lng, lat };
+    };
 
     const results = await Promise.all(originArr.map(async (origin) => {
       const [origLng, origLat] = origin.split(',').map(Number);
@@ -1171,18 +1157,11 @@ router.get('/distance', async (req, res) => {
         return { elements: [{ status: 'ERROR', message: 'Invalid coordinates' }] };
       }
 
-      // Calculate straight-line distance first
-      const straightDistance = geolib.getDistance(
-        { latitude: origLat, longitude: origLng },
-        { latitude: destLat, longitude: destLng }
-      );
+      // Snap both origin & destination to roads
+      const snappedOrigin = await snapToRoad(origLng, origLat);
+      const snappedDest = await snapToRoad(destLng, destLat);
 
-      // If distance > 6000km, skip ORS call
-      if (straightDistance > 6000000) {
-        return { elements: [{ status: 'ERROR', message: 'Distance exceeds ORS limit' }] };
-      }
-
-      const url = `https://api.openrouteservice.org/v2/directions/driving-car?api_key=${orsApiKey}&start=${origLng},${origLat}&end=${destLng},${destLat}`;
+      const url = `https://api.openrouteservice.org/v2/directions/driving-car?api_key=${orsApiKey}&start=${snappedOrigin.lng},${snappedOrigin.lat}&end=${snappedDest.lng},${snappedDest.lat}`;
       const orsRes = await fetch(url);
 
       if (!orsRes.ok) {
@@ -1214,52 +1193,6 @@ router.get('/distance', async (req, res) => {
   }
 });
 
-
-// router.get('/distance', async (req, res) => {
-//   const { origins, destinations } = req.query;
-//   const orsApiKey = process.env.ORS_API_KEY;
-
-//   try {
-//     // Split and keep in lng,lat order (frontend already sends correct format)
-//     const originArr = origins.split('|');
-//     const [destLng, destLat] = destinations.split(',').map(Number); // fixed order
-
-//     const results = await Promise.all(originArr.map(async (origin) => {
-//       const [origLng, origLat] = origin.split(',').map(Number); // fixed order
-
-//       const url = `https://api.openrouteservice.org/v2/directions/driving-car?api_key=${orsApiKey}&start=${origLng},${origLat}&end=${destLng},${destLat}`;
-      
-//       const orsRes = await fetch(url);
-      
-//       if (!orsRes.ok) {
-//         // Log exact ORS error body
-//         const errorText = await orsRes.text();
-//         console.error(`ORS API error (${orsRes.status}):`, errorText);
-//         return { elements: [{ status: 'ERROR', message: errorText }] };
-//       }
-
-//       const orsData = await orsRes.json();
-
-//       if (orsData?.features?.[0]) {
-//         return {
-//           elements: [{
-//             status: 'OK',
-//             distance: { value: orsData.features[0].properties.summary.distance }, // meters
-//             duration: { value: orsData.features[0].properties.summary.duration }, // seconds
-//           }]
-//         };
-//       } else {
-//         return { elements: [{ status: 'ZERO_RESULTS' }] };
-//       }
-//     }));
-
-//     res.json({ status: 'OK', rows: results });
-
-//   } catch (err) {
-//     console.error('ORS error:', err);
-//     res.status(500).json({ status: 'ERROR', error: err.message });
-//   }
-// });
 
 // Route: /api/products-by-partner/:partnerId
 router.get('/products-by-partner/:partnerId', async (req, res) => {
@@ -1314,8 +1247,8 @@ const OrderSchema = new mongoose.Schema({
   paymentStatus: { type: String, enum: ['Pending', 'Paid'], default: 'Pending' },
   createdAt: { type: Date, default: Date.now },
   assignedDriver: { type: mongoose.Schema.Types.ObjectId, ref: 'Driver', default: null },
-  deliveredAt: { type: Date }, 
-  deliveredBy: { type: String }, 
+  deliveredAt: { type: Date },
+  deliveredBy: { type: String },
   deliveredByPhone: { type: String },
   status: { type: String, enum: ['Pending', 'Delivered', 'Confirmed Delivered'], default: 'Pending' },
 });
@@ -1474,7 +1407,7 @@ router.post('/orders/place', async (req, res) => {
   } catch (err) {
     await session.abortTransaction();
     session.endSession();
-    console.error(err);n
+    console.error(err); n
     res.status(500).json({ error: 'Failed to place order.' });
   }
 });
@@ -1642,7 +1575,19 @@ router.put('/suborders/:id/status', async (req, res) => {
     });
 
     const allReady = parentOrder.subOrders.every((so) => so.status === 'ReadyForPickup');
+    // After updating suborder status and fetching parentOrder work for own delivery
+    const allOutForDelivery = parentOrder.subOrders.every((so) => so.status === 'OutForDelivery');
 
+    if (
+      allOutForDelivery &&
+      parentOrder.delivery.option === 'own' &&
+      parentOrder.status !== 'Delivered'
+    ) {
+      parentOrder.status = 'Delivered';
+      await parentOrder.save();
+    }
+
+    // Notify drivers if all suborders are ready for pickup for platform delivery
     if (allReady) {
       const shop = await Partner.findById(subOrder.shop._id);
       if (!shop || !shop.location) {
@@ -2127,65 +2072,6 @@ router.put('/orders/:orderId/assign-driver', authenticateToken, async (req, res)
   }
 });
 
-// router.put('/orders/:orderId/assign-driver', authenticateToken, async (req, res) => {
-//   const { orderId } = req.params;
-//   const { driverId, action } = req.body; // `action` can be 'accept' or 'decline'
-
-//   try {
-//     const order = await Order.findById(orderId).populate('subOrders');
-
-//     if (!order) {
-//       return res.status(404).json({ error: 'Order not found' });
-//     }
-
-//     if (action === 'accept') {
-//       const driver = await Driver.findById(driverId);
-
-//       if (!driver) {
-//         return res.status(404).json({ error: 'Driver not found' });
-//       }
-
-//       // Assign the driver to the order
-//       order.assignedDriver = driverId;
-//       await order.save();
-
-//       // Update all suborders with the driver's details
-//       await Promise.all(
-//         order.subOrders.map(async (subOrderId) => {
-//           await SubOrder.findByIdAndUpdate(subOrderId, {
-//             driverName: driver.username,
-//             driverPhone: driver.phoneNumber,
-//           });
-//         })
-//       );
-
-//       res.json({ message: 'Driver assigned to order', order });
-//     } else if (action === 'decline') {
-//       // Remove the driver from the order
-//       order.assignedDriver = null;
-//       await order.save();
-
-//       // Remove the driver's details from all suborders
-//       await Promise.all(
-//         order.subOrders.map(async (subOrderId) => {
-//           await SubOrder.findByIdAndUpdate(subOrderId, {
-//             $unset: { driverName: '', driverPhone: '' },
-//           });
-//         })
-//       );
-
-//       res.json({ message: 'Driver removed from order', order });
-//     } else {
-//       res.status(400).json({ error: 'Invalid action' });
-//     }
-//   } catch (error) {
-//     console.error('Error updating order assignment:', error.message);
-//     res.status(500).json({ error: 'Server error updating order assignment' });
-//   }
-// });
-
-
-
 router.get('/driver-active-orders/:driverId', authenticateToken, async (req, res) => {
   const { driverId } = req.params;
   try {
@@ -2240,13 +2126,21 @@ router.put('/orders/:orderId/confirm-delivery', authenticateToken, async (req, r
   try {
     const order = await Order.findByIdAndUpdate(
       orderId,
-      { status: 'Confirmed Delivered' },
+      {
+        status: 'Confirmed Delivered',
+        deliveredAt: new Date()  // Set the delivery confirmation time
+      },
       { new: true }
     );
 
     if (!order) {
       return res.status(404).json({ error: 'Order not found' });
     }
+    // Update all suborders to Confirmed Delivered
+    await SubOrder.updateMany(
+      { parentOrder: orderId },
+      { status: 'Confirmed Delivered' }
+    );
 
     res.json({ message: 'Order confirmed as delivered', order });
   } catch (error) {
