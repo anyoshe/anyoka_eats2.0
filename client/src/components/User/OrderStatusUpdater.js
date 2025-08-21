@@ -20,11 +20,18 @@ const OrderStatusUpdater = ({
   parentOrderId,
   onStatusChange,
   deliveredBy,
+  deliveryOption,
 }) => {
   const [loading, setLoading] = useState(false);
   const intervalRef = useRef(null);
   const statusRef = useRef(currentStatus);
 
+  // Disable after PickedUp for own delivery, after ReadyForPickup for platform
+  const disablePartner =
+    loading ||
+    (deliveryOption === 'own'
+      ? statusFlow.indexOf(currentStatus) > statusFlow.indexOf('PickedUp') // allow up to PickedUp
+      : statusFlow.indexOf(currentStatus) >= statusFlow.indexOf('ReadyForPickup'));
   useEffect(() => {
     statusRef.current = currentStatus;
   }, [currentStatus]);
@@ -100,14 +107,14 @@ const OrderStatusUpdater = ({
       {nextStatus && (
         <button
           onClick={handleStatusUpdate}
-          disabled={loading || (currentStatus === 'OutForDelivery' && deliveredBy)}
+          disabled={disablePartner}
           className={styles.statusButtonOrder}
         >
           {loading
             ? 'Updating...'
             : currentStatus === 'OutForDelivery' && deliveredBy
-            ? 'Syncing with parent...'
-            : `Mark as ${nextStatus}`}
+              ? 'Syncing with parent...'
+              : `Mark as ${nextStatus}`}
         </button>
       )}
     </div>

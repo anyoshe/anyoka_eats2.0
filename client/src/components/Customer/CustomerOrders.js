@@ -246,7 +246,7 @@ const CustomerOrders = () => {
       {orders.length === 0 && <p className={styles.noOrders}>No orders found.</p>}
 
       <div className={styles.ordersGrid}>
-          {orders.map((order) => {
+        {orders.map((order) => {
           const isCollapsed = collapsedOrders.includes(order._id);
 
           return (
@@ -290,7 +290,7 @@ const CustomerOrders = () => {
                             </li>
                           ))}
                         </ul>
-                         <p className={styles.subOrderTotal}>
+                        <p className={styles.subOrderTotal}>
                           <strong>Total:</strong> KES {sub.total}
                         </p>
                         <button disabled className={`${styles.button} ${styles.disabledButton}`}>
@@ -302,19 +302,24 @@ const CustomerOrders = () => {
                       </li>
                     ))}
                   </ul>
-
-                  {order.status === 'Delivered' ? (
-                    <button
-                      onClick={() => handleConfirmReceived(order._id)}
-                      className={`${styles.button} ${styles.confirmButton}`}
-                    >
-                      Confirm Received
-                    </button>
-                  ) : (
-                    <button disabled className={`${styles.button} ${styles.disabledButton}`}>
-                      {getOrderButtonStatus(order)}
-                    </button>
-                  )}
+                  
+                  {(
+                    order.status === 'Delivered' ||
+                    order.status === 'ReadyForPickup' ||
+                    (order.status === 'PickedUp' && order.delivery.option === 'own')
+                  )
+                    ? (
+                      <button
+                        onClick={() => handleConfirmReceived(order._id)}
+                        className={`${styles.button} ${styles.confirmButton}`}
+                      >
+                        Confirm Received
+                      </button>
+                    ) : (
+                      <button disabled className={`${styles.button} ${styles.disabledButton}`}>
+                        {getOrderButtonStatus(order)}
+                      </button>
+                    )}
                 </>
               )}
             </div>
