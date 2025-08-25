@@ -23,11 +23,14 @@ const MenuPage = () => {
   const location = useLocation();
   const params = new URLSearchParams(location.search);
   const selectedCategory = params.get('category');
+  const selectedProductQuery = params.get('product');
+  const shopId = params.get("shop");
   const { currentProduct, setCurrentProduct, user, setRedirectPath } = useContext(AuthContext);
   const [productsByCategory, setProductsByCategory] = useState({});
   const { cart, addToCart } = useContext(CartContext);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState(null);
+  const [products, setProducts] = React.useState([]);
   const [loading, setLoading] = useState(true);
   const [showCart, setShowCart] = useState(false);
 
@@ -39,18 +42,37 @@ const MenuPage = () => {
     const fetchProducts = async () => {
       try {
         setLoading(true);
-        const response = await axios.get(`${config.backendUrl}/api/all-products`);
-        const products = response.data.products || [];
-       console.log(products);
-        const groupedProducts = products.reduce((acc, product) => {
-          if (!acc[product.category]) {
-            acc[product.category] = [];
-          }
-          acc[product.category].push(product);
-          return acc;
-        }, {});
 
-        setProductsByCategory(groupedProducts);
+        let products = [];
+
+        if (shopId) {
+          // ✅ fetch products by shop
+          const res = await axios.get(`${config.backendUrl}/api/products/by-shop/${shopId}`);
+          products = res.data.products || [];
+          setProductsByCategory({ Shop: products });
+
+        } else {
+          const response = await axios.get(`${config.backendUrl}/api/all-products`);
+          const products = response.data.products || [];
+          console.log(products);
+          const groupedProducts = products.reduce((acc, product) => {
+            if (!acc[product.category]) {
+              acc[product.category] = [];
+            }
+            acc[product.category].push(product);
+            return acc;
+          }, {});
+
+          setProductsByCategory(groupedProducts);
+
+          // ✅ Filter for product search
+          if (selectedProductQuery) {
+            const filtered = products.filter(p =>
+              p.name.toLowerCase().includes(selectedProductQuery.toLowerCase())
+            );
+            setProductsByCategory({ Search: filtered }); // store under "Search"
+          }
+        }
       } catch (error) {
         console.error('Error fetching products:', error);
       } finally {
@@ -59,7 +81,7 @@ const MenuPage = () => {
     };
 
     fetchProducts();
-  }, []);
+  }, [selectedCategory, selectedProductQuery, shopId]);
 
 
   const handleProductClick = (product) => {
@@ -117,125 +139,259 @@ const MenuPage = () => {
 
   return (
 
-    
-  <div className={styles.storeWrapper}>
-    <div className={styles.backButton} onClick={() => navigate(-1)}>
-      <FontAwesomeIcon icon={faCaretDown} rotation={90} /> Back
-    </div>
 
-    <button className={styles.floatingCartIcon} onClick={() => setShowCart(true)}>
-      <FontAwesomeIcon icon={faCartShopping} />
-    </button>
+    <div className={styles.storeWrapper}>
+      <div className={styles.backButton} onClick={() => navigate(-1)}>
+        <FontAwesomeIcon icon={faCaretDown} rotation={90} /> Back
+      </div>
 
-    {/* <Logout /> */}
+      <button className={styles.floatingCartIcon} onClick={() => setShowCart(true)}>
+        <FontAwesomeIcon icon={faCartShopping} />
+      </button>
+
+      {/* <Logout /> */}
 
 
-  <div className={styles.bodyWrapper}>
-    <section className={styles.dispalySection}>
-      {/* <div className={styles.cartTopDiv}>
+      <div className={styles.bodyWrapper}>
+        <section className={styles.dispalySection}>
+          {/* <div className={styles.cartTopDiv}>
         <button className={styles.floatingCartIcon} onClick={() => setShowCart(true)}>
           <FontAwesomeIcon icon={faCartShopping} />
         </button>
       </div> */}
 
-      {showCart && (
-        <div className={styles.cartModal}>
-          <button className={styles.closeCartBtn} onClick={() => setShowCart(false)}>×</button>
-          <CartSection />
-        </div>
-      )}
+          {showCart && (
+            <div className={styles.cartModal}>
+              <button className={styles.closeCartBtn} onClick={() => setShowCart(false)}>×</button>
+              <CartSection />
+            </div>
+          )}
 
-      {loading ? (
-        <div className={styles.loadingWrapper}>
-          <div className={styles.spinner}></div>
-          <p>Loading selected category...</p>
-        </div>
-      ) : selectedCategory && productsByCategory[selectedCategory] ? (
-        <div className={styles.categorySectionDivName}>
-          <h3 className={styles.categorySectiontitle}>{selectedCategory}</h3>
-          <section className={styles.categorySectionDisplay}>
-            {productsByCategory[selectedCategory].map((product, index) => (
-              <div
-                key={index}
-                className={styles.categorySectionDisplayDivs}
-                onClick={() => handleProductClick(product)}
-              >
-                {typeof product.discountedPrice === 'number' && product.discountedPrice > 0 && (
-                  <div className={styles.discountBadge}>
-                    <span>Ksh {product.discountedPrice.toFixed(1)}</span>
-                  </div>
-                )}
-
-                <img
-                  src={getImageSrc(product)}
-                  alt={product.name}
-                  className={styles.categorySectionImage}
-                  onError={(e) => {
-                    e.target.onerror = null;
-                    e.target.src = '/path/to/placeholder-image.jpg';
-                  }}
-                />
-
-                <p className={`${styles.categorySectionName} ${styles.categorySectionP}`}>
-                  {product.name}
-                </p>
-
-                <div className={styles.priceQuantityRow}>
-                  {product.discountedPrice ? (
-                    <span className={styles.originalPriceOffer}>
-                      <span className={`${styles.diagonalStrikethrough} ${styles.linePrice}`}>
-                        Ksh {product.price.toFixed(1)}
-                      </span>
-                    </span>
-                  ) : (
-                    <p className={styles.productPrice}>Ksh {product.price.toFixed(1)}</p>
-                  )}
-
-                  <p className={`${styles.categorySectionQuantity} ${styles.categorySectionP}`}>
-                    <span>{product.quantity}</span> {product.unit}
-                  </p>
-                </div>
-
-                <div className={`${styles.ratingsDiv} ${styles.starIcon}`}>
-                  {product.ratings?.average
-                    ? renderStars(product.ratings.average)
-                    : 'No ratings yet'}
-                </div>
-
-                <div className={styles.addCartBtn}>
-                  <button
-                    className={styles.addToCartBtn}
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      handleAddToCart(product);
-                    }}
+          {loading ? (
+            <div className={styles.loadingWrapper}>
+              <div className={styles.spinner}></div>
+              <p>Loading selected category...</p>
+            </div>
+          ) : shopId && productsByCategory["Shop"] ? (
+            // ✅ shop search flow
+            <div>
+              <h3 className={styles.categorySectiontitle}>Shop Products</h3>
+              <section className={styles.categorySectionDisplay}>
+                {productsByCategory["Shop"].map(product => (
+                  <div
+                    key={product._id}
+                    className={styles.categorySectionDisplayDivs}
+                    onClick={() => handleProductClick(product)}
                   >
-                    <FontAwesomeIcon icon={faCartShopping} />
-                  </button>
-                </div>
-              </div>
-            ))}
-          </section>
-        </div>
-      ) : (
-        <p>No products found for selected category.</p>
-      )}
-    </section>
+                    {typeof product.discountedPrice === 'number' && product.discountedPrice > 0 && (
+                      <div className={styles.discountBadge}>
+                        <span>Ksh {product.discountedPrice.toFixed(1)}</span>
+                      </div>
+                    )}
 
-    <section className={styles.cartSecti}>
-      <CartSection />
-    </section>
+                    <img
+                      src={getImageSrc(product)}
+                      alt={product.name}
+                      className={styles.categorySectionImage}
+                      onError={(e) => {
+                        e.target.onerror = null;
+                        e.target.src = '/path/to/placeholder-image.jpg';
+                      }}
+                    />
 
-    {selectedProduct && (
-      <ProductDetailModal
-        isOpen={isModalOpen}
-        onRequestClose={closeModal}
-        product={selectedProduct}
-        onAddToCart={handleAddToCart}
-      />
-    )}
-  </div>
-</div>
+                    <p className={`${styles.categorySectionName} ${styles.categorySectionP}`}>
+                      {product.name}
+                    </p>
+
+                    <div className={styles.priceQuantityRow}>
+                      {product.discountedPrice ? (
+                        <span className={styles.originalPriceOffer}>
+                          <span className={`${styles.diagonalStrikethrough} ${styles.linePrice}`}>
+                            Ksh {product.price.toFixed(1)}
+                          </span>
+                        </span>
+                      ) : (
+                        <p className={styles.productPrice}>Ksh {product.price.toFixed(1)}</p>
+                      )}
+
+                      <p className={`${styles.categorySectionQuantity} ${styles.categorySectionP}`}>
+                        <span>{product.quantity}</span> {product.unit}
+                      </p>
+                    </div>
+
+                    <div className={`${styles.ratingsDiv} ${styles.starIcon}`}>
+                      {product.ratings?.average
+                        ? renderStars(product.ratings.average)
+                        : 'No ratings yet'}
+                    </div>
+
+                    <div className={styles.addCartBtn}>
+                      <button
+                        className={styles.addToCartBtn}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleAddToCart(product);
+                        }}
+                      >
+                        <FontAwesomeIcon icon={faCartShopping} />
+                      </button>
+                    </div>
+                  </div>
+                ))}
+              </section>
+            </div>
+          ) : selectedCategory && productsByCategory[selectedCategory] ? (
+            <div className={styles.categorySectionDivName}>
+              <h3 className={styles.categorySectiontitle}>{selectedCategory}</h3>
+              <section className={styles.categorySectionDisplay}>
+                {productsByCategory[selectedCategory].map((product, index) => (
+                  <div
+                    key={index}
+                    className={styles.categorySectionDisplayDivs}
+                    onClick={() => handleProductClick(product)}
+                  >
+                    {typeof product.discountedPrice === 'number' && product.discountedPrice > 0 && (
+                      <div className={styles.discountBadge}>
+                        <span>Ksh {product.discountedPrice.toFixed(1)}</span>
+                      </div>
+                    )}
+
+                    <img
+                      src={getImageSrc(product)}
+                      alt={product.name}
+                      className={styles.categorySectionImage}
+                      onError={(e) => {
+                        e.target.onerror = null;
+                        e.target.src = '/path/to/placeholder-image.jpg';
+                      }}
+                    />
+
+                    <p className={`${styles.categorySectionName} ${styles.categorySectionP}`}>
+                      {product.name}
+                    </p>
+
+                    <div className={styles.priceQuantityRow}>
+                      {product.discountedPrice ? (
+                        <span className={styles.originalPriceOffer}>
+                          <span className={`${styles.diagonalStrikethrough} ${styles.linePrice}`}>
+                            Ksh {product.price.toFixed(1)}
+                          </span>
+                        </span>
+                      ) : (
+                        <p className={styles.productPrice}>Ksh {product.price.toFixed(1)}</p>
+                      )}
+
+                      <p className={`${styles.categorySectionQuantity} ${styles.categorySectionP}`}>
+                        <span>{product.quantity}</span> {product.unit}
+                      </p>
+                    </div>
+
+                    <div className={`${styles.ratingsDiv} ${styles.starIcon}`}>
+                      {product.ratings?.average
+                        ? renderStars(product.ratings.average)
+                        : 'No ratings yet'}
+                    </div>
+
+                    <div className={styles.addCartBtn}>
+                      <button
+                        className={styles.addToCartBtn}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleAddToCart(product);
+                        }}
+                      >
+                        <FontAwesomeIcon icon={faCartShopping} />
+                      </button>
+                    </div>
+                  </div>
+                ))}
+              </section>
+            </div>
+          ) : selectedProductQuery && productsByCategory["Search"] ? (
+            // ✅ product search flow
+            <div>
+              <h3 className={styles.categorySectiontitle}>
+                Results for "{selectedProductQuery}"
+              </h3>
+              <section className={styles.categorySectionDisplay}>
+                {productsByCategory["Search"].map(product => (
+                  <div key={product._id} onClick={() => handleProductClick(product)}>
+                    {typeof product.discountedPrice === 'number' && product.discountedPrice > 0 && (
+                      <div className={styles.discountBadge}>
+                        <span>Ksh {product.discountedPrice.toFixed(1)}</span>
+                      </div>
+                    )}
+
+                    <img
+                      src={getImageSrc(product)}
+                      alt={product.name}
+                      className={styles.categorySectionImage}
+                      onError={(e) => {
+                        e.target.onerror = null;
+                        e.target.src = '/path/to/placeholder-image.jpg';
+                      }}
+                    />
+
+                    <p className={`${styles.categorySectionName} ${styles.categorySectionP}`}>
+                      {product.name}
+                    </p>
+
+                    <div className={styles.priceQuantityRow}>
+                      {product.discountedPrice ? (
+                        <span className={styles.originalPriceOffer}>
+                          <span className={`${styles.diagonalStrikethrough} ${styles.linePrice}`}>
+                            Ksh {product.price.toFixed(1)}
+                          </span>
+                        </span>
+                      ) : (
+                        <p className={styles.productPrice}>Ksh {product.price.toFixed(1)}</p>
+                      )}
+
+                      <p className={`${styles.categorySectionQuantity} ${styles.categorySectionP}`}>
+                        <span>{product.quantity}</span> {product.unit}
+                      </p>
+                    </div>
+
+                    <div className={`${styles.ratingsDiv} ${styles.starIcon}`}>
+                      {product.ratings?.average
+                        ? renderStars(product.ratings.average)
+                        : 'No ratings yet'}
+                    </div>
+
+                    <div className={styles.addCartBtn}>
+                      <button
+                        className={styles.addToCartBtn}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleAddToCart(product);
+                        }}
+                      >
+                        <FontAwesomeIcon icon={faCartShopping} />
+                      </button>
+                    </div>
+                  </div>
+                ))}
+              </section>
+            </div>
+          ) : (
+            <p>No products found for selected category.</p>
+          )}
+        </section>
+
+        <section className={styles.cartSecti}>
+          <CartSection />
+        </section>
+
+        {selectedProduct && (
+          <ProductDetailModal
+            isOpen={isModalOpen}
+            onRequestClose={closeModal}
+            product={selectedProduct}
+            onAddToCart={handleAddToCart}
+          />
+        )}
+      </div>
+    </div>
 
   );
 };
