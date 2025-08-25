@@ -21,11 +21,11 @@
 
 //                     <Link to="/sign-in">
 //                         <button className={styles.logInButton}>
-                            
+
 //                             LOG IN 
 //                         </button>
 //                     </Link>
-                    
+
 //                     <Link to="/customer-dashboard" className="hover:text-blue-600">
 //                         <User className="w-6 h-6" />
 //                     </Link>
@@ -34,11 +34,11 @@
 
 //             <div className={styles.heroAdsDiv}>
 //                 <div className={`${styles.leftAd} ${styles.adsDiv}`}>
-                    
+
 //                 </div>
 
 //                 <div className={`${styles.rightAd} ${styles.adsDiv}`}>
-                    
+
 //                 </div>
 //             </div>
 
@@ -121,6 +121,7 @@ import rightAd from '../../assets/images/adExample.jpg';
 import styles from './HeroHeader.module.css';
 import InstallPrompt from '../Header/InstallPrompt';
 import { AuthContext } from '../../contexts/AuthContext';
+import HeroHeaderSearch from './HeroHeaderSearch';
 
 const HeroHeader = () => {
     const { isLoggedIn, logout } = useContext(AuthContext);
@@ -201,11 +202,18 @@ const HeroHeader = () => {
             </div>
 
             <section className={styles.categorySection}>
-                <div className={styles.searchContainer}>
+                {/* <div className={styles.searchContainer}>
                     <input type="text" className={styles.searchInput} placeholder="Search Top Categories ..." />
                     <i className={`fas fa-search ${styles.searchIcon}`}></i>
-                </div>
+                </div> */}
 
+                <HeroHeaderSearch
+                    onSearchSelect={(item, type) => {
+                        if (type === 'category') navigate(`/menu?category=${encodeURIComponent(item)}`);
+                        else if (type === 'product') navigate(`/menu?product=${encodeURIComponent(item.name)}`);
+                        else if (type === 'partner') navigate(`/menu?shop=${item._id}`);
+                    }}
+                />
                 <div className={styles.categoryDivs}>
                     <Link to="/menu?category=Food" className={styles.categoryLinks}>
                         <div className={styles.categoryDiv}>
@@ -221,7 +229,7 @@ const HeroHeader = () => {
                         </div>
                     </Link>
 
-                    <Link to="/menu?category=Pet supplies" className={styles.categoryLinks}>
+                    <Link to="/menu?category=Pet Supplies" className={styles.categoryLinks}>
                         <div className={styles.categoryDiv}>
                             <i className={`fas fa-dog fa-beat ${styles.slow3} ${styles.categoryPic}`}></i>
                             <p className={styles.categoryText}>Pet supplies</p>
@@ -249,7 +257,7 @@ const HeroHeader = () => {
                         </div>
                     </Link>
 
-                    <Link to="/menu?category=Beauty" className={styles.categoryLinks}>
+                    <Link to="/menu?category=Beauty & Personal Care" className={styles.categoryLinks}>
                         <div className={styles.categoryDiv}>
                             <i className={`fas fa-spa fa-flip ${styles.slow7} ${styles.categoryPic}`}></i>
                             <p className={styles.categoryText}>Beauty</p>

@@ -2229,7 +2229,47 @@ function sendEmailNotification(email, message) {
 }
 
 
+router.get('/search', async (req, res) => {
+  const { q } = req.query;
+  if (!q) return res.json({ products: [], partners: [], categories: [] });
 
+  // Search products
+  const products = await Product.find({
+    name: { $regex: q, $options: 'i' }
+  }).limit(5);
+
+  // Search partners (shops)
+  const partners = await Partner.find({
+    businessName: { $regex: q, $options: 'i' }
+  }).limit(5);
+
+  // Search categories (static or from products)
+  const categories = await Product.distinct('category', {
+    category: { $regex: q, $options: 'i' }
+  });
+
+  res.json({ products, partners, categories });
+});
+
+router.get('/products/search', async (req, res) => {
+  const { q } = req.query;
+  if (!q) return res.json({ products: [] });
+  const products = await Product.find({
+    name: { $regex: q, $options: 'i' }
+  });
+  res.json({ products });
+});
+// Get all products by shopId
+router.get('/products/by-shop/:shopId', async (req, res) => {
+  try {
+    const { shopId } = req.params;
+    const products = await Product.find({ "shop.shopId": shopId });
+    res.json({ products });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Server error" });
+  }
+});
 
 
 
