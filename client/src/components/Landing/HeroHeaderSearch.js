@@ -134,20 +134,32 @@ const HeroHeaderSearch = ({ onSearchSelect }) => {
 
   // 👇 Close dropdown when clicking outside OR inside the input
   useEffect(() => {
-    const handleClickOutside = (e) => {
-      if (containerRef.current && containerRef.current.contains(e.target)) {
-        // Clicked inside search (including input) → close dropdown
-        setShowDropdown(false);
-      } else {
-        // Clicked anywhere else → close dropdown
-        setShowDropdown(false);
-      }
-    };
+  const handleClickOutside = (e) => {
+    if (containerRef.current && !containerRef.current.contains(e.target)) {
+      // ✅ Close only when clicking OUTSIDE the search container
+      setShowDropdown(false);
+    }
+  };
 
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, []);
+  document.addEventListener('mousedown', handleClickOutside);
+  return () => document.removeEventListener('mousedown', handleClickOutside);
+}, []);
 
+ // useEffect(() => {
+  //   const handleClickOutside = (e) => {
+  //     if (containerRef.current && containerRef.current.contains(e.target)) {
+  //       // Clicked inside search (including input) → close dropdown
+  //       setShowDropdown(false);
+  //     } else {
+  //       // Clicked anywhere else → close dropdown
+  //       setShowDropdown(false);
+  //     }
+  //   };
+   //   document.addEventListener('mousedown', handleClickOutside);
+  //   return () => document.removeEventListener('mousedown', handleClickOutside);
+  // }, []);
+
+ 
   const handleSelect = (item, type) => {
     setQuery('');
     setShowDropdown(false);
