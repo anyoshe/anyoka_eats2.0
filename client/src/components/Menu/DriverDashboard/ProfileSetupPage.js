@@ -298,22 +298,22 @@ const ProfileSetupPage = () => {
     if (file) setProfilePhotoPreview(URL.createObjectURL(file));
   };
 
-  const handleMapClick = (event) => {
-    const lat = event.latLng.lat();
-    const lng = event.latLng.lng();
-    setMarkerPosition({ lat, lng });
+const handleMapClick = (event) => {
+  const lat = event.latLng.lat();
+  const lng = event.latLng.lng();
+  setMarkerPosition({ lat, lng });
 
-    const geocoder = new window.google.maps.Geocoder();
-    geocoder.geocode({ location: { lat, lng } }, (results, status) => {
-      if (status === 'OK' && results[0]) {
-        setCurrentLocation({
-          town: currentLocation.town,
-          location: results[0].formatted_address,
-        });
-        setMapVisible(false); // close popup after choosing location
-      }
-    });
-  };
+  const geocoder = new window.google.maps.Geocoder();
+  geocoder.geocode({ location: { lat, lng } }, (results, status) => {
+    if (status === 'OK' && results[0]) {
+      setCurrentLocation((prev) => ({
+        ...prev,
+        location: results[0].formatted_address, // update pinned location
+      }));
+      setMapVisible(false); // close map after choosing
+    }
+  });
+};
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -378,35 +378,72 @@ const ProfileSetupPage = () => {
           <input type="text" placeholder="Relationship" value={emergencyContact.relationship} onChange={(e) => setEmergencyContact({ ...emergencyContact, relationship: e.target.value })} />
         </div>
 
-        {/* Location Section */}
-        <h3>Current Location</h3>
-        <input
-          type="text"
-          placeholder="Town"
-          value={currentLocation.town}
-          onClick={() => setMapVisible(true)}
-          onChange={(e) => setCurrentLocation({ ...currentLocation, town: e.target.value })}
-          readOnly
-        />
+{/* Location Section */}
+<h3>Current Location</h3>
 
-        {currentLocation.location && <p className={styles.selectedLocation}>Selected Location: {currentLocation.location}</p>}
+{/* Town input (typed manually) */}
+<input
+  type="text"
+  placeholder="Town"
+  value={currentLocation.town}
+  onChange={(e) => setCurrentLocation({ ...currentLocation, town: e.target.value })}
+/>
 
-        {/* Map Modal */}
-        {mapVisible && (
-          <div className={styles.mapOverlay}>
-            <div className={styles.mapModal}>
-              <button type="button" className={styles.closeMapBtn} onClick={() => setMapVisible(false)}>✕</button>
-              <GoogleMap
-                mapContainerStyle={{ width: '100%', height: '100%' }}
-                center={mapCenter}
-                zoom={15}
-                onClick={handleMapClick}
-              >
-                {markerPosition && <Marker position={markerPosition} />}
-              </GoogleMap>
-            </div>
-          </div>
-        )}
+{/* Location input (pinned, read-only, opens map when clicked) */}
+<input
+  type="text"
+  placeholder="Click to pin location"
+  value={currentLocation.location}
+  readOnly
+  className={styles.readOnlyInput}
+  onClick={async () => {
+    if (currentLocation.town.trim()) {
+      try {
+        const geocoder = new window.google.maps.Geocoder();
+        geocoder.geocode({ address: currentLocation.town }, (results, status) => {
+          if (status === 'OK' && results[0]) {
+            setMapCenter(results[0].geometry.location.toJSON()); // center map on typed town
+          } else {
+            setMapCenter({ lat: -1.2921, lng: 36.8219 }); // fallback default Nairobi
+          }
+          setMapVisible(true);
+        });
+      } catch (err) {
+        console.error("Geocoding failed", err);
+        setMapCenter({ lat: -1.2921, lng: 36.8219 });
+        setMapVisible(true);
+      }
+    } else {
+      setMapCenter({ lat: -1.2921, lng: 36.8219 }); // no town typed, use default
+      setMapVisible(true);
+    }
+  }}
+/>
+
+{/* Map Modal */}
+{mapVisible && (
+  <div className={styles.mapOverlay}>
+    <div className={styles.mapModal}>
+      <button
+        type="button"
+        className={styles.closeMapBtn}
+        onClick={() => setMapVisible(false)}
+      >
+        ✕
+      </button>
+      <GoogleMap
+        mapContainerStyle={{ width: '100%', height: '100%' }}
+        center={mapCenter}
+        zoom={15}
+        onClick={handleMapClick}
+      >
+        {markerPosition && <Marker position={markerPosition} />}
+      </GoogleMap>
+    </div>
+  </div>
+)}
+
+
 
         {/* Buttons */}
         <div className={styles.buttonRow}>
