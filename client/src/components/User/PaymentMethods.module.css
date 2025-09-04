@@ -1,75 +1,75 @@
 /* src/components/PaymentMethods.css */
 
 .paymentMethods {
-    border-radius: 8px;
-    padding: 1.5rem;
-    margin: 0 auto;
-    width: inherit;
+  border-radius: 8px;
+  padding: 1.5rem;
+  margin: 0 auto;
+  width: inherit;
 
-  }
-  
-  .paymentMethods h4 {
-    font-size: 1.5rem;
-    font-weight: 600;
-    color: var(--green);
-    margin-bottom: 1rem;
-    text-decoration: underline;
-  }
+}
 
-  .paymentMethodsWrapper{
-    display: grid;
-    grid-template-columns: repeat(4,1fr);
-  }
+.paymentMethods h4 {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: var(--green);
+  margin-bottom: 1rem;
+  text-decoration: underline;
+}
+
+.paymentMethodsWrapper{
+  display: grid;
+  grid-template-columns: repeat(4,1fr);
+}
+
+.paymentMethods label {
+  display: flex;
+  align-items: center;
+  margin-bottom: 0.75rem;
+  font-size: 1rem;
+  color: #444;
+  cursor: pointer;
+  transition: color 0.2s ease;
+}
+
+.paymentMethods label:hover {
+  color: #000;
+}
+
+.paymentMethods input[type="radio"] {
+  margin-right: 0.5rem;
+  accent-color: var(--green);
+  width: 1.1rem;
+  height: 1.1rem;
+}
   
-  .paymentMethods label {
-    display: flex;
-    align-items: center;
-    margin-bottom: 0.75rem;
-    font-size: 1rem;
-    color: #444;
-    cursor: pointer;
-    transition: color 0.2s ease;
-  }
-  
-  .paymentMethods label:hover {
-    color: #000;
-  }
-  
-  .paymentMethods input[type="radio"] {
-    margin-right: 0.5rem;
-    accent-color: var(--green);
-    width: 1.1rem;
-    height: 1.1rem;
-  }
-  
-  .paymentMethods button {
-    display: block;
-    width: 100%;
-    background: var(--green);
-    color: #fff;
-    border: none;
-    outline: none;
-    border-radius: 6px;
-    padding: 0.75rem;
-    font-size: 1rem;
-    font-weight: 600;
-    cursor: pointer;
-    margin-top: 1rem;
-    transition: background 0.2s ease, transform 0.1s ease;
-  }
-  
-  /* .paymentMethods button:hover:not(:disabled) {
-    background: #0056b3;
-  } */
-  
-  /* .paymentMethods button:active:not(:disabled) {
-    transform: scale(0.98);
-  } */
-  
-  /* .paymentMethods button:disabled {
-    background: #ccc;
-    cursor: not-allowed;
-  } */
+.paymentMethods button {
+  display: block;
+  width: 100%;
+  background: var(--green);
+  color: #fff;
+  border: none;
+  outline: none;
+  border-radius: 6px;
+  padding: 0.75rem;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  margin-top: 1rem;
+  transition: background 0.2s ease, transform 0.1s ease;
+}
+
+/* .paymentMethods button:hover:not(:disabled) {
+  background: #0056b3;
+} */
+
+/* .paymentMethods button:active:not(:disabled) {
+  transform: scale(0.98);
+} */
+
+/* .paymentMethods button:disabled {
+  background: #ccc;
+  cursor: not-allowed;
+} */
 
   .paymentMethods button:hover{
     background-color: var(--white);

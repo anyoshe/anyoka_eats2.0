@@ -12,34 +12,69 @@
 }
 
 .userDropdown {
+    /* border: 2px solid blue; */
+
   position: relative;
   display: inline-block;
+  align-items: center;
+  justify-content: center;
   /* background-color: red; */
   height: 2.5rem;
+  /* width: 2.5rem; */
 }
 
-.userIconButton {
+/* .userIconButton {
   background: none;
   border: none;
   cursor: pointer;
-  /* background-color: green; */
   height: inherit;
   display: flex;
   justify-content: center;
   align-items: center;
   transition: background-color 0.2s ease-in-out;
+} */
+
+/* .userLinkToDashboard{
+    border: 5px solid green;
+    height: 5rem;
+
+} */
+
+.userIconButton {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: #fff; 
+    border: none;
+    cursor: pointer;
+    padding: 0.4rem;            
+    border-radius: 10%;         
+    transition: transform 0.2s ease, color 0.2s ease;
 }
 
 .userIconButton:hover{
     background-color: var(--white);
 }
 
-.userIcon {
+/* .userIcon {
     color: var(--green);
     transition: color 0.2s ease-in-out;
     background-color: var(--white);
-    border-radius: 50%;
+    font-size: 3rem;
+    padding: 0.3rem;
+} */
+
+.userIcon {
+    font-size: 1.8rem;           
+    color: var(--green);        
+    transition: color 0.2s ease, transform 0.2s ease;
 }
+
+.userIconButton:hover .userIcon {
+    color: var(--orange);        
+    transform: scale(1.15);     
+}
+
 
 .dropdownMenu {
   position: absolute;
@@ -121,12 +156,24 @@
     margin: 0.1rem;
 }
 
-.installLogIn{
+/* .installLogIn{
     width: 19%;
     display: flex;
     flex-direction: row;
     justify-content: space-between;
+} */
+
+.installLogIn {
+    /* border: 2px solid red; */
+
+    display: flex;
+    align-items: center;
+    justify-content: flex-end; 
+    gap: 2rem; 
+    min-width: 12rem; 
+    align-items: center; 
 }
+
 
 .logInButton {
     padding: 0.5rem 1rem;

@@ -82,6 +82,7 @@
 .pieceContent h3 {
     font-size: 1.5rem;
     margin-bottom: 0.1rem;
+    color: var(--white);
 }
 
 .pieceContent p {
