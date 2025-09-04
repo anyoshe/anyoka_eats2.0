@@ -59,10 +59,14 @@ const DriverDashboard = () => {
         {/* Mobile Menu */}
         {menuOpen && (
           <div className={styles.mobileMenu}>
-            <div onClick={() => handleTabChange("profile")}>Profile</div>
-            <div onClick={() => handleTabChange("available")}>Available Orders</div>
-            <div onClick={() => handleTabChange("active")}>Active Orders</div>
-            <div onClick={() => handleTabChange("completed")}>Completed Orders</div>
+            <div onClick={() => handleTabChange("profile")} className={styles.mobileMenuDiv}>Profile</div>
+            <div onClick={() => handleTabChange("available")} className={styles.mobileMenuDiv}>Available Orders</div>
+            <div onClick={() => handleTabChange("active")} className={styles.mobileMenuDiv}>Active Orders</div>
+            <div onClick={() => handleTabChange("completed")} className={styles.mobileMenuDiv}>Completed Orders</div>
+             {/* Logout option for mobile menu */}
+            <div>
+              <DriverLogout />
+            </div>
           </div>
         )}
 

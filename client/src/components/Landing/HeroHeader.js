@@ -161,7 +161,7 @@ const HeroHeader = () => {
                         </Link>
                     ) : (
                         <div ref={dropdownRef} className={styles.userDropdown}>
-                            <Link to="/customer-dashboard">
+                            <Link to="/customer-dashboard" className={styles.userLinkToDashboard}>
                                 <button
                                     className={styles.userIconButton}
                                     onClick={() => setDropdownOpen((open) => !open)}
