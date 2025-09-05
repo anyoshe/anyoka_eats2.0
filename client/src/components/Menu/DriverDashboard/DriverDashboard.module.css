@@ -58,7 +58,27 @@
   color: #ffffff;
 }
 
+.backButton {
+  background: var(--green);
+  color: #fff;
+  border: none;
+  padding: 0.6rem 0.8rem;
+  border-radius: 0.3em;
+  font-size: 0.8rem;
+  cursor: pointer;
+  /* margin-bottom: 0.8rem; */
+  transition: background 0.2s ease, transform 0.1s ease;
+}
+
+.backButton:hover {
+  background: var(--orange);
+  transform: scale(1.03);
+}
+
+
 .headerNavIcons {
+  /* border: 2px solid red; */
+
   display: flex;
   align-items: center;
   justify-content: space-around;
@@ -138,9 +158,13 @@ padding: 0.5rem 1rem;
 }
 
 @media (max-width: 426px) {
-  .tabs {
-    display: none !important;
-  }
+.tabs {
+  display: none !important;
+}
+
+/* .backButton {
+  display: none;
+} */
 
 .hamburgerMenu {
   position: fixed;
