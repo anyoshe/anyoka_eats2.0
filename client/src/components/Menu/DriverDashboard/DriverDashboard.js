@@ -9,6 +9,8 @@ import ActiveDriverOrders from './ActiveDriverOrders';
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faBell, faBars } from "@fortawesome/free-solid-svg-icons";
 import CompletedDriverOrders from "./CompletedDriverOrders";
+import { useNavigate } from "react-router-dom";
+
 
 const DriverDashboard = () => {
   const [menuOpen, setMenuOpen] = useState(false);
@@ -36,6 +38,9 @@ const DriverDashboard = () => {
     }
   };
 
+  const navigate = useNavigate();
+
+
   return (
     <div className={styles.dashboardWrapper}>
       <div className={styles.container}>
@@ -60,10 +65,13 @@ const DriverDashboard = () => {
         {menuOpen && (
           <div className={styles.mobileMenu}>
             <div onClick={() => handleTabChange("profile")} className={styles.mobileMenuDiv}>Profile</div>
+
             <div onClick={() => handleTabChange("available")} className={styles.mobileMenuDiv}>Available Orders</div>
+
             <div onClick={() => handleTabChange("active")} className={styles.mobileMenuDiv}>Active Orders</div>
+
             <div onClick={() => handleTabChange("completed")} className={styles.mobileMenuDiv}>Completed Orders</div>
-             {/* Logout option for mobile menu */}
+            
             <div>
               <DriverLogout />
             </div>
@@ -72,6 +80,10 @@ const DriverDashboard = () => {
 
         {/* Tabs */}
         <div className={styles.tabs}>
+          <button className={styles.backButton} onClick={() => navigate("/")}>
+            Back
+          </button>
+
           <div
             className={`${styles.tab} ${activeTab === "profile" ? styles.active : ""}`}
             onClick={() => handleTabChange("profile")}
