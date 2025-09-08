@@ -1,62 +1,62 @@
-@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@100;200;300;400;500;600;700;800;900&display=swap');
+  @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@100;200;300;400;500;600;700;800;900&display=swap');
 
-:root{
+  :root{
     --green:rgb(30, 165, 9);
     --orange: rgb(255,165,0);
     --transition-short: all .2s ease-in-out;
-}
+  }
 
-* {
+  * {
   padding: 0px;
   margin: 0px;
   box-sizing: border-box;
   font-family: 'Poppins',sans-serif;
-}
+  }
 
-.footer-section {
+  .footer-section {
   overflow: hidden;
   background: #151414;
   position: relative;
   width: 100%;
   min-height: 400px;
-}
+  }
 
-.top_header_div{
+  .top_header_div{
     display: grid;
     grid-template-columns: repeat(3 ,1fr);
     border-bottom: 1px solid #373636;
     margin-bottom: 2%;
     padding-bottom: 1%;
-}
+  }
 
-.top_header_divs{
+  .top_header_divs{
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
-}
+  }
 
-#top_header_icons {
+  #top_header_icons {
   color: var(--orange);
   font-size: 30px;
   margin-top: 8px;
   margin-bottom: 4%;
   margin-top: 5%;
-}
+  }
 
-.top_header_divs_headers{
+  .top_header_divs_headers{
     color: #fff;
     font-size: 20px;
     font-weight: 600;
     margin-bottom: 2px;
-}
+  }
 
-.top_header_divs_para{
+  .top_header_divs_para{
     font-size: 15px;
     color: var(--orange);
-}
+  }
 
-.footer-content {
+  .footer-content {
     position: relative;
     padding: 0px 5%; 
     overflow-x: hidden;
@@ -64,39 +64,39 @@
     background-repeat: none;
     background-position: center;
     background-size: contain;
-}
+  }
 
-.row_two{
+  .row_two{
     display: grid;
     grid-template-columns: 1.2fr 0.5fr 1fr;
     gap: 0.5%;
     padding-bottom: 1rem;
-}
+  }
 
-.column_footer{
+  .column_footer{
     height: 100%;
     padding-top: 5%;
     z-index: 999;
-}
+  }
 
-.footer-logo {
+  .footer-logo {
   margin-bottom: 30px;
-}
+  }
 
-.footer_logo_link{
+  .footer_logo_link{
     text-decoration: none;
-}
+  }
 
-.footer_logo_head{
-    color: var(--orange);
-    font-size: 5em;
-}
+  .footer_logo_head{
+  color: var(--orange);
+  font-size: 5em;
+  }
 
-.footer-logo img {
+  .footer-logo img {
     max-width: 200px;
-}
+  }
 
-.footer-logo-text {
+  .footer-logo-text {
     margin-bottom: 14px;
     font-size: 17px;
     color: white;
