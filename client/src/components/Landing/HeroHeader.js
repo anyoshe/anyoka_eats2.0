@@ -112,8 +112,9 @@ import React, { useContext, useState, useRef, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { User } from 'lucide-react';
 import logoImg from '../../assets/images/logo_on_white orange.png';
-import leftAd from '../../assets/images/adsExample.jpg';
-import rightAd from '../../assets/images/adExample.jpg';
+// import ADS from '../../assets/images/Ecommerce_ADs.png';
+import leftAd from '../../assets/Ecommerce_ADs.png';
+import rightAd from '../../assets/Ecommerce_ADs 2.png';
 import styles from './HeroHeader.module.css';
 import InstallPrompt from '../Header/InstallPrompt';
 import { AuthContext } from '../../contexts/AuthContext';
@@ -152,6 +153,8 @@ const HeroHeader = () => {
                     <img src={logoImg} alt="Logo" className={styles.logoImg} />
                 </a>
 
+                {/* <span className={styles.tagline}>Discover. Shop. Enjoy!</span> */}
+
                 <div className={styles.installLogIn}>
                     <InstallPrompt />
 
@@ -188,21 +191,16 @@ const HeroHeader = () => {
             <div className={styles.heroAdsDiv}>
                 <div className={`${styles.leftAd} ${styles.adsDiv}`}>
                     {/* Left Ad Content */}
-                    {/* <img src={leftAd} alt="Left Ad" className={styles.adImage} /> */}
+                    <img src={leftAd} alt="Left Ad"  className={styles.adImage}/>
                 </div>
 
                 <div className={`${styles.rightAd} ${styles.adsDiv}`}>
                     {/* Right Ad Content */}
-                    {/* <img src={rightAd} alt="Right Ad" className={styles.adImage} /> */}
+                    <img src={rightAd} alt="Right Ad"  className={styles.adImage}/>
                 </div>
             </div>
 
             <section className={styles.categorySection}>
-                {/* <div className={styles.searchContainer}>
-                    <input type="text" className={styles.searchInput} placeholder="Search Top Categories ..." />
-                    <i className={`fas fa-search ${styles.searchIcon}`}></i>
-                </div> */}
-
                 <HeroHeaderSearch
                     onSearchSelect={(item, type) => {
                         if (type === 'category') navigate(`/menu?category=${encodeURIComponent(item)}`);
