@@ -988,6 +988,7 @@ router.delete('/products/:id', async (req, res) => {
 //   }
 // });
 
+
 router.put('/products/:id', uploadProductImages, async (req, res) => {
   try {
     const productId = req.params.id;
@@ -1003,23 +1004,16 @@ router.put('/products/:id', uploadProductImages, async (req, res) => {
       quantity,
       unit,
       inventory,
-      primaryImage,   // fallback primary image from req.body
-      deletedImages,  // JSON string from frontend
+      primaryImage,   // fallback primary image (string from body)
+      deletedImages,  // JSON string
     } = req.body;
 
-    // Extract uploaded additional images
-    const newImages = (req.files?.images || []).map(
-      (file) => `/uploads/products/${file.filename}`
-    );
+    const product = await Product.findById(productId);
+    if (!product) {
+      return res.status(404).json({ message: 'Product not found' });
+    }
 
-    // Extract uploaded primary image
-    const primaryImageFile = req.files?.primaryImage?.[0]
-      ? `/uploads/products/${req.files.primaryImage[0].filename}`
-      : null;
-
-    const finalPrimaryImage = primaryImageFile || primaryImage;
-
-    // Normalize deleted images
+    // 1️⃣ Normalize deleted images
     const deletedImagesArray = deletedImages
       ? JSON.parse(deletedImages).map((imgPath) => {
           const parts = imgPath.split('/uploads/');
@@ -1027,75 +1021,53 @@ router.put('/products/:id', uploadProductImages, async (req, res) => {
         })
       : [];
 
-    // Fetch product
-    const updatedProduct = await Product.findById(productId);
-    if (!updatedProduct) {
-      return res.status(404).json({ message: 'Product not found' });
+    // 2️⃣ Remove deleted images from DB + filesystem
+    if (deletedImagesArray.length > 0) {
+      product.images = product.images.filter((img) => !deletedImagesArray.includes(img));
+
+      deletedImagesArray.forEach((imgPath) => {
+        const fullPath = path.join(__dirname, '..', imgPath);
+        if (fs.existsSync(fullPath)) {
+          fs.unlink(fullPath, (err) => {
+            if (err) console.error(`Failed to delete: ${fullPath}`, err);
+          });
+        }
+      });
     }
 
-    // --- UPDATE FIELDS ---
-    updatedProduct.name = name || updatedProduct.name;
-    updatedProduct.description = description || updatedProduct.description;
-    updatedProduct.category = category || updatedProduct.category;
-    updatedProduct.subCategory = subCategory || updatedProduct.subCategory;
-    updatedProduct.brand = brand || updatedProduct.brand;
-    updatedProduct.tags = tags
-      ? tags.split(',').map((tag) => tag.trim())
-      : updatedProduct.tags;
-    updatedProduct.price = price || updatedProduct.price;
-    updatedProduct.quantity = quantity || updatedProduct.quantity;
-    updatedProduct.unit = unit || updatedProduct.unit;
-    updatedProduct.inventory = inventory || updatedProduct.inventory;
-
-    // --- HANDLE IMAGES ---
-    let currentImages = updatedProduct.images || [];
-
-    // 1. Remove deleted images
-    currentImages = currentImages.filter(
-      (image) => !deletedImagesArray.includes(image)
-    );
-
-    // 2. Add new images
-    currentImages = [...currentImages, ...newImages];
-
-    // 3. Deduplicate (avoid repeated paths)
-    currentImages = [...new Set(currentImages)];
-
-    updatedProduct.images = currentImages;
-
-    // --- PRIMARY IMAGE ---
-    if (finalPrimaryImage) {
-      updatedProduct.primaryImage = finalPrimaryImage;
-
-      // Optionally ensure primary image is also in images[] for consistency
-      if (!updatedProduct.images.includes(finalPrimaryImage)) {
-        updatedProduct.images.unshift(finalPrimaryImage); // put primary first
-      }
+    // 3️⃣ Handle new uploaded images
+    const newImages = (req.files?.images || []).map((file) => `/uploads/products/${file.filename}`);
+    if (newImages.length > 0) {
+      // Merge without duplicates
+      const uniqueImages = new Set([...product.images, ...newImages]);
+      product.images = Array.from(uniqueImages);
     }
 
-    // --- DELETE FROM FILESYSTEM ---
-    deletedImagesArray.forEach((imagePath) => {
-      const fullPath = path.join(__dirname, '..', imagePath);
-      if (fs.existsSync(fullPath)) {
-        fs.unlink(fullPath, (err) => {
-          if (err) {
-            console.error(`Failed to delete image file: ${fullPath}`, err);
-          }
-        });
-      } else {
-        console.warn(`File not found: ${fullPath}`);
-      }
-    });
+    // 4️⃣ Handle primary image
+    const newPrimaryImage = req.files?.primaryImage?.[0]
+      ? `/uploads/products/${req.files.primaryImage[0].filename}`
+      : primaryImage;
 
-    // --- DISCOUNTED PRICE ---
-    if (discountedPrice !== undefined) {
-      updatedProduct.discountedPrice = discountedPrice;
+    if (newPrimaryImage) {
+      product.primaryImage = newPrimaryImage;
     }
 
-    await updatedProduct.save();
-    res
-      .status(200)
-      .json({ message: 'Product updated successfully', product: updatedProduct });
+    // 5️⃣ Update other fields
+    product.name = name || product.name;
+    product.description = description || product.description;
+    product.category = category || product.category;
+    product.subCategory = subCategory || product.subCategory;
+    product.brand = brand || product.brand;
+    product.tags = tags ? tags.split(',').map((tag) => tag.trim()) : product.tags;
+    product.price = price || product.price;
+    product.discountedPrice = discountedPrice !== undefined ? discountedPrice : product.discountedPrice;
+    product.quantity = quantity || product.quantity;
+    product.unit = unit || product.unit;
+    product.inventory = inventory || product.inventory;
+
+    await product.save();
+
+    res.status(200).json({ message: 'Product updated successfully', product });
   } catch (error) {
     console.error('Error updating product:', error);
     res.status(500).json({ message: 'Failed to update product', error: error.message });

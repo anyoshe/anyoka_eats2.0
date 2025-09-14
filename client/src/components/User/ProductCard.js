@@ -57,10 +57,15 @@ const getImageSrc = (imagePath) => {
                 src={getImageSrc(images[currentImageIndex])}
                 alt={`Product Image ${currentImageIndex + 1}`}
                 className={styles.productImage}
+                // onError={(e) => {
+                //   e.target.onerror = null;
+                //   e.target.src = '/path/to/placeholder-image.jpg';
+                // }}
                 onError={(e) => {
-                  e.target.onerror = null;
-                  e.target.src = '/path/to/placeholder-image.jpg';
-                }}
+  e.target.onerror = null;
+  e.target.src = '/images/placeholder.png'; // put this in /public/images/
+}}
+
               />
               <button className={styles.nextButton} onClick={handleNextImage}>
                 &#8250;
