@@ -784,6 +784,78 @@ const Product = mongoose.model('Product', productSchema);
 
 
 // Route to add a new product
+// router.post('/products', uploadProductImages, async (req, res) => {
+//   try {
+//     const {
+//       name,
+//       description,
+//       category,
+//       subCategory,
+//       brand,
+//       tags,
+//       price,
+//       discountedPrice,
+//       quantity,
+//       unit,
+//       inventory,
+//       shopId, // Partner's ID
+//     } = req.body;
+
+
+//     const images = req.files?.images?.map((file) => `/uploads/products/${file.filename}`) || [];
+//     const primaryImageFile = req.files?.primaryImage?.[0]?.path;
+//     const primaryImage = primaryImageFile
+//       ? `/uploads/products/${primaryImageFile.split('/').pop()}`
+//       : req.body.primaryImage;
+
+
+//     // Fetch the partner details using the shopId
+//     const partner = await Partner.findById(shopId);
+//     if (!partner) {
+//       return res.status(404).json({ message: 'Shop not found' });
+//     }
+
+//     // Generate a unique product ID
+//     const productId = shortid.generate();
+
+//     // Create a new product
+//     const newProduct = new Product({
+//       productId,
+//       name,
+//       description,
+//       images,
+//       primaryImage,
+//       category,
+//       subCategory,
+//       brand,
+//       tags,
+//       price,
+//       discountedPrice,
+//       quantity,
+//       unit,
+//       inventory,
+//       shop: {
+//         shopId: partner._id,
+//         shopName: partner.businessName,
+//         town: partner.town,
+//         location: partner.location,
+//       },
+//     });
+
+//     if (discountedPrice !== undefined) {
+//       newProduct.discountedPrice = discountedPrice;
+//     }
+
+//     // Save the product to the database
+//     await newProduct.save();
+
+//     res.status(201).json({ message: 'Product added successfully', product: newProduct });
+//   } catch (error) {
+//     console.error('Error adding product:', error);
+//     res.status(500).json({ message: 'Failed to add product', error: error.message });
+//   }
+// });
+
 router.post('/products', uploadProductImages, async (req, res) => {
   try {
     const {
@@ -798,27 +870,23 @@ router.post('/products', uploadProductImages, async (req, res) => {
       quantity,
       unit,
       inventory,
-      shopId, // Partner's ID
+      shopId,
+      primaryImageIndex // 👈 comes from frontend
     } = req.body;
 
+    // Save uploaded images
+    const images = req.files?.map((file) => `/uploads/products/${file.filename}`) || [];
 
-    const images = req.files?.images?.map((file) => `/uploads/products/${file.filename}`) || [];
-    const primaryImageFile = req.files?.primaryImage?.[0]?.path;
-    const primaryImage = primaryImageFile
-      ? `/uploads/products/${primaryImageFile.split('/').pop()}`
-      : req.body.primaryImage;
+    // Pick primary from the chosen index, else fallback to first
+    const primaryImage = images[primaryImageIndex] || images[0] || null;
 
-
-    // Fetch the partner details using the shopId
     const partner = await Partner.findById(shopId);
     if (!partner) {
       return res.status(404).json({ message: 'Shop not found' });
     }
 
-    // Generate a unique product ID
     const productId = shortid.generate();
 
-    // Create a new product
     const newProduct = new Product({
       productId,
       name,
@@ -828,7 +896,7 @@ router.post('/products', uploadProductImages, async (req, res) => {
       category,
       subCategory,
       brand,
-      tags,
+      tags: tags ? tags.split(',') : [],
       price,
       discountedPrice,
       quantity,
@@ -842,13 +910,7 @@ router.post('/products', uploadProductImages, async (req, res) => {
       },
     });
 
-    if (discountedPrice !== undefined) {
-      newProduct.discountedPrice = discountedPrice;
-    }
-
-    // Save the product to the database
     await newProduct.save();
-
     res.status(201).json({ message: 'Product added successfully', product: newProduct });
   } catch (error) {
     console.error('Error adding product:', error);
