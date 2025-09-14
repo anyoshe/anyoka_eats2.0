@@ -56,7 +56,7 @@ const ProductList = ({ onEditProduct, onDeleteProduct, refreshTrigger }) => {
             return `${config.backendUrl}/uploads/${product.images[0].split('/uploads/')[1]}`;
         }
 
-        return '/path/to/placeholder-image.jpg';
+        return '/images/placeholder-image.png';
       };
       
     return (

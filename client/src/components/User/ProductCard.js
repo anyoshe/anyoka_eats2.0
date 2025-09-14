@@ -12,7 +12,7 @@ const ProductCard = ({ product }) => {
 
   const images = product.primaryImage
     ? [product.primaryImage, ...(product.images || [])]
-    : product.images || ['/path/to/placeholder-image.jpg'];
+    : product.images || ['/images/placeholder-image.png'];
 
   const handleNextImage = () => {
     setCurrentImageIndex((prevIndex) => (prevIndex + 1) % images.length);
