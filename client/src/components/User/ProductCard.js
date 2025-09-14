@@ -10,60 +10,45 @@ const ProductCard = ({ product }) => {
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [showReviews, setShowReviews] = useState(false); // Toggle for reviews section
 
-  // const images = product.primaryImage
-  //   ? [product.primaryImage, ...(product.images || [])]
-  //   : product.images || ['/path/to/placeholder-image.jpg'];
-  const images = product.images || [];
-  const allImages = product.primaryImage
-    ? [product.primaryImage, ...images.filter(img => img !== product.primaryImage)]
-    : images;
+  const images = product.primaryImage
+    ? [product.primaryImage, ...(product.images || [])]
+    : product.images || ['/path/to/placeholder-image.jpg'];
 
-
-  // const handleNextImage = () => {
-  //   setCurrentImageIndex((prevIndex) => (prevIndex + 1) % images.length);
-  // };
-
-  // const handlePrevImage = () => {
-  //   setCurrentImageIndex((prevIndex) => (prevIndex - 1 + images.length) % images.length);
-  // };
-
-  // const handleDotClick = (index) => {
-  //   setCurrentImageIndex(index);
-  // };
   const handleNextImage = () => {
-    setCurrentImageIndex((prevIndex) => (prevIndex + 1) % allImages.length);
+    setCurrentImageIndex((prevIndex) => (prevIndex + 1) % images.length);
   };
 
   const handlePrevImage = () => {
-    setCurrentImageIndex((prevIndex) => (prevIndex - 1 + allImages.length) % allImages.length);
+    setCurrentImageIndex((prevIndex) => (prevIndex - 1 + images.length) % images.length);
   };
 
   const handleDotClick = (index) => {
     setCurrentImageIndex(index);
   };
 
-  const getImageSrc = (imagePath) => {
-    if (!imagePath) return '/path/to/placeholder-image.jpg';
+ 
+const getImageSrc = (imagePath) => {
+  if (!imagePath) return '/path/to/placeholder-image.jpg';
 
-    // If path already starts with http (absolute URL), just return it
-    if (imagePath.startsWith('http')) return imagePath;
+  // If path already starts with http (absolute URL), just return it
+  if (imagePath.startsWith('http')) return imagePath;
 
-    // If the path contains "/uploads", strip everything before it
-    const relativePath = imagePath.includes('/uploads')
-      ? imagePath.substring(imagePath.indexOf('/uploads'))
-      : `/uploads/products/${imagePath}`; // fallback if only filename is saved
+  // If the path contains "/uploads", strip everything before it
+  const relativePath = imagePath.includes('/uploads')
+    ? imagePath.substring(imagePath.indexOf('/uploads'))
+    : `/uploads/products/${imagePath}`; // fallback if only filename is saved
 
-    return `${config.backendUrl}${relativePath}`;
-  };
+  return `${config.backendUrl}${relativePath}`;
+};
 
-
+  
 
   return (
     <div className={styles.productCard}>
       <div className={styles.productContentWrapper}>
         {/* Image Section */}
         <div className={styles.productImageWrapper}>
-          {/* {images.length > 0 ? (
+          {images.length > 0 ? (
             <div className={styles.imageCarousel}>
               <button className={styles.prevButton} onClick={handlePrevImage}>
                 &#8249;
@@ -96,54 +81,7 @@ const ProductCard = ({ product }) => {
               alt="Placeholder"
               className={styles.productImage}
             />
-          )} */}
-          {allImages.length > 0 ? (
-            <div className={styles.imageCarousel}>
-              <button className={styles.prevButton} onClick={handlePrevImage}>
-                &#8249;
-              </button>
-              <img
-                src={getImageSrc(allImages[currentImageIndex])}
-                alt={`Product Image ${currentImageIndex + 1}`}
-                className={styles.productImage}
-                onError={(e) => {
-                  e.target.onerror = null;
-                  e.target.src = '/path/to/placeholder-image.jpg';
-                }}
-              />
-              <button className={styles.nextButton} onClick={handleNextImage}>
-                &#8250;
-              </button>
-
-              {/* ✅ New Set as Primary Button */}
-              <button
-                className={styles.setPrimaryButton}
-                onClick={() => {
-                  const selectedImage = allImages[currentImageIndex];
-                  console.log("Set as primary:", selectedImage);
-                  // TODO: API call to save as primary
-                }}
-              >
-                Set as Primary
-              </button>
-              <div className={styles.carouselDots}>
-                {allImages.map((_, index) => (
-                  <span
-                    key={index}
-                    className={`dot ${index === currentImageIndex ? 'active' : ''}`}
-                    onClick={() => handleDotClick(index)}
-                  ></span>
-                ))}
-              </div>
-            </div>
-          ) : (
-            <img
-              src="/path/to/placeholder-image.jpg"
-              alt="Placeholder"
-              className={styles.productImage}
-            />
           )}
-
           {product.discountedPrice && (
             <span className={styles.discountedPriceCircle}>
               Now <br /> Ksh {product.discountedPrice.toFixed(2)}
@@ -170,7 +108,7 @@ const ProductCard = ({ product }) => {
           <p className={styles.productInventory}>Available : {product.inventory}</p>
 
           <div className={styles.rating}>
-            Ratings :
+            Ratings : 
             {[...Array(5)].map((_, index) => {
               const star = index + 1;
               return (
@@ -183,7 +121,7 @@ const ProductCard = ({ product }) => {
               );
             })}
           </div>
-
+          
           <p className={styles.average}>
             Average Rating: {product.ratings?.average?.toFixed(2) || 0}
             <br />
@@ -224,8 +162,8 @@ const ProductCard = ({ product }) => {
           )}
         </div>
       )}
-      {/* <hr /> */}
-    </div>
+    {/* <hr /> */}
+  </div>
   );
 };
 
