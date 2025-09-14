@@ -79,7 +79,7 @@ const ProductList = ({ onEditProduct, onDeleteProduct, refreshTrigger }) => {
                                     
                                     onError={(e) => {
                                         e.target.onerror = null;
-                                        e.target.src = '/path/to/placeholder-image.jpg';
+                                        e.target.src = '/images/placeholder-image.png';
                                     }}
                                 />
                                <div className={styles.productDetails}>
