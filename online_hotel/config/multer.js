@@ -199,21 +199,14 @@ const uploadBusinessPermit = multer({
 }).single('businessPermit');
 
 // Multer upload setup for product images
-// const uploadProductImages = multer({
-//   storage: createStorage('products', 'product'),
-//   limits: { fileSize: 2000000 },
-//   fileFilter: (req, file, cb) => checkFileType(file, cb),
-// }).fields([
-//   { name: 'images', maxCount: 5 },       // regular images
-//   { name: 'primaryImage', maxCount: 1 }  // primary image
-// ]);
-
 const uploadProductImages = multer({
   storage: createStorage('products', 'product'),
   limits: { fileSize: 2000000 },
   fileFilter: (req, file, cb) => checkFileType(file, cb),
-}).array('images', 6);  // 👈 allow up to 6 images, all in one field
-
+}).fields([
+  { name: 'images', maxCount: 5 },       // regular images
+  { name: 'primaryImage', maxCount: 1 }  // primary image
+]);
 
 module.exports = {
   upload,
