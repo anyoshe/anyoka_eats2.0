@@ -56,15 +56,25 @@ const ProductModal = ({ isOpen, onClose, onSubmit, editingProduct, onProductUpda
         setPrimaryImage(image);
     };
 
+    // const handleDeleteImage = (index) => {
+    //     setProductImages((prevImages) => {
+    //         const imageToDelete = prevImages[index];
+    //         if (typeof imageToDelete === 'string') {
+    //             setDeletedImages((prevDeleted) => [...prevDeleted, imageToDelete]);
+    //         }
+    //         return prevImages.filter((_, i) => i !== index);
+    //     });
+    // };
     const handleDeleteImage = (index) => {
-        setProductImages((prevImages) => {
-            const imageToDelete = prevImages[index];
-            if (typeof imageToDelete === 'string') {
-                setDeletedImages((prevDeleted) => [...prevDeleted, imageToDelete]);
-            }
-            return prevImages.filter((_, i) => i !== index);
-        });
-    };
+  setProductImages((prevImages) => {
+    const imageToDelete = prevImages[index];
+    if (typeof imageToDelete === 'string') {
+      setDeletedImages((prev) => [...prev, imageToDelete]);
+    }
+    return prevImages.filter((_, i) => i !== index);
+  });
+};
+
 
     const handleSubmit = async (event) => {
         event.preventDefault();
@@ -163,12 +173,19 @@ const ProductModal = ({ isOpen, onClose, onSubmit, editingProduct, onProductUpda
                     <div key={index} className={styles.imagePreviewItem}>
                         <img
                         className={styles.productImagePreview}
-                        src={
+                        // src={
                                    
-                                        typeof image === 'string'
-                                          ? `${config.backendUrl}${image.replace('/mnt/shared/Projects/anyoka_eats2.0/online_hotel', '')}`
-                                          : URL.createObjectURL(image)
-                                      }
+                        //                 typeof image === 'string'
+                        //                   ? `${config.backendUrl}${image.replace('/mnt/shared/Projects/anyoka_eats2.0/online_hotel', '')}`
+                        //                   : URL.createObjectURL(image)
+                        //               }
+
+                        src={
+  typeof image === 'string'
+    ? `${config.backendUrl}${image}`
+    : URL.createObjectURL(image)
+}
+
                                       
                                     alt={`Product ${index + 1}`}
                                 />
