@@ -1,4 +1,6 @@
 import React, { createContext, useState, useEffect } from 'react';
+import axios from 'axios';
+import config from '../config';
 
 export const AuthContext = createContext();
 
@@ -30,6 +32,22 @@ export const AuthProvider = ({ children }) => {
     }
   }, []);
 
+ 
+  const fetchUserProfile = async () => {
+    try {
+      if (!token) return;
+
+      const res = await axios.get(`${config.backendUrl}/api/user/me`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+
+      setUser(res.data.user);
+      localStorage.setItem('user', JSON.stringify(res.data.user));
+    } catch (err) {
+      console.error('Error fetching user profile:', err);
+    }
+  };
+
   const logout = () => {
     setUser(null);
     setIsLoggedIn(false);
@@ -55,6 +73,7 @@ export const AuthProvider = ({ children }) => {
         logout,
         currentStore,
         setCurrentStore,
+        fetchUserProfile,
       }}
     >
       {children}

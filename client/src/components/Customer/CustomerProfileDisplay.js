@@ -7,7 +7,7 @@ import MapSelector from '../../components/User/MapSelector';
 import { AuthContext } from '../../contexts/AuthContext';
 
 const CustomerProfileDisplay = () => {
-  const { user, fetchUserProfile, loading } = useContext(AuthContext);
+  const { user, setUser, fetchUserProfile, loading } = useContext(AuthContext);
   const [editing, setEditing] = useState(false);
   const [formData, setFormData] = useState({});
   const [showMapSelector, setShowMapSelector] = useState(false);
@@ -60,6 +60,7 @@ const CustomerProfileDisplay = () => {
     const town = e.target.value;
     setFormData(prev => ({ ...prev, town }));
 
+
     try {
       const response = await fetch(`https://maps.googleapis.com/maps/api/geocode/json?address=${encodeURIComponent(town)}&key=${process.env.REACT_APP_GOOGLE_API_KEY}`);
       const data = await response.json();
@@ -98,6 +99,7 @@ const CustomerProfileDisplay = () => {
     setShowMapSelector(false);
   };
 
+
   const handleSaveClick = async () => {
     try {
       const token = localStorage.getItem('userToken');
@@ -105,12 +107,15 @@ const CustomerProfileDisplay = () => {
 
       const payload = { ...formData };
 
-      await axios.put(`${config.backendUrl}/api/user/update-profile`, payload, {
-        headers: { Authorization: `Bearer ${token}` }
+      const res = await axios.put(`${config.backendUrl}/api/user/update-profile`, payload, {
+        headers: { Authorization: `Bearer ${token}` },
       });
 
+      // ✅ update context and localStorage immediately
+      setUser(res.data.user);
+      localStorage.setItem('user', JSON.stringify(res.data.user));
+
       setEditing(false);
-      await fetchUserProfile();
     } catch (err) {
       console.error('Error saving profile:', err);
     }
@@ -121,106 +126,106 @@ const CustomerProfileDisplay = () => {
 
   return (
     <div className={styles.profile_wrapper}>
-    {showMapSelector && (
-      <MapSelector
-        onSelect={handleLocationSelect}
-        onCancel={() => setShowMapSelector(false)}
-      />
-    )}
-  
-    {editing && mapCenter && (
-      <div className={styles.mapContainer}>
-        <GoogleMap
-          mapContainerStyle={{ width: '100%', height: '400px' }}
-          center={mapCenter}
-          zoom={15}
-          onClick={handleMapClick}
-        >
-          {markerPosition && <Marker position={markerPosition} />}
-        </GoogleMap>
-      </div>
-    )}
-  
-    <div className={styles.profileContent}>
-      {/* Optional: Profile image container placeholder */}
-      <div className={styles.profileImageContainer}>
-        {/* Placeholder image or logic if applicable */}
-      </div>
-  
-      <div className={styles.profileDetails}>
-        <div className={styles.profileItem}>
-          <strong>Username</strong>
+      {showMapSelector && (
+        <MapSelector
+          onSelect={handleLocationSelect}
+          onCancel={() => setShowMapSelector(false)}
+        />
+      )}
+
+      {editing && mapCenter && (
+        <div className={styles.mapContainer}>
+          <GoogleMap
+            mapContainerStyle={{ width: '100%', height: '400px' }}
+            center={mapCenter}
+            zoom={15}
+            onClick={handleMapClick}
+          >
+            {markerPosition && <Marker position={markerPosition} />}
+          </GoogleMap>
+        </div>
+      )}
+
+      <div className={styles.profileContent}>
+        {/* Optional: Profile image container placeholder */}
+        <div className={styles.profileImageContainer}>
+          {/* Placeholder image or logic if applicable */}
+        </div>
+
+        <div className={styles.profileDetails}>
+          <div className={styles.profileItem}>
+            <strong>Username</strong>
+            {editing ? (
+              <input name="username" value={formData.username} onChange={handleInputChange} />
+            ) : (
+              <span>{formData.username}</span>
+            )}
+          </div>
+
+          <div className={styles.profileItem}>
+            <strong>Names</strong>
+            {editing ? (
+              <input name="names" value={formData.names} onChange={handleInputChange} />
+            ) : (
+              <span>{formData.names}</span>
+            )}
+          </div>
+
+          <div className={styles.profileItem}>
+            <strong>Email</strong>
+            {editing ? (
+              <input name="email" value={formData.email} onChange={handleInputChange} />
+            ) : (
+              <span>{formData.email}</span>
+            )}
+          </div>
+
+          <div className={styles.profileItem}>
+            <strong>Phone Number</strong>
+            {editing ? (
+              <input name="phoneNumber" value={formData.phoneNumber} onChange={handleInputChange} />
+            ) : (
+              <span>{formData.phoneNumber}</span>
+            )}
+          </div>
+
+          <div className={styles.profileItem}>
+            <strong>Town</strong>
+            {editing ? (
+              <input name="town" value={formData.town} onChange={handleTownChange} />
+            ) : (
+              <span>{formData.town}</span>
+            )}
+          </div>
+
+          <div className={styles.profileItem}>
+            <strong>Location</strong>
+            {editing ? (
+              <input
+                name="location"
+                value={formData.location}
+                readOnly
+                onClick={() => setShowMapSelector(true)}
+              />
+            ) : (
+              <span>{formData.location}</span>
+            )}
+          </div>
+        </div>
+
+        <div className={styles.details_buttons}>
           {editing ? (
-            <input name="username" value={formData.username} onChange={handleInputChange} />
+            <>
+              <button className={styles.save_btn} onClick={handleSaveClick}>Save</button>
+              <button className={styles.edit_btn} onClick={handleCancelClick}>Cancel</button>
+            </>
           ) : (
-            <span>{formData.username}</span>
+            <button className={styles.edit_btn} onClick={handleEditClick}>Edit Profile</button>
           )}
         </div>
-  
-        <div className={styles.profileItem}>
-          <strong>Names</strong>
-          {editing ? (
-            <input name="names" value={formData.names} onChange={handleInputChange} />
-          ) : (
-            <span>{formData.names}</span>
-          )}
-        </div>
-  
-        <div className={styles.profileItem}>
-          <strong>Email</strong>
-          {editing ? (
-            <input name="email" value={formData.email} onChange={handleInputChange} />
-          ) : (
-            <span>{formData.email}</span>
-          )}
-        </div>
-  
-        <div className={styles.profileItem}>
-          <strong>Phone Number</strong>
-          {editing ? (
-            <input name="phoneNumber" value={formData.phoneNumber} onChange={handleInputChange} />
-          ) : (
-            <span>{formData.phoneNumber}</span>
-          )}
-        </div>
-  
-        <div className={styles.profileItem}>
-          <strong>Town</strong>
-          {editing ? (
-            <input name="town" value={formData.town} onChange={handleTownChange} />
-          ) : (
-            <span>{formData.town}</span>
-          )}
-        </div>
-  
-        <div className={styles.profileItem}>
-          <strong>Location</strong>
-          {editing ? (
-            <input
-              name="location"
-              value={formData.location}
-              readOnly
-              onClick={() => setShowMapSelector(true)}
-            />
-          ) : (
-            <span>{formData.location}</span>
-          )}
-        </div>
-      </div>
-  
-      <div className={styles.details_buttons}>
-        {editing ? (
-          <>
-            <button className={styles.save_btn} onClick={handleSaveClick}>Save</button>
-            <button className={styles.edit_btn} onClick={handleCancelClick}>Cancel</button>
-          </>
-        ) : (
-          <button className={styles.edit_btn} onClick={handleEditClick}>Edit Profile</button>
-        )}
       </div>
     </div>
-  </div>
-  
+
   );
 };
 

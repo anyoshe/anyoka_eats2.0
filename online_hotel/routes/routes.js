@@ -677,6 +677,34 @@ router.put('/users/update-profile', uploadProfileImage, async (req, res) => {
   }
 });
 
+// Update profile (JSON only, no files)
+router.put("/user/update-profile", authenticateToken, async (req, res) => {
+  try {
+    const userId = req.user._id; // comes from the decoded token
+    console.log('Updating profile for user ID:', userId);
+    const { username, names, email, phoneNumber, town, location } = req.body;
+    console.log('Request body:', req.body);
+
+    // Find user
+    const user = await User.findById(userId);
+    if (!user) return res.status(404).json({ error: "User not found" });
+
+    // Update fields
+    user.username = username || user.username;
+    user.names = names || user.names;
+    user.email = email || user.email;
+    user.phoneNumber = phoneNumber || user.phoneNumber;
+    user.town = town || user.town;
+    user.location = location || user.location;
+
+    await user.save();
+
+    res.status(200).json({ message: "Profile updated successfully", user });
+  } catch (error) {
+    console.error("Error updating profile:", error);
+    res.status(500).json({ error: "Server error" });
+  }
+});
 
 router.get('/orders/my-orders', authenticateToken, async (req, res) => {
   try {
