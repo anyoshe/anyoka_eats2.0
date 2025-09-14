@@ -105,7 +105,7 @@ const CustomerProfileDisplay = () => {
 
       const payload = { ...formData };
 
-      await axios.put(`${config.backendUrl}/api/user/update-profile`, payload, {
+      await axios.put(`${config.backendUrl}/api/users/update-profile`, payload, {
         headers: { Authorization: `Bearer ${token}` }
       });
 
