@@ -7,12 +7,19 @@ import { faStar as solidStar } from '@fortawesome/free-solid-svg-icons';
 import { faStar as regularStar } from '@fortawesome/free-regular-svg-icons';
 
 const ProductCard = ({ product }) => {
-  const [currentImageIndex, setCurrentImageIndex] = useState(0);
+  // const [currentImageIndex, setCurrentImageIndex] = useState(0);
+  const [currentImageIndex, setCurrentImageIndex] = useState(
+  product.images?.indexOf(product.primaryImage) !== -1
+    ? product.images.indexOf(product.primaryImage)
+    : 0
+);
+
   const [showReviews, setShowReviews] = useState(false); // Toggle for reviews section
 
-  const images = product.primaryImage
-    ? [product.primaryImage, ...(product.images || [])]
-    : product.images || ['/path/to/placeholder-image.jpg'];
+  // const images = product.primaryImage
+  //   ? [product.primaryImage, ...(product.images || [])]
+  //   : product.images || ['/path/to/placeholder-image.jpg'];
+const images = product.images?.length ? product.images : ['/path/to/placeholder-image.jpg'];
 
   const handleNextImage = () => {
     setCurrentImageIndex((prevIndex) => (prevIndex + 1) % images.length);
@@ -26,11 +33,7 @@ const ProductCard = ({ product }) => {
     setCurrentImageIndex(index);
   };
 
-  // const getImageSrc = (imagePath) => {
-  //   const stripServerPath = (fullPath) =>
-  //     fullPath.replace('/mnt/shared/Projects/anyoka_eats2.0/online_hotel', '');
-  //   return `${config.backendUrl}${stripServerPath(imagePath)}`;
-  // };
+
 const getImageSrc = (imagePath) => {
   if (!imagePath) return '/path/to/placeholder-image.jpg';
 
