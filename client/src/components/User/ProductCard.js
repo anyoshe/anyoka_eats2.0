@@ -26,11 +26,26 @@ const ProductCard = ({ product }) => {
     setCurrentImageIndex(index);
   };
 
-  const getImageSrc = (imagePath) => {
-    const stripServerPath = (fullPath) =>
-      fullPath.replace('/mnt/shared/Projects/anyoka_eats2.0/online_hotel', '');
-    return `${config.backendUrl}${stripServerPath(imagePath)}`;
-  };
+  // const getImageSrc = (imagePath) => {
+  //   const stripServerPath = (fullPath) =>
+  //     fullPath.replace('/mnt/shared/Projects/anyoka_eats2.0/online_hotel', '');
+  //   return `${config.backendUrl}${stripServerPath(imagePath)}`;
+  // };
+const getImageSrc = (imagePath) => {
+  if (!imagePath) return '/path/to/placeholder-image.jpg';
+
+  // If path already starts with http (absolute URL), just return it
+  if (imagePath.startsWith('http')) return imagePath;
+
+  // If the path contains "/uploads", strip everything before it
+  const relativePath = imagePath.includes('/uploads')
+    ? imagePath.substring(imagePath.indexOf('/uploads'))
+    : `/uploads/products/${imagePath}`; // fallback if only filename is saved
+
+  return `${config.backendUrl}${relativePath}`;
+};
+
+  
 
   return (
     <div className={styles.productCard}>
