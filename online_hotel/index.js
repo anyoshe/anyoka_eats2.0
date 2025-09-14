@@ -22,7 +22,7 @@ const database = mongoose.connection;
 // Serve static files from the uploads directory
 // app.use('/uploads', express.static('/var/data/uploads'));
 // Serve static files from the 'public' directory
-app.use('/uploads', express.static(path.join(__dirname, '/uploads')));
+// app.use('/uploads', express.static(path.join(__dirname, '/uploads')));
 
 
 // Middleware
@@ -62,12 +62,12 @@ app.use(passport.session());
 app.use('/api', routes);
 
 // File Uploads
-app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+// app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 app.use('/uploads', express.static(path.join(__dirname, '/var/data/uploads')));
 app.use('/uploads/images', express.static(path.join('/var/data/uploads/images')));
 app.use('/uploads/profile-images', express.static(path.join('/var/data/uploads/profile-images')));
 app.use('/uploads/conferences', express.static(path.join('/var/data/uploads/conferences')));
-app.use('uploads/business-permits', express.static(path.join('/var/data/uploads/business-permits')));
+app.use('/uploads/business-permits', express.static(path.join('/var/data/uploads/business-permits')));
 app.use('/uploads/products', express.static(path.join('/var/data/uploads/products')));
 
 const fs = require('fs');
