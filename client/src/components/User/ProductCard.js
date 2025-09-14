@@ -28,7 +28,7 @@ const ProductCard = ({ product }) => {
 
  
 const getImageSrc = (imagePath) => {
-  if (!imagePath) return '/path/to/placeholder-image.jpg';
+  if (!imagePath) return '/images/placeholder-image.png';
 
   // If path already starts with http (absolute URL), just return it
   if (imagePath.startsWith('http')) return imagePath;
