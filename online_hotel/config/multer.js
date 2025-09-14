@@ -159,7 +159,8 @@ function checkFileType(file, cb) {
 // Reusable storage setup function
 function createStorage(destinationFolder, filenamePrefix) {
   return multer.diskStorage({
-    destination: path.join(__dirname, `../uploads/${destinationFolder}`),
+    // destination: path.join(__dirname, `../uploads/${destinationFolder}`),
+        destination: `/var/data/uploads/${destinationFolder}`,
     filename: (req, file, cb) => {
       cb(null, `${filenamePrefix}-${Date.now()}${path.extname(file.originalname)}`);
     },
