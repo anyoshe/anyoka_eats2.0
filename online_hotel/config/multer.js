@@ -64,22 +64,15 @@ const uploadBusinessPermit = multer({
   fileFilter: (req, file, cb) => checkFileType(file, cb),
 }).single('businessPermit');
 
-// Multer upload setup for product images
-// const uploadProductImages = multer({
-//   storage: createStorage('products', 'product'),
-//   limits: { fileSize: 2000000 },
-//   fileFilter: (req, file, cb) => checkFileType(file, cb),
-// }).fields([
-//   { name: 'images', maxCount: 5 },       // regular images
-//   { name: 'primaryImage', maxCount: 1 }  // primary image
-// ]);
 
 // Multer upload setup for product images
+
 const uploadProductImages = multer({
   storage: createStorage('products', 'product'),
   limits: { fileSize: 2000000 },
   fileFilter: (req, file, cb) => checkFileType(file, cb),
-}).array('images', 5);  // only multiple images
+}).array('images', 5); // up to 5 images
+
 
 module.exports = {
   upload,

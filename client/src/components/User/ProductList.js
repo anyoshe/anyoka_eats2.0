@@ -19,7 +19,7 @@ const ProductList = ({ onEditProduct, onDeleteProduct, refreshTrigger }) => {
                 console.error('Partner ID is missing. Please log in.');
                 return;
             }
-            
+
 
             try {
                 const response = await fetch(`${config.backendUrl}/api/products?partnerId=${partner._id}`);
@@ -57,13 +57,13 @@ const ProductList = ({ onEditProduct, onDeleteProduct, refreshTrigger }) => {
         }
 
         return '/images/placeholder-image.png';
-      };
-      
+    };
+
     return (
-     
+
         <div className={styles.productListContainer}>
             {Object.keys(productsByCategory).map((category) => (
-                <div key={category}  className={styles.categorySection}>
+                <div key={category} className={styles.categorySection}>
                     {/* Category Heading */}
                     <h2 className={styles.categoryHeading}>{category}</h2>
 
@@ -71,18 +71,18 @@ const ProductList = ({ onEditProduct, onDeleteProduct, refreshTrigger }) => {
                     <div className={styles.productsGrid}>
                         {productsByCategory[category].map((product) => (
                             <div className={styles.productItem} key={product._id}>
-                            
+
                                 <img
                                     src={getImageSrc(product)}
                                     alt={product.name}
                                     className={styles.productImagePreview}
-                                    
+
                                     onError={(e) => {
                                         e.target.onerror = null;
                                         e.target.src = '/images/placeholder-image.png';
                                     }}
                                 />
-                               <div className={styles.productDetails}>
+                                <div className={styles.productDetails}>
                                     <div className={styles.productField}>
                                         <strong>Name:</strong>
                                         <span>{product.name}</span>
@@ -114,20 +114,20 @@ const ProductList = ({ onEditProduct, onDeleteProduct, refreshTrigger }) => {
 
                                         <button
                                             className={styles.editProductButton}
-                                            
+
                                             onClick={() => onEditProduct(product)}
                                             title="Edit"
-                                            
+
                                         >
-                                          
+
                                             <FontAwesomeIcon icon={faEdit} />
                                         </button>
                                         <button
                                             className={styles.deleteProductButton}
-                                           
+
                                             onClick={() => onDeleteProduct(product._id)}
                                             title="Delete"
-                                            
+
                                         >
                                             <FontAwesomeIcon icon={faTrash} />
                                         </button>
