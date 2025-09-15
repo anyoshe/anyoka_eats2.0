@@ -26,22 +26,22 @@ const ProductCard = ({ product }) => {
     setCurrentImageIndex(index);
   };
 
- 
-const getImageSrc = (imagePath) => {
-  if (!imagePath) return '/images/placeholder-image.png';
 
-  // If path already starts with http (absolute URL), just return it
-  if (imagePath.startsWith('http')) return imagePath;
+  const getImageSrc = (imagePath) => {
+    if (!imagePath) return '/images/placeholder-image.png';
 
-  // If the path contains "/uploads", strip everything before it
-  const relativePath = imagePath.includes('/uploads')
-    ? imagePath.substring(imagePath.indexOf('/uploads'))
-    : `/uploads/products/${imagePath}`; // fallback if only filename is saved
+    // If path already starts with http (absolute URL), just return it
+    if (imagePath.startsWith('http')) return imagePath;
 
-  return `${config.backendUrl}${relativePath}`;
-};
+    // If the path contains "/uploads", strip everything before it
+    const relativePath = imagePath.includes('/uploads')
+      ? imagePath.substring(imagePath.indexOf('/uploads'))
+      : `/uploads/products/${imagePath}`; // fallback if only filename is saved
 
-  
+    return `${config.backendUrl}${relativePath}`;
+  };
+
+
 
   return (
     <div className={styles.productCard}>
@@ -62,9 +62,9 @@ const getImageSrc = (imagePath) => {
                 //   e.target.src = '/path/to/placeholder-image.jpg';
                 // }}
                 onError={(e) => {
-  e.target.onerror = null;
-  e.target.src = '/images/placeholder.png'; // put this in /public/images/
-}}
+                  e.target.onerror = null;
+                  e.target.src = '/images/placeholder.png'; // put this in /public/images/
+                }}
 
               />
               <button className={styles.nextButton} onClick={handleNextImage}>
@@ -113,7 +113,7 @@ const getImageSrc = (imagePath) => {
           <p className={styles.productInventory}>Available : {product.inventory}</p>
 
           <div className={styles.rating}>
-            Ratings : 
+            Ratings :
             {[...Array(5)].map((_, index) => {
               const star = index + 1;
               return (
@@ -126,7 +126,7 @@ const getImageSrc = (imagePath) => {
               );
             })}
           </div>
-          
+
           <p className={styles.average}>
             Average Rating: {product.ratings?.average?.toFixed(2) || 0}
             <br />
@@ -167,8 +167,8 @@ const getImageSrc = (imagePath) => {
           )}
         </div>
       )}
-    {/* <hr /> */}
-  </div>
+      {/* <hr /> */}
+    </div>
   );
 };
 
