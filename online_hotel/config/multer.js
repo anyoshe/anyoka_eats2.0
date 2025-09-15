@@ -81,18 +81,16 @@
 //   uploadBusinessPermit,
 //   uploadProductImages,
 // };
-
 const multer = require('multer');
 const path = require('path');
 
-// Helper function to check file types (consolidated for all use cases)
+// Helper function to check file types
 function checkFileType(file, cb) {
   const imageFiletypes = /jpeg|jpg|png|gif/;
   const videoFiletypes = /mp4|webm|ogg/;
   const pdfFiletypes = /pdf/;
   const extname = path.extname(file.originalname).toLowerCase();
   const mimetype = file.mimetype;
-  // Check file extension and mimetype for allowed types
   if (
     (imageFiletypes.test(extname) && imageFiletypes.test(mimetype)) ||
     (videoFiletypes.test(extname) && videoFiletypes.test(mimetype)) ||
@@ -109,7 +107,8 @@ function createStorage(destinationFolder, filenamePrefix) {
   return multer.diskStorage({
     destination: `/var/data/uploads/${destinationFolder}`,
     filename: (req, file, cb) => {
-      cb(null, `${filenamePrefix}-${Date.now()}${path.extname(file.originalname)}`);
+      const uniqueName = `${filenamePrefix}-${Date.now()}-${Math.random().toString(36).substring(2, 8)}${path.extname(file.originalname)}`;
+      cb(null, uniqueName);
     },
   });
 }
@@ -150,7 +149,7 @@ const uploadProductImages = multer({
   storage: createStorage('products', 'product'),
   limits: { fileSize: 2000000 },
   fileFilter: (req, file, cb) => checkFileType(file, cb),
-}).array('images', 5); // only multiple images
+}).array('images', 5);
 
 module.exports = {
   upload,

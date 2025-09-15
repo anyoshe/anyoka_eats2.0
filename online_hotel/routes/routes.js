@@ -861,6 +861,7 @@ const Product = mongoose.model('Product', productSchema);
 // const shortid = require('shortid'); const Product = require('../models/Product'); const Partner = require('../models/Partner');
 // const { uploadProductImages } = require('../middleware/multerConfig'); // or wherever your multer is
 
+
 router.post('/products', uploadProductImages, async (req, res) => {
   try {
     const {
@@ -876,10 +877,10 @@ router.post('/products', uploadProductImages, async (req, res) => {
       unit,
       inventory,
       shopId,
-      primaryImage, // string: either path (unlikely for new) or 'new:<index>'
+      primaryImage, // string: either path or 'new:<index>'
     } = req.body;
 
-    const newImages = req.files?.map((file) => `/uploads/products/${file.filename}`) || [];
+    const newImages = [...new Set(req.files?.map((file) => `/uploads/products/${file.filename}`) || [])];
 
     if (newImages.length > 5) {
       return res.status(400).json({ message: 'Maximum of 5 images allowed.' });
@@ -889,16 +890,14 @@ router.post('/products', uploadProductImages, async (req, res) => {
     if (!partner) return res.status(404).json({ message: 'Shop not found' });
 
     let resolvedPrimaryImage = null;
-    const primaryFromBody = req.body.primaryImage;
-
-    if (primaryFromBody) {
-      if (primaryFromBody.startsWith('new:')) {
-        const idx = parseInt(primaryFromBody.slice(4));
+    if (primaryImage) {
+      if (primaryImage.startsWith('new:')) {
+        const idx = parseInt(primaryImage.slice(4));
         if (idx >= 0 && idx < newImages.length) {
           resolvedPrimaryImage = newImages[idx];
         }
-      } else if (newImages.includes(primaryFromBody)) {
-        resolvedPrimaryImage = primaryFromBody;
+      } else if (newImages.includes(primaryImage)) {
+        resolvedPrimaryImage = primaryImage;
       }
     }
 
@@ -916,7 +915,7 @@ router.post('/products', uploadProductImages, async (req, res) => {
       category,
       subCategory,
       brand,
-      tags: tags ? tags.split(',').map((tag) => tag.trim()) : [], // Assuming tags come as comma-separated string
+      tags: tags ? tags.split(',').map((tag) => tag.trim()) : [],
       price,
       discountedPrice,
       quantity,
@@ -955,7 +954,6 @@ router.put('/products/:id', uploadProductImages, async (req, res) => {
     product.quantity = req.body.quantity || product.quantity;
     product.unit = req.body.unit || product.unit;
     product.inventory = req.body.inventory || product.inventory;
-    // Shop fields are assumed not to change, or update if needed
 
     // Handle deleted images
     const deletedImages = req.body.deletedImages ? JSON.parse(req.body.deletedImages) : [];
@@ -966,9 +964,10 @@ router.put('/products/:id', uploadProductImages, async (req, res) => {
       }
     }
 
-    // Add new images
-    const newImages = req.files?.map((file) => `/uploads/products/${file.filename}`) || [];
-    product.images = [...product.images, ...newImages];
+    // Add new images, ensuring no duplicates
+    const newImages = [...new Set(req.files?.map((file) => `/uploads/products/${file.filename}`) || [])];
+    const existingImages = product.images.filter((img) => !newImages.includes(img));
+    product.images = [...existingImages, ...newImages];
 
     // Enforce max 5 images
     if (product.images.length > 5) {
@@ -976,8 +975,8 @@ router.put('/products/:id', uploadProductImages, async (req, res) => {
     }
 
     // Handle primaryImage
-    const primaryFromBody = req.body.primaryImage;
     let resolvedPrimaryImage = product.primaryImage;
+    const primaryFromBody = req.body.primaryImage;
 
     if (primaryFromBody) {
       if (primaryFromBody.startsWith('new:')) {
@@ -1007,11 +1006,10 @@ router.put('/products/:id', uploadProductImages, async (req, res) => {
 
 router.get('/products', async (req, res) => {
   try {
-    const { partnerId } = req.query; // Get partnerId from query parameters
+    const { partnerId } = req.query;
     if (!partnerId) {
       return res.status(400).json({ message: 'Partner ID is required' });
     }
-    // Fetch products for the specific partner
     const products = await Product.find({ 'shop.shopId': partnerId });
     res.status(200).json({ products });
   } catch (error) {
@@ -1019,6 +1017,7 @@ router.get('/products', async (req, res) => {
     res.status(500).json({ message: 'Failed to fetch products' });
   }
 });
+
 
 // router.get('/products', async (req, res) => {
 //   try {
