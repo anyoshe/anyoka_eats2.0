@@ -106,9 +106,16 @@ const ProductModal = ({ isOpen, onClose, onSubmit, editingProduct, onProductUpda
             }
         });
 
+        // if (primaryImage) {
+        //     formData.append('primaryImage', primaryImage);
+        // }
         if (primaryImage) {
-            formData.append('primaryImage', primaryImage);
-        }
+  // if it's a new file, backend will resolve after upload
+  if (typeof primaryImage === 'string') {
+    formData.append('primaryImage', primaryImage); 
+  }
+}
+
 
         if (deletedImages.length > 0) {
             formData.append('deletedImages', JSON.stringify(deletedImages));
