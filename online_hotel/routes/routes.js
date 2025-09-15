@@ -874,8 +874,12 @@ router.post('/products', uploadProductImages, async (req, res) => {
       primaryImage,  // comes as string (path or index)
     } = req.body;
 
-    const images = req.files?.map((file) => `/uploads/products/${file.filename}`) || [];
+    // const images = req.files?.map((file) => `/uploads/products/${file.filename}`) || [];
+ // Collect uploaded image paths
+    let images = req.files?.map((file) => `/uploads/products/${file.filename}`) || [];
 
+    // Remove duplicates and limit to 5
+    images = Array.from(new Set(images)).slice(0, 5);
     // primaryImage is just a reference (string)
     let resolvedPrimaryImage = null;
     if (primaryImage && images.includes(primaryImage)) {
