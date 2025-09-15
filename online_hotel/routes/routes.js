@@ -862,8 +862,11 @@ const Product = mongoose.model('Product', productSchema);
 // const { uploadProductImages } = require('../middleware/multerConfig'); // or wherever your multer is
 
 
+
 router.post('/products', uploadProductImages, async (req, res) => {
   try {
+    console.log('Received body:', req.body);
+    console.log('Received files:', req.files);
     const {
       name,
       description,
@@ -877,10 +880,11 @@ router.post('/products', uploadProductImages, async (req, res) => {
       unit,
       inventory,
       shopId,
-      primaryImage, // string: either path or 'new:<index>'
+      primaryImage,
+      deletedImages,
     } = req.body;
 
-    const newImages = [...new Set(req.files?.map((file) => `/uploads/products/${file.filename}`) || [])];
+    const newImages = [...new Set(req.files?.images?.map((file) => `/uploads/products/${file.filename}`) || [])];
 
     if (newImages.length > 5) {
       return res.status(400).json({ message: 'Maximum of 5 images allowed.' });
@@ -932,17 +936,18 @@ router.post('/products', uploadProductImages, async (req, res) => {
     await newProduct.save();
     res.status(201).json({ message: 'Product added successfully', product: newProduct });
   } catch (error) {
-    console.error('Error adding product:', error);
+    console.error('Error adding product:', error, error.stack);
     res.status(500).json({ message: 'Failed to add product', error: error.message });
   }
 });
 
 router.put('/products/:id', uploadProductImages, async (req, res) => {
   try {
+    console.log('Received body:', req.body);
+    console.log('Received files:', req.files);
     const product = await Product.findById(req.params.id);
     if (!product) return res.status(404).json({ message: 'Product not found' });
 
-    // Update fields if provided
     product.name = req.body.name || product.name;
     product.description = req.body.description || product.description;
     product.category = req.body.category || product.category;
@@ -955,7 +960,6 @@ router.put('/products/:id', uploadProductImages, async (req, res) => {
     product.unit = req.body.unit || product.unit;
     product.inventory = req.body.inventory || product.inventory;
 
-    // Handle deleted images
     const deletedImages = req.body.deletedImages ? JSON.parse(req.body.deletedImages) : [];
     if (deletedImages.length > 0) {
       product.images = product.images.filter((img) => !deletedImages.includes(img));
@@ -964,17 +968,14 @@ router.put('/products/:id', uploadProductImages, async (req, res) => {
       }
     }
 
-    // Add new images, ensuring no duplicates
-    const newImages = [...new Set(req.files?.map((file) => `/uploads/products/${file.filename}`) || [])];
+    const newImages = [...new Set(req.files?.images?.map((file) => `/uploads/products/${file.filename}`) || [])];
     const existingImages = product.images.filter((img) => !newImages.includes(img));
     product.images = [...existingImages, ...newImages];
 
-    // Enforce max 5 images
     if (product.images.length > 5) {
       return res.status(400).json({ message: 'Total images cannot exceed 5.' });
     }
 
-    // Handle primaryImage
     let resolvedPrimaryImage = product.primaryImage;
     const primaryFromBody = req.body.primaryImage;
 
@@ -999,7 +1000,7 @@ router.put('/products/:id', uploadProductImages, async (req, res) => {
     await product.save();
     res.status(200).json({ message: 'Product updated successfully', product });
   } catch (error) {
-    console.error('Error updating product:', error);
+    console.error('Error updating product:', error, error.stack);
     res.status(500).json({ message: 'Failed to update product', error: error.message });
   }
 });
