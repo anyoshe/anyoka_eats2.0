@@ -81,10 +81,11 @@
 //   uploadBusinessPermit,
 //   uploadProductImages,
 // };
+
+
 const multer = require('multer');
 const path = require('path');
 
-// Helper function to check file types
 function checkFileType(file, cb) {
   const imageFiletypes = /jpeg|jpg|png|gif/;
   const videoFiletypes = /mp4|webm|ogg/;
@@ -102,7 +103,6 @@ function checkFileType(file, cb) {
   }
 }
 
-// Reusable storage setup function
 function createStorage(destinationFolder, filenamePrefix) {
   return multer.diskStorage({
     destination: `/var/data/uploads/${destinationFolder}`,
@@ -113,14 +113,12 @@ function createStorage(destinationFolder, filenamePrefix) {
   });
 }
 
-// Multer upload setup for images
 const upload = multer({
   storage: createStorage('images', 'image'),
   limits: { fileSize: 1000000 },
   fileFilter: (req, file, cb) => checkFileType(file, cb),
 }).single('image');
 
-// Multer upload setup for multiple conference-related files
 const uploadMultiple = multer({
   storage: createStorage('conferences', 'conference'),
   fileFilter: (req, file, cb) => checkFileType(file, cb),
@@ -130,26 +128,23 @@ const uploadMultiple = multer({
   { name: 'floorPlans', maxCount: 4 },
 ]);
 
-// Multer upload setup for profile images
 const uploadProfileImage = multer({
   storage: createStorage('profile-images', 'profile'),
   limits: { fileSize: 1000000 },
   fileFilter: (req, file, cb) => checkFileType(file, cb),
 }).single('profileImage');
 
-// Multer upload setup for business permit PDFs
 const uploadBusinessPermit = multer({
   storage: createStorage('business-permits', 'permit'),
   limits: { fileSize: 2000000 },
   fileFilter: (req, file, cb) => checkFileType(file, cb),
 }).single('businessPermit');
 
-// Multer upload setup for product images
 const uploadProductImages = multer({
   storage: createStorage('products', 'product'),
   limits: { fileSize: 2000000 },
   fileFilter: (req, file, cb) => checkFileType(file, cb),
-}).array('images', 5);
+}).fields([{ name: 'images', maxCount: 5 }]);
 
 module.exports = {
   upload,

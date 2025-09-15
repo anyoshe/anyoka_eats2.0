@@ -432,7 +432,6 @@ const ProductModal = ({ isOpen, onClose, onSubmit, editingProduct, onProductUpda
       setProductTags(editingProduct.tags?.join(', ') || '');
       setProductDiscountedPrice(editingProduct.discountedPrice || '');
 
-      // Remove duplicates from images and format paths
       const uniqueImages = [...new Set(editingProduct.images || [])].map((image) =>
         image.startsWith('/var/data') ? image.replace('/var/data', '') : image
       );
@@ -456,7 +455,6 @@ const ProductModal = ({ isOpen, onClose, onSubmit, editingProduct, onProductUpda
       return;
     }
 
-    // Prevent duplicate files by checking file names
     const newFiles = files.filter((file) => !productImages.some((img) => img.name === file.name));
     if (newFiles.length === 0) {
       alert('All selected images are already added.');
@@ -507,8 +505,8 @@ const ProductModal = ({ isOpen, onClose, onSubmit, editingProduct, onProductUpda
     }
 
     const newFiles = productImages.filter((image) => typeof image !== 'string');
-    newFiles.forEach((file, index) => {
-      formData.append(`images[${index}]`, file);
+    newFiles.forEach((file) => {
+      formData.append('images', file);
     });
 
     if (primaryImage) {
@@ -524,6 +522,11 @@ const ProductModal = ({ isOpen, onClose, onSubmit, editingProduct, onProductUpda
 
     if (deletedImages.length > 0) {
       formData.append('deletedImages', JSON.stringify(deletedImages));
+    }
+
+    // Debug: Log FormData
+    for (let [key, value] of formData.entries()) {
+      console.log(`FormData: ${key} = ${value}`);
     }
 
     try {
