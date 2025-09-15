@@ -856,6 +856,11 @@ const Product = mongoose.model('Product', productSchema);
 //   }
 // });
 
+// Assuming this is part of your router file, e.g., products.js
+// Also assuming you have: const express = require('express'); const router = express.Router();
+// const shortid = require('shortid'); const Product = require('../models/Product'); const Partner = require('../models/Partner');
+// const { uploadProductImages } = require('../middleware/multerConfig'); // or wherever your multer is
+
 router.post('/products', uploadProductImages, async (req, res) => {
   try {
     const {
@@ -871,38 +876,47 @@ router.post('/products', uploadProductImages, async (req, res) => {
       unit,
       inventory,
       shopId,
-      primaryImage,  // comes as string (path or index)
+      primaryImage, // string: either path (unlikely for new) or 'new:<index>'
     } = req.body;
 
-    // const images = req.files?.map((file) => `/uploads/products/${file.filename}`) || [];
- // Collect uploaded image paths
-    let images = req.files?.map((file) => `/uploads/products/${file.filename}`) || [];
+    const newImages = req.files?.map((file) => `/uploads/products/${file.filename}`) || [];
 
-    // Remove duplicates and limit to 5
-    images = Array.from(new Set(images)).slice(0, 5);
-    // primaryImage is just a reference (string)
-    let resolvedPrimaryImage = null;
-    if (primaryImage && images.includes(primaryImage)) {
-      resolvedPrimaryImage = primaryImage;
-    } else if (images.length > 0) {
-      resolvedPrimaryImage = images[0]; // fallback
+    if (newImages.length > 5) {
+      return res.status(400).json({ message: 'Maximum of 5 images allowed.' });
     }
 
     const partner = await Partner.findById(shopId);
     if (!partner) return res.status(404).json({ message: 'Shop not found' });
 
-    const productId = shortid.generate();
+    let resolvedPrimaryImage = null;
+    const primaryFromBody = req.body.primaryImage;
 
+    if (primaryFromBody) {
+      if (primaryFromBody.startsWith('new:')) {
+        const idx = parseInt(primaryFromBody.slice(4));
+        if (idx >= 0 && idx < newImages.length) {
+          resolvedPrimaryImage = newImages[idx];
+        }
+      } else if (newImages.includes(primaryFromBody)) {
+        resolvedPrimaryImage = primaryFromBody;
+      }
+    }
+
+    if (!resolvedPrimaryImage && newImages.length > 0) {
+      resolvedPrimaryImage = newImages[0];
+    }
+
+    const productId = shortid.generate();
     const newProduct = new Product({
       productId,
       name,
       description,
-      images,
+      images: newImages,
       primaryImage: resolvedPrimaryImage,
       category,
       subCategory,
       brand,
-      tags,
+      tags: tags ? tags.split(',').map((tag) => tag.trim()) : [], // Assuming tags come as comma-separated string
       price,
       discountedPrice,
       quantity,
@@ -917,7 +931,6 @@ router.post('/products', uploadProductImages, async (req, res) => {
     });
 
     await newProduct.save();
-
     res.status(201).json({ message: 'Product added successfully', product: newProduct });
   } catch (error) {
     console.error('Error adding product:', error);
@@ -925,24 +938,105 @@ router.post('/products', uploadProductImages, async (req, res) => {
   }
 });
 
+router.put('/products/:id', uploadProductImages, async (req, res) => {
+  try {
+    const product = await Product.findById(req.params.id);
+    if (!product) return res.status(404).json({ message: 'Product not found' });
+
+    // Update fields if provided
+    product.name = req.body.name || product.name;
+    product.description = req.body.description || product.description;
+    product.category = req.body.category || product.category;
+    product.subCategory = req.body.subCategory || product.subCategory;
+    product.brand = req.body.brand || product.brand;
+    product.tags = req.body.tags ? req.body.tags.split(',').map((tag) => tag.trim()) : product.tags;
+    product.price = req.body.price || product.price;
+    product.discountedPrice = req.body.discountedPrice || product.discountedPrice;
+    product.quantity = req.body.quantity || product.quantity;
+    product.unit = req.body.unit || product.unit;
+    product.inventory = req.body.inventory || product.inventory;
+    // Shop fields are assumed not to change, or update if needed
+
+    // Handle deleted images
+    const deletedImages = req.body.deletedImages ? JSON.parse(req.body.deletedImages) : [];
+    if (deletedImages.length > 0) {
+      product.images = product.images.filter((img) => !deletedImages.includes(img));
+      if (deletedImages.includes(product.primaryImage)) {
+        product.primaryImage = null;
+      }
+    }
+
+    // Add new images
+    const newImages = req.files?.map((file) => `/uploads/products/${file.filename}`) || [];
+    product.images = [...product.images, ...newImages];
+
+    // Enforce max 5 images
+    if (product.images.length > 5) {
+      return res.status(400).json({ message: 'Total images cannot exceed 5.' });
+    }
+
+    // Handle primaryImage
+    const primaryFromBody = req.body.primaryImage;
+    let resolvedPrimaryImage = product.primaryImage;
+
+    if (primaryFromBody) {
+      if (primaryFromBody.startsWith('new:')) {
+        const idx = parseInt(primaryFromBody.slice(4));
+        if (idx >= 0 && idx < newImages.length) {
+          resolvedPrimaryImage = newImages[idx];
+        }
+      } else if (product.images.includes(primaryFromBody)) {
+        resolvedPrimaryImage = primaryFromBody;
+      }
+    }
+
+    if (!resolvedPrimaryImage && product.images.length > 0) {
+      resolvedPrimaryImage = product.images[0];
+    }
+
+    product.primaryImage = resolvedPrimaryImage;
+    product.updatedAt = Date.now();
+
+    await product.save();
+    res.status(200).json({ message: 'Product updated successfully', product });
+  } catch (error) {
+    console.error('Error updating product:', error);
+    res.status(500).json({ message: 'Failed to update product', error: error.message });
+  }
+});
 
 router.get('/products', async (req, res) => {
   try {
     const { partnerId } = req.query; // Get partnerId from query parameters
-
     if (!partnerId) {
       return res.status(400).json({ message: 'Partner ID is required' });
     }
-
     // Fetch products for the specific partner
     const products = await Product.find({ 'shop.shopId': partnerId });
-
     res.status(200).json({ products });
   } catch (error) {
     console.error('Error fetching products:', error);
     res.status(500).json({ message: 'Failed to fetch products' });
   }
 });
+
+// router.get('/products', async (req, res) => {
+//   try {
+//     const { partnerId } = req.query; // Get partnerId from query parameters
+
+//     if (!partnerId) {
+//       return res.status(400).json({ message: 'Partner ID is required' });
+//     }
+
+//     // Fetch products for the specific partner
+//     const products = await Product.find({ 'shop.shopId': partnerId });
+
+//     res.status(200).json({ products });
+//   } catch (error) {
+//     console.error('Error fetching products:', error);
+//     res.status(500).json({ message: 'Failed to fetch products' });
+//   }
+// });
 
 // Route to delete a product by ID
 router.delete('/products/:id', async (req, res) => {
@@ -964,98 +1058,98 @@ router.delete('/products/:id', async (req, res) => {
 });
 
 
-router.put('/products/:id', uploadProductImages, async (req, res) => {
-  try {
-    const productId = req.params.id;
-    const {
-      name,
-      description,
-      category,
-      subCategory,
-      brand,
-      tags,
-      price,
-      discountedPrice,
-      quantity,
-      unit,
-      inventory,
-      primaryImage,   // fallback primary image from req.body
-      deletedImages,  // This should be a JSON string
-    } = req.body;
+// router.put('/products/:id', uploadProductImages, async (req, res) => {
+//   try {
+//     const productId = req.params.id;
+//     const {
+//       name,
+//       description,
+//       category,
+//       subCategory,
+//       brand,
+//       tags,
+//       price,
+//       discountedPrice,
+//       quantity,
+//       unit,
+//       inventory,
+//       primaryImage,   // fallback primary image from req.body
+//       deletedImages,  // This should be a JSON string
+//     } = req.body;
 
-    // Extract additional images (if any)
-    const images = (req.files && req.files.images && Array.isArray(req.files.images))
-      ? req.files.images.map((file) => `/uploads/products/${file.filename}`)
-      : [];
+//     // Extract additional images (if any)
+//     const images = (req.files && req.files.images && Array.isArray(req.files.images))
+//       ? req.files.images.map((file) => `/uploads/products/${file.filename}`)
+//       : [];
 
-    // Extract primary image file if uploaded
-    const primaryImageFile = (req.files && req.files.primaryImage && Array.isArray(req.files.primaryImage))
-      ? `/uploads/products/${req.files.primaryImage[0].filename}`
-      : null;
+//     // Extract primary image file if uploaded
+//     const primaryImageFile = (req.files && req.files.primaryImage && Array.isArray(req.files.primaryImage))
+//       ? `/uploads/products/${req.files.primaryImage[0].filename}`
+//       : null;
 
-    // Use the primary image file if available; otherwise, fallback to primaryImage from req.body.
-    const finalPrimaryImage = primaryImageFile || primaryImage;
+//     // Use the primary image file if available; otherwise, fallback to primaryImage from req.body.
+//     const finalPrimaryImage = primaryImageFile || primaryImage;
 
-    // Normalize deleted image paths to match stored paths
-    const deletedImagesArray = deletedImages
-      ? JSON.parse(deletedImages).map((imgPath) => {
-        const parts = imgPath.split('/uploads/');
-        return parts.length > 1 ? `/uploads/${parts[1]}` : imgPath;
-      })
-      : [];
+//     // Normalize deleted image paths to match stored paths
+//     const deletedImagesArray = deletedImages
+//       ? JSON.parse(deletedImages).map((imgPath) => {
+//         const parts = imgPath.split('/uploads/');
+//         return parts.length > 1 ? `/uploads/${parts[1]}` : imgPath;
+//       })
+//       : [];
 
-    const updatedProduct = await Product.findById(productId);
-    if (!updatedProduct) {
-      return res.status(404).json({ message: 'Product not found' });
-    }
+//     const updatedProduct = await Product.findById(productId);
+//     if (!updatedProduct) {
+//       return res.status(404).json({ message: 'Product not found' });
+//     }
 
-    // Update product fields
-    updatedProduct.name = name || updatedProduct.name;
-    updatedProduct.description = description || updatedProduct.description;
-    updatedProduct.category = category || updatedProduct.category;
-    updatedProduct.subCategory = subCategory || updatedProduct.subCategory;
-    updatedProduct.brand = brand || updatedProduct.brand;
-    updatedProduct.tags = tags ? tags.split(',').map((tag) => tag.trim()) : updatedProduct.tags;
-    updatedProduct.price = price || updatedProduct.price;
-    updatedProduct.quantity = quantity || updatedProduct.quantity;
-    updatedProduct.unit = unit || updatedProduct.unit;
-    updatedProduct.inventory = inventory || updatedProduct.inventory;
-    updatedProduct.primaryImage = finalPrimaryImage || updatedProduct.primaryImage;
+//     // Update product fields
+//     updatedProduct.name = name || updatedProduct.name;
+//     updatedProduct.description = description || updatedProduct.description;
+//     updatedProduct.category = category || updatedProduct.category;
+//     updatedProduct.subCategory = subCategory || updatedProduct.subCategory;
+//     updatedProduct.brand = brand || updatedProduct.brand;
+//     updatedProduct.tags = tags ? tags.split(',').map((tag) => tag.trim()) : updatedProduct.tags;
+//     updatedProduct.price = price || updatedProduct.price;
+//     updatedProduct.quantity = quantity || updatedProduct.quantity;
+//     updatedProduct.unit = unit || updatedProduct.unit;
+//     updatedProduct.inventory = inventory || updatedProduct.inventory;
+//     updatedProduct.primaryImage = finalPrimaryImage || updatedProduct.primaryImage;
 
-    // Add new images
-    updatedProduct.images.push(...images);
+//     // Add new images
+//     updatedProduct.images.push(...images);
 
-    // Remove deleted images from the images array
-    if (deletedImagesArray.length > 0) {
-      updatedProduct.images = updatedProduct.images.filter(
-        (image) => !deletedImagesArray.includes(image)
-      );
+//     // Remove deleted images from the images array
+//     if (deletedImagesArray.length > 0) {
+//       updatedProduct.images = updatedProduct.images.filter(
+//         (image) => !deletedImagesArray.includes(image)
+//       );
 
-      // Delete the files from the file system
-      deletedImagesArray.forEach((imagePath) => {
-        const fullPath = path.join(__dirname, '..', imagePath); // Resolve path relative to the project
-        if (fs.existsSync(fullPath)) {
-          fs.unlink(fullPath, (err) => {
-            if (err) {
-              console.error(`Failed to delete image file: ${fullPath}`, err);
-            }
-          });
-        } else {
-          console.warn(`File not found: ${fullPath}`);
-        }
-      });
-    }
-    if (discountedPrice !== undefined) {
-      updatedProduct.discountedPrice = discountedPrice;
-    }
+//       // Delete the files from the file system
+//       deletedImagesArray.forEach((imagePath) => {
+//         const fullPath = path.join(__dirname, '..', imagePath); // Resolve path relative to the project
+//         if (fs.existsSync(fullPath)) {
+//           fs.unlink(fullPath, (err) => {
+//             if (err) {
+//               console.error(`Failed to delete image file: ${fullPath}`, err);
+//             }
+//           });
+//         } else {
+//           console.warn(`File not found: ${fullPath}`);
+//         }
+//       });
+//     }
+//     if (discountedPrice !== undefined) {
+//       updatedProduct.discountedPrice = discountedPrice;
+//     }
 
-    await updatedProduct.save();
-    res.status(200).json({ message: 'Product updated successfully', product: updatedProduct });
-  } catch (error) {
-    console.error('Error updating product:', error);
-    res.status(500).json({ message: 'Failed to update product', error: error.message });
-  }
-});
+//     await updatedProduct.save();
+//     res.status(200).json({ message: 'Product updated successfully', product: updatedProduct });
+//   } catch (error) {
+//     console.error('Error updating product:', error);
+//     res.status(500).json({ message: 'Failed to update product', error: error.message });
+//   }
+// });
 
 
 // router.put('/products/:id', uploadProductImages, async (req, res) => {
@@ -1143,16 +1237,16 @@ router.put('/products/:id', uploadProductImages, async (req, res) => {
 //   }
 // });
 
-// Route to fetch all products
-router.get('/all-products', async (req, res) => {
-  try {
-    const products = await Product.find();
-    res.status(200).json({ products }); // Ensure the response contains a `products` key
-  } catch (error) {
-    console.error('Error fetching products:', error);
-    res.status(500).json({ message: 'Failed to fetch products', error: error.message });
-  }
-});
+// // Route to fetch all products
+// router.get('/all-products', async (req, res) => {
+//   try {
+//     const products = await Product.find();
+//     res.status(200).json({ products }); // Ensure the response contains a `products` key
+//   } catch (error) {
+//     console.error('Error fetching products:', error);
+//     res.status(500).json({ message: 'Failed to fetch products', error: error.message });
+//   }
+// });
 
 
 
