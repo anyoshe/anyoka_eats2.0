@@ -69,10 +69,9 @@ const uploadBusinessPermit = multer({
 
 const uploadProductImages = multer({
   storage: createStorage('products', 'product'),
-  limits: { fileSize: 2000000 },
+  limits: { fileSize: 5 * 1024 * 1024, files: 5, fieldSize: 25 * 1024 * 1024 }, // 5MB per file, 5 files, 25MB total
   fileFilter: (req, file, cb) => checkFileType(file, cb),
 }).array('images', 5); // up to 5 images
-
 
 module.exports = {
   upload,
