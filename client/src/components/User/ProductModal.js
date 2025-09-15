@@ -48,30 +48,30 @@ const ProductModal = ({ isOpen, onClose, onSubmit, editingProduct, onProductUpda
         }
     }, [editingProduct]);
 
+    // const handleImageChange = (event) => {
+    //     const files = Array.from(event.target.files);
+    //     setProductImages((prevImages) => [...prevImages, ...files]);
+    // };
     const handleImageChange = (event) => {
         const files = Array.from(event.target.files);
-        setProductImages((prevImages) => [...prevImages, ...files]);
+        setProductImages((prevImages) => {
+            // Only allow up to 5 images
+            const newImages = [...prevImages, ...files].slice(0, 5);
+            return newImages;
+        });
     };
-
     const handleSetPrimaryImage = (image) => {
         setPrimaryImage(image);
     };
 
-    // const handleDeleteImage = (index) => {
-    //     setProductImages((prevImages) => {
-    //         const imageToDelete = prevImages[index];
-    //         if (typeof imageToDelete === 'string') {
-    //             setDeletedImages((prevDeleted) => [...prevDeleted, imageToDelete]);
-    //         }
-    //         return prevImages.filter((_, i) => i !== index);
-    //     });
-    // };
     const handleDeleteImage = (index) => {
         setProductImages((prevImages) => {
             const imageToDelete = prevImages[index];
             if (typeof imageToDelete === 'string') {
                 setDeletedImages((prev) => [...prev, imageToDelete]);
             }
+            // If deleting the primary image, unset primary
+            if (imageToDelete === primaryImage) setPrimaryImage(null);
             return prevImages.filter((_, i) => i !== index);
         });
     };
@@ -79,6 +79,11 @@ const ProductModal = ({ isOpen, onClose, onSubmit, editingProduct, onProductUpda
 
     const handleSubmit = async (event) => {
         event.preventDefault();
+        // Only allow up to 5 images
+        if (productImages.length > 5) {
+            alert('You can only upload up to 5 images.');
+            return;
+        }
 
         const formData = new FormData();
         formData.append('name', productName);
@@ -107,13 +112,13 @@ const ProductModal = ({ isOpen, onClose, onSubmit, editingProduct, onProductUpda
             }
         });
 
-        // if (primaryImage) {
-        //     formData.append('primaryImage', primaryImage);
-        // }
-      // Only send primaryImage if it’s a string path (never a File object)
-if (primaryImage && typeof primaryImage === 'string') {
-    formData.append('primaryImage', primaryImage);
-}
+        // Send the primary image as the filename (string)
+        if (primaryImage && typeof primaryImage === 'string') {
+            formData.append('primaryImage', primaryImage);
+        } else if (primaryImage && typeof primaryImage !== 'string') {
+            // If the primary image is a new file, use its name after upload (backend will resolve)
+            formData.append('primaryImage', primaryImage.name);
+        }
 
 
         if (deletedImages.length > 0) {
@@ -179,13 +184,6 @@ if (primaryImage && typeof primaryImage === 'string') {
                         <div key={index} className={styles.imagePreviewItem}>
                             <img
                                 className={styles.productImagePreview}
-                                // src={
-
-                                //                 typeof image === 'string'
-                                //                   ? `${config.backendUrl}${image.replace('/mnt/shared/Projects/anyoka_eats2.0/online_hotel', '')}`
-                                //                   : URL.createObjectURL(image)
-                                //               }
-
                                 src={
                                     typeof image === 'string'
                                         ? `${config.backendUrl}${image}`
