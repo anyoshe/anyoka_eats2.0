@@ -404,7 +404,7 @@ import styles from './ProductModal.module.css';
 const ProductModal = ({ isOpen, onClose, onSubmit, editingProduct, onProductUpdated }) => {
   const { partner } = useContext(PartnerContext);
   const [primaryImage, setPrimaryImage] = useState(null);
-  const [deletedImages, setDeletedImages] = useState([]); // Track deleted images
+  const [deletedImages, setDeletedImages] = useState([]);
   const [productName, setProductName] = useState('');
   const [productPrice, setProductPrice] = useState('');
   const [productBrand, setProductBrand] = useState('');
@@ -432,19 +432,17 @@ const ProductModal = ({ isOpen, onClose, onSubmit, editingProduct, onProductUpda
       setProductTags(editingProduct.tags?.join(', ') || '');
       setProductDiscountedPrice(editingProduct.discountedPrice || '');
 
-      const formattedImages = editingProduct.images?.map((image) => {
-        if (image.startsWith('/var/data')) {
-          return image.replace('/var/data', '');
-        }
-        return image;
-      }) || [];
-      setProductImages(formattedImages);
+      // Remove duplicates from images and format paths
+      const uniqueImages = [...new Set(editingProduct.images || [])].map((image) =>
+        image.startsWith('/var/data') ? image.replace('/var/data', '') : image
+      );
+      setProductImages(uniqueImages);
 
       let formattedPrimary = editingProduct.primaryImage || null;
       if (formattedPrimary && formattedPrimary.startsWith('/var/data')) {
         formattedPrimary = formattedPrimary.replace('/var/data', '');
       }
-      setPrimaryImage(formattedPrimary);
+      setPrimaryImage(uniqueImages.includes(formattedPrimary) ? formattedPrimary : uniqueImages[0] || null);
     }
   }, [editingProduct]);
 
@@ -458,7 +456,14 @@ const ProductModal = ({ isOpen, onClose, onSubmit, editingProduct, onProductUpda
       return;
     }
 
-    setProductImages((prevImages) => [...prevImages, ...files]);
+    // Prevent duplicate files by checking file names
+    const newFiles = files.filter((file) => !productImages.some((img) => img.name === file.name));
+    if (newFiles.length === 0) {
+      alert('All selected images are already added.');
+      return;
+    }
+
+    setProductImages((prevImages) => [...prevImages, ...newFiles]);
   };
 
   const handleSetPrimaryImage = (image) => {
@@ -473,7 +478,7 @@ const ProductModal = ({ isOpen, onClose, onSubmit, editingProduct, onProductUpda
       }
       const updatedImages = prevImages.filter((_, i) => i !== index);
       if (primaryImage === imageToDelete) {
-        setPrimaryImage(null);
+        setPrimaryImage(updatedImages.length > 0 ? updatedImages[0] : null);
       }
       return updatedImages;
     });
@@ -502,8 +507,8 @@ const ProductModal = ({ isOpen, onClose, onSubmit, editingProduct, onProductUpda
     }
 
     const newFiles = productImages.filter((image) => typeof image !== 'string');
-    newFiles.forEach((file) => {
-      formData.append('images', file);
+    newFiles.forEach((file, index) => {
+      formData.append(`images[${index}]`, file);
     });
 
     if (primaryImage) {
