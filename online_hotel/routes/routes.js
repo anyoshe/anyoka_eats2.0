@@ -1237,16 +1237,16 @@ router.delete('/products/:id', async (req, res) => {
 //   }
 // });
 
-// // Route to fetch all products
-// router.get('/all-products', async (req, res) => {
-//   try {
-//     const products = await Product.find();
-//     res.status(200).json({ products }); // Ensure the response contains a `products` key
-//   } catch (error) {
-//     console.error('Error fetching products:', error);
-//     res.status(500).json({ message: 'Failed to fetch products', error: error.message });
-//   }
-// });
+// Route to fetch all products
+router.get('/all-products', async (req, res) => {
+  try {
+    const products = await Product.find();
+    res.status(200).json({ products }); // Ensure the response contains a `products` key
+  } catch (error) {
+    console.error('Error fetching products:', error);
+    res.status(500).json({ message: 'Failed to fetch products', error: error.message });
+  }
+});
 
 
 
