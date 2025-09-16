@@ -1107,92 +1107,92 @@ router.post('/products/:id/rate', async (req, res) => {
   }
 });
 
-//Handling distance calculations.
-// router.get('/distance', async (req, res) => {
-//   const { origins, destinations } = req.query;
-
-//   try {
-//     const response = await fetch(`https://maps.googleapis.com/maps/api/distancematrix/json?origins=${origins}&destinations=${destinations}&key=${process.env.GOOGLE_API_KEY}`);
-//     const data = await response.json();
-//     res.json(data);
-//   } catch (err) {
-//     console.error('Error fetching from Google:', err);
-//     res.status(500).json({ error: 'Google API fetch failed' });
-//   }
-// });
-
-
-
+// Handling distance calculations.
 router.get('/distance', async (req, res) => {
   const { origins, destinations } = req.query;
-  const orsApiKey = process.env.ORS_API_KEY;
 
   try {
-    const originArr = origins.split('|');
-    const [destLng, destLat] = destinations.split(',').map(Number);
-
-    const snapToRoad = async (lng, lat) => {
-      const nearestUrl = `https://api.openrouteservice.org/v2/snap/driving-car?api_key=${orsApiKey}&point=${lat},${lng}`;
-      const snapRes = await fetch(nearestUrl);
-
-      if (!snapRes.ok) return { lng, lat }; // fallback to original
-      const snapData = await snapRes.json();
-
-      if (snapData?.coordinates) {
-        return {
-          lng: snapData.coordinates[0],
-          lat: snapData.coordinates[1]
-        };
-      }
-      return { lng, lat };
-    };
-
-    const results = await Promise.all(originArr.map(async (origin) => {
-      const [origLng, origLat] = origin.split(',').map(Number);
-
-      // Validate coordinates
-      if (
-        isNaN(origLng) || isNaN(origLat) ||
-        isNaN(destLng) || isNaN(destLat)
-      ) {
-        return { elements: [{ status: 'ERROR', message: 'Invalid coordinates' }] };
-      }
-
-      // Snap both origin & destination to roads
-      const snappedOrigin = await snapToRoad(origLng, origLat);
-      const snappedDest = await snapToRoad(destLng, destLat);
-
-      const url = `https://api.openrouteservice.org/v2/directions/driving-car?api_key=${orsApiKey}&start=${snappedOrigin.lng},${snappedOrigin.lat}&end=${snappedDest.lng},${snappedDest.lat}`;
-      const orsRes = await fetch(url);
-
-      if (!orsRes.ok) {
-        const errorText = await orsRes.text();
-        console.error(`ORS API error (${orsRes.status}):`, errorText);
-        return { elements: [{ status: 'ERROR', message: errorText }] };
-      }
-
-      const orsData = await orsRes.json();
-
-      if (orsData?.features?.[0]) {
-        return {
-          elements: [{
-            status: 'OK',
-            distance: { value: orsData.features[0].properties.summary.distance },
-            duration: { value: orsData.features[0].properties.summary.duration },
-          }]
-        };
-      } else {
-        return { elements: [{ status: 'ZERO_RESULTS' }] };
-      }
-    }));
-
-    res.json({ status: 'OK', rows: results });
-
+    const response = await fetch(`https://maps.googleapis.com/maps/api/distancematrix/json?origins=${origins}&destinations=${destinations}&key=${process.env.GOOGLE_API_KEY}`);
+    const data = await response.json();
+    res.json(data);
   } catch (err) {
-    console.error('ORS error:', err);
-    res.status(500).json({ status: 'ERROR', error: err.message });
+    console.error('Error fetching from Google:', err);
+    res.status(500).json({ error: 'Google API fetch failed' });
   }
 });
+
+
+
+// router.get('/distance', async (req, res) => {
+//   const { origins, destinations } = req.query;
+//   const orsApiKey = process.env.ORS_API_KEY;
+
+//   try {
+//     const originArr = origins.split('|');
+//     const [destLng, destLat] = destinations.split(',').map(Number);
+
+//     const snapToRoad = async (lng, lat) => {
+//       const nearestUrl = `https://api.openrouteservice.org/v2/snap/driving-car?api_key=${orsApiKey}&point=${lat},${lng}`;
+//       const snapRes = await fetch(nearestUrl);
+
+//       if (!snapRes.ok) return { lng, lat }; // fallback to original
+//       const snapData = await snapRes.json();
+
+//       if (snapData?.coordinates) {
+//         return {
+//           lng: snapData.coordinates[0],
+//           lat: snapData.coordinates[1]
+//         };
+//       }
+//       return { lng, lat };
+//     };
+
+//     const results = await Promise.all(originArr.map(async (origin) => {
+//       const [origLng, origLat] = origin.split(',').map(Number);
+
+//       // Validate coordinates
+//       if (
+//         isNaN(origLng) || isNaN(origLat) ||
+//         isNaN(destLng) || isNaN(destLat)
+//       ) {
+//         return { elements: [{ status: 'ERROR', message: 'Invalid coordinates' }] };
+//       }
+
+//       // Snap both origin & destination to roads
+//       const snappedOrigin = await snapToRoad(origLng, origLat);
+//       const snappedDest = await snapToRoad(destLng, destLat);
+
+//       const url = `https://api.openrouteservice.org/v2/directions/driving-car?api_key=${orsApiKey}&start=${snappedOrigin.lng},${snappedOrigin.lat}&end=${snappedDest.lng},${snappedDest.lat}`;
+//       const orsRes = await fetch(url);
+
+//       if (!orsRes.ok) {
+//         const errorText = await orsRes.text();
+//         console.error(`ORS API error (${orsRes.status}):`, errorText);
+//         return { elements: [{ status: 'ERROR', message: errorText }] };
+//       }
+
+//       const orsData = await orsRes.json();
+
+//       if (orsData?.features?.[0]) {
+//         return {
+//           elements: [{
+//             status: 'OK',
+//             distance: { value: orsData.features[0].properties.summary.distance },
+//             duration: { value: orsData.features[0].properties.summary.duration },
+//           }]
+//         };
+//       } else {
+//         return { elements: [{ status: 'ZERO_RESULTS' }] };
+//       }
+//     }));
+
+//     res.json({ status: 'OK', rows: results });
+
+//   } catch (err) {
+//     console.error('ORS error:', err);
+//     res.status(500).json({ status: 'ERROR', error: err.message });
+//   }
+// });
 
 
 // Route: /api/products-by-partner/:partnerId
