@@ -21,6 +21,7 @@ import ProfileSetupPage from './components/Menu/DriverDashboard/ProfileSetupPage
 import DriverDashboard from './components/Menu/DriverDashboard/DriverDashboard';
 import CustomerProfileDisplay from './components/Customer/CustomerProfileDisplay';
 import CustomerDashboard from './components/Customer/CustomerDashboard';
+import PasswordReset from './components/User/PasswordReset';
 
 
 function App() {
@@ -50,6 +51,7 @@ function App() {
                         <Route path="/reset-partner-password" element={<ResetPartnerPassword />} />
                         <Route path="/dashboard" element={<AccountPage />} />
                         <Route path="/customer-dashboard" element={<CustomerDashboard />} />
+                        <Route path="/password-reset" element={<PasswordReset />} />
                         
                         <Route path="/menu" element={
                             <CartProvider>

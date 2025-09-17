@@ -23,6 +23,7 @@ const nodemailer = require('nodemailer');
 const { notifyPartner, notifyDriver } = require('../socketServer');
 const geolib = require('geolib');
 const fetch = require('node-fetch');
+const crypto = require('crypto'); 
 
 
 
@@ -1120,79 +1121,6 @@ router.get('/distance', async (req, res) => {
     res.status(500).json({ error: 'Google API fetch failed' });
   }
 });
-
-
-
-// router.get('/distance', async (req, res) => {
-//   const { origins, destinations } = req.query;
-//   const orsApiKey = process.env.ORS_API_KEY;
-
-//   try {
-//     const originArr = origins.split('|');
-//     const [destLng, destLat] = destinations.split(',').map(Number);
-
-//     const snapToRoad = async (lng, lat) => {
-//       const nearestUrl = `https://api.openrouteservice.org/v2/snap/driving-car?api_key=${orsApiKey}&point=${lat},${lng}`;
-//       const snapRes = await fetch(nearestUrl);
-
-//       if (!snapRes.ok) return { lng, lat }; // fallback to original
-//       const snapData = await snapRes.json();
-
-//       if (snapData?.coordinates) {
-//         return {
-//           lng: snapData.coordinates[0],
-//           lat: snapData.coordinates[1]
-//         };
-//       }
-//       return { lng, lat };
-//     };
-
-//     const results = await Promise.all(originArr.map(async (origin) => {
-//       const [origLng, origLat] = origin.split(',').map(Number);
-
-//       // Validate coordinates
-//       if (
-//         isNaN(origLng) || isNaN(origLat) ||
-//         isNaN(destLng) || isNaN(destLat)
-//       ) {
-//         return { elements: [{ status: 'ERROR', message: 'Invalid coordinates' }] };
-//       }
-
-//       // Snap both origin & destination to roads
-//       const snappedOrigin = await snapToRoad(origLng, origLat);
-//       const snappedDest = await snapToRoad(destLng, destLat);
-
-//       const url = `https://api.openrouteservice.org/v2/directions/driving-car?api_key=${orsApiKey}&start=${snappedOrigin.lng},${snappedOrigin.lat}&end=${snappedDest.lng},${snappedDest.lat}`;
-//       const orsRes = await fetch(url);
-
-//       if (!orsRes.ok) {
-//         const errorText = await orsRes.text();
-//         console.error(`ORS API error (${orsRes.status}):`, errorText);
-//         return { elements: [{ status: 'ERROR', message: errorText }] };
-//       }
-
-//       const orsData = await orsRes.json();
-
-//       if (orsData?.features?.[0]) {
-//         return {
-//           elements: [{
-//             status: 'OK',
-//             distance: { value: orsData.features[0].properties.summary.distance },
-//             duration: { value: orsData.features[0].properties.summary.duration },
-//           }]
-//         };
-//       } else {
-//         return { elements: [{ status: 'ZERO_RESULTS' }] };
-//       }
-//     }));
-
-//     res.json({ status: 'OK', rows: results });
-
-//   } catch (err) {
-//     console.error('ORS error:', err);
-//     res.status(500).json({ status: 'ERROR', error: err.message });
-//   }
-// });
 
 
 // Route: /api/products-by-partner/:partnerId
@@ -2435,16 +2363,162 @@ router.post('/mpesa/status', async (req, res) => {
 
 
 
-//MAILS POST
-
-// Configure your email service
+// Configure nodemailer (commented out for now)
 const transporter = nodemailer.createTransport({
   service: 'gmail',
   auth: {
     user: 'anyokaeats@gmail.com',
-    pass: 'hsvu kcue lejt cmks',
+    pass: 'xxxxxxxxxxxxxxxx', // Replace with valid App Password when ready
   },
 });
+
+// Verify transporter configuration (commented out)
+/*
+transporter.verify((error, success) => {
+  if (error) {
+    console.error('Nodemailer verification error:', error);
+  } else {
+    console.log('Nodemailer is ready to send emails');
+  }
+});
+*/
+
+// Request password reset (send email with reset link, commented out)
+/*
+router.post('/auth/request-reset', async (req, res) => {
+  const { email } = req.body;
+
+  try {
+    if (!email) {
+      return res.status(400).json({ message: 'Email is required' });
+    }
+
+    let account = await User.findOne({ email });
+    let role = 'user';
+
+    if (!account) {
+      account = await Partner.findOne({ email });
+      role = 'partner';
+    }
+
+    if (!account) {
+      return res.status(404).json({ message: 'No account found with this email.' });
+    }
+
+    const resetToken = crypto.randomBytes(32).toString('hex');
+    const resetTokenExpiry = Date.now() + 3600000;
+
+    account.resetToken = resetToken;
+    account.resetTokenExpiry = resetTokenExpiry;
+    await account.save({ validateBeforeSave: false });
+
+    const resetUrl = `${process.env.FRONTEND_URL}/password-reset?token=${resetToken}&email=${email}`;
+    const mailOptions = {
+      from: 'anyokaeats@gmail.com',
+      to: email,
+      subject: 'Password Reset Request',
+      html: `
+        <p>You requested a password reset.</p>
+        <p>Click this <a href="${resetUrl}">link</a> to reset your password.</p>
+        <p>This link will expire in 1 hour.</p>
+      `,
+    };
+
+    console.log('Sending email to:', email);
+    await transporter.sendMail(mailOptions);
+    res.status(200).json({ message: 'Password reset link sent to your email.' });
+  } catch (error) {
+    console.error('Error during password reset request:', error.message, error.stack);
+    res.status(500).json({ message: 'Server error', error: error.message });
+  }
+});
+*/
+
+// Reset password (email-based, commented out)
+/*
+router.post('/auth/reset-password', async (req, res) => {
+  const { token, newPassword } = req.body;
+
+  try {
+    let account = await User.findOne({
+      resetToken: token,
+      resetTokenExpiry: { $gt: Date.now() },
+    });
+
+    let role = 'user';
+    if (!account) {
+      account = await Partner.findOne({
+        resetToken: token,
+        resetTokenExpiry: { $gt: Date.now() },
+      });
+      role = 'partner';
+    }
+
+    if (!account) {
+      return res.status(400).json({ message: 'Invalid or expired reset token.' });
+    }
+
+    const hashedPassword = await bcrypt.hash(newPassword, 10);
+    account.password = hashedPassword;
+    account.resetToken = undefined;
+    account.resetTokenExpiry = undefined;
+    await account.save({ validateBeforeSave: false });
+
+    res.status(200).json({ message: 'Password reset successfully.' });
+  } catch (error) {
+    console.error('Error during password reset:', error.message, error.stack);
+    res.status(500).json({ message: 'Server error', error: error.message });
+  }
+});
+*/
+
+// Immediate password reset (new endpoint)
+router.post('/auth/reset-password-immediate', async (req, res) => {
+  const { email, newPassword } = req.body;
+
+  try {
+    if (!email || !newPassword) {
+      return res.status(400).json({ message: 'Email and new password are required' });
+    }
+
+    // Find user or partner by email
+    let account = await User.findOne({ email });
+    let role = 'user';
+
+    if (!account) {
+      account = await Partner.findOne({ email });
+      role = 'partner';
+    }
+
+    if (!account) {
+      return res.status(404).json({ message: 'No account found with this email.' });
+    }
+
+    // Hash new password
+    const hashedPassword = await bcrypt.hash(newPassword, 10);
+
+    // Update password
+    account.password = hashedPassword;
+    await account.save({ validateBeforeSave: false }); // Bypass validation to avoid idNumber error
+
+    res.status(200).json({ message: 'Password reset successfully.' });
+  } catch (error) {
+    console.error('Error during immediate password reset:', error.message, error.stack);
+    res.status(500).json({ message: 'Server error', error: error.message });
+  }
+});
+
+//MAILS POST
+
+// Configure your email service
+// const transporter = nodemailer.createTransport({
+//   service: 'gmail',
+//   auth: {
+//     user: 'anyokaeats@gmail.com',
+//     pass: 'hsvu kcue lejt cmks',
+//   },
+// });
+
 
 // Route to handle form submission
 router.post('/send-email', (req, res) => {
