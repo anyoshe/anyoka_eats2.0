@@ -755,7 +755,7 @@ const productSchema = new Schema({
   brand: { type: String, required: true }, // Product brand
   tags: [{ type: String, required: false }], // Optional tags for the product
   price: { type: Number, required: true }, // Product price
-  discountedPrice: { type: Number, required: false },
+  discountedPrice: { type: Number, required: false, default: null },
   quantity: { type: Number, required: true },
   unit: { type: String, required: true }, // Unit of measurement (e.g., kg, g, etc.)
   inventory: { type: Number, required: true }, // Inventory count
@@ -878,16 +878,15 @@ router.put('/products/:id', uploadProductImages, async (req, res) => {
     product.tags = req.body.tags ? req.body.tags.split(',').map((tag) => tag.trim()) : product.tags;
     product.price = req.body.price || product.price;
 
-    // ✅ Normalize discountedPrice
-    if (
-      req.body.discountedPrice === '' ||
-      req.body.discountedPrice === '0' ||
-      Number(req.body.discountedPrice) === 0
-    ) {
-      req.body.discountedPrice = null;
-    }
-
-    product.discountedPrice = req.body.discountedPrice || product.discountedPrice;
+  if (
+  req.body.discountedPrice === '' ||
+  req.body.discountedPrice === '0' ||
+  Number(req.body.discountedPrice) === 0
+) {
+  product.discountedPrice = null;
+} else if (req.body.discountedPrice !== undefined) {
+  product.discountedPrice = req.body.discountedPrice;
+}
     product.quantity = req.body.quantity || product.quantity;
     product.unit = req.body.unit || product.unit;
     product.inventory = req.body.inventory || product.inventory;
