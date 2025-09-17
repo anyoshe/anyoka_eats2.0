@@ -97,13 +97,7 @@ const ProductModal = ({ isOpen, onClose, onSubmit, editingProduct, onProductUpda
     formData.append('description', productDescription);
     formData.append('tags', productTags);
     formData.append('inventory', productInventory);
-    // formData.append('discountedPrice', productDiscountedPrice);
-    // ✅ Fix: Treat 0 or empty as null
-  const discounted =
-    productDiscountedPrice === '' || Number(productDiscountedPrice) === 0
-      ? null
-      : productDiscountedPrice;
-  formData.append('discountedPrice', discounted);
+    formData.append('discountedPrice', productDiscountedPrice);
 
     if (partner && partner._id) {
       formData.append('shopId', partner._id);
