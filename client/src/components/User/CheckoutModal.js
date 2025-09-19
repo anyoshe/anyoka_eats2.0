@@ -12,9 +12,10 @@ const CheckoutModal = ({ isOpen, onClose, cart, total }) => {
   const { user, setRedirectPath } = useContext(AuthContext);
   const [savedLocations, setSavedLocations] = useState([]);
   const [isAddingNewLocation, setIsAddingNewLocation] = useState(false);
-  const [deliveryOption, setDeliveryOption] = useState('platform'); // add to state
+  const [deliveryOption, setDeliveryOption] = useState('platform');
   const [isDeliveryFeeReady, setIsDeliveryFeeReady] = useState(false);
   const [isDeliveryCalculating, setIsDeliveryCalculating] = useState(false);
+  const [deliveryFee, setDeliveryFee] = useState(null);
 
   const location = useLocation();
 
@@ -26,9 +27,7 @@ const CheckoutModal = ({ isOpen, onClose, cart, total }) => {
 
   const [mapCenter, setMapCenter] = useState({ lat: -3.2192, lng: 40.1169 });
   const [isEditingLocation, setIsEditingLocation] = useState(false);
-  const [showAuthPrompt, setShowAuthPrompt] = useState(false);
-  const [deliveryFee, setDeliveryFee] = useState(null); // Default
-
+  const [showAuthPrompt, setShowAuthPrompt] = useState(!user);
 
   const handleDeliveryChange = (fee, option, calculating) => {
     setDeliveryFee(fee);
@@ -53,7 +52,7 @@ const CheckoutModal = ({ isOpen, onClose, cart, total }) => {
       }
     };
 
-    if (isOpen) {
+    if (isOpen && user) {
       fetchSavedLocations();
     }
   }, [isOpen, user]);
@@ -78,11 +77,26 @@ const CheckoutModal = ({ isOpen, onClose, cart, total }) => {
     return () => clearTimeout(debounce);
   }, [formState.town]);
 
+  useEffect(() => {
+    if (isOpen && !user) {
+      // Save full URL (path + query string)
+      setRedirectPath(`${location.pathname}${location.search}`);
+      setShowAuthPrompt(true);
+    }
+  }, [isOpen, user, location.pathname, location.search, setRedirectPath]);
+
   if (!isOpen) return null;
 
-  if (!user && !showAuthPrompt) {
-    setRedirectPath(location.pathname);
-    setShowAuthPrompt(true);
+  if (!user) {
+    return (
+      <AuthPromptModal
+        isOpen={showAuthPrompt}
+        onRequestClose={() => {
+          setShowAuthPrompt(false);
+          onClose();
+        }}
+      />
+    );
   }
 
   const handleInputChange = (e) => {
@@ -94,7 +108,6 @@ const CheckoutModal = ({ isOpen, onClose, cart, total }) => {
     setFormState((prev) => ({ ...prev, selectedLocation: location }));
   };
 
-  
   const handleSaveLocation = async () => {
     if (!formState.selectedLocation.trim() || !formState.town.trim()) {
       alert('Please enter both a town and pin your location.');
@@ -119,6 +132,8 @@ const CheckoutModal = ({ isOpen, onClose, cart, total }) => {
       });
 
       if (!response.ok) throw new Error('Failed to save location');
+      const data = await response.json();
+      setSavedLocations([...savedLocations, data.location]);
       alert('Location saved successfully!');
       setIsEditingLocation(false);
     } catch (error) {
@@ -127,157 +142,135 @@ const CheckoutModal = ({ isOpen, onClose, cart, total }) => {
     }
   };
 
-  const handlePayment = (method) => {
-    alert(`Proceeding with ${method} payment...`);
-  };
-
   return (
     <div className={styles.checkoutModalBackdrop}>
       <div className={styles.checkoutModalContent}>
         <h2 className={styles.checkoutModalH2}>Confirm Your Order</h2>
 
-        {user ? (
-          <>
-            <div className={styles.customerDetails}>
-              <p><strong>Name: <br></br> </strong> {user.names}</p>
-              <p><strong>Phone: <br></br> </strong> {user.phoneNumber}</p>
-              <p><strong>Town: <br></br> </strong> {formState.town}</p>
-              <p><strong>Delivery Location: <br></br> </strong> {formState.selectedLocation}</p>
+        <div className={styles.customerDetails}>
+          <p><strong>Name: </strong> {user.names || 'N/A'}</p>
+          <p><strong>Phone: </strong> {user.phoneNumber || 'N/A'}</p>
+          <p><strong>Town: </strong> {formState.town || 'N/A'}</p>
+          <p><strong>Delivery Location: </strong> {formState.selectedLocation || 'None'}</p>
 
-              <button onClick={() => setIsEditingLocation(!isEditingLocation)} className={styles.changeLocationBtn}>
-                {isEditingLocation ? 'Cancel Edit' : 'Change Delivery Location'}
-              </button>
+          <button onClick={() => setIsEditingLocation(!isEditingLocation)} className={styles.changeLocationBtn}>
+            {isEditingLocation ? 'Cancel Edit' : 'Change Delivery Location'}
+          </button>
 
-              {isEditingLocation && (
+          {isEditingLocation && (
+            <>
+              {!isAddingNewLocation ? (
                 <>
-                  {!isAddingNewLocation ? (
+                  {savedLocations.length > 0 ? (
                     <>
-                      {savedLocations.length > 0 ? (
-                        <>
-                          <select
-                            onChange={(e) => {
-                              const selected = JSON.parse(e.target.value);
-                              setFormState({
-                                ...formState,
-                                town: selected.town,
-                                selectedLocation: selected.location,
-                                label: selected.label,
-                              });
-                              setIsEditingLocation(false);
-                            }}
-                            className={styles.locationDropdown}
-                          >
-                            <option>Select a saved location</option>
-                            {savedLocations.map((loc, idx) => (
-                              <option key={idx} value={JSON.stringify(loc)}>
-                                {loc.label} - {loc.town}
-                              </option>
-                            ))}
-                          </select>
-                          <button onClick={() => setIsAddingNewLocation(true)}>
-                            + Add New Location
-                          </button>
-                        </>
-                      ) : (
-                        <>
-                          <p>No saved locations found.</p>
-                          <button onClick={() => setIsAddingNewLocation(true)}>
-                            + Add New Location
-                          </button>
-                        </>
-                      )}
+                      <select
+                        onChange={(e) => {
+                          const selected = JSON.parse(e.target.value);
+                          setFormState({
+                            ...formState,
+                            town: selected.town,
+                            selectedLocation: selected.location,
+                            label: selected.label,
+                          });
+                          setIsEditingLocation(false);
+                        }}
+                        className={styles.locationDropdown}
+                      >
+                        <option value="">Select a saved location</option>
+                        {savedLocations.map((loc, idx) => (
+                          <option key={idx} value={JSON.stringify(loc)}>
+                            {loc.label} - {loc.town}
+                          </option>
+                        ))}
+                      </select>
+                      <button onClick={() => setIsAddingNewLocation(true)}>
+                        + Add New Location
+                      </button>
                     </>
                   ) : (
                     <>
-                      <input
-                        type="text"
-                        name="town"
-                        placeholder="Enter town"
-                        value={formState.town}
-                        onChange={handleInputChange}
-                        className={styles.locationInput}
-                      />
-
-                      <select
-                        name="label"
-                        value={formState.label}
-                        onChange={handleInputChange}
-                        className={styles.labelDropdown}
-                      >
-                        <option value="Home">Home</option>
-                        <option value="Office">Office</option>
-                        <option value="Other">Other</option>
-                      </select>
-
-                      <MapSelector
-                        onLocationSelect={handleLocationSelect}
-                        center={mapCenter}
-                      />
-
-                      <p>Selected Location: {formState.selectedLocation || 'None'}</p>
-
-                      <button onClick={handleSaveLocation}>Save Location</button>
-                      <button onClick={() => setIsAddingNewLocation(false)}>Cancel</button>
+                      <p>No saved locations found.</p>
+                      <button onClick={() => setIsAddingNewLocation(true)}>
+                        + Add New Location
+                      </button>
                     </>
                   )}
                 </>
+              ) : (
+                <>
+                  <input
+                    type="text"
+                    name="town"
+                    placeholder="Enter town"
+                    value={formState.town}
+                    onChange={handleInputChange}
+                    className={styles.locationInput}
+                  />
+
+                  <select
+                    name="label"
+                    value={formState.label}
+                    onChange={handleInputChange}
+                    className={styles.labelDropdown}
+                  >
+                    <option value="Home">Home</option>
+                    <option value="Office">Office</option>
+                    <option value="Other">Other</option>
+                  </select>
+
+                  <MapSelector
+                    onLocationSelect={handleLocationSelect}
+                    center={mapCenter}
+                  />
+
+                  <p>Selected Location: {formState.selectedLocation || 'None'}</p>
+
+                  <button onClick={handleSaveLocation}>Save Location</button>
+                  <button onClick={() => setIsAddingNewLocation(false)}>Cancel</button>
+                </>
               )}
-            </div>
+            </>
+          )}
+        </div>
 
-            <div className={styles.orderSummary}>
-              <h4 className={styles.orderSummaryH4}>Order Details:</h4>
+        <div className={styles.orderSummary}>
+          <h4 className={styles.orderSummaryH4}>Order Details:</h4>
 
-              <div className={styles.orderItemDiv}>
-                {cart.map((item, index) => (
-                  <div key={index} className={styles.orderItem}>
-                    {item.name} x {item.quantity || 1} = KSH {item.price * (item.quantity || 1)}
-                  </div>
-                ))}
+          <div className={styles.orderItemDiv}>
+            {cart.map((item, index) => (
+              <div key={index} className={styles.orderItem}>
+                {item.name} x {item.quantity || 1} = KSH {(item.price * (item.quantity || 1)).toFixed(2)}
               </div>
-              <div className={`${styles.orderItem} ${styles.total}`}>
-                <strong>Total:</strong> KSH {total + deliveryFee}
-              </div>
+            ))}
+          </div>
+          <div className={`${styles.orderItem} ${styles.total}`}>
+            <strong>Total:</strong> KSH {(total + (deliveryFee || 0)).toFixed(2)}
+          </div>
 
-              <DeliveryOptions
-                cart={cart}
-                userLocation={formState.selectedLocation}
-                deliveryTown={formState.town}
-                onDeliveryOptionSelected={(fee, option) => {
-                  setDeliveryFee(fee);
-                  setDeliveryOption(option); 
-                  setIsDeliveryFeeReady(option === 'own' || (option === 'platform' && fee > 0));
-                }}
-              />
-            </div>
-
-            <PaymentMethods
-              cart={cart}
-              total={total}
-              deliveryFee={deliveryFee}
-              deliveryOption={deliveryOption}
-              deliveryTown={formState.town}
-              isDeliveryFeeReady={isDeliveryFeeReady}
-              deliveryLocation={formState.selectedLocation}
-              clearCart={() => { /* clear context cart */ }}
-              onSuccess={() => alert('Order placed!')}
-              onError={msg => alert(`Order error: ${msg}`)}
-            />
-          </>
-        ) : (
-          <AuthPromptModal
-            isOpen={showAuthPrompt}
-            onRequestClose={() => {
-              setShowAuthPrompt(false);
-              onClose();
-            }}
+          <DeliveryOptions
+            cart={cart}
+            userLocation={formState.selectedLocation}
+            deliveryTown={formState.town}
+            onDeliveryOptionSelected={handleDeliveryChange}
           />
-        )}
+        </div>
 
-        {/* <button className={styles.closeBtn} onClick={onClose}>Close</button> */}
+        <PaymentMethods
+          cart={cart}
+          total={total}
+          deliveryFee={deliveryFee}
+          deliveryOption={deliveryOption}
+          deliveryTown={formState.town}
+          isDeliveryFeeReady={isDeliveryFeeReady}
+          deliveryLocation={formState.selectedLocation}
+          clearCart={() => { /* clear context cart */ }}
+          onSuccess={() => alert('Order placed!')}
+          onError={(msg) => alert(`Order error: ${msg}`)}
+        />
+
         <button className={styles.closeBtn} onClick={onClose}>
           &times;
         </button>
-
       </div>
     </div>
   );
