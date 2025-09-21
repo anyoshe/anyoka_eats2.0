@@ -1,0 +1,32 @@
+.appInstall {
+    padding: 0.5rem 1rem;
+    font-size: 1em;
+    border-radius: 60rem;
+    border: none;
+    background-color: var(--green);
+    color: var(--white);
+    cursor: pointer;
+    transition: 0.2s ease-in;
+}
+
+.appInstall:hover {
+    background-color: white;
+    color: var(--orange);
+    outline: 1px solid var(--orange);
+    font-size: 1.1em;
+}
+
+@media (max-width: 426px) {
+    
+    .appInstall{
+        font-size: 0.58em;
+        /* padding: 0.3rem 0.8rem; */
+    }
+}
+
+/* @media (max-width: 320px) {
+    .appInstall{
+        font-size: 0.8rem;
+        padding: 0.3rem 0.8rem; 
+    }
+} */
