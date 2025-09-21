@@ -25,3 +25,6 @@ Thumbs.db
 .vscode/
 .idea/
 *.swp
+
+client/node_modules/
+client/node_modules/.cache/
