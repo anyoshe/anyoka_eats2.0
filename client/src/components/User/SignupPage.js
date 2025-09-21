@@ -121,6 +121,7 @@ const SignupPage = () => {
             name="email"
             value={formData.email}
             onChange={handleInputChange}
+            required
           />
         </div>
 

@@ -1,6 +1,7 @@
 import React, { createContext, useState, useEffect } from 'react';
 import config from '../config';
 import { useNavigate } from 'react-router-dom';
+import axios from 'axios';
 
 export const DriverContext = createContext();
 
@@ -102,6 +103,24 @@ export const DriverProvider = ({ children }) => {
     }
   };
 
+  const requestDriverReset = async (email) => {
+    try {
+      const response = await axios.post(`${config.backendUrl}/api/driver/request-reset`, { email });
+      return { success: true, message: response.data.message };
+    } catch (error) {
+      return { success: false, message: error.response?.data?.message || 'Failed to send reset link' };
+    }
+  };
+
+  const resetDriverPassword = async (token, newPassword) => {
+    try {
+      const response = await axios.post(`${config.backendUrl}/api/driver/reset-password`, { token, newPassword });
+      return { success: true, message: response.data.message };
+    } catch (error) {
+      return { success: false, message: error.response?.data?.message || 'Failed to reset password' };
+    }
+  };
+
   const logoutDriver = () => {
     setDriver(null);
     setToken(null);
@@ -110,7 +129,7 @@ export const DriverProvider = ({ children }) => {
   };
 
   return (
-    <DriverContext.Provider value={{ driver, setDriver, token, fetchDriverProfile, loading, signupDriver, loginDriver, logoutDriver }}>
+    <DriverContext.Provider value={{ driver, setDriver, token, fetchDriverProfile, loading, signupDriver, loginDriver, requestDriverReset, resetDriverPassword, logoutDriver }}>
       {children}
     </DriverContext.Provider>
   );
