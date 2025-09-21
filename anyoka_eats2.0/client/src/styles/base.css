@@ -1,0 +1,59 @@
+/* Minimal reset and base layer wired to tokens. Keep scope global but neutral. */
+
+/* Font import (Winky Sans primary) */
+@import url('https://fonts.googleapis.com/css2?family=Winky+Sans:ital,wght@0,300..900;1,300..900&display=swap');
+
+/* Reset */
+*, *::before, *::after { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+body { margin: 0; font-family: var(--font-sans); color: var(--color-text); background: var(--color-bg); line-height: var(--line-height); }
+img, picture, video, canvas, svg { display: block; max-width: 100%; }
+input, button, textarea, select { font: inherit; }
+
+/* Typography */
+h1 { font-size: var(--font-size-2xl); margin: 0 0 var(--space-4); }
+h2 { font-size: var(--font-size-xl); margin: 0 0 var(--space-3); }
+h3 { font-size: var(--font-size-lg); margin: 0 0 var(--space-3); }
+p  { font-size: var(--font-size-md); margin: 0 0 var(--space-4); color: var(--color-text); }
+small { font-size: var(--font-size-sm); color: var(--color-text-muted); }
+
+/* Links */
+a { color: var(--color-green); text-decoration: none; }
+a:hover { text-decoration: underline; }
+
+/* Buttons (primitive) */
+.btn { display: inline-flex; align-items: center; justify-content: center; gap: var(--space-2); border: 1px solid transparent; border-radius: var(--radius-pill); padding: 0.5rem 1rem; font-weight: 600; cursor: pointer; transition: background var(--duration-base) var(--ease-out), color var(--duration-base) var(--ease-out), transform var(--duration-fast) var(--ease-out), box-shadow var(--duration-fast) var(--ease-out); }
+.btn:active { transform: translateY(1px); }
+.btn--primary { background: var(--color-orange); color: #000; }
+.btn--primary:hover { background: #ffb733; }
+.btn--emphasis { background: var(--color-green); color: var(--color-white); }
+.btn--emphasis:hover { filter: brightness(1.05); }
+.btn--subtle { background: var(--color-gray-100); color: var(--color-gray-800); }
+
+/* Inputs */
+.field { display: grid; gap: var(--space-2); }
+.input { width: 100%; border: 1px solid var(--color-border); border-radius: var(--radius-md); padding: 0.6rem 0.8rem; background: var(--color-white); color: var(--color-text); outline: none; transition: border-color var(--duration-fast) var(--ease-out), box-shadow var(--duration-fast) var(--ease-out); }
+.input:focus { border-color: var(--color-orange); box-shadow: 0 0 0 3px rgba(255,165,0,0.25); }
+.help { color: var(--color-text-muted); font-size: var(--font-size-sm); }
+.error { color: #b00020; font-size: var(--font-size-sm); }
+
+/* Card primitive */
+.card { background: var(--color-white); border: 1px solid var(--color-border); border-radius: var(--radius-lg); box-shadow: var(--shadow-sm); padding: var(--space-4); }
+
+/* Containers */
+.container { width: min(100% - 2rem, var(--container-lg)); margin-inline: auto; }
+
+/* Layout utilities */
+.stack > * + * { margin-top: var(--space-4); }
+.cluster { display: flex; flex-wrap: wrap; gap: var(--space-3); align-items: center; }
+.grid { display: grid; gap: var(--space-4); }
+
+/* Focus visibility */
+:focus-visible { outline: 2px solid var(--color-orange); outline-offset: 2px; }
+
+/* Reduced motion safety */
+@media (prefers-reduced-motion: reduce) {
+  * { animation-duration: 0.001s !important; animation-iteration-count: 1 !important; transition-duration: 0.001s !important; scroll-behavior: auto !important; }
+}
+
+

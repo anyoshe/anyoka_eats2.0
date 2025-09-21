@@ -1,0 +1,678 @@
+/* ------------------------------ Cart Base Styles ------------------------------ */
+
+.cartSection {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  height: 100%;
+  max-height: 100vh;
+  position: relative;
+  background-color: var(--color-white);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-sm);
+}
+
+.deliveryPointDiv {
+  background-color: var(--color-green);
+  color: var(--color-white);
+  padding: 0.7rem 1rem;
+  text-align: center;
+  border-radius: var(--radius-md);
+  font-weight: 500;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  margin-bottom: var(--space-2);
+}
+
+.deliveringP {
+  margin-right: 0.4rem;
+  margin-bottom: 0;
+  font-size: 0.9rem;
+}
+
+.deliveryTruck {
+  margin-right: 0.5rem;
+  color: var(--color-white);
+}
+
+.locationChoice {
+  color: var(--color-white);
+  margin-left: 0.2rem;
+}
+
+.deliveringIcon {
+  transition: 0.2s ease-in;
+  color: var(--color-white);
+}
+
+.deliveringIcon:hover {
+  cursor: pointer;
+  color: var(--color-orange);
+}
+
+.cartListDiv {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  width: 100%;
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  padding: var(--space-1);
+  padding-bottom: var(--space-2);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  margin-bottom: var(--space-2);
+}
+
+.cartItem {
+  display: flex;
+  flex-direction: column;
+  padding: var(--space-1) 0;
+  border-bottom: 1px solid #ddd;
+  width: 100%;
+}
+
+.cartItemTop {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}
+
+.cartItemName,
+.cartItemPrice {
+  font-size: 0.95rem;
+  margin-bottom: 0.2rem;
+}
+
+.cartQuantityControls {
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  gap: var(--space-2);
+  margin: var(--space-1) 0;
+  flex-wrap: wrap;
+}
+
+.quantityBtn {
+  background-color: var(--color-green);
+  border: none;
+  cursor: pointer;
+  border-radius: var(--radius-sm);
+  font-size: 0.8rem;
+  padding: 0.2rem 0.5rem;
+  transition: background-color var(--duration-fast) var(--ease-out), color var(--duration-fast) var(--ease-out);
+
+}
+
+.quantityBtn:hover {
+  background-color: var(--color-white);
+  color: var(--color-orange);
+  outline: 1px solid var(--color-orange);
+}
+
+.removeBtn {
+  background-color: #ffe5e5;
+  color: #f1181b;
+}
+
+.removeBtn:hover {
+  background-color: #ffcccc;
+}
+
+.cartItemQty {
+  font-weight: bold;
+  min-width: 20px;
+  text-align: center;
+}
+
+.cartFooter {
+  position: sticky;
+  bottom: 0;
+  background-color: var(--color-white);
+  border-top: 1px solid var(--color-border);
+  padding: var(--space-2);
+  z-index: 10;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  flex-shrink: 0;
+  border-radius: 0 0 var(--radius-lg) var(--radius-lg);
+}
+
+.cartTotal {
+  display: flex;
+  justify-content: space-between;
+  font-weight: bold;
+  color: var(--color-orange);
+  background-color: var(--color-white);
+  width: 100%;
+}
+
+.totalP,
+.totalfigure {
+  margin-bottom: 0;
+}
+
+.doneButtonDiv {
+  background-color: var(--color-green);
+  color: var(--color-white);
+  text-align: center;
+  padding: 0.7rem;
+  border-radius: var(--radius-md);
+  font-weight: 600;
+  cursor: pointer;
+  transition: background var(--duration-fast) var(--ease-out), color var(--duration-fast) var(--ease-out), transform var(--duration-fast) var(--ease-out);
+  font-size: 0.9rem;
+  border: none;
+  outline: none;
+  width: 100%;
+}
+
+.doneButtonDiv:hover {
+  background-color: var(--color-white);
+  color: var(--color-orange);
+  outline: 1px solid var(--color-orange);
+  box-shadow: var(--shadow-sm);
+}
+
+.doneButtonDiv:active {
+  transform: scale(0.96);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.15);
+}
+
+/* ---------------------------- Media Queries ---------------------------- */
+
+@media (min-width: 2560px) {
+  .cartSection {
+    height: 100vh;
+    max-height: 100vh;
+    /* padding-top: 10rem;  */
+  }
+}
+
+@media (min-width: 1920px) and (max-width: 2559px) {
+  .cartSection {
+    height: 100vh;
+    max-height: 100vh;
+    padding-top: 9.6rem; /* 6.4rem ads + 3.2rem controls */
+  }
+}
+
+@media (min-width: 1440px) and (max-width: 1919px) {
+  .cartSection {
+    height: 100vh;
+    max-height: 100vh;
+  }
+}
+
+@media (max-width: 1440px) {
+  .cartSection {
+    height: 100vh;
+    max-height: 100vh;
+  }
+}
+
+@media (min-width: 1024px) and (max-width: 1440px) {
+  .cartSection {
+    height: 100vh;
+    max-height: 100vh;
+  }
+  
+  .cartListDiv {
+    max-height: calc(100vh - 15rem); /* Account for top padding + header + footer */
+    overflow-y: auto;
+  }
+}
+
+@media (max-width: 1024px) {
+  .cartSection {
+    height: 100vh;
+    max-height: 100vh;
+  }
+  
+  .cartListDiv {
+    max-height: calc(100vh - 15rem);
+    overflow-y: auto;
+  }
+}
+
+@media (max-width: 768px) {
+  .cartSection {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    max-height: 100vh;
+    box-shadow: none;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    background: var(--color-white);
+  }
+
+  .deliveryPointDiv {
+    background: linear-gradient(135deg, var(--color-green), #16a34a);
+    margin: 0;
+    border-radius: 0;
+    padding: 1rem;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+  }
+
+  .cartListDiv {
+    flex: 1;
+    padding: 1rem;
+    margin: 0;
+    border: none;
+    border-radius: 0;
+    background: var(--color-gray-50);
+    overflow-y: auto;
+  }
+
+  .cartFooter {
+    position: sticky;
+    bottom: 0;
+    background: var(--color-white);
+    border-top: 2px solid var(--color-border);
+    padding: 1.5rem;
+    margin: 0;
+    border-radius: 0;
+    box-shadow: 0 -4px 16px rgba(0, 0, 0, 0.1);
+  }
+
+  .cartTotal {
+    position: static;
+    font-size: 1.2rem;
+  }
+
+  .doneButtonDiv {
+    padding: 1rem;
+    font-size: 1.1rem;
+    font-weight: 700;
+    margin-top: 1rem;
+  }
+
+  .cartItem {
+    background: var(--color-white);
+    border-radius: var(--radius-lg);
+    padding: 1rem;
+    margin-bottom: 0.75rem;
+    box-shadow: var(--shadow-sm);
+    border: 1px solid var(--color-border);
+    transition: all var(--duration-fast) var(--ease-out);
+  }
+
+  .cartItem:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-md);
+  }
+
+  .cartItemTop {
+    margin-bottom: 0.75rem;
+  }
+
+  .cartItemName {
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--color-gray-800);
+    margin-bottom: 0.25rem;
+  }
+
+  .cartItemPrice {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--color-green);
+  }
+
+  .cartQuantityControls {
+    justify-content: space-between;
+    align-items: center;
+    margin: 0;
+  }
+
+  .quantityBtn {
+    width: 2.5rem;
+    height: 2.5rem;
+    border-radius: 50%;
+    font-size: 1rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .removeBtn {
+    background: #fee2e2;
+    color: #dc2626;
+  }
+
+  .removeBtn:hover {
+    background: #fecaca;
+    color: #b91c1c;
+  }
+
+  .cartItemQty {
+    font-size: 1.1rem;
+    font-weight: 700;
+    min-width: 2rem;
+    text-align: center;
+    background: var(--color-gray-100);
+    padding: 0.5rem;
+    border-radius: var(--radius-md);
+  }
+
+  .emptyCartState {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 3rem 1rem;
+    text-align: center;
+    color: var(--color-gray-500);
+  }
+
+  .emptyCartIcon {
+    font-size: 4rem;
+    color: var(--color-gray-300);
+    margin-bottom: 1rem;
+  }
+
+  .emptyCartText {
+    font-size: 1.1rem;
+    font-weight: 500;
+    margin-bottom: 0.5rem;
+  }
+
+  .emptyCartSubtext {
+    font-size: 0.9rem;
+    color: var(--color-gray-400);
+  }
+}
+
+@media (max-width: 480px) {
+  /* Additional styles for 480px screens can be added here */
+  
+  .floatingCartIcon {
+    display: flex;
+    position: fixed;
+    top: 5rem;
+    right: 1rem;
+    background-color: var(--green);
+    color: white;
+    border: none;
+    border-radius: 50%;
+    width: 3rem;
+    height: 3rem;
+    font-size: 1.4rem;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+    align-items: center;
+    justify-content: center;
+    z-index: 999;
+  }
+  .mobileCartOverlay {
+    display: block;
+    position: fixed;
+    top: 4.5rem;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: white;
+    z-index: 998;
+    overflow-y: auto;
+    padding: 1rem;
+  }
+  .closeCartBtn {
+    position: absolute;
+    top: 0.6rem;
+    right: 1rem;
+    font-size: 1.4rem;
+    background: none;
+    border: none;
+    color: var(--gray-dark);
+  }
+}
+
+/* Optimized for screens 425px and below */
+@media (max-width: 425px) {
+  .deliveryPointDiv {
+    padding: 0.75rem;
+  }
+
+  .deliveryPointDiv h3 {
+    font-size: 0.9rem;
+  }
+
+  .deliveryPointDiv p {
+    font-size: 0.8rem;
+  }
+
+  .cartListDiv {
+    padding: 0.75rem;
+  }
+
+  .cartItem {
+    padding: 0.75rem;
+    margin-bottom: 0.5rem;
+  }
+
+  .cartItemName {
+    font-size: 0.9rem;
+    margin-bottom: 0.2rem;
+  }
+
+  .cartItemPrice {
+    font-size: 1rem;
+  }
+
+  .cartQuantityControls {
+    gap: 0.5rem;
+  }
+
+  .quantityBtn {
+    width: 2rem;
+    height: 2rem;
+    font-size: 0.9rem;
+  }
+
+  .cartItemQty {
+    font-size: 0.9rem;
+    min-width: 1.5rem;
+    padding: 0.4rem;
+  }
+
+  .cartFooter {
+    padding: 1rem;
+  }
+
+  .cartTotal {
+    font-size: 1.1rem;
+  }
+
+  .doneButtonDiv {
+    padding: 0.8rem;
+    font-size: 1rem;
+    margin-top: 0.75rem;
+  }
+
+  .emptyCartState {
+    padding: 2rem 0.75rem;
+  }
+
+  .emptyCartIcon {
+    font-size: 3rem;
+    margin-bottom: 0.75rem;
+  }
+
+  .emptyCartText {
+    font-size: 1rem;
+    margin-bottom: 0.4rem;
+  }
+
+  .emptyCartSubtext {
+    font-size: 0.85rem;
+  }
+}
+
+@media (max-width: 375px) {
+  .cartItemTop {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .deliveryPointDiv {
+    padding: 0.6rem;
+  }
+
+  .deliveryPointDiv h3 {
+    font-size: 0.85rem;
+  }
+
+  .deliveryPointDiv p {
+    font-size: 0.75rem;
+  }
+
+  .cartListDiv {
+    padding: 0.6rem;
+  }
+
+  .cartItem {
+    padding: 0.6rem;
+    margin-bottom: 0.4rem;
+  }
+
+  .cartItemName {
+    font-size: 0.85rem;
+  }
+
+  .cartItemPrice {
+    font-size: 0.95rem;
+  }
+
+  .quantityBtn {
+    width: 1.8rem;
+    height: 1.8rem;
+    font-size: 0.8rem;
+  }
+
+  .cartItemQty {
+    font-size: 0.85rem;
+    min-width: 1.3rem;
+    padding: 0.3rem;
+  }
+
+  .cartFooter {
+    padding: 0.8rem;
+  }
+
+  .cartTotal {
+    font-size: 1rem;
+  }
+
+  .doneButtonDiv {
+    padding: 0.7rem;
+    font-size: 0.95rem;
+    margin-top: 0.6rem;
+  }
+
+  .emptyCartState {
+    padding: 1.5rem 0.6rem;
+  }
+
+  .emptyCartIcon {
+    font-size: 2.5rem;
+    margin-bottom: 0.6rem;
+  }
+
+  .emptyCartText {
+    font-size: 0.95rem;
+    margin-bottom: 0.3rem;
+  }
+
+  .emptyCartSubtext {
+    font-size: 0.8rem;
+  }
+}
+
+@media (max-width: 320px) {
+  /* .cartSection {
+    padding-top: 8.2rem; 
+  } */
+  
+  .deliveryPointDiv {
+    padding: 0.5rem;
+  }
+
+  .deliveryPointDiv h3 {
+    font-size: 0.8rem;
+  }
+
+  .deliveryPointDiv p {
+    font-size: 0.7rem;
+  }
+
+  .cartListDiv {
+    padding: 0.5rem;
+  }
+
+  .cartItem {
+    padding: 0.5rem;
+    margin-bottom: 0.3rem;
+  }
+
+  .cartItemName {
+    font-size: 0.8rem;
+  }
+
+  .cartItemPrice {
+    font-size: 0.9rem;
+  }
+
+  .quantityBtn {
+    width: 1.6rem;
+    height: 1.6rem;
+    font-size: 0.75rem;
+  }
+
+  .cartItemQty {
+    font-size: 0.8rem;
+    min-width: 1.2rem;
+    padding: 0.25rem;
+  }
+
+  .cartFooter {
+    padding: 0.7rem;
+  }
+
+  .cartTotal {
+    font-size: 0.95rem;
+  }
+
+  .doneButtonDiv {
+    padding: 0.6rem;
+    font-size: 0.9rem;
+    margin-top: 0.5rem;
+  }
+
+  .emptyCartState {
+    padding: 1.2rem 0.5rem;
+  }
+
+  .emptyCartIcon {
+    font-size: 2rem;
+    margin-bottom: 0.5rem;
+  }
+
+  .emptyCartText {
+    font-size: 0.9rem;
+    margin-bottom: 0.25rem;
+  }
+
+  .emptyCartSubtext {
+    font-size: 0.75rem;
+  }
+}

@@ -1,0 +1,129 @@
+.landingBodyContainer {
+	position: relative;
+	width: 90%;
+	margin-bottom: var(--space-8);
+}
+
+.landingWrapper {
+	/* margin-top: 3em; */
+	width: 100%;
+}
+
+.topRestaurantH1 {
+	font-size: var(--font-size-2xl);
+	margin-bottom: var(--space-6);
+	margin-left: var(--space-6);
+}
+
+.storeDivsWrapper {
+	display: grid;
+	grid-template-columns: repeat(auto-fit, minmax(13rem, 1fr));
+	gap: var(--space-4);
+	justify-content: center;
+	content-visibility: auto;
+}
+
+/* New full-card link style */
+.storeCard {
+	width: 100%;
+	background-color: var(--color-white);
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	padding: var(--space-4);
+	border-radius: var(--radius-xl);
+	text-decoration: none;
+	box-shadow: var(--shadow-sm);
+	transition: transform var(--duration-base) var(--ease-out), box-shadow var(--duration-base) var(--ease-out), outline-color var(--duration-fast) var(--ease-out);
+	outline: 2px solid transparent;
+}
+
+.storeCard:hover { transform: translateY(-2px); box-shadow: var(--shadow-md); text-decoration: none; }
+.storeCard:focus { text-decoration: none; }
+.storeCard:focus-visible { outline: 2px solid var(--color-orange); outline-offset: 2px; }
+.storeCard * { text-decoration: none; }
+
+.imageDiv {
+	width: 8rem;
+	height: 8rem;
+	border-radius: 50%;
+	overflow: hidden;
+	margin-bottom: var(--space-4);
+}
+
+.storeImage {
+	width: 100%;
+	height: 100%;
+	object-fit: cover;
+	filter: blur(8px);
+	transform: scale(1.02);
+	transition: filter var(--duration-slow) var(--ease-out), transform var(--duration-slow) var(--ease-out), opacity var(--duration-slow) var(--ease-out);
+	opacity: 0.8;
+}
+
+.isLoaded { filter: blur(0); transform: scale(1); opacity: 1; }
+
+.storeName {
+	font-weight: 600;
+	color: var(--color-green);
+	margin-bottom: var(--space-2);
+	text-align: center;
+	text-decoration: none;
+}
+
+.ratingDiv {
+	display: flex;
+	justify-content: center;
+	margin-top: var(--space-2);
+}
+
+.starIcon {
+	color: var(--color-orange);
+	font-size: 1rem;
+	margin: 0 0.1rem;
+}
+
+/* Skeletons */
+.skeletonCard { width: 100%; background: var(--color-white); border: 1px solid var(--color-border); border-radius: var(--radius-xl); padding: var(--space-4); }
+.skeletonImage { width: 8rem; height: 8rem; border-radius: 50%; background: var(--color-gray-100); margin: 0 auto var(--space-4); }
+.skeletonLine { height: 12px; width: 70%; background: var(--color-gray-100); border-radius: var(--radius-sm); margin: 0.5rem auto; }
+.skeletonLineShort { height: 12px; width: 40%; background: var(--color-gray-100); border-radius: var(--radius-sm); margin: 0.5rem auto; }
+
+/* Empty/error state */
+.emptyState { text-align: center; padding: var(--space-8) 0; color: var(--color-text-muted); }
+
+.landingBodyContainer hr{
+	margin-top: var(--space-8);
+	margin-bottom: 0;
+}
+
+@media (max-width: 1024px) {
+	.landingBodyContainer{
+		margin: 0 var(--space-8);
+	}
+
+	.storeDivsWrapper{
+		grid-template-columns: repeat(auto-fit, minmax(11rem, 1fr));
+		width: 100%;
+		row-gap: var(--space-4);
+		padding-bottom: var(--space-4);
+	}
+	
+	.imageDiv { width: 7rem; height: 7rem; }
+	.topRestaurantH1 { font-size: var(--font-size-xl); margin-left: var(--space-4); }
+}
+
+@media (max-width: 768px) {
+	.storeDivsWrapper{ grid-template-columns: repeat(auto-fit, minmax(10rem, 1fr)); width: 100%; }
+	.imageDiv { width: 6.5rem; height: 6.5rem; }
+	.topRestaurantH1 { font-size: var(--font-size-lg); margin-left: var(--space-4); text-align: center; }
+	.storeDivsWrapper { gap: var(--space-3); }
+}
+
+@media (max-width: 480px) {
+	.imageDiv { width: 6rem; height: 6rem; }
+	.topRestaurantH1 { font-size: var(--font-size-md); margin-left: 0; text-align: center; }
+	.storeDivsWrapper { grid-template-columns: repeat(2,1fr); gap: var(--space-2); }
+	.landingBodyContainer{ margin: 0; }
+}
+  

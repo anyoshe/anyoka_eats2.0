@@ -1,0 +1,172 @@
+.topAdsBar{
+  position: sticky;
+  top: 0;
+  z-index: 30;
+  background: var(--color-white);
+  border-bottom: 1px solid var(--color-border);
+  min-height: var(--adsbar-height, 3.2rem);
+}
+
+.adsContent{
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: calc(var(--space-1) + 2px) var(--space-2) 0 var(--space-2);
+  min-height: var(--adsbar-height, 3.2rem);
+}
+
+.backButton{
+  border: none;
+  outline: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3125rem;
+  background: var(--color-green);
+  color: var(--color-white);
+  font-size: 1rem;
+  cursor: pointer;
+  padding: 0.3rem 0.6rem;
+  border-radius: 0.3125rem;
+  transition: background var(--duration-fast) var(--ease-out);
+}
+
+.backButton:hover{
+  background: var(--color-white);
+  color: var(--color-orange);
+  outline: 1px solid var(--color-orange);
+}
+
+.cartButton{
+  border: none;
+  outline: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--color-orange);
+  color: var(--color-white);
+  font-size: 1rem;
+  cursor: pointer;
+  padding: 0.3rem 0.6rem;
+  border-radius: 0.3125rem;
+  transition: background var(--duration-fast) var(--ease-out);
+  position: relative;
+  min-width: 2.5rem;
+  height: 2.2rem;
+}
+
+.cartButton:hover{
+  background: var(--color-white);
+  color: var(--color-orange);
+  outline: 1px solid var(--color-orange);
+}
+
+.cartBadge {
+  position: absolute;
+  top: -0.5rem;
+  right: -0.5rem;
+  background: var(--color-green);
+  color: var(--color-white);
+  border-radius: 50%;
+  width: 1.2rem;
+  height: 1.2rem;
+  font-size: 0.7rem;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 2px solid var(--color-white);
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.1); }
+  100% { transform: scale(1); }
+}
+
+.marquee{
+  flex: 1;
+  overflow: hidden;
+}
+
+.marqueeTrack{
+  display: inline-flex;
+  gap: var(--space-6);
+  white-space: nowrap;
+  align-items: center;
+  animation: marqueeLeft 18s linear infinite;
+}
+
+.marqueeItem{
+  color: var(--color-orange);
+  font-weight: 600;
+}
+
+@keyframes marqueeLeft{
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+
+/* Hide cart button on all large screens (1024px and above) */
+@media (min-width: 1024px){
+  .cartButton{ 
+    display: none !important; 
+    visibility: hidden !important;
+    opacity: 0 !important;
+  }
+}
+
+/* Responsive adjustments for combined ads + controls bar */
+@media (min-width: 2560px){
+  .topAdsBar{ min-height: 6.6rem; }
+  .adsContent{ min-height: 3.4rem; }
+}
+
+@media (min-width: 1920px){
+  .topAdsBar{ min-height: 6.4rem; }
+  .adsContent{ min-height: 3.2rem; }
+}
+
+@media (min-width: 1440px){
+  .topAdsBar{ min-height: 6.2rem; }
+  .adsContent{ min-height: 3.2rem; }
+}
+
+@media (max-width: 1024px){
+  .topAdsBar{ min-height: 6rem; }
+  .adsContent{ min-height: 3rem; }
+}
+
+/* Show cart button on small screens (768px and below) */
+@media (max-width: 768px){
+  .topAdsBar{ min-height: 5.8rem; }
+  .adsContent{ min-height: 3rem; }
+  .cartButton{ 
+    display: inline-flex !important; 
+    visibility: visible !important;
+    opacity: 1 !important;
+  }
+}
+
+@media (max-width: 480px){
+  .topAdsBar{ min-height: 5.6rem; }
+  .adsContent{ min-height: 3rem; }
+  .cartButton{ 
+    display: inline-flex !important; 
+    visibility: visible !important;
+    opacity: 1 !important;
+  }
+}
+
+@media (max-width: 320px){
+  .topAdsBar{ min-height: 5.4rem; }
+  .adsContent{ min-height: 2.8rem; }
+  .cartButton{ 
+    display: inline-flex !important; 
+    visibility: visible !important;
+    opacity: 1 !important;
+  }
+}
+
+
+

@@ -1,0 +1,104 @@
+:root {
+  --green: #1ea509;
+  --orange: #ffa500;
+  --white: #ffffff;
+}
+
+.orders-container {
+  padding: 20px;
+}
+
+.yourOrderTitle{
+  color: var(--green);
+  text-decoration: underline;
+}
+
+.CSVbuttton{
+  background: var(--orange);
+  color: var(--white);
+  margin-bottom: 0.3rem;
+  padding: 0.5rem 1rem;
+  border: none;
+}
+
+.CSVbuttton:hover{
+  background: var(--white);
+  color: var(--orange);
+  outline: 1px solid var(--orange);
+}
+
+.orders-list{
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+}
+
+.order-card {
+  border: 1px solid #ccc;
+  padding: 15px;
+  margin-bottom: 20px;
+  border-radius: 5px;
+}
+
+.order-card h3 {
+  margin-top: 0;
+}
+
+.order-card p {
+  margin: 5px 0;
+}
+  
+.order-card ul {
+  list-style-type: none;
+  padding-left: 0;
+}
+
+.order-card li {
+  margin: 5px 0;
+}
+  
+@media screen and (max-width: 320px) {
+  .orders-container {
+    padding: 0rem;
+  }
+
+  .order-card{
+    margin-bottom: 0rem;
+    padding: 0.3rem;
+  }
+
+  .orders-list {
+    /* gap: 0.2rem; */
+    grid-template-columns: 1fr;
+  }
+}
+
+/* @media screen and (min-width: 321px) and (max-width: 375px) {
+  .orders-container {
+    padding: 0rem;
+  }
+
+  .orders-list {
+    gap: 0.2rem;
+  }
+
+  .order-card {
+    padding: 0.4rem;
+    margin-bottom: 0.3rem;
+    border-radius: 5px;
+  }
+} */
+
+@media screen and (min-width: 321px) and (max-width: 426px) {
+  .orders-container {
+    padding: 0.5rem;
+  }
+  .orders-list {
+    gap: 0.2rem;
+  }
+  .order-card {
+    padding: 0.4rem;
+    margin-bottom: 0.3rem;
+    border-radius: 5px;
+  }
+}

@@ -1,0 +1,182 @@
+:root {
+  --green: #1ea509;
+  --orange: #ffa500;
+  --white: #ffffff;
+}
+
+.profileSetupContainer {
+  max-width: 60rem;
+  margin: 2rem auto;
+  padding: 2rem;
+  background: var(--white);
+  border-radius: 1rem;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+h2 {
+  text-align: center;
+  color: var(--green);
+  margin-bottom: 1.5rem;
+}
+
+h3 {
+  margin: 1.5rem 0 1rem;
+  color: var(--orange);
+}
+
+.photoSection {
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+.photoPreview,
+.photoPlaceholder {
+  width: 8rem;
+  height: 8rem;
+  border-radius: 50%;
+  object-fit: cover;
+  display: block;
+  margin: 0 auto 1rem;
+  border: 2px solid var(--orange);
+}
+
+.photoPlaceholder {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #f2f2f2;
+  color: #777;
+}
+
+.gridTwo {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+}
+
+input {
+  padding: 0.8rem 1rem;
+  border: 1px solid #ccc;
+  border-radius: 0.5rem;
+  font-size: 1rem;
+  transition: border 0.3s ease;
+  width: 100%;
+}
+
+input:focus {
+  border: 1px solid var(--orange);
+  outline: none;
+}
+
+.selectedLocation {
+  margin-top: 0.5rem;
+  font-size: 0.9rem;
+  color: #555;
+}
+
+/* Floating Map Modal */
+.mapOverlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0,0,0,0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+}
+
+.mapModal {
+  position: relative;
+  width: 90%;
+  max-width: 50rem;
+  height: 70vh;
+  background: var(--white);
+  border-radius: 1rem;
+  overflow: hidden;
+}
+
+.closeMapBtn {
+  position: absolute;
+  top: 0.5rem;
+  right: 0.5rem;
+  background: var(--orange);
+  border: none;
+  border-radius: 50%;
+  width: 2rem;
+  height: 2rem;
+  color: var(--white);
+  font-size: 1.2rem;
+  cursor: pointer;
+  z-index: 10;
+}
+
+.buttonRow {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 2rem;
+  gap: 1rem;
+}
+
+.backButton,
+.submitButton {
+  flex: 1;
+  padding: 0.8rem;
+  border: none;
+  border-radius: 2rem;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+.backButton {
+  background: #eee;
+  color: #333;
+}
+
+.backButton:hover {
+  background: #ddd;
+}
+
+.submitButton {
+  background: var(--green);
+  color: var(--white);
+}
+
+.submitButton:hover {
+  background: var(--orange);
+}
+
+/* Media Queries - 2560px to 320px */
+@media (max-width: 2560px) {
+  .profileSetupContainer { max-width: 70rem; }
+}
+
+@media (max-width: 1920px) {
+  .profileSetupContainer { max-width: 60rem; }
+}
+
+@media (max-width: 1440px) {
+  .profileSetupContainer { max-width: 50rem; }
+}
+
+@media (max-width: 1024px) {
+  .gridTwo { grid-template-columns: 1fr; }
+}
+
+@media (max-width: 768px) {
+  .profileSetupContainer { padding: 1.5rem; }
+  .buttonRow { flex-direction: column; }
+}
+
+@media (max-width: 480px) {
+  .photoPreview, .photoPlaceholder { width: 6rem; height: 6rem; }
+}
+
+@media (max-width: 320px) {
+  .profileSetupContainer { padding: 1rem; }
+  input { font-size: 0.9rem; }
+  h2 { font-size: 1.2rem; }
+}

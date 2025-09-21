@@ -1,0 +1,160 @@
+/* Use global tokens and base layer; avoid redefining globals */
+
+.checkoutModalBackdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+  padding: var(--space-4);
+  box-sizing: border-box;
+  animation: fadeInOverlay var(--duration-base) var(--ease-out);
+}
+
+.checkoutModalContent {
+  background: var(--color-white);
+  border-radius: var(--radius-lg);
+  width: 100%;
+  max-width: 58rem;
+  max-height: 90vh;
+  overflow-y: auto;
+  padding: var(--space-3) var(--space-8);
+  box-shadow: var(--shadow-lg);
+  position: relative;
+  animation: slideUpModal var(--duration-base) var(--ease-out);
+  z-index: 2500;
+}
+
+.checkoutModalH2{
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: var(--color-green);
+  margin-bottom: var(--space-4);
+  /* text-align: center; */
+  text-decoration: underline;
+}
+
+.customerDetails,
+.orderSummary,
+.paymentOptions {
+  margin-bottom: var(--space-4);
+  z-index: 1000;
+}
+
+.orderSummaryH4{
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: var(--color-green);
+  margin-bottom: var(--space-3);
+  text-decoration: underline;
+}
+
+.customerDetails{
+  /* border: 2px solid red; */
+
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+}
+
+.orderItem {
+  margin: var(--space-2) 0;
+  font-size: 0.95rem;
+}
+
+.orderItemDiv{
+  /* border: 2px solid red; */
+
+  display: grid;
+  grid-template-columns: repeat(2,1fr);
+  gap: var(--space-2);
+}
+
+.orderItem.total {
+  font-weight: bold;
+  font-size: 1.1rem;
+  color: var(--color-orange);
+}
+
+.closeBtn {
+  background-color: var(--color-green);
+  color: var(--color-white);
+  padding: 0rem 0.5rem;
+  border-radius: var(--radius-md);
+  border: none;
+  cursor: pointer;
+  transition: background-color var(--duration-fast) var(--ease-out), color var(--duration-fast) var(--ease-out);
+  z-index: 1000;
+  position: absolute;
+  align-items: center;
+  justify-content: center;
+  top: 1rem;
+  right: 1rem;
+  font-size: 1.7rem;
+  font-weight: bold;
+}
+
+.closeBtn:hover {
+  background-color: var(--color-white);
+  color: var(--color-orange);
+  outline: 1px solid var(--color-orange);
+}
+
+.changeLocationBtn,
+.labelDropdown,
+.locationInput,
+.locationDropdown {
+  margin: var(--space-2) 0;
+  padding: var(--space-2);
+  border-radius: var(--radius-sm);
+  border: 1px solid #ccc;
+  width: 100%;
+  font-size: 0.95rem;
+  cursor: pointer;
+}
+
+.changeLocationBtn {
+  background-color: var(--color-green);
+  color: white;
+  border: none;
+  grid-column: 1 / span 2;
+  border: none;
+  outline: none;
+  transition: background var(--duration-fast) var(--ease-out), color var(--duration-fast) var(--ease-out);
+}
+
+.changeLocationBtn:hover {
+  background-color: var(--color-white);
+  color: var(--color-orange);
+  outline: 1px solid var(--color-orange);
+}
+
+.locationInput {
+  border: 1px solid #ccc;
+}
+
+.labelDropdown,
+.locationDropdown {
+  background-color: var(--color-gray-50);
+}
+
+/* Animations */
+@keyframes fadeInOverlay {
+  0% { opacity: 0; }
+  100% { opacity: 1; }
+}
+
+@keyframes slideUpModal {
+  0% {
+    transform: translateY(40px);
+    opacity: 0;
+  }
+  100% {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
