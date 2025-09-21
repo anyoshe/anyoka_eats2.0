@@ -1,12 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useNavigate, useLocation } from 'react-router-dom';
-import config from '../../config';
-import styles from './Login.module.css';
+import config from '../../../config';
+import styles from './DriverSignup.module.css'; // Reuse styles from DriverSignup
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCaretDown } from '@fortawesome/free-solid-svg-icons';
 
-const PasswordReset = () => {
+const DriverPasswordReset = () => {
   const [email, setEmail] = useState('');
   const [newPassword, setNewPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
@@ -17,7 +17,6 @@ const PasswordReset = () => {
   const [isLinkSent, setIsLinkSent] = useState(false);
   const navigate = useNavigate();
   const location = useLocation();
-  const [accountType, setAccountType] = useState('user');
 
   // Map email domains to login URLs
   const emailProviders = {
@@ -26,46 +25,42 @@ const PasswordReset = () => {
     'outlook.com': 'https://outlook.live.com',
     'hotmail.com': 'https://outlook.live.com',
     'aol.com': 'https://mail.aol.com',
-    // Add more providers as needed
   };
 
-  // Get email provider login URL
   const getEmailProviderUrl = (email) => {
     const domain = email.split('@')[1]?.toLowerCase();
     return emailProviders[domain] || null;
   };
 
-  // Extract token and email from URL query parameters
+  // Extract token + email from query string
   useEffect(() => {
     const params = new URLSearchParams(location.search);
     const urlToken = params.get('token');
     const urlEmail = params.get('email');
-    const urlAccountType = params.get('accountType');
     if (urlToken && urlEmail) {
       setToken(urlToken);
       setEmail(urlEmail);
-      setAccountType(urlAccountType || 'user');
       setIsResetRequest(false);
       setIsLinkSent(false);
     }
   }, [location.search]);
 
-  // Handle password reset request (send email with reset link)
+  // Send reset link
   const handleRequestReset = async (e) => {
     e.preventDefault();
     setError('');
     setMessage('');
 
     try {
-      const res = await axios.post(`${config.backendUrl}/api/auth/request-reset`, { email, accountType });
+      const res = await axios.post(`${config.backendUrl}/api/driver/request-reset`, { email });
       setMessage(res.data.message);
-      setIsLinkSent(true); // Show confirmation message instead of reset form
+      setIsLinkSent(true); // Show "Check your email"
     } catch (err) {
       setError(err.response?.data?.message || 'Failed to send reset link. Please try again.');
     }
   };
 
-  // Handle email-based password reset
+  // Reset password with token
   const handleResetPassword = async (e) => {
     e.preventDefault();
     setError('');
@@ -82,72 +77,66 @@ const PasswordReset = () => {
     }
 
     try {
-      const res = await axios.post(`${config.backendUrl}/api/auth/reset-password`, {
+      const res = await axios.post(`${config.backendUrl}/api/driver/reset-password`, {
         token,
         email,
         newPassword,
-        accountType,
       });
       setMessage(res.data.message);
-      setTimeout(() => navigate('/sign-in'), 2000);
+      setTimeout(() => navigate('/driver-signup'), 2000);
     } catch (err) {
       setError(err.response?.data?.message || 'Failed to reset password. Please try again.');
     }
   };
 
-  // Handle "Check Your Email" button click
+  // Open email provider site
   const handleCheckEmail = () => {
     const providerUrl = getEmailProviderUrl(email);
     if (providerUrl) {
       window.open(providerUrl, '_blank');
     } else {
-      // Fallback: Open default mail client or prompt user
       window.location.href = 'mailto:';
     }
   };
 
   return (
-    <div className='loginBackDiv'>
-      <div className={styles.backButton} onClick={() => navigate('/sign-in')}>
-        <FontAwesomeIcon icon={faCaretDown} rotation={90} /> Back to Login
+    <div className={styles.signupContainer}>
+      <div className={styles.backButton} onClick={() => navigate('/driver-signup')}>
+        <FontAwesomeIcon icon={faCaretDown} rotation={90} /> Back
       </div>
 
       {isLinkSent ? (
-        <div className={styles.form}>
-          <h2>Reset Password</h2>
-          {message && <p className={styles.message}>{message}</p>}
+        <div className={styles.signupForm}>
+          <h2 className={styles.signupTitle}>Reset Password</h2>
+          {message && <p className={styles.successMessage}>{message}</p>}
           <p>A link has been sent to your email for password reset.</p>
-          <button onClick={handleCheckEmail}>Check Your Email</button>
+          <button onClick={handleCheckEmail} className={styles.submitButton}>
+            Check Your Email
+          </button>
         </div>
       ) : (
-        <form className={styles.form} onSubmit={isResetRequest ? handleRequestReset : handleResetPassword}>
-          <h2>Reset Password</h2>
+        <form
+          className={styles.signupForm}
+          onSubmit={isResetRequest ? handleRequestReset : handleResetPassword}
+        >
+          <h2 className={styles.signupTitle}>Reset Password</h2>
 
-          {error && <p className={styles.error}>{error}</p>}
-          {message && <p className={styles.message}>{message}</p>}
+          {error && <p className={styles.errorMessage}>{error}</p>}
+          {message && <p className={styles.successMessage}>{message}</p>}
 
           {isResetRequest ? (
-            <>
-              <div className={styles.field}>
-                <label>Account Type:</label>
-                <select value={accountType} onChange={e => setAccountType(e.target.value)}>
-                  <option value="user">User</option>
-                  <option value="partner">Partner</option>
-                </select>
-              </div>
-              <div className={styles.field}>
-                <label>Email:</label>
-                <input
-                  type="email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  required
-                />
-              </div>
-            </>
+            <div className={styles.formGroup}>
+              <label>Email:</label>
+              <input
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                required
+              />
+            </div>
           ) : (
             <>
-              <div className={styles.field}>
+              <div className={styles.formGroup}>
                 <label>Email:</label>
                 <input
                   type="email"
@@ -156,7 +145,7 @@ const PasswordReset = () => {
                   required
                 />
               </div>
-              <div className={styles.field}>
+              <div className={styles.formGroup}>
                 <label>Reset Token:</label>
                 <input
                   type="text"
@@ -165,7 +154,7 @@ const PasswordReset = () => {
                   required
                 />
               </div>
-              <div className={styles.field}>
+              <div className={styles.formGroup}>
                 <label>New Password:</label>
                 <input
                   type="password"
@@ -174,7 +163,7 @@ const PasswordReset = () => {
                   required
                 />
               </div>
-              <div className={styles.field}>
+              <div className={styles.formGroup}>
                 <label>Confirm New Password:</label>
                 <input
                   type="password"
@@ -186,12 +175,14 @@ const PasswordReset = () => {
             </>
           )}
 
-          <button type="submit">{isResetRequest ? 'Send Reset Link' : 'Reset Password'}</button>
+          <button type="submit" className={styles.submitButton}>
+            {isResetRequest ? 'Send Reset Link' : 'Reset Password'}
+          </button>
 
           {isResetRequest && (
             <p>
               <span
-                className={styles.forgotPasswordLink}
+                className={styles.toggleButton}
                 onClick={() => setIsResetRequest(false)}
               >
                 Already have a reset token? Enter it here
@@ -204,4 +195,4 @@ const PasswordReset = () => {
   );
 };
 
-export default PasswordReset;
+export default DriverPasswordReset;

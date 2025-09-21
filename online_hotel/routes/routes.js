@@ -12,7 +12,7 @@ const passport = require('passport');
 const jwt = require('jsonwebtoken');
 const LocalStrategy = require('passport-local').Strategy;
 const session = require('express-session');
-const { upload, uploadMultiple, uploadFiles, uploadProfileImage, uploadBusinessPermit, uploadProductImages } = require('../config/multer');
+const { upload, uploadMultiple, uploadFiles, uploadProfileImage, uploadBusinessPermit, uploadProductImages, uploadSignupFiles } = require('../config/multer');
 const multer = require('multer');
 const path = require('path');
 const fs = require('fs');
@@ -85,10 +85,12 @@ const partnerSchema = new mongoose.Schema({
   businessName: { type: String, required: true, unique: true },
   businessType: { type: String, required: true },
   contactNumber: { type: String, required: true, unique: true },
-  email: { type: String, required: false, unique: true },
-  town: { type: String, required: false },
-  location: { type: String, required: false },
+  email: { type: String, required: true, unique: true },
+  town: { type: String, required: true },
+  location: { type: String, required: true },
   password: { type: String, required: true },
+  resetToken: { type: String },
+  resetTokenExpiry: { type: Number },
   profileImage: { type: String, required: false },
   idNumber: { type: String, required: true, unique: true },
   businessPermit: { type: String, required: false },
@@ -121,8 +123,10 @@ router.get('/partner', authenticateToken, async (req, res) => {
   }
 });
 
-// Partner Sign up  route
-router.post('/signup', uploadBusinessPermit, async (req, res) => {
+
+
+// Partner Sign up route
+router.post('/signup', uploadSignupFiles, async (req, res) => {
   try {
     const {
       businessName,
@@ -132,16 +136,14 @@ router.post('/signup', uploadBusinessPermit, async (req, res) => {
       email,
       town,
       location,
-      password
+      password,
+      role,
     } = req.body;
 
-    console.log('Received:', req.body);
+    console.log('Received:', req.body, 'Files:', req.files);
 
     const existingPartner = await Partner.findOne({
-      $or: [
-        { businessName },
-        { contactNumber }
-      ]
+      $or: [{ businessName }, { contactNumber }],
     });
 
     if (existingPartner) {
@@ -149,7 +151,7 @@ router.post('/signup', uploadBusinessPermit, async (req, res) => {
     }
 
     const hashedPassword = await bcrypt.hash(password, 10);
-    const role = (email === 'anyokaeats@gmail.com') ? 'admin' : 'partner';
+    const effectiveRole = email === 'anyokaeats@gmail.com' ? 'admin' : role || 'partner';
 
     const newPartnerData = {
       businessName,
@@ -160,21 +162,21 @@ router.post('/signup', uploadBusinessPermit, async (req, res) => {
       town,
       location,
       password: hashedPassword,
-      role
+      role: effectiveRole,
     };
 
-
-
-    // Check if business permit is uploaded
-    if (req.file && req.file.fieldname === 'businessPermit') {
-      newPartnerData.businessPermit = `/uploads/business-permits/${req.file.filename}`;
+    // Add file paths if uploaded
+    if (req.files && req.files.businessPermit) {
+      newPartnerData.businessPermit = `/uploads/business-permits/${req.files.businessPermit[0].filename}`;
+    }
+    if (req.files && req.files.profileImage) {
+      newPartnerData.profileImage = `/uploads/profile-images/${req.files.profileImage[0].filename}`;
     }
 
     const newPartner = new Partner(newPartnerData);
     await newPartner.save();
 
-
-    // Generate JWT token after partner is created
+    // Generate JWT token
     const token = jwt.sign(
       { _id: newPartner._id, role: newPartner.role },
       process.env.JWT_SECRET,
@@ -182,16 +184,15 @@ router.post('/signup', uploadBusinessPermit, async (req, res) => {
     );
 
     res.status(201).json({
+      message: 'Sign-up successful',
       token,
-      partner: newPartner
+      partner: newPartner,
     });
-
   } catch (error) {
     console.error('Sign-up failed:', error);
-    res.status(500).json({ message: 'Server error during sign-up.' });
+    res.status(500).json({ message: error.message || 'Server error during sign-up.' });
   }
 });
-
 
 
 // Retrieve Partner Route
@@ -287,7 +288,39 @@ router.post('/upload-profile-image', (req, res) => {
   });
 });
 
+// Update/Add Business permit
+router.post('/upload-business-permit', (req, res) => {
+  uploadBusinessPermit(req, res, async (err) => {
+    if (err) {
+      return res.status(400).json({ message: err.message });
+    }
 
+    try {
+      const { partnerId } = req.body;
+      if (!partnerId || !req.file) {
+        return res.status(400).json({ message: 'Partner ID and file are required' });
+      }
+
+      const updatedPartner = await Partner.findByIdAndUpdate(
+        partnerId,
+        { businessPermit: `/uploads/business-permits/${req.file.filename}` },
+        { new: true }
+      );
+
+      if (!updatedPartner) {
+        return res.status(404).json({ message: 'Partner not found' });
+      }
+
+      res.status(200).json({
+        message: 'Business permit uploaded and profile updated successfully',
+        businessPermit: `/uploads/business-permits/${req.file.filename}`,
+      });
+    } catch (error) {
+      console.error('Error uploading business permit:', error);
+      res.status(500).json({ message: 'Server error', error: error.message });
+    }
+  });
+});
 
 
 // Route to fetch all partners
@@ -409,7 +442,7 @@ router.post('/partners/:id/rate', async (req, res) => {
 const userSchema = new mongoose.Schema({
   username: { type: String, required: true, unique: true },
   names: { type: String, required: true },
-  email: { type: String, required: false, unique: true },
+  email: { type: String, required: true, unique: true },
   phoneNumber: { type: String, required: true, unique: true },
   town: { type: String, required: true },
   location: { type: String, required: true },
@@ -418,7 +451,9 @@ const userSchema = new mongoose.Schema({
     town: { type: String },
     location: { type: String },
   }],
-  password: { type: String, required: true }
+  password: { type: String, required: true },
+  resetToken: { type: String },
+  resetTokenExpiry: { type: Number },
 });
 
 const User = mongoose.model('User', userSchema);
@@ -1640,9 +1675,10 @@ router.delete('/partner-notifications/:id', async (req, res) => {
 const DriverSchema = new mongoose.Schema({
   username: { type: String, required: true, unique: true },
   phoneNumber: { type: String, required: true, unique: true },
-  email: { type: String, unique: true },
+  email: { type: String, required: true, unique: true },
   password: { type: String, required: true },
-
+  resetToken: { type: String },
+  resetTokenExpiry: { type: Number },
   nationalId: { type: String, required: true, unique: true },
   driverLicenseNumber: { type: String, required: true, unique: true },
   profilePhotoUrl: { type: String },
@@ -1802,6 +1838,7 @@ router.post('/driver/login', async (req, res) => {
     res.status(500).json({ message: 'Server error, please try again later' });
   }
 });
+
 
 // get driver details
 router.get('/driver/profile', authenticateToken, async (req, res) => {
@@ -2371,18 +2408,16 @@ router.post('/mpesa/status', async (req, res) => {
 
 
 
-
-// Configure nodemailer (commented out for now)
+// Configure nodemailer
 const transporter = nodemailer.createTransport({
   service: 'gmail',
   auth: {
-    user: 'anyokaeats@gmail.com',
-    pass: 'xxxxxxxxxxxxxxxx', // Replace with valid App Password when ready
+    user: process.env.GMAIL_USER,
+    pass: process.env.GMAIL_APP_PASSWORD,
   },
 });
 
-// Verify transporter configuration (commented out)
-/*
+// Verify transporter configuration
 transporter.verify((error, success) => {
   if (error) {
     console.error('Nodemailer verification error:', error);
@@ -2390,24 +2425,22 @@ transporter.verify((error, success) => {
     console.log('Nodemailer is ready to send emails');
   }
 });
-*/
 
-// Request password reset (send email with reset link, commented out)
-/*
+// Request password reset (send email with reset link)
 router.post('/auth/request-reset', async (req, res) => {
-  const { email } = req.body;
+  const { email, accountType } = req.body;
 
   try {
     if (!email) {
       return res.status(400).json({ message: 'Email is required' });
     }
+    let account;
+    let role = accountType || 'user';
 
-    let account = await User.findOne({ email });
-    let role = 'user';
-
-    if (!account) {
+    if (role === 'partner') {
       account = await Partner.findOne({ email });
-      role = 'partner';
+    } else {
+      account = await User.findOne({ email });
     }
 
     if (!account) {
@@ -2421,7 +2454,7 @@ router.post('/auth/request-reset', async (req, res) => {
     account.resetTokenExpiry = resetTokenExpiry;
     await account.save({ validateBeforeSave: false });
 
-    const resetUrl = `${process.env.FRONTEND_URL}/password-reset?token=${resetToken}&email=${email}`;
+    const resetUrl = `${process.env.FRONTEND_URL}/password-reset?token=${resetToken}&email=${email}&accountType=${role}`;
     const mailOptions = {
       from: 'anyokaeats@gmail.com',
       to: email,
@@ -2441,30 +2474,35 @@ router.post('/auth/request-reset', async (req, res) => {
     res.status(500).json({ message: 'Server error', error: error.message });
   }
 });
-*/
 
-// Reset password (email-based, commented out)
-/*
+// Reset password (email-based)
 router.post('/auth/reset-password', async (req, res) => {
-  const { token, newPassword } = req.body;
+  const { token, email, newPassword, accountType } = req.body;
 
   try {
-    let account = await User.findOne({
-      resetToken: token,
-      resetTokenExpiry: { $gt: Date.now() },
-    });
+    if (!token || !email || !newPassword) {
+      return res.status(400).json({ message: 'Token, email, and new password are required.' });
+    }
 
-    let role = 'user';
-    if (!account) {
+    let account;
+    let role = accountType || 'user';
+
+    if (role === 'partner') {
       account = await Partner.findOne({
+        email,
         resetToken: token,
         resetTokenExpiry: { $gt: Date.now() },
       });
-      role = 'partner';
+    } else {
+      account = await User.findOne({
+        email,
+        resetToken: token,
+        resetTokenExpiry: { $gt: Date.now() },
+      });
     }
 
     if (!account) {
-      return res.status(400).json({ message: 'Invalid or expired reset token.' });
+      return res.status(400).json({ message: 'Invalid or expired reset token, or email does not match.' });
     }
 
     const hashedPassword = await bcrypt.hash(newPassword, 10);
@@ -2479,55 +2517,87 @@ router.post('/auth/reset-password', async (req, res) => {
     res.status(500).json({ message: 'Server error', error: error.message });
   }
 });
-*/
 
-// Immediate password reset (new endpoint)
-router.post('/auth/reset-password-immediate', async (req, res) => {
-  const { email, newPassword } = req.body;
+
+
+
+// Request driver password reset (send email with reset link)
+router.post('/driver/request-reset', async (req, res) => {
+  const { email } = req.body;
 
   try {
-    if (!email || !newPassword) {
-      return res.status(400).json({ message: 'Email and new password are required' });
+    if (!email) {
+      return res.status(400).json({ message: 'Email is required' });
     }
 
-    // Find user or partner by email
-    let account = await User.findOne({ email });
-    let role = 'user';
-
-    if (!account) {
-      account = await Partner.findOne({ email });
-      role = 'partner';
+    const driver = await Driver.findOne({ email });
+    if (!driver) {
+      return res.status(404).json({ message: 'No driver found with this email.' });
     }
 
-    if (!account) {
-      return res.status(404).json({ message: 'No account found with this email.' });
+    const resetToken = crypto.randomBytes(32).toString('hex');
+    const resetTokenExpiry = Date.now() + 3600000; // 1 hour
+
+    driver.resetToken = resetToken;
+    driver.resetTokenExpiry = resetTokenExpiry;
+    await driver.save({ validateBeforeSave: false });
+
+    // frontend reset page with query params for auto-fill
+    const resetUrl = `${process.env.FRONTEND_URL}/driver/reset-password?token=${resetToken}&email=${email}`;
+    const mailOptions = {
+      from: 'anyokaeats@gmail.com',
+      to: email,
+      subject: 'Driver Password Reset Request',
+      html: `
+        <p>You requested a password reset.</p>
+        <p>Click this <a href="${resetUrl}">link</a> to reset your password.</p>
+        <p>This link will expire in 1 hour.</p>
+      `,
+    };
+
+    console.log('Sending reset email to driver:', email);
+    await transporter.sendMail(mailOptions);
+
+    res.status(200).json({ message: 'Password reset link sent to your email.' });
+  } catch (error) {
+    console.error('Error during driver password reset request:', error.message, error.stack);
+    res.status(500).json({ message: 'Server error', error: error.message });
+  }
+});
+
+// Reset password (email-based)
+router.post('/driver/reset-password', async (req, res) => {
+  const { token, email, newPassword } = req.body;
+
+  try {
+    if (!token || !email || !newPassword) {
+      return res.status(400).json({ message: 'Token, email, and new password are required.' });
     }
 
-    // Hash new password
+    const driver = await Driver.findOne({
+      email,
+      resetToken: token,
+      resetTokenExpiry: { $gt: Date.now() },
+    });
+
+    if (!driver) {
+      return res.status(400).json({ message: 'Invalid or expired reset token, or email does not match.' });
+    }
+
     const hashedPassword = await bcrypt.hash(newPassword, 10);
-
-    // Update password
-    account.password = hashedPassword;
-    await account.save({ validateBeforeSave: false }); // Bypass validation to avoid idNumber error
+    driver.password = hashedPassword;
+    driver.resetToken = undefined;
+    driver.resetTokenExpiry = undefined;
+    await driver.save({ validateBeforeSave: false });
 
     res.status(200).json({ message: 'Password reset successfully.' });
   } catch (error) {
-    console.error('Error during immediate password reset:', error.message, error.stack);
+    console.error('Error during driver password reset:', error.message, error.stack);
     res.status(500).json({ message: 'Server error', error: error.message });
   }
 });
 
 //MAILS POST
-
-// Configure your email service
-// const transporter = nodemailer.createTransport({
-//   service: 'gmail',
-//   auth: {
-//     user: 'anyokaeats@gmail.com',
-//     pass: 'hsvu kcue lejt cmks',
-//   },
-// });
-
 
 // Route to handle form submission
 router.post('/send-email', (req, res) => {
@@ -2553,151 +2623,7 @@ router.post('/send-email', (req, res) => {
   });
 });
 
-// DRIVER FORGOT PASSWORD ROUTES
 
-router.post('/driverForgotPassword', async (req, res) => {
-  const { email, idNumber } = req.body; // Assuming you send both email and IDNumber from the frontend
-  console.log(email, idNumber); // For debugging
-
-  try {
-    // Find driver by IDNumber
-    const driver = await Driver.findOne({ IDNumber: idNumber }); // Find driver by both email and IDNumber
-    if (!driver) {
-      return res.status(404).json({ message: 'Driver with this email and IDNumber does not exist.' });
-    }
-    console.log(driver)
-    console.log(driver._id)
-    // Generate a reset token with driver ID
-    const resetToken = jwt.sign({ driverId: driver._id, idNumber: driver.IDNumber }, RESET_PASSWORD_SECRET, { expiresIn: RESET_PASSWORD_EXPIRY });
-
-    // Construct the reset link
-    const resetLink = `${process.env.FRONTEND_URL}/reset-password?token=${resetToken}`; // Ensure using backticks for string interpolation
-
-    // Send email
-    await transporter.sendMail({
-      from: process.env.EMAIL_USER,
-      to: email,
-      subject: 'Password Reset Request',
-      html: `<p>Click the link below to reset your password:</p><a href="${resetLink}">Reset Password</a>`, // Use backticks for HTML template
-    });
-
-    res.json({ message: 'Password reset email sent. Please check your inbox.' });
-  } catch (error) {
-    console.error('Error sending password reset email:', error);
-    res.status(500).json({ message: 'Error sending password reset email. Please try again.' });
-  }
-});
-
-
-// Password reset route
-router.post('/reset-password', async (req, res) => {
-  const { token, newPassword, idNumber } = req.body;
-  console.log(req.body);
-
-  try {
-    // Verify the token
-    const decoded = jwt.verify(token, RESET_PASSWORD_SECRET);
-    const driverId = decoded.driverId;
-    console.log("Decoded Driver ID:", driverId);
-
-    // Find driver by ID and verify ID number
-    const driver = await Driver.findById(driverId);
-    if (!driver || driver.IDNumber !== Number(idNumber)) {
-      return res.status(403).json({ message: 'Invalid ID number. Please try again.' });
-    }
-
-    // Hash the new password outside of the pre-save hook
-    const salt = await bcrypt.genSalt(10);
-    const hashedPassword = await bcrypt.hash(newPassword, salt);
-
-    // Update the password directly in the database
-    await Driver.findByIdAndUpdate(driverId, { password: hashedPassword });
-
-    res.json({ message: 'Password has been reset successfully' });
-  } catch (err) {
-    if (err.name === 'TokenExpiredError') {
-      return res.status(400).json({ message: 'Reset token has expired. Please request a new one.' });
-    }
-    console.error(err);
-    res.status(500).json({ message: 'Server error' });
-  }
-});
-
-
-// PARTNER FORGOT PASSWORD ROUTES
-
-router.post('/recover-password', async (req, res) => {
-  const { email, contactNumber } = req.body;
-  console.log(req.body);
-
-  try {
-    // Find the partner by email and contact number
-    const partner = await Partner.findOne({ contactNumber });
-    if (!partner) {
-      return res.status(404).json({ message: 'Partner not found with this email and contact number.' });
-    }
-
-    console.log(partner);
-
-    // Generate a reset token with partner ID
-    const resetToken = jwt.sign(
-      { partnerId: partner._id, contactNumber: partner.contactNumber },
-      RESET_PASSWORD_SECRET,
-      { expiresIn: RESET_PASSWORD_EXPIRY }
-    );
-
-    // Construct the reset link
-    const resetLink = `${process.env.FRONTEND_URL}/reset-partner-password?token=${resetToken}`; // Ensure using backticks for string interpolation
-
-
-
-    // Send email with reset link
-    await transporter.sendMail({
-      from: process.env.EMAIL_USER,
-      to: email,
-      subject: 'Password Reset Request',
-      html: `<p>You requested a password reset. Click the link below to reset your password:</p><a href="${resetLink}">Reset Password</a>`, // Use HTML for better formatting
-    });
-
-    res.status(200).json({ message: 'Password reset email sent. Please check your inbox.' });
-  } catch (error) {
-    console.error('Error in password recovery:', error);
-    res.status(500).json({ message: 'Internal server error' });
-  }
-});
-
-
-router.post('/reset-partner-password', async (req, res) => {
-  const { token, newPassword } = req.body;
-
-  try {
-    // Verify the token
-    const decoded = jwt.verify(token, RESET_PASSWORD_SECRET);
-    const { partnerId } = decoded;
-
-    // Find the partner by ID
-    const partner = await Partner.findById(partnerId);
-    if (!partner) {
-      return res.status(404).json({ message: 'Partner not found.' });
-    }
-
-    // Hash the new password
-    const salt = await bcrypt.genSalt(10);
-    const hashedPassword = await bcrypt.hash(newPassword, salt);
-
-    // Update the partner's password
-    partner.password = hashedPassword; // Store the hashed password
-    await partner.save();
-
-    res.status(200).json({ message: 'Password has been reset successfully.' });
-  } catch (error) {
-    if (error.name === 'TokenExpiredError') {
-      return res.status(400).json({ message: 'Reset token has expired. Please request a new one.' });
-    }
-    console.error('Error resetting password:', error);
-    res.status(500).json({ message: 'Failed to reset password. Please try again.' });
-  }
-});
 
 // ORDER CONFIRMATION FOR ORDERS
 

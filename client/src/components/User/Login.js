@@ -108,7 +108,7 @@ const Login = () => {
 
         <button type="submit">Login</button>
         <p className={styles.forgotPassword}>
-          Forgot your password? <a href="/(password-reset)">Reset it here</a>
+          Forgot your password? <a href="/password-reset">Reset it here</a>
         </p>
       </form>
     </div>
