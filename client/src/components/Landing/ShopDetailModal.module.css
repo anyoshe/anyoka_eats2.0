@@ -1,0 +1,328 @@
+/* ShopDetailModal.module.css */
+
+.shop-detail-modal {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background-color: var(--color-white);
+    width: min(100% - 2rem, 900px);
+    height: 80vh;
+    max-height: 600px;
+    border-radius: var(--radius-xl);
+    z-index: var(--z-modal);
+    box-shadow: var(--shadow-lg);
+    overflow: hidden;
+  }
+  
+  
+  .shop-detail-modal-overlay {
+    position: fixed; /* Fixed position to overlay background */
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.5); /* Semi-transparent background */
+    z-index: 1099; /* Ensure it's above header and below modal */
+  }
+  
+  
+  .modalContentWrapper { position: relative; display: grid; grid-template-rows: auto 1fr; height: 100%; }
+
+  .modalHeader {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: var(--space-3) var(--space-4);
+    border-bottom: 1px solid var(--color-border);
+    background: var(--color-white);
+    flex-shrink: 0;
+  }
+
+  .modalTitle { margin: 0; font-size: var(--font-size-lg); }
+  
+  .closeButton {
+    font-size: 1.5rem;
+    color: var(--color-gray-600);
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    border-radius: var(--radius-pill);
+    transition: background var(--duration-fast) var(--ease-out), color var(--duration-fast) var(--ease-out);
+  }
+  
+  .closeButton:hover {
+    color: var(--color-orange);
+    background: var(--color-gray-100);
+  }
+  
+  .modalBody { 
+    display: grid; 
+    grid-template-columns: 320px 1fr; 
+    gap: var(--space-4); 
+    padding: var(--space-4); 
+    overflow: hidden; 
+    height: 100%;
+  }
+
+  /* Reviews Section (Left) */
+  .reviewsSection { 
+    display: flex; 
+    flex-direction: column; 
+    overflow: hidden; 
+  }
+
+  .reviewsTitle { 
+    margin: 0 0 var(--space-3); 
+    font-size: var(--font-size-lg); 
+    color: var(--color-text); 
+    font-weight: 600; 
+  }
+
+  .reviewsList { 
+    flex: 1; 
+    overflow-y: auto; 
+    padding-right: var(--space-2); 
+  }
+
+  .reviewItem { 
+    padding: var(--space-3); 
+    border-bottom: 1px solid var(--color-gray-100); 
+    margin-bottom: var(--space-2); 
+  }
+
+  .reviewHeader { 
+    display: flex; 
+    justify-content: space-between; 
+    align-items: center; 
+    margin-bottom: var(--space-1); 
+  }
+
+  .reviewerName { 
+    font-weight: 600; 
+    color: var(--color-text); 
+    font-size: var(--font-size-sm); 
+  }
+
+  .reviewStars { 
+    display: flex; 
+    gap: 2px; 
+  }
+
+  .reviewComment { 
+    margin: var(--space-1) 0; 
+    color: var(--color-text-muted); 
+    font-size: var(--font-size-sm); 
+    line-height: 1.4; 
+  }
+
+  .reviewDate { 
+    font-size: var(--font-size-xs); 
+    color: var(--color-gray-500); 
+  }
+
+  .noReviews { 
+    text-align: center; 
+    color: var(--color-text-muted); 
+    font-style: italic; 
+    padding: var(--space-4); 
+  }
+
+  /* Profile Section (Right) */
+  .profileSection { 
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-4); 
+    overflow: hidden; 
+  }
+
+  .profileCard { 
+    background: var(--color-gray-50); 
+    border-radius: var(--radius-lg); 
+    padding: var(--space-4); 
+    border: 1px solid var(--color-border); 
+  }
+
+  .profileImage { 
+    width: 80px; 
+    height: 80px; 
+    border-radius: 50%; 
+    overflow: hidden; 
+    margin: 0 auto var(--space-3); 
+    border: 2px solid var(--color-white); 
+    box-shadow: var(--shadow-sm); 
+  }
+
+  .profileImage img { 
+    width: 100%; 
+    height: 100%; 
+    object-fit: cover; 
+  }
+
+  .profileInfo { 
+    text-align: center; 
+  }
+
+  .shopName { 
+    margin: 0 0 var(--space-2); 
+    font-size: var(--font-size-lg); 
+    color: var(--color-text); 
+    font-weight: 600; 
+  }
+
+  .shopTown, .shopAddress, .shopEmail, .shopPhone { 
+    margin: 0 0 var(--space-1); 
+    font-size: var(--font-size-xs); 
+    color: var(--color-text-muted); 
+  }
+
+  .ratingInfo { 
+    margin-top: var(--space-3); 
+    padding-top: var(--space-2); 
+    border-top: 1px solid var(--color-border); 
+  }
+
+  .ratingLabel { 
+    display: block; 
+    font-size: var(--font-size-xs); 
+    color: var(--color-text-muted); 
+    margin-bottom: var(--space-1); 
+  }
+
+  .ratingStars { 
+    display: flex;
+    justify-content: center;
+    gap: 2px; 
+    margin-bottom: var(--space-1); 
+  }
+
+  .ratingText { 
+    font-size: var(--font-size-xs); 
+    color: var(--color-text-muted); 
+    text-align: center; 
+    display: block; 
+  }
+
+  .rateSection { 
+    background: var(--color-white); 
+    border: 1px solid var(--color-border); 
+    border-radius: var(--radius-lg); 
+    padding: var(--space-3); 
+  }
+
+  .rateTitle { 
+    margin: 0 0 var(--space-2); 
+    font-size: var(--font-size-sm); 
+    color: var(--color-text); 
+    font-weight: 600; 
+  }
+
+  .rateStars { 
+    display: flex; 
+    justify-content: center; 
+    gap: var(--space-1); 
+  }
+
+  .commentSection { 
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2); 
+  }
+
+  .commentLabel { 
+    font-size: var(--font-size-sm); 
+    color: var(--color-text); 
+    font-weight: 600; 
+  }
+  
+  .star { 
+    font-size: 1.2rem; 
+    color: var(--color-gray-300); 
+    cursor: pointer; 
+    transition: transform var(--duration-fast) var(--ease-out), color var(--duration-fast) var(--ease-out); 
+  }
+  
+  .star:hover { 
+    transform: scale(1.05); 
+    color: var(--color-orange); 
+  }
+  
+  .filled { 
+    color: var(--color-orange); 
+  }
+  
+  .commentBox {
+    width: 100%;
+    min-height: 80px; 
+    padding: 0.6rem 0.8rem; 
+    border-radius: var(--radius-md); 
+    border: 1px solid var(--color-border); 
+    font-size: var(--font-size-sm); 
+    color: var(--color-text); 
+    resize: vertical; 
+  }
+  
+  .commentBox:focus {
+    border-color: var(--color-orange);
+    outline: 0;
+    box-shadow: 0 0 0 3px rgba(255,165,0,0.25);
+  }
+  
+  .submitComment {
+    padding: 0.6rem 1rem; 
+    background: var(--color-green); 
+    color: var(--color-white); 
+    font-weight: 600; 
+    border: none;
+    border-radius: var(--radius-pill); 
+    cursor: pointer;
+    transition: background var(--duration-fast) var(--ease-out), color var(--duration-fast) var(--ease-out); 
+  }
+  
+  .submitComment:hover {
+    background: var(--color-white); 
+    color: var(--color-orange); 
+    outline: 1px solid var(--color-orange); 
+  }
+
+  /* Mobile responsive */
+  @media (max-width: 768px) {
+    .shop-detail-modal {
+      width: 96%;
+      max-width: 640px;
+      height: 500px;
+      margin-top: 1rem;
+      /* margin-top: 0.9rem; ensure visual clearance from app header */
+      left: 50%;
+      
+      max-height: none;
+      overflow: hidden; /* scrolling will be on modal body */
+    }
+    
+    .modalBody {
+      grid-template-columns: 1fr;
+      grid-template-rows: auto 1fr;
+      gap: var(--space-3);
+      overflow-y: auto; /* enable scrolling inside modal body */
+    }
+    
+    .modalContentWrapper {
+    height: 100%;
+    }
+
+    .reviewsList { max-height: none; overflow: visible; }
+
+    .profileSection {
+      order: -1;
+    }
+    
+    .profileCard {
+      padding: var(--space-3);
+    }
+    
+    .profileImage {
+      width: 60px;
+      height: 60px;
+    }
+  }
+  

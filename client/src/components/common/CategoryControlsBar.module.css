@@ -1,0 +1,353 @@
+.controlsBar{
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin: 0;
+  min-height: var(--controlsbar-height, 3.2rem);
+  gap: var(--space-3);
+  padding: var(--space-2) var(--space-2) var(--space-2) var(--space-2);
+  background: var(--color-white);
+  border-bottom: 1px solid var(--color-border);
+}
+
+.stickyControls{
+  position: static;
+  z-index: 20;
+}
+
+.controlsGroup{
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  /* flex-wrap: wrap; */
+}
+
+.row2Group,
+.row3Group {
+  display: contents;
+}
+
+.select,
+.input{
+  padding: 0.4rem 0.6rem;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  background: var(--color-white);
+}
+
+.select{ min-width: 6rem; }
+.selectSort{ min-width: 6rem; }
+.selectVendor{ min-width: 6rem; }
+.selectRating{ min-width: 6rem; }
+
+.rangeDash{ color: #999; }
+
+.searchBarLarge{ 
+  flex: 1; 
+  max-width: 72rem; 
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.searchFieldWrapper{
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.searchIcon{
+  position: absolute;
+  left: 0.75rem;
+  color: var(--color-gray-500);
+  pointer-events: none;
+}
+
+.searchInputLarge{
+  width: 100%;
+  padding: 0.6rem 0.8rem 0.6rem 2.2rem;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  background: var(--color-white);
+  font-size: 1rem;
+  min-width: 24rem;
+}
+
+.hamburgerButton {
+  display: none;
+  background: var(--color-green);
+  color: var(--color-white);
+  border: none;
+  border-radius: var(--radius-sm);
+  padding: 0.5rem;
+  cursor: pointer;
+  font-size: 1rem;
+  transition: all var(--duration-fast) var(--ease-out);
+  flex-shrink: 0;
+}
+
+.hamburgerButton:hover {
+  background: var(--color-orange);
+  transform: scale(1.05);
+}
+
+.showFilters {
+  display: flex;
+}
+
+.hideFilters {
+  display: none;
+}
+
+@media (max-width: 768px) {
+  .controlsBar{ flex-direction: column; align-items: stretch; gap: var(--space-2); }
+  .searchBarLarge{ max-width: none; }
+  
+  /* Show hamburger button starting from 768px */
+  .hamburgerButton {
+    display: block;
+  }
+  
+  /* Row 1: Search bar with hamburger */
+  .searchBarLarge {
+    flex-direction: row;
+    gap: 0.5rem;
+  }
+  
+  .searchFieldWrapper {
+    flex: 1;
+  }
+  
+  /* Controls group - hidden by default, shown when hamburger is clicked */
+  .controlsGroup {
+    display: none;
+    flex-direction: column;
+    gap: 0.4rem;
+    width: 100%;
+    background: var(--color-white);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-sm);
+    padding: 0.5rem;
+    box-shadow: var(--shadow-sm);
+  }
+  
+  .controlsGroup.showFilters {
+    display: flex;
+  }
+  
+  /* Row 2: Relevance + Min/Max inputs */
+  .row2Group {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 0.4rem;
+    width: 100%;
+    flex-wrap: wrap;
+  }
+  
+  .selectSort {
+    min-width: auto;
+    width: auto;
+    flex-shrink: 0;
+  }
+  
+  .input {
+    min-width: 0;
+    flex: 1;
+    max-width: 6rem;
+  }
+  
+  /* Row 3: Vendor and Rating selects */
+  .row3Group {
+    display: flex;
+    flex-direction: row;
+    gap: 0.4rem;
+    width: 100%;
+  }
+  
+  .selectVendor,
+  .selectRating {
+    flex: 1;
+  }
+}
+
+@media (max-width: 425px) {
+  .searchInputLarge {
+    min-width: 0;
+    padding: 0.5rem 0.5rem 0.5rem 1.8rem;
+    font-size: 0.9rem;
+  }
+  
+  .searchFieldWrapper {
+    flex: 1;
+  }
+  
+  .controlsGroup {
+    padding: 0.5rem;
+  }
+  
+  .selectSort {
+    padding: 0.3rem 0.4rem;
+    font-size: 0.85rem;
+  }
+  
+  .input {
+    padding: 0.3rem 0.4rem;
+    font-size: 0.85rem;
+    max-width: 5rem;
+  }
+  
+  .rangeDash {
+    margin: 0 0.2rem;
+    font-size: 0.8rem;
+  }
+  
+  .selectVendor,
+  .selectRating {
+    min-width: 4rem;
+    padding: 0.3rem 0.4rem;
+    font-size: 0.85rem;
+  }
+}
+
+@media (max-width: 375px) {
+  .searchInputLarge {
+    min-width: 0;
+    padding: 0.4rem 0.5rem 0.4rem 1.8rem;
+    font-size: 0.85rem;
+  }
+  
+  .searchFieldWrapper {
+    flex: 1;
+  }
+  
+  .controlsGroup {
+    padding: 0.4rem;
+  }
+  
+  .row2Group {
+    gap: 0.3rem;
+  }
+  
+  .selectSort {
+    padding: 0.25rem 0.3rem;
+    font-size: 0.8rem;
+  }
+  
+  .input {
+    padding: 0.25rem 0.3rem;
+    font-size: 0.8rem;
+    max-width: 4.5rem;
+  }
+  
+  .rangeDash {
+    margin: 0 0.15rem;
+    font-size: 0.75rem;
+  }
+  
+  .row3Group {
+    gap: 0.3rem;
+  }
+  
+  .selectVendor,
+  .selectRating {
+    min-width: 3.5rem;
+    padding: 0.25rem 0.3rem;
+    font-size: 0.8rem;
+  }
+}
+
+@media (max-width: 320px) {
+  .searchInputLarge {
+    min-width: 0;
+    padding: 0.4rem 0.4rem 0.4rem 1.8rem;
+    font-size: 0.8rem;
+  }
+  
+  .searchFieldWrapper {
+    flex: 1;
+  }
+  
+  .controlsGroup {
+    padding: 0.3rem;
+  }
+  
+  .selectSort {
+    padding: 0.2rem 0.25rem;
+    font-size: 0.75rem;
+  }
+  
+  .input {
+    padding: 0.2rem 0.25rem;
+    font-size: 0.75rem;
+    max-width: 4rem;
+  }
+  
+  .rangeDash {
+    margin: 0 0.1rem;
+    font-size: 0.7rem;
+  }
+  
+  .selectVendor,
+  .selectRating {
+    min-width: 3rem;
+    padding: 0.2rem 0.25rem;
+    font-size: 0.75rem;
+  }
+}
+
+@media (min-width: 1024px) {
+  /* Ensure original layout for larger screens */
+  .hamburgerButton {
+    display: none !important;
+  }
+  
+  .controlsGroup {
+    display: inline-flex !important;
+    flex-direction: row !important;
+    background: transparent !important;
+    border: none !important;
+    border-radius: 0 !important;
+    padding: 0 !important;
+    box-shadow: none !important;
+  }
+  
+  .row2Group,
+  .row3Group {
+    display: contents !important;
+  }
+  
+  .searchBarLarge {
+    flex-direction: row !important;
+  }
+  
+  .searchFieldWrapper {
+    flex: 1;
+  }
+}
+
+@media (min-width: 1440px) {
+  .controlsBar{ gap: var(--space-4); }
+  .controlsGroup{ gap: var(--space-3); }
+  .searchBarLarge{ max-width: 80rem; }
+  .selectSort{ min-width: 7rem; }
+  .selectVendor{ min-width: 7rem; }
+  .selectRating{ min-width: 7rem; }
+}
+
+@media (min-width: 1920px) {
+  .searchBarLarge{ max-width: 90rem; }
+  .controlsGroup{ gap: var(--space-4); }
+  .selectSort{ min-width: 8rem; }
+  .selectVendor{ min-width: 8rem; }
+  .selectRating{ min-width: 8rem; }
+}
+
+@media (min-width: 2560px) {
+  .searchBarLarge{ max-width: 100rem; }
+  .selectSort{ min-width: 9rem; }
+  .selectVendor{ min-width: 9rem; }
+  .selectRating{ min-width: 9rem; }
+}
+
+
