@@ -120,55 +120,91 @@ const ProductDetailModal = ({ isOpen, onRequestClose, product, onAddToCart }) =>
     contentLabel="Product Details"
     className={styles['product-detail-modal']}
     overlayClassName={styles['product-detail-modal-overlay']}
+    shouldCloseOnOverlayClick={true}
+    ariaHideApp={true}
     >
     {/* <div className="modal-content"> */}
     <div className={styles.modalContentWrapper}>
-      <button className={styles.closeButton} onClick={onRequestClose}>
-        &times;
-      </button>
-      <div className={styles.modalInnerScrollable}>
-        {/* Render ProductCard with reviews */}
-        <ProductCard product={{ ...product, ratings: { ...product.ratings, reviews } }} />
-
-        {/* Review interaction controls */}
-        {/* <div className="review-controls"> */}
-        <div className={styles.reviewControls}>
-          <div className={styles.modalRating}>
-
-            <h3 className={styles.modalRatingH3}>Rate this Product</h3>
-            
-            {[1, 2, 3, 4, 5].map((star) => (
-              <FontAwesomeIcon
-                key={star}
-                icon={star <= (hoverRating || selectedRating) ? solidStar : regularStar}
-                onMouseEnter={() => setHoverRating(star)}
-                onMouseLeave={() => setHoverRating(0)}
-                onClick={() => handleStarClick(star)}
-                className={styles.starIcon}
-              />
-            ))}
-            {/* <span className="rating-value">({selectedRating.toFixed(1)})</span> */}
+      <div className={styles.modalHeader}>
+        <h2 className={styles.modalTitle}>Product Details</h2>
+        <button className={styles.closeButton} aria-label="Close product details" onClick={onRequestClose}>
+          &times;
+        </button>
+      </div>
+      <div className={styles.modalBody}>
+        {/* Left Column - Product Card and Rating */}
+        <div className={styles.productSection}>
+          <div className={styles.productCard}>
+            {/* Render ProductCard with reviews */}
+            <ProductCard product={{ ...product, ratings: { ...product.ratings, reviews } }} />
           </div>
 
-          <div className={styles.bottomContent}>
-            <div className={styles.modalComments}>
-              <textarea
-                value={comment}
-                onChange={(e) => setComment(e.target.value)}
-                placeholder="Leave a comment..."
-                className={styles.commentBox}
-              />
-
-              <button onClick={handleAddComment} className={styles.submitComment}>
-                Submit Comment
-              </button>
-
+          <div className={styles.rateSection}>
+            <h4 className={styles.rateTitle}>Rate this product</h4>
+            <div className={styles.rateStars} role="radiogroup" aria-label="Rate this product">
+              {[1, 2, 3, 4, 5].map((star) => (
+                <FontAwesomeIcon
+                  key={star}
+                  icon={star <= (hoverRating || selectedRating) ? solidStar : regularStar}
+                  onMouseEnter={() => setHoverRating(star)}
+                  onMouseLeave={() => setHoverRating(0)}
+                  onClick={() => handleStarClick(star)}
+                  className={`${styles.star} ${star <= (hoverRating || selectedRating) ? styles.filled : ''}`}
+                />
+              ))}
             </div>
           </div>
+
+          <button onClick={() => onAddToCart(product)} className={styles.addToCartButton} aria-label={`Add ${product.name} to cart`}>
+            Add to Cart
+          </button>
         </div>
-        <button onClick={() => onAddToCart(product)} className={styles.addToCartButton}>
-          Add to Cart
-        </button>
+
+        {/* Right Column - Reviews and Comments */}
+        <div className={styles.reviewsSection}>
+          <h3 className={styles.reviewsTitle}>Customer Reviews</h3>
+          <div className={styles.reviewsList}>
+            {reviews.length > 0 ? (
+              reviews.map((review, index) => (
+                <div key={index} className={styles.reviewItem}>
+                  <div className={styles.reviewHeader}>
+                    <span className={styles.reviewerName}>{review.user?.name || 'Anonymous'}</span>
+                    <div className={styles.reviewStars}>
+                      {[1, 2, 3, 4, 5].map((star) => (
+                        <FontAwesomeIcon
+                          key={star}
+                          icon={star <= (review.rating || 0) ? solidStar : regularStar}
+                          className={`${styles.star} ${star <= (review.rating || 0) ? styles.filled : ''}`}
+                        />
+                      ))}
+                    </div>
+                  </div>
+                  {review.comment && (
+                    <p className={styles.reviewComment}>{review.comment}</p>
+                  )}
+                  <span className={styles.reviewDate}>
+                    {new Date(review.createdAt).toLocaleDateString()}
+                  </span>
+                </div>
+              ))
+            ) : (
+              <p className={styles.noReviews}>No reviews yet. Be the first to review!</p>
+            )}
+          </div>
+          <div className={styles.commentSection}>
+            <label htmlFor="commentBox" className={styles.commentLabel}>Leave a comment</label>
+            <textarea
+              id="commentBox"
+              value={comment}
+              onChange={(e) => setComment(e.target.value)}
+              placeholder="Share your experience..."
+              className={styles.commentBox}
+            />
+            <button onClick={handleAddComment} className={styles.submitComment}>
+              Submit Comment
+            </button>
+          </div>
+        </div>
       </div>
       </div>
       <AuthPromptModal

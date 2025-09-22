@@ -1,14 +1,12 @@
-:root {
-  --green: #1ea509;
-  --orange: #ffa500;
-  --white: #ffffff;
-  --gray-light: #f8f8f8;
-  --gray-dark: #888;
-}
+/* Use global tokens; avoid redefining variables locally */
 
 .storeWrapper {
   position: relative;
   width: 100%;
+  /* Shared height token for top ads bar, used by sticky controls */
+  --adsbar-height: 3.2rem;
+  /* Fixed cart width on desktop to balance layout */
+  --cart-width: 26%;
 }
 
 .bodyWrapper {
@@ -17,15 +15,13 @@
   position: relative;
   display: grid;
   grid-template-columns: 2.7fr 1fr;
-  gap: 0.2rem;
+  gap: var(--space-2);
   width: 100%;
-  margin-top: 3rem;
-  padding: 0.1rem 0.5rem;
+  /* margin-top: 3rem; */
+  padding: var(--space-1) var(--space-2);
 }
 
-.dispalyAreaHeader{
-  /* border: 2px solid red; */
-}
+
 
 /* .cartTopDiv{
   width: 50%;
@@ -38,8 +34,8 @@
   position: fixed;
   top: 1.2rem;
   right: 1rem;
-  background-color: var(--green);
-  color: var(--white);
+  background-color: var(--color-green);
+  color: var(--color-white);
   border: none;
   /* border-radius: 50%; */
   padding: 0.4rem 1rem;
@@ -47,7 +43,8 @@
   cursor: pointer;
   z-index: 1000;
   font-size: 1rem;
-  transition: background-color 0.3s ease, transform 0.2s ease;
+  transition: background-color var(--duration-fast) var(--ease-out), transform var(--duration-fast) var(--ease-out);
+  display: none; /* Hidden by default */
 }
 
 .floatingCartIcon:active {
@@ -55,27 +52,27 @@
 }
 
 .backButton {
-  position: absolute;
-  top: -2rem; 
-  left: 0.625rem;
+  position: relative;
+  top: 0; 
+  left: 0;
   border: none;
   outline: none;
-  display: flex;
+  display: inline-flex;
   align-items: center;
   gap: 0.3125rem; 
-  background: var(--green);
-  color: var(--white);
+  background: var(--color-green);
+  color: var(--color-white);
   font-size: 1rem;
   cursor: pointer;
-  padding: 0.3rem 0.4rem; 
+  padding: 0.3rem 0.6rem; 
   border-radius: 0.3125rem; 
-  transition: background 0.2s ease;
+  transition: background var(--duration-fast) var(--ease-out);
 }
 
 .backButton:hover {
-  background:var(--white);
-  color: var(--orange);
-  outline: 1px solid var(--orange);
+  background:var(--color-white);
+  color: var(--color-orange);
+  outline: 1px solid var(--color-orange);
 }
 
 .dispalySection{
@@ -83,9 +80,6 @@
   padding-top: 0rem;
 }
 
-.categorySectionDivName{
-  /* margin-top: 0rem; */
-}
 
 .cartModal {
   position: fixed;
@@ -93,24 +87,57 @@
   left: 0;
   width: 100vw;
   height: 100vh;
-  background-color: var(--white);
+  background-color: rgba(0, 0, 0, 0.5);
   z-index: 2000;
   display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  overflow: hidden;
+  animation: fadeIn var(--duration-base) var(--ease-out);
+}
+
+.cartModalContent {
+  background-color: var(--color-white);
+  border-radius: 1rem;
+  margin: 2rem 1rem;
+  height: calc(100vh - 4rem);
+  width: calc(100vw - 2rem);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
+  display: flex;
   flex-direction: column;
-  padding: 1rem;
-  overflow-y: auto;
-  box-shadow: 0 0 15px rgba(0, 0, 0, 0.3);
-  animation: fadeIn 0.3s ease-in-out;
+  overflow: hidden;
+  animation: slideInFromRight var(--duration-base) var(--ease-out);
 }
 
 @keyframes fadeIn {
   from {
     opacity: 0;
-    transform: translateY(20px);
   }
   to {
     opacity: 1;
-    transform: translateY(0);
+  }
+}
+
+@keyframes slideInFromRight {
+  from {
+    opacity: 0;
+    transform: translateX(100%);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes slideOutToRight {
+  from {
+    opacity: 1;
+    transform: translateX(0);
+  }
+  to {
+    opacity: 0;
+    transform: translateX(100%);
   }
 }
 
@@ -119,38 +146,144 @@
   top: 1rem;
   right: 1rem;
   font-size: 2rem;
-  background: none;
+  background: var(--color-gray-100);
   border: none;
-  color: var(--orange);
+  color: var(--color-gray-600);
   cursor: pointer;
   z-index: 2100;
   font-weight: bold;
+  width: 3rem;
+  height: 3rem;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all var(--duration-fast) var(--ease-out);
+  box-shadow: var(--shadow-sm);
+}
+
+.closeCartBtn:hover {
+  background: var(--color-orange);
+  color: var(--color-white);
+  transform: scale(1.1);
 }
 
 .categorySectiontitle {
   font-size: 1.2rem;
   font-weight: bold;
-  color: var(--green);
+  color: var(--color-green);
   margin-top: 1rem;
   margin-bottom: 1rem;
-  border-left: 4px solid var(--orange);
+  border-left: 4px solid var(--color-orange);
   text-align: center;
 }
 
 .categorySectionDisplay {
   display: grid;
-  grid-template-columns: repeat(5, 1fr);
-  gap: 1rem;
+  grid-template-columns: repeat(auto-fit, minmax(12rem, 1fr));
+  gap: var(--space-4);
 }
+
+.controlsBar{
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin: 0 0 var(--space-3) 0;
+}
+.stickyControls{
+  position: sticky;
+  top: var(--adsbar-height);
+  z-index: 20;
+  background: var(--color-white);
+  padding: var(--space-2) 0;
+}
+
+/* Top Ads Bar moved to common component stylesheet */
+
+@keyframes marquee {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+
+.resultMeta{
+  font-weight: 600;
+  color: var(--color-green);
+}
+
+.controlsGroup{
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.searchBarLarge{
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  flex: 1;
+  max-width: 52rem;
+}
+
+.searchIcon{ color: var(--color-gray-500); }
+
+.searchInputLarge{
+  flex: 1;
+  padding: 0.6rem 0.8rem;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  background: var(--color-white);
+  font-size: 1rem;
+  min-width: 18rem;
+}
+
+.select,
+.input{
+  padding: 0.4rem 0.6rem;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  background: var(--color-white);
+}
+
+.rangeDash{ color: #999; }
+
+.searchInput{
+  padding: 0.4rem 0.6rem;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  background: var(--color-white);
+  min-width: 12rem;
+}
+
+.chipsRow{
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  margin: var(--space-2) 0 var(--space-3) 0;
+}
+
+.chip{
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.35rem 0.7rem;
+  border-radius: 999px;
+  border: 1px solid var(--color-border);
+  background: var(--color-white);
+  color: var(--color-text);
+  cursor: pointer;
+}
+
+.chip:hover{ background: var(--color-gray-50); }
+.chipActive{ background: var(--color-green); color: var(--color-white); border-color: var(--color-green); }
 
 .categorySectionDisplayDivs {
   position: relative;
-  background-color: var(--white);
-  border-radius: 0.3rem;
-  padding: 0.4rem;
-  transition: all 0.2s ease;
+  background-color: var(--color-white);
+  border-radius: var(--radius-md);
+  padding: var(--space-3);
+  transition: transform var(--duration-fast) var(--ease-out), box-shadow var(--duration-fast) var(--ease-out);
   cursor: pointer;
-  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.05);
+  box-shadow: var(--shadow-sm);
   display: flex;
   flex-direction: column;
   align-items: start;
@@ -159,7 +292,7 @@
 
 .categorySectionDisplayDivs:hover {
   transform: translateY(-4px);
-  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
+  box-shadow: var(--shadow-md);
 }
 
 .discountBadge {
@@ -173,7 +306,7 @@
   padding: 0.2rem 0.5rem;
   transform: rotate(-45deg);
   z-index: 10;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  box-shadow: var(--shadow-sm);
   pointer-events: none;
   text-decoration: none;
 }
@@ -182,14 +315,75 @@
   width: 100%;
   height: 8rem;
   object-fit: cover;
-  background-color: var(--gray-light);
-  border-radius: 0.3rem;
-  margin-bottom: 0.8rem;
+  background-color: var(--color-gray-100);
+  border-radius: var(--radius-md);
+  margin-bottom: var(--space-3);
+  filter: blur(8px);
+  transform: scale(1.02);
+  transition: filter var(--duration-slow) var(--ease-out), transform var(--duration-slow) var(--ease-out), opacity var(--duration-slow) var(--ease-out);
+  opacity: 0.8;
 }
+
+/* Image loading states */
+.imageContainer {
+  position: relative;
+  width: 100%;
+  height: 8rem;
+  margin-bottom: var(--space-3);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+}
+
+.imageSkeleton {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, var(--color-gray-100) 25%, var(--color-gray-200) 50%, var(--color-gray-100) 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+  border-radius: var(--radius-md);
+}
+
+.skeletonShimmer {
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent 0%, rgba(255, 255, 255, 0.4) 50%, transparent 100%);
+  animation: shimmer 1.5s infinite;
+}
+
+.imageLoaded {
+  opacity: 1 !important;
+}
+
+.isLoaded {
+  filter: blur(0);
+  transform: scale(1);
+  opacity: 1;
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+/* Skeletons for loading state */
+.skeletonCard{ background: var(--color-white); border: 1px solid var(--color-border); border-radius: var(--radius-md); padding: var(--space-3); }
+.skeletonImage{ width: 100%; height: 8rem; border-radius: var(--radius-md); background: var(--color-gray-100); margin-bottom: var(--space-3); }
+.skeletonLine{ height: 12px; width: 70%; background: var(--color-gray-100); border-radius: var(--radius-sm); margin: 0.3rem 0; }
+.skeletonLineShort{ height: 12px; width: 40%; background: var(--color-gray-100); border-radius: var(--radius-sm); margin: 0.3rem 0; }
+.skeletonButton{ height: 34px; width: 100%; background: var(--color-gray-100); border-radius: var(--radius-sm); margin-top: 0.5rem; }
+
+.emptyState{ text-align: center; color: var(--color-text-muted); padding: var(--space-6) 0; }
 
 .categorySectionP {
   font-size: 0.9rem;
-  margin: 0rem;
+  margin: 0;
   text-align: left;
 }
 
@@ -202,7 +396,7 @@
   display: flex;
   justify-content: space-between;
   width: 100%;
-  margin: 0.5rem 0rem;
+  margin: var(--space-2) 0;
 }
 
 .diagonalStrikethrough,
@@ -213,13 +407,13 @@
 }
 
 .productPrice {
-  color: var(--green);
+  color: var(--color-green);
   font-weight: 600;
   margin-bottom: 0;
 }
 
 .categorySectionPrice {
-  color: var(--green);
+  color: var(--color-green);
   font-weight: 600;
 }
 
@@ -232,7 +426,7 @@
   margin-bottom: 0.3rem;
   width: 100%;
   text-align: center;
-  color: var(--orange);
+  color: var(--color-orange);
 }
 
 .addCartBtn {
@@ -241,23 +435,23 @@
 
 .addToCartBtn {
   width: 100%;
-  padding: 0.2rem;
-  background-color: var(--green);
-  color: var(--white);
+  padding: var(--space-2);
+  background-color: var(--color-green);
+  color: var(--color-white);
   border: none;
-  border-radius: 0.3rem;
+  border-radius: var(--radius-md);
   cursor: pointer;
   font-weight: 600;
   font-size: 0.95rem;
-  transition: all 0.2s ease;
+  transition: background var(--duration-fast) var(--ease-out), color var(--duration-fast) var(--ease-out), transform var(--duration-fast) var(--ease-out);
   margin-top: 0rem;
   margin-bottom: 0rem;
 }
 
 .addToCartBtn:hover {
-  background-color: var(--white);
-  color: var(--orange);
-  outline: 1px solid var(--orange);
+  background-color: var(--color-white);
+  color: var(--color-orange);
+  outline: 1px solid var(--color-orange);
 }
 
 .addToCartBtn:active {
@@ -268,36 +462,91 @@
 .cartSecti{
   /* border: 2px solid red; */
   position: fixed;
-  right: 0.1rem;
-  top: 0;
-  width: 26%;
-  min-height: 100vh;
-  background-color: var(--white);
-  /* padding-top: 3.6rem; */
-  padding-top: 1rem;
-  padding-left: 0.5rem;
+  right: 0;
+  top: calc(var(--adsbar-height) + var(--controlsbar-height, 3.2rem) + 1rem);
+  width: var(--cart-width);
+  height: calc(100vh - var(--adsbar-height) - var(--controlsbar-height, 3.2rem) - 1rem);
+  background-color: var(--color-white);
+  padding: var(--space-2);
   box-shadow: -2px 0 6px rgba(0, 0, 0, 0.1);
   display: flex;
   flex-direction: column;
   z-index: 50;
+  overflow: hidden;
+}
+
+.cartContent{
+  position: sticky;
+  top: 0;
+  max-height: calc(100vh - var(--space-4));
+  overflow-y: auto;
+  padding-right: var(--space-2);
 }
 
 @media (max-width: 1440px) {
   .floatingCartIcon {
-    display: none;
+    display: none !important; /* Hide floating cart on larger screens */
   } 
+  
+  .cartSecti {
+    height: calc(100vh - var(--adsbar-height, 6rem) - var(--controlsbar-height, 3.2rem) - 1rem);
+    top: calc(var(--adsbar-height, 6rem) + var(--controlsbar-height, 3.2rem) + 1rem);
+  }
 }
 
 @media (max-width: 1024px) {
   .bodyWrapper {
-    grid-template-columns: 2.3 1fr;
+    grid-template-columns: 2.3fr 1fr;
   }
   .categorySectionDisplay {
     grid-template-columns: repeat(4, 1fr);
   }
 
   .floatingCartIcon {
-    display: none;
+    display: none !important; /* Hide floating cart on larger screens */
+  }
+  
+  .cartSecti {
+    width: 28%;
+    height: calc(100vh - var(--adsbar-height, 6rem) - var(--controlsbar-height, 3.2rem) - 1rem);
+    top: calc(var(--adsbar-height, 6rem) + var(--controlsbar-height, 3.2rem) + 1rem);
+  }
+}
+
+/* Ensure product area and fixed cart are both visible on large screens */
+@media (min-width: 1024px) {
+  .cartSecti {
+    position: fixed;
+    width: 26%;
+    height: calc(100vh - var(--adsbar-height, 6rem) - var(--controlsbar-height, 3.2rem) - 1rem);
+    top: calc(var(--adsbar-height, 6rem) + var(--controlsbar-height, 3.2rem) + 1rem);
+  }
+}
+
+@media (min-width: 1440px) {
+  .cartSecti {
+    position: fixed;
+    width: 26%;
+    height: calc(100vh - var(--adsbar-height, 6.2rem) - var(--controlsbar-height, 3.2rem) - 1rem);
+    top: calc(var(--adsbar-height, 6.2rem) + var(--controlsbar-height, 3.2rem) + 1rem);
+  }
+}
+
+@media (min-width: 1920px) {
+  .cartSecti {
+    position: fixed;
+    width: 26%;
+    height: calc(100vh - var(--adsbar-height, 6.4rem) - var(--controlsbar-height, 3.2rem) - 1rem);
+    top: calc(var(--adsbar-height, 6.4rem) + var(--controlsbar-height, 3.2rem) + 1rem);
+  }
+}
+
+@media (min-width: 2560px) {
+  .cartSecti {
+    position: fixed;
+    width: 26%;
+    height: calc(100vh - var(--adsbar-height, 6.6rem) - var(--controlsbar-height, 3.4rem) - 1rem);
+    top: calc(var(--adsbar-height, 6.6rem) + var(--controlsbar-height, 3.4rem) + 1rem);
   }
 }
 
@@ -315,8 +564,13 @@
   }
 
   .floatingCartIcon {
-    display: block;
+    display: block !important; /* Show floating cart icon on 768px and below */
   }
+
+
+  .controlsBar{ flex-direction: column; align-items: stretch; gap: var(--space-2); }
+  .controlsGroup{ justify-content: space-between; flex-wrap: wrap; }
+  .searchBarLarge{ max-width: none; }
 }
 
 @media (max-width: 480px) {
@@ -341,7 +595,7 @@
   }
 
   .floatingCartIcon {
-    display: block;
+    display: block !important;
   }
 
   .closeCartBtn {
@@ -349,6 +603,15 @@
     right: 1rem;
     font-size: 2rem;
   }
+
+  .cartModalContent {
+    margin: 1rem 0.5rem;
+    height: calc(100vh - 2rem);
+    width: calc(100vw - 1rem);
+  }
+
+  /* Adjust shared ads bar height for small screens */
+  .storeWrapper { --adsbar-height: 3rem; }
 }
 
 @media (max-width: 376px) {
@@ -378,10 +641,17 @@
 @media (max-width: 320px) {
   .bodyWrapper{
     padding: 0.2rem;
+    grid-template-columns: 1fr;
+    gap: 0.5rem;
   }
 
   .categorySectiontitle {
     font-size: 1rem;
+  }
+
+  .categorySectionDisplay {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0.5rem;
   }
 
   .categorySectionImage {
@@ -403,10 +673,70 @@
   }
 
   .closeCartBtn {
-    top: -0.5rem;
-    right: 1rem;
+    top: -0.2rem;
+    right: 0.6rem;
     font-size: 2rem;
   }
+
+  .cartModalContent {
+    margin: 0.5rem 0.25rem;
+    height: calc(100vh - 1rem);
+    width: calc(100vw - 0.5rem);
+  }
+
+  /* Fix search bar and controls overflow on 320px screens */
+  .controlsBar {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0.5rem;
+    padding: 0.5rem 0;
+  }
+
+  .controlsGroup {
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+
+  .searchBarLarge {
+    max-width: 100%;
+    min-width: 0;
+  }
+
+  .searchInputLarge {
+    min-width: 0;
+    flex: 1;
+    padding: 0.5rem 0.6rem;
+    font-size: 0.9rem;
+  }
+
+  .select,
+  .input {
+    padding: 0.3rem 0.4rem;
+    font-size: 0.85rem;
+    min-width: 0;
+  }
+
+  /* Adjust shared ads bar height for extra small screens */
+  .storeWrapper { --adsbar-height: 2.8rem; }
+}
+
+/* Ultra-wide and desktop refinements */
+@media (min-width: 1440px) {
+  .categorySectionDisplay { grid-template-columns: repeat(5, 1fr); }
+}
+
+@media (min-width: 1920px) {
+  .categorySectionDisplay { grid-template-columns: repeat(6, 1fr); }
+}
+
+@media (min-width: 2560px) {
+  .bodyWrapper { max-width: 1800px; margin-left: auto; margin-right: auto; }
+  .categorySectionDisplay { grid-template-columns: repeat(7, 1fr); }
+  .categorySectionImage { height: 10rem; }
+  .controlsBar { padding: var(--space-2) 0; }
+  /* Slightly taller ads bar on ultra-wide */
+  .storeWrapper { --adsbar-height: 3.4rem; }
 }
 
 .loadingWrapper {

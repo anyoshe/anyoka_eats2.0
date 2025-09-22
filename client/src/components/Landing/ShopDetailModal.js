@@ -111,40 +111,124 @@ useEffect(() => {
       className={styles['shop-detail-modal']}
       overlayClassName={styles['shop-detail-modal-overlay']}
     >
-      <div className={styles.modalContentWrapper}>
-        <button className={styles.closeButton} onClick={onRequestClose}>
-          &times;
+      <div className={styles.modalContentWrapper} role="dialog" aria-labelledby="shop-modal-title">
+        <div className={styles.modalHeader}>
+          <h2 id="shop-modal-title" className={styles.modalTitle}>Store Details</h2>
+          <button className={styles.closeButton} onClick={onRequestClose} aria-label="Close">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false">
+              <path d="M18 6L6 18" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
+              <path d="M6 6L18 18" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
+            </svg>
         </button>
-        <ShopCard shop={store} />
-        <div className={styles.shopDetails}>
-          <h3>{store.businessName}</h3>
-          <p>{store.description}</p>
         </div>
 
-        {/* Rating Section */}
-        <div className={styles.modalRating}>
-          <h3>Rate this Store</h3>
+        <div className={styles.modalBody}>
+          <div className={styles.profileSection}>
+            <div className={styles.profileCard}>
+              <div className={styles.profileImage}>
+                <img
+                  src={store.profileImage?.startsWith('http') ? store.profileImage : `${config.backendUrl}${store.profileImage}`}
+                  alt={store.businessName}
+                />
+              </div>
+              <div className={styles.profileInfo}>
+                <h3 className={styles.shopName}>{store.businessName}</h3>
+                {store.town && (
+                  <p className={styles.shopTown}>{store.town}</p>
+                )}
+                {store.address && (
+                  <p className={styles.shopAddress}>{store.address}</p>
+                )}
+                {store.email && (
+                  <p className={styles.shopEmail}>{store.email}</p>
+                )}
+                {store.phone && (
+                  <p className={styles.shopPhone}>{store.phone}</p>
+                )}
+                <div className={styles.ratingInfo}>
+                  <span className={styles.ratingLabel}>Rating:</span>
+                  <div className={styles.ratingStars}>
+                    {[1, 2, 3, 4, 5].map((star) => (
+                      <i
+                        key={star}
+                        className={`fas fa-star ${styles.star} ${star <= (store.ratings?.average || 0) ? styles.filled : ''}`}
+                      />
+                    ))}
+                  </div>
+                  <span className={styles.ratingText}>
+                    {store.ratings?.average?.toFixed(1) || '0.0'} ({store.ratings?.reviews?.length || 0} reviews)
+                  </span>
+                </div>
+              </div>
+        </div>
+
+            <div className={styles.rateSection}>
+              <h4 className={styles.rateTitle}>Rate this store</h4>
+              <div className={styles.rateStars} role="radiogroup" aria-label="Rate this store">
           {[1, 2, 3, 4, 5].map((star) => (
             <i
               key={star}
-              className={`fas fa-star ${star <= (hoverRating || selectedRating) ? 'filled' : ''}`}
+                    role="radio"
+                    aria-checked={star <= (hoverRating || selectedRating)}
+                    tabIndex={0}
+                    className={`fas fa-star ${styles.star} ${star <= (hoverRating || selectedRating) ? styles.filled : ''}`}
               onMouseEnter={() => setHoverRating(star)}
               onMouseLeave={() => setHoverRating(0)}
               onClick={() => handleStarClick(star)}
-            ></i>
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter' || e.key === ' ') handleStarClick(star);
+                    }}
+                  />
           ))}
+              </div>
+            </div>
+
         </div>
 
-        {/* Comment Section */}
+          <div className={styles.reviewsSection}>
+            <h3 className={styles.reviewsTitle}>Customer Reviews</h3>
+            <div className={styles.reviewsList}>
+              {reviews.length > 0 ? (
+                reviews.map((review, index) => (
+                  <div key={index} className={styles.reviewItem}>
+                    <div className={styles.reviewHeader}>
+                      <span className={styles.reviewerName}>{review.user?.name || 'Anonymous'}</span>
+                      <div className={styles.reviewStars}>
+                        {[1, 2, 3, 4, 5].map((star) => (
+                          <i
+                            key={star}
+                            className={`fas fa-star ${styles.star} ${star <= (review.rating || 0) ? styles.filled : ''}`}
+                          />
+                        ))}
+                      </div>
+                    </div>
+                    {review.comment && (
+                      <p className={styles.reviewComment}>{review.comment}</p>
+                    )}
+                    <span className={styles.reviewDate}>
+                      {new Date(review.createdAt).toLocaleDateString()}
+                    </span>
+                  </div>
+                ))
+              ) : (
+                <p className={styles.noReviews}>No reviews yet. Be the first to review!</p>
+              )}
+            </div>
+            <div className={styles.commentSection}>
+              <label htmlFor="commentBox" className={styles.commentLabel}>Leave a comment</label>
         <textarea
+                id="commentBox"
           value={comment}
           onChange={(e) => setComment(e.target.value)}
-          placeholder="Leave a comment..."
+                placeholder="Share your experience..."
           className={styles.commentBox}
         />
         <button onClick={handleAddComment} className={styles.submitComment}>
           Submit Comment
         </button>
+            </div>
+          </div>
+        </div>
       </div>
 
       {/* Auth Prompt Modal */}

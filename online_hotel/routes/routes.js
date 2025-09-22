@@ -985,7 +985,6 @@ router.get('/products', async (req, res) => {
   }
 });
 
-
 // Route to delete a product by ID
 router.delete('/products/:id', async (req, res) => {
   try {
@@ -1839,7 +1838,6 @@ router.post('/driver/login', async (req, res) => {
   }
 });
 
-
 // get driver details
 router.get('/driver/profile', authenticateToken, async (req, res) => {
   try {
@@ -2622,7 +2620,6 @@ router.post('/send-email', (req, res) => {
     res.status(200).send('Email sent successfully');
   });
 });
-
 
 
 // ORDER CONFIRMATION FOR ORDERS

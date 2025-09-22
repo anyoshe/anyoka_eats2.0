@@ -1,15 +1,4 @@
-:root {
-    --green: #1ea509;
-    --orange: #ffa500;
-    --white: #ffffff;
-}
-
-* {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-    font-family: "Winky Sans", sans-serif;
-}
+/* Use app-level tokens; avoid redefining globals to prevent bleed */
 
 .userDropdown {
     /* border: 2px solid blue; */
@@ -47,9 +36,9 @@
     background-color: #fff; 
     border: none;
     cursor: pointer;
-    padding: 0.4rem;            
-    border-radius: 10%;         
-    transition: transform 0.2s ease, color 0.2s ease;
+    padding: var(--space-2);            
+    border-radius: var(--radius-md);         
+    transition: transform var(--duration-fast) var(--ease-out), color var(--duration-fast) var(--ease-out);
 }
 
 .userIconButton:hover{
@@ -66,12 +55,12 @@
 
 .userIcon {
     font-size: 1.8rem;           
-    color: var(--green);        
-    transition: color 0.2s ease, transform 0.2s ease;
+    color: var(--color-white);        
+    transition: color var(--duration-fast) var(--ease-out), transform var(--duration-fast) var(--ease-out);
 }
 
 .userIconButton:hover .userIcon {
-    color: var(--orange);        
+    color: var(--color-orange);        
     transform: scale(1.15);     
 }
 
@@ -81,26 +70,26 @@
   right: -2rem;
   top: 100%;
   border: none;
-  border-radius: 4px;
+  border-radius: var(--radius-md);
   min-width: 90px;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.12);
+  box-shadow: var(--shadow-sm);
   z-index: 10;
 }
 
 .dropdownItem {
   display: block;
   padding: 8px 16px;
-  color: var(--white);
-  background-color: var(--green);
+  color: var(--color-white);
+  background-color: var(--color-green);
   text-decoration: none;
   cursor: pointer;
   width: 100%;
 }
 
 .dropdownItem:hover {
-  background: var(--white);
-  color: var(--orange);
-  outline: var(--orange) 1px solid;
+  background: var(--color-white);
+  color: var(--color-orange);
+  outline: var(--color-orange) 1px solid;
 }
 
 
@@ -130,40 +119,49 @@
 }
 
 .landingNav {
-    /* border: 1px solid red; */
-
     position: fixed;
-    z-index: 1000;
-    /* width: inherit; */
+    z-index: var(--z-nav);
     width: 100%;
-    padding: 0.1em 2.5em;
-    display: flex;
+    padding: var(--space-1) var(--space-8);
+    display: grid;
+    grid-template-columns: auto 1fr auto;
     align-items: center;
-    justify-content: space-between;
-    background-color: var(--orange);
+    gap: var(--space-3);
+    background-color: var(--color-orange);
 }
 
 .homeLogoPic {
-    background-color: var(--white);
-    display: flex;
+    display: inline-flex;
     align-items: center;
-    border-radius: 50%;
+    gap: var(--space-2);
+    text-decoration: none;
+}
+
+.homeLogoPic:hover,
+.homeLogoPic:focus {
+    text-decoration: none;
 }
 
 .logoImg {
-    border-radius: 50%;
-    width: 2.5em;
-    height: 2.5em;
-    background-color: var(--orange);
-    margin: 0.1rem;
+    border-radius: 0.6rem;
+    width: 2.8rem;
+    height: 2.8rem;
+    background-color: var(--color-white);
+    padding: 2px;
+    box-shadow: var(--shadow-sm);
+}
+
+.brandText {
+    font-weight: 800;
+    color: var(--color-white);
 }
 
 .installLogIn {
     display: flex;
     align-items: center;
     justify-content: flex-end; 
-    gap: 2rem; 
-    min-width: 12rem; 
+    gap: var(--space-6); 
+    min-width: 12rem;
     align-items: center; 
 }
 
@@ -171,19 +169,19 @@
 .logInButton {
     padding: 0.5rem 1rem;
     font-size: 1em;
-    border-radius: 60rem;
+    border-radius: var(--radius-pill);
     border: none;
     outline: none;
-    background-color: var(--green);
-    color: var(--white);
+    background-color: var(--color-green);
+    color: var(--color-white);
     cursor: pointer;
-    transition: 0.2s ease-in;
+    transition: background var(--duration-fast) var(--ease-out), color var(--duration-fast) var(--ease-out), transform var(--duration-fast) var(--ease-out);
 }
 
 .logInButton:hover {
-    background-color: white;
-    color: var(--orange);
-    outline: 1px solid var(--orange);
+    background-color: var(--color-white);
+    color: var(--color-orange);
+    outline: 1px solid var(--color-orange);
     font-size: 1.1rem;
 }
 
@@ -192,39 +190,125 @@
 }
 
 .heroAdsDiv {
-    margin-top: 2.5em;
+    margin-top: var(--space-8);
     display: flex;
-    gap: 1em;
-    padding: 1em;
+    gap: var(--space-4);
+    padding: var(--space-4);
+    justify-content: center;
 }
+
+/* Center header ad slot */
+.adSlot {
+    justify-self: stretch;
+    align-self: center;
+    width: 100%;
+}
+
+/* Marquee banner */
+.marquee {
+    position: relative;
+    overflow: hidden;
+    height: 44px;
+    display: flex;
+    align-items: center;
+    background: rgba(255,255,255,0.9);
+    border-radius: var(--radius-md);
+    box-shadow: var(--shadow-sm);
+}
+
+.marqueeContent {
+    display: inline-flex;
+    gap: var(--space-6);
+    align-items: center;
+    white-space: nowrap;
+    padding: 0 var(--space-4);
+    min-width: 200%;
+    animation: slideLeft 22s linear infinite;
+}
+
+.marqueeContent span {
+    color: var(--color-green);
+    font-weight: 600;
+}
+
+@keyframes slideLeft {
+    0% { transform: translateX(0); }
+    100% { transform: translateX(-50%); }
+}
+
+/* Compact ad bar for small screens */
+.adBar {
+    display: none;
+    width: 100%;
+    background: var(--color-white);
+    padding: var(--space-2) var(--space-8);
+}
+
+.marqueeSmall {
+    position: relative;
+    overflow: hidden;
+    height: 36px;
+    background: var(--color-gray-50);
+    border-radius: var(--radius-md);
+    box-shadow: var(--shadow-sm);
+}
+
+.marqueeContentSmall {
+    display: inline-flex;
+    gap: var(--space-4);
+    align-items: center;
+    white-space: nowrap;
+    padding: 0 var(--space-3);
+    animation: slideLeft 16s linear infinite;
+}
+
+.marqueeContentSmall span {
+    color: var(--color-green);
+    font-weight: 600;
+}
+
+.marqueeSmall::before,
+.marqueeSmall::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    width: 24px;
+    height: 100%;
+    pointer-events: none;
+}
+
+.marqueeSmall::before { left: 0; background: linear-gradient(to right, var(--color-gray-50), rgba(250,250,250,0)); }
+.marqueeSmall::after { right: 0; background: linear-gradient(to left, var(--color-gray-50), rgba(250,250,250,0)); }
+
+.marqueeSmall:hover .marqueeContentSmall { animation-play-state: paused; }
 
 .adsDiv {
     display: flex;
     align-items: center;
-    /* padding: 1rem; */
-    /* gap: 2rem; */
-    border-radius: 1rem;
+    border-radius: var(--radius-lg);
     height: 16rem;
-    width: 30rem;
+    width: 100%;
+    max-width: 30rem;
 }
 
 .adtext {
     width: 80%;
     text-align: justify;
-    font-size: 0.9em;
+    font-size: var(--font-size-sm);
 }
 
 .adImage {
-    width: inherit;
-    height: inherit;
-    border-radius: 2%;
+    width: 100%;
+    height: auto;
+    border-radius: var(--radius-md);
+    object-fit: cover;
 }
 
 .tagline{
     /* border: 5px solid blue; */
 
     position: absolute;
-    color: var(--white);
+    color: var(--color-white);
     /* align-items: center;
     justify-content: center;
     text-align: center; */
@@ -238,33 +322,34 @@
 
 .categorySection {
     position: relative;
-    width: 80%;
+    width: min(100% - 2rem, var(--container-lg));
 }
 
 .searchContainer {
     position: relative;
     width: 100%;
-    max-width: 22rem;
-    margin: 1rem auto;
+    max-width: clamp(220px, 50vw, 560px);
+    margin: var(--space-4) auto;
 }
 
 .searchInput {
     width: 100%;
-    padding: 0.7rem 2.5rem 0.7rem 1rem;
+    padding: 0 2.5rem 0 1rem;
+    height: clamp(36px, 4.5vw, 48px);
     border-radius: 2rem;
     border: none;
     outline: 1px solid #ccc;
     font-size: 1rem;
     cursor: pointer;
-    transition: all 0.2s ease-in-out;
+    transition: all var(--duration-fast) var(--ease-out);
 }
 
 .searchInput:hover {
-    outline: 1px solid var(--orange);
+    outline: 1px solid var(--color-orange);
 }
 
 .searchInput:focus {
-  outline: 1px solid var(--orange);
+  outline: 1px solid var(--color-orange);
   box-shadow: 0 2px 8px rgba(0,0,0,0.15);
 }
 
@@ -273,7 +358,7 @@
     right: 1rem;
     top: 50%;
     transform: translateY(-50%);
-    color: var(--green);
+    color: var(--color-green);
     font-size: 1.2rem;
     cursor: pointer;
     pointer-events: none; 
@@ -283,12 +368,12 @@
   position: absolute;
   top: 110%; 
   left: 0;
-  width: 100%;
+  width: 100%; /* matches clamped search width */
   max-height: 16rem;
   overflow-y: auto;
-  background: var(--white);
-  border-radius: 0.8rem;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+  background: var(--color-white);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-md);
   z-index: 999;
   padding: 0.5rem 0;
   animation: fadeIn 0.2s ease-in-out;
@@ -297,7 +382,7 @@
 .searchResultHeader {
   font-weight: bold;
   font-size: 0.85rem;
-  color: var(--green);
+  color: var(--color-green);
   padding: 0.4rem 1rem;
   border-bottom: 1px solid #eee;
 }
@@ -315,20 +400,54 @@
 
 .searchResultItem:hover {
   background-color: rgba(30, 165, 9, 0.1);
-  color: var(--orange);
+  color: var(--color-orange);
 }
 
 .searchContainer:hover .searchIcon {
-    color: var(--orange);
+    color: var(--color-orange);
 }
 
-.categoryDivs {
+/* Compact chips (non-scrollable, wrap) */
+.chipRow {
     display: flex;
-    overflow: hidden;
-    width: 100%;
-    justify-content: space-around;
-    padding: 0.5rem;
+    flex-wrap: wrap;
+    gap: var(--space-3);
+    padding: var(--space-2) var(--space-2);
+    justify-content: center;
 }
+
+.chip {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2);
+    padding: 0.5rem 0.8rem;
+    border-radius: var(--radius-pill);
+    background: var(--color-white);
+    border: 1px solid var(--color-border);
+    color: var(--color-gray-800);
+    text-decoration: none;
+    transition: background var(--duration-fast) var(--ease-out), color var(--duration-fast) var(--ease-out), box-shadow var(--duration-fast) var(--ease-out);
+}
+
+.chip:hover,
+.chip:focus { background: var(--color-gray-50); box-shadow: var(--shadow-sm); color: var(--color-orange); text-decoration: none; }
+
+.chipIcon { color: var(--color-orange); }
+.chipLabel { font-weight: 600; font-size: 0.95rem; }
+
+/* Small-screen organic stagger (not a strict grid) */
+@media (max-width: 426px) {
+    .chipRow { justify-content: center; }
+    .chip:nth-child(odd) { transform: translateY(2px); }
+    .chip:nth-child(3n) { transform: translateY(6px); }
+}
+
+/* Subtle color rhythm */
+.chip:nth-child(2n) { background: var(--color-gray-50); }
+.chip:nth-child(3n) { background: rgba(255,165,0,0.08); border-color: rgba(255,165,0,0.25); }
+.chip:nth-child(5n) { background: rgba(30,165,9,0.06); border-color: rgba(30,165,9,0.2); }
+
+/* removed tile prototype */
 
 .categoryLinks{
     text-decoration: none;
@@ -339,16 +458,16 @@
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    padding-top: 1rem;
+    padding-top: var(--space-4);
 }
 
 .categoryPic {
-    border-radius: 50%;
-    padding: 1.2rem;
+    border-radius: var(--radius-pill);
+    padding: var(--space-4);
     font-size: 2.2rem;
     display: block;
     margin: 0 auto 0.5rem auto;
-    color: var(--orange);
+    color: var(--color-orange);
 }
 
 .slow1 { --fa-animation-duration: 2.5s; }
@@ -360,25 +479,25 @@
 .slow7 { --fa-animation-duration: 5s; }
 
 .categoryText {
-    font-size: 0.9rem;
-    padding: 0.2rem;
+    font-size: var(--font-size-sm);
+    padding: var(--space-1) var(--space-2);
     font-weight: 500;
-    color: var(--white);
-    border-radius: 0.5rem;
+    color: var(--color-white);
+    border-radius: var(--radius-md);
     width: 7rem;
     text-align: center;
     margin-top: 1rem;
-    background-color: var(--green);
+    background-color: var(--color-green);
     border: none;
     outline: none;
     cursor: pointer;
-    transition: 0.2s ease-in;
+    transition: background var(--duration-fast) var(--ease-out), color var(--duration-fast) var(--ease-out), transform var(--duration-fast) var(--ease-out);
 }
 
 .categoryText:hover {
-    color: var(--orange);
-    background-color: var(--white);
-    outline: 1px solid var(--orange);
+    color: var(--color-orange);
+    background-color: var(--color-white);
+    outline: 1px solid var(--color-orange);
 }
 
 .categoryText:active {
@@ -393,12 +512,14 @@
     .adsDiv {
         width: 38rem;
     }
+    .heroAdsDiv { margin-top: 6rem; }
 }
 
 @media (max-width: 1024px) {
     .adsDiv {
         width: 31rem;
     }
+    .heroAdsDiv { margin-top: 5rem; }
 
     .logInButton {
         padding: 0.5rem 0.7rem;
@@ -425,6 +546,9 @@
 }
 
 @media (max-width: 768px) {
+    .adSlot { display: none; }
+    .adBar { display: block; margin-top: 4.8rem; }
+    .installLogIn { min-width: 10rem; gap: var(--space-3); }
     .logoImg {
         width: 2.6em;
         height: 2.6em;
@@ -494,12 +618,9 @@
         padding: 0.4em;
         gap: 0.2rem;
     }
+    .adBar { margin-top: 3.6rem; padding: var(--space-2); }
 
-    .installLogIn {
-        width: 100%;
-        justify-content: center;
-        width: 40%;
-    }
+    .installLogIn { min-width: 9rem; gap: var(--space-2); justify-content: flex-end; }
 
     .logInButton{
         font-size: 0.5em;
@@ -511,7 +632,7 @@
         padding: 0.3rem;
         /* width: 100%; */
         width: 96%;
-        margin-top: 3.5em;
+        margin-top: 0.6rem; /* space between ad bar and ads */
         gap: 0.3rem;
         /* display: grid; */
         /* grid-template-columns: 1fr 1fr; */
@@ -527,9 +648,10 @@
 
         /* height: 10rem;
         width: 8rem; */
-        height: 100%;
-        width: 23.5rem;
+        height: auto;
+        width: 100%;
         padding: 0rem;
+        margin: 0 auto; /* center ads block */
     }
     
 
@@ -560,6 +682,7 @@
 }
 
 @media (max-width: 376px) {
+    .logInButton { padding: 0.5rem 0.8rem; }
     .searchInput {
         padding: 0.5rem 2rem 0.5rem 1rem;
     }
@@ -584,12 +707,15 @@
     }
 
     .installLogIn {
-        width: 48%;
+        width: auto;
+        margin-left: auto; /* push to far right */
+        justify-content: flex-end;
+        gap: 0.3rem;
     }
 
     .heroAdsDiv {
         padding: 0.2rem;
-        margin-top: 3em;
+        margin-top: 0.1em;
         gap: 0.2rem;
         flex-direction: column;
     }

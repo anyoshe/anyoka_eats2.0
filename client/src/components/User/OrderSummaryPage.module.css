@@ -1,38 +1,24 @@
-@import url('https://fonts.googleapis.com/css2?family=Winky+Sans:ital,wght@0,300..900;1,300..900&display=swap');
-@import url('https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&family=Winky+Sans:ital,wght@0,300..900;1,300..900&display=swap');
-
-:root {
-  --green: #1ea509;
-  --orange: #ffa500;
-  --white: #ffffff;
-}
-
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-  font-family: "Winky Sans", sans-serif;
-}
+/* Use global tokens and base layer; avoid redefining globals */
 
 .orderSummary {
   max-width: 47rem; 
-  margin: 0.625rem auto;
-  padding: 1rem;
-  border: 0.0625rem solid #ddd; 
-  border-radius: 0.75rem; 
-  background: #fff;
-  box-shadow: 0 0 0.625rem rgba(0, 0, 0, 0.05); 
+  margin: var(--space-2) auto;
+  padding: var(--space-4);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  background: var(--color-white);
+  box-shadow: var(--shadow-sm);
 }
 
 .heading {
-  color: var(--green);
-  margin-bottom: 0.5rem;
+  color: var(--color-green);
+  margin-bottom: var(--space-2);
   text-decoration: underline;
   font-size: 1.3rem;
 }
 
 .subHeading {
-  color: var(--green);
+  color: var(--color-green);
   text-decoration: underline;
   margin-bottom: 0rem;
   font-size: 1.3rem;
@@ -41,9 +27,9 @@
 .orderDetailsGrid {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  column-gap: 0.2rem; 
-  row-gap: 0.8rem;
-  margin-bottom: 1rem;
+  column-gap: var(--space-2); 
+  row-gap: var(--space-3);
+  margin-bottom: var(--space-4);
 }
 
 .detailItem{
@@ -55,38 +41,38 @@
   padding-left: 0;
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 0.2rem; 
+  gap: var(--space-2); 
 }
 
 .item {
-  padding: 0.2rem 0; 
+  padding: var(--space-1) 0; 
   border-bottom: 0.0625rem solid #eee;
-  padding-left: 0.2rem; 
+  padding-left: var(--space-1); 
 }
 
 .total {
   font-size: 1.3rem;
   font-weight: 600;
-  color: var(--orange);
-  margin-top: 1rem; 
+  color: var(--color-orange);
+  margin-top: var(--space-4); 
 }
 
 .backLink {
   display: inline-block;
-  background: var(--green);
-  color: var(--white);
+  background: var(--color-green);
+  color: var(--color-white);
   padding: 0.625rem 1.25rem; 
-  border-radius: 0.5rem; 
+  border-radius: var(--radius-md); 
   text-decoration: none;
   border: none;
   outline: none;
-  transition: all 0.3s ease;
+  transition: background var(--duration-fast) var(--ease-out), color var(--duration-fast) var(--ease-out);
 }
 
 .backLink:hover {
-  background: var(--white);
-  color: var(--orange);
-  border: 0.0625rem solid var(--orange); 
+  background: var(--color-white);
+  color: var(--color-orange);
+  border: 0.0625rem solid var(--color-orange); 
 }
 
 

@@ -11,29 +11,7 @@
   width: 100%;
 }
 
-.backButton {
-  position: absolute;
-  top: -2rem; 
-  left: 0.625rem;
-  border: none;
-  outline: none;
-  display: flex;
-  align-items: center;
-  gap: 0.3125rem; 
-  background: var(--green);
-  color: var(--white);
-  font-size: 1rem;
-  cursor: pointer;
-  padding: 0.3rem 0.4rem; 
-  border-radius: 0.3125rem; 
-  transition: background 0.2s ease;
-}
-
-.backButton:hover {
-  background:var(--white);
-  color: var(--orange);
-  outline: 1px solid var(--orange);
-}
+/* Back button moved into shared TopAdsBar component */
 
 .bodyWrapper {
   position: relative;
@@ -261,13 +239,13 @@
 
 .cartSecti{
   position: fixed;
-  right: 1rem;
-  top: 0;
+  right: 0;
+  top: calc(var(--adsbar-height, 3.2rem) + var(--controlsbar-height, 3.2rem));
   width: 26%;
   min-height: 100vh;
   background-color: var(--white);
   /* padding-top: 3.6rem; */
-  padding-top: 1rem;
+  padding-top: 0.5rem;
   padding-left: 0.5rem;
   box-shadow: -2px 0 6px rgba(0, 0, 0, 0.1);
   display: flex;

@@ -5,6 +5,7 @@ import {
   faPlus,
   faMinus,
   faTrash,
+  faCartShopping,
 } from '@fortawesome/free-solid-svg-icons';
 import styles from './CartSection.module.css';
 // import styles from '../Menu/MenuPage.module.css';
@@ -64,20 +65,25 @@ const CartSection = () => {
   const total = calculateTotal();
   return (
     <section className={styles.cartSection}>
-          <div className={styles.deliveryPointDiv}>
-            <p className={styles.deliveringP}>
-              <FontAwesomeIcon icon={faTruck} className={styles.deliveryTruck} />
-              to 
-              <span className={styles.locationChoice}>{getLocationText()}</span>
-            </p>
-              <FontAwesomeIcon icon={faCaretDown} className={styles.deliveringIcon} />
-          </div>
+      <div className={styles.deliveryPointDiv}>
+        <p className={styles.deliveringP}>
+          <FontAwesomeIcon icon={faTruck} className={styles.deliveryTruck} />
+          to 
+          <span className={styles.locationChoice}>{getLocationText()}</span>
+        </p>
+        <FontAwesomeIcon icon={faCaretDown} className={styles.deliveringIcon} />
+      </div>
 
-      <div className={styles.cartWrapperDiv}>
-        <div className={styles.cartListDiv}>
-          {cart.map((item, index) => (
+      <div className={styles.cartListDiv}>
+        {cart.length === 0 ? (
+          <div className={styles.emptyCartState}>
+            <FontAwesomeIcon icon={faCartShopping} className={styles.emptyCartIcon} />
+            <p className={styles.emptyCartText}>Your cart is empty</p>
+            <p className={styles.emptyCartSubtext}>Add some items to get started</p>
+          </div>
+        ) : (
+          cart.map((item, index) => (
             <div key={index} className={styles.cartItem}>
-              
               <div className={styles.cartItemTop}>
                 <p className={styles.cartItemName}>{item.name}</p>
                 <p className={styles.cartItemPrice}>
@@ -101,17 +107,19 @@ const CartSection = () => {
                 </button>
               </div>
             </div>
-          ))}
-        </div>
-
-        <div className={styles.cartTotal}>
-              <p className={styles.totalP}>Total</p>
-              <p className={styles.totalfigure}>KSH {calculateTotal()}</p>
-        </div>
+          ))
+        )}
       </div>
 
-      <div className={styles.doneButtonDiv} onClick={() => setShowCheckout(true)}>
-        Check Out
+      <div className={styles.cartFooter}>
+        <div className={styles.cartTotal}>
+          <p className={styles.totalP}>Total</p>
+          <p className={styles.totalfigure}>KSH {calculateTotal()}</p>
+        </div>
+
+        <div className={styles.doneButtonDiv} onClick={() => setShowCheckout(true)}>
+          Check Out
+        </div>
       </div>
 
       <CheckoutModal

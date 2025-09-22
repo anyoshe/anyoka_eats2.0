@@ -1,3 +1,35 @@
+Design System Overview
+
+Tokens and base
+- Global tokens: see src/styles/tokens.css (colors, spacing, typography, radii, shadows, z-index, containers, motion)
+- Base layer: see src/styles/base.css (reset, typography, buttons, inputs, card, utilities)
+- Primary font: Winky Sans
+- Brand colors: --color-orange (primary), --color-green (emphasis), --color-white (background)
+
+How to style components
+- Prefer CSS Modules per component to avoid global bleed
+- Use token vars instead of hardcoded values (e.g., var(--color-orange), var(--space-4), var(--radius-md))
+- For layout, use utilities from base.css: .container, .stack, .cluster, .grid
+- Buttons: add class .btn with variants (.btn--primary, .btn--emphasis, .btn--subtle) or mirror the patterns used in modules
+
+Responsive guidelines
+- Mobile-first; use fluid type via tokens and grids using repeat(auto-fit, minmax(...))
+- Breakpoints generally: 320, 375, 425, 768, 1024, 1440, 1920, 2560
+
+Accessibility and performance
+- Focus states use outline; ensure interactive elements have aria-labels where text is not present
+- Lazy-load images and keep modals dismissible via overlay
+
+Shared shell
+- Header: components/AppHeader.* (shown on routes except Landing)
+- Footer: components/AppFooter.* (rendered globally below routes)
+
+Adding new components
+1) Create ComponentName.module.css
+2) Use tokens and base utilities
+3) Keep selectors scoped and avoid global resets
+4) Validate contrast and keyboard/focus interactions
+
 # Getting Started with Create React App
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).

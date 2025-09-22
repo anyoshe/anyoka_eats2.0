@@ -9,12 +9,12 @@ const PartnershipSection = () => {
       <div className={styles.puzzleContainer}>
         {/* Vendor */}
         <div className={`${styles.puzzlePiece} ${styles.vendor}`}>
-          <img src={vendorImg} alt="" className={styles.promoImg} />
-          <div className={styles.pieceContent}>
+          <img src={vendorImg} alt="Vendor" className={styles.promoImg} />
+          <div className={styles.glassPanel}>
             <h3>Vendor's</h3>
             <p className={styles.sectionIntro}>
-              Vendor's Our platform helps you expand your reach without the hassle. 
-              We provide delivery support, and visibility you need to grow — so you can focus on what you do best
+              Our platform helps you expand your reach without the hassle. 
+              We provide delivery support and visibility you need to grow — so you can focus on what you do best.
             </p>
             <a href="/sign-up-sign-in" className={`${styles.ctaButton} ${styles.vendorCta}`}>Sign Up Now</a>
           </div>
@@ -22,7 +22,7 @@ const PartnershipSection = () => {
 
         {/* Platform */}
         <div className={`${styles.puzzlePiece} ${styles.platform}`}>
-          <div className={`${styles.pieceContent} ${styles.platformPieceContent}`}>
+          <div className={`${styles.glassPanel} ${styles.platformPieceContent}`}>
             <p>
               We bring together local vendors, reliable drivers, and valued customers in one seamless platform — 
               making buying, selling, and delivering effortless for everyone.
@@ -32,8 +32,8 @@ const PartnershipSection = () => {
 
         {/* Driver */}
         <div className={`${styles.puzzlePiece} ${styles.driver}`}>
-          <img src={driverImg} alt="" className={styles.promoImg} />
-          <div className={styles.pieceContent}>
+          <img src={driverImg} alt="Driver" className={styles.promoImg} />
+          <div className={styles.glassPanel}>
             <h3>Driver</h3>
             <p> 
               Want to earn on schedule? Sign up with no upfront costs. We partner with trusted local vendors and provide you with a steady flow of delivery orders.

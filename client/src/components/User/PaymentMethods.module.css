@@ -1,8 +1,8 @@
-/* src/components/PaymentMethods.css */
+/* Use global tokens; avoid redefining variables locally */
 
 .paymentMethods {
-  border-radius: 8px;
-  padding: 1.5rem;
+  border-radius: var(--radius-lg);
+  padding: var(--space-4);
   margin: 0 auto;
   width: inherit;
 
@@ -11,24 +11,25 @@
 .paymentMethods h4 {
   font-size: 1.5rem;
   font-weight: 600;
-  color: var(--green);
-  margin-bottom: 1rem;
+  color: var(--color-green);
+  margin-bottom: var(--space-3);
   text-decoration: underline;
 }
 
 .paymentMethodsWrapper{
   display: grid;
-  grid-template-columns: repeat(4,1fr);
+  grid-template-columns: repeat(auto-fit, minmax(10rem, 1fr));
+  gap: var(--space-3);
 }
 
 .paymentMethods label {
   display: flex;
   align-items: center;
-  margin-bottom: 0.75rem;
+  margin-bottom: var(--space-2);
   font-size: 1rem;
   color: #444;
   cursor: pointer;
-  transition: color 0.2s ease;
+  transition: color var(--duration-fast) var(--ease-out);
 }
 
 .paymentMethods label:hover {
@@ -37,7 +38,7 @@
 
 .paymentMethods input[type="radio"] {
   margin-right: 0.5rem;
-  accent-color: var(--green);
+  accent-color: var(--color-green);
   width: 1.1rem;
   height: 1.1rem;
 }
@@ -45,17 +46,17 @@
 .paymentMethods button {
   display: block;
   width: 100%;
-  background: var(--green);
+  background: var(--color-green);
   color: #fff;
   border: none;
   outline: none;
-  border-radius: 6px;
-  padding: 0.75rem;
+  border-radius: var(--radius-md);
+  padding: var(--space-3);
   font-size: 1rem;
   font-weight: 600;
   cursor: pointer;
-  margin-top: 1rem;
-  transition: background 0.2s ease, transform 0.1s ease;
+  margin-top: var(--space-3);
+  transition: background var(--duration-fast) var(--ease-out), transform var(--duration-fast) var(--ease-out), color var(--duration-fast) var(--ease-out);
 }
 
 /* .paymentMethods button:hover:not(:disabled) {
@@ -72,14 +73,14 @@
 } */
 
   .paymentMethods button:hover{
-    background-color: var(--white);
-    color: var(--orange);
-    outline: 1px solid var(--orange);
+    background-color: var(--color-white);
+    color: var(--color-orange);
+    outline: 1px solid var(--color-orange);
   }
   
   @media (max-width: 480px) {
     .paymentMethods {
-      padding: 1rem;
+      padding: var(--space-3);
     }
   
     .paymentMethods h4 {
@@ -91,7 +92,7 @@
     }
   
     .paymentMethods button {
-      padding: 0.65rem;
+      padding: var(--space-2);
       font-size: 0.95rem;
     }
   }

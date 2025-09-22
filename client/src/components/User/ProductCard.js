@@ -26,22 +26,22 @@ const ProductCard = ({ product }) => {
     setCurrentImageIndex(index);
   };
 
+ 
+const getImageSrc = (imagePath) => {
+  if (!imagePath) return '/images/placeholder-image.png';
 
-  const getImageSrc = (imagePath) => {
-    if (!imagePath) return '/images/placeholder-image.png';
+  // If path already starts with http (absolute URL), just return it
+  if (imagePath.startsWith('http')) return imagePath;
 
-    // If path already starts with http (absolute URL), just return it
-    if (imagePath.startsWith('http')) return imagePath;
+  // If the path contains "/uploads", strip everything before it
+  const relativePath = imagePath.includes('/uploads')
+    ? imagePath.substring(imagePath.indexOf('/uploads'))
+    : `/uploads/products/${imagePath}`; // fallback if only filename is saved
 
-    // If the path contains "/uploads", strip everything before it
-    const relativePath = imagePath.includes('/uploads')
-      ? imagePath.substring(imagePath.indexOf('/uploads'))
-      : `/uploads/products/${imagePath}`; // fallback if only filename is saved
+  return `${config.backendUrl}${relativePath}`;
+};
 
-    return `${config.backendUrl}${relativePath}`;
-  };
-
-
+  
 
   return (
     <div className={styles.productCard}>
@@ -62,9 +62,9 @@ const ProductCard = ({ product }) => {
                 //   e.target.src = '/path/to/placeholder-image.jpg';
                 // }}
                 onError={(e) => {
-                  e.target.onerror = null;
-                  e.target.src = '/images/placeholder.png'; // put this in /public/images/
-                }}
+  e.target.onerror = null;
+  e.target.src = '/images/placeholder.png'; // put this in /public/images/
+}}
 
               />
               <button className={styles.nextButton} onClick={handleNextImage}>
@@ -106,14 +106,14 @@ const ProductCard = ({ product }) => {
           ) : (
             <p className={styles.productPrice}>Price: Ksh {product.price.toFixed(2)}</p>
           )}
-          <p className={styles.productBrand}>Brand : {product.brand}</p>
-          <p className={styles.productCategory}>Category : {product.category}</p>
+          {/* <p className={styles.productBrand}>Brand : {product.brand}</p> */}
+          {/* <p className={styles.productCategory}>Category : {product.category}</p> */}
           <p className={styles.productInventory}>Seller : {product.shop.shopName}</p>
           <p className={styles.productInventory}>Town : {product.shop.town}</p>
           <p className={styles.productInventory}>Available : {product.inventory}</p>
 
           <div className={styles.rating}>
-            Ratings :
+            Ratings : 
             {[...Array(5)].map((_, index) => {
               const star = index + 1;
               return (
@@ -126,18 +126,18 @@ const ProductCard = ({ product }) => {
               );
             })}
           </div>
-
+          
           <p className={styles.average}>
             Average Rating: {product.ratings?.average?.toFixed(2) || 0}
             <br />
             ({product.ratings?.reviews?.length || 0} reviews)
           </p>
-          <button
+          {/* <button
             onClick={() => setShowReviews(!showReviews)}
             className={styles.toggleReviewsButton}
           >
             {showReviews ? 'Hide Reviews' : 'Show Reviews'}
-          </button>
+          </button> */}
         </div>
       </div>
 
@@ -167,8 +167,8 @@ const ProductCard = ({ product }) => {
           )}
         </div>
       )}
-      {/* <hr /> */}
-    </div>
+    {/* <hr /> */}
+  </div>
   );
 };
 

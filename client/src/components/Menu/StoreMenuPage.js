@@ -16,6 +16,8 @@ import CartSection from '../User/CartSection';
 import { CartContext } from '../../contexts/CartContext';
 import { faTruck } from '@fortawesome/free-solid-svg-icons';
 import Logout from '../User/UserLogout';
+import TopAdsBar from '../common/TopAdsBar';
+import CategoryControlsBar from '../common/CategoryControlsBar';
 
 const StoreMenuPage = () => {
     const { storeId } = useParams();
@@ -118,9 +120,25 @@ const StoreMenuPage = () => {
     return (
         <div className={styles.storeWrapper}>
 
-            <div className={styles.backButton} onClick={() => navigate(-1)}>
-                <FontAwesomeIcon icon={faCaretDown} rotation={90} /> Back
-            </div>
+            <TopAdsBar 
+                onBack={() => navigate(-1)}
+                showControls={true}
+                searchQuery={''}
+                onSearchChange={() => {}}
+                sortBy={'relevance'}
+                onSortChange={() => {}}
+                priceMin={''}
+                onPriceMinChange={() => {}}
+                priceMax={''}
+                onPriceMaxChange={() => {}}
+                selectedVendor={''}
+                onVendorChange={() => {}}
+                vendorOptions={[]}
+                ratingThreshold={'0'}
+                onRatingChange={() => {}}
+                showVendor={false}
+                showRating={false}
+            />
             
             <button className={styles.floatingCartIcon} onClick={() => setShowCart(true)}>
                 <FontAwesomeIcon icon={faCartShopping} />
@@ -256,3 +274,4 @@ const StoreMenuPage = () => {
 };
 
 export default StoreMenuPage;
+

@@ -7,6 +7,8 @@ import SignUpSignIn from './components/Landing/SignUpSignIn';
 import AccountPage from './components/User/AccountPage';
 import { PartnerProvider } from './contexts/PartnerContext';
 import InstallPrompt from './components/Header/InstallPrompt';
+import ResetPassword from './components/Landing/ResetPassword';
+import ResetPartnerPassword from './components/Landing/ResetPartnerPassword';
 import SignupPage from './components/User/SignupPage';
 import ProductCard from './components/User/ProductCard';
 import Logout from './components/User/UserLogout';
@@ -19,6 +21,8 @@ import ProfileSetupPage from './components/Menu/DriverDashboard/ProfileSetupPage
 import DriverDashboard from './components/Menu/DriverDashboard/DriverDashboard';
 import CustomerProfileDisplay from './components/Customer/CustomerProfileDisplay';
 import CustomerDashboard from './components/Customer/CustomerDashboard';
+import AppFooter from './components/AppFooter';
+import AppHeader from './components/AppHeader';
 import PasswordReset from './components/User/PasswordReset';
 import DriverPasswordReset from './components/Menu/DriverDashboard/DriverPasswordReset';
 
@@ -36,6 +40,7 @@ function App() {
                
                 <CartProvider>
     
+                    {/* Shared header on all routes except Landing */}
                     <Routes>
 
                         <Route path="/" element={<LandingPage />} />
@@ -68,6 +73,8 @@ function App() {
                         <Route path="/user" element={<AccountPage />} />
 
                     </Routes>
+
+                    <AppFooter />
 
                 </CartProvider>
 

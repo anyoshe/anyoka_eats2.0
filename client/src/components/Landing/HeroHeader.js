@@ -150,10 +150,21 @@ const HeroHeader = () => {
         <header className={styles.heroHeader}>
             <nav className={styles.landingNav}>
                 <a href="/" className={styles.homeLogoPic}>
-                    <img src={logoImg} alt="Logo" className={styles.logoImg} />
+                    <img src={logoImg} alt="Anyoka Eats" className={styles.logoImg} />
+                    <span className={styles.brandText}>Anyoka Eats</span>
                 </a>
 
-                {/* <span className={styles.tagline}>Discover. Shop. Enjoy!</span> */}
+                {/* Center Ad Slot */}
+                <div className={styles.adSlot} aria-label="Promotional banner">
+                    <div className={styles.marquee}>
+                        <div className={styles.marqueeContent}>
+                            <span>Fast local delivery</span>
+                            <span>Trusted vendors</span>
+                            <span>Great offers every day</span>
+                            <span>Secure checkout</span>
+                        </div>
+                    </div>
+                </div>
 
                 <div className={styles.installLogIn}>
                     <InstallPrompt />
@@ -188,6 +199,18 @@ const HeroHeader = () => {
                 </div>
             </nav>
 
+            {/* Compact ad bar for small screens */}
+            <div className={styles.adBar} aria-hidden>
+                <div className={styles.marqueeSmall}>
+                    <div className={styles.marqueeContentSmall}>
+                        <span>Fast local delivery</span>
+                        <span>Trusted vendors</span>
+                        <span>Great offers every day</span>
+                        <span>Secure checkout</span>
+                    </div>
+                </div>
+            </div>
+
             <div className={styles.heroAdsDiv}>
                 <div className={`${styles.leftAd} ${styles.adsDiv}`}>
                     {/* Left Ad Content */}
@@ -208,54 +231,34 @@ const HeroHeader = () => {
                         else if (type === 'partner') navigate(`/menu?shop=${item._id}`);
                     }}
                 />
-                <div className={styles.categoryDivs}>
-                    <Link to="/menu?category=Food" className={styles.categoryLinks}>
-                        <div className={styles.categoryDiv}>
-                            <i className={`fas fa-utensils fa-bounce ${styles.slow1} ${styles.categoryPic}`}></i>
-                            <p className={styles.categoryText}>Food</p>
-                        </div>
+                <div className={styles.chipRow}>
+                    <Link to="/menu?category=Food" className={styles.chip}>
+                        <i className={`fas fa-utensils ${styles.chipIcon}`}></i>
+                        <span className={styles.chipLabel}>Food</span>
                     </Link>
-
-                    <Link to="/menu?category=Fashion" className={styles.categoryLinks}>
-                        <div className={styles.categoryDiv}>
-                            <i className={`fas fa-shirt fa-shake ${styles.slow2} ${styles.categoryPic}`}></i>
-                            <p className={styles.categoryText}>Fashion</p>
-                        </div>
+                    <Link to="/menu?category=Fashion" className={styles.chip}>
+                        <i className={`fas fa-shirt ${styles.chipIcon}`}></i>
+                        <span className={styles.chipLabel}>Fashion</span>
                     </Link>
-
-                    <Link to="/menu?category=Pet Supplies" className={styles.categoryLinks}>
-                        <div className={styles.categoryDiv}>
-                            <i className={`fas fa-dog fa-beat ${styles.slow3} ${styles.categoryPic}`}></i>
-                            <p className={styles.categoryText}>Pet supplies</p>
-                        </div>
+                    <Link to="/menu?category=Pet Supplies" className={styles.chip}>
+                        <i className={`fas fa-dog ${styles.chipIcon}`}></i>
+                        <span className={styles.chipLabel}>Pet supplies</span>
                     </Link>
-
-                    <Link to="/menu?category=Toys & games" className={styles.categoryLinks}>
-                        <div className={styles.categoryDiv}>
-                            <i className={`fas fa-puzzle-piece fa-bounce ${styles.slow4} ${styles.categoryPic}`}></i>
-                            <p className={styles.categoryText}>Toys & games</p>
-                        </div>
+                    <Link to="/menu?category=Toys & games" className={styles.chip}>
+                        <i className={`fas fa-puzzle-piece ${styles.chipIcon}`}></i>
+                        <span className={styles.chipLabel}>Toys & games</span>
                     </Link>
-
-                    <Link to="/menu?category=Electronics" className={styles.categoryLinks}>
-                        <div className={styles.categoryDiv}>
-                            <i className={`fas fa-microchip fa-spin-pulse ${styles.slow5} ${styles.categoryPic}`}></i>
-                            <p className={styles.categoryText}>Electronics</p>
-                        </div>
+                    <Link to="/menu?category=Electronics" className={styles.chip}>
+                        <i className={`fas fa-microchip ${styles.chipIcon}`}></i>
+                        <span className={styles.chipLabel}>Electronics</span>
                     </Link>
-
-                    <Link to="/menu?category=Health" className={styles.categoryLinks}>
-                        <div className={styles.categoryDiv}>
-                            <i className={`fas fa-heartbeat fa-beat ${styles.slow6} ${styles.categoryPic}`}></i>
-                            <p className={styles.categoryText}>Health</p>
-                        </div>
+                    <Link to="/menu?category=Health" className={styles.chip}>
+                        <i className={`fas fa-heartbeat ${styles.chipIcon}`}></i>
+                        <span className={styles.chipLabel}>Health</span>
                     </Link>
-
-                    <Link to="/menu?category=Beauty & Personal Care" className={styles.categoryLinks}>
-                        <div className={styles.categoryDiv}>
-                            <i className={`fas fa-spa fa-flip ${styles.slow7} ${styles.categoryPic}`}></i>
-                            <p className={styles.categoryText}>Beauty</p>
-                        </div>
+                    <Link to="/menu?category=Beauty & Personal Care" className={styles.chip}>
+                        <i className={`fas fa-spa ${styles.chipIcon}`}></i>
+                        <span className={styles.chipLabel}>Beauty</span>
                     </Link>
                 </div>
 

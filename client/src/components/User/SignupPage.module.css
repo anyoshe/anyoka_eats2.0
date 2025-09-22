@@ -1,41 +1,26 @@
-@import url('https://fonts.googleapis.com/css2?family=Winky+Sans:ital,wght@0,300..900;1,300..900&display=swap');
-@import url('https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&family=Winky+Sans:ital,wght@0,300..900;1,300..900&display=swap');
-
-/* ======= Root & Global Reset ======= */
-:root {
-    --green: #1ea509;
-    --orange: #ffa500;
-    --white: #ffffff;
-}
-
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-  font-family: "Winky Sans", sans-serif;
-}
+/* Use global tokens and base layer; avoid redefining globals */
 
 
 .signup-page {
   max-width: 56rem;
-  margin: 2rem auto;
-  padding: 20px;
-  background-color: #f9f9f9;
-  border-radius: 8px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  margin: var(--space-8) auto;
+  padding: var(--space-4);
+  background-color: var(--color-gray-50);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-sm);
 }
 
 .signup-page h1 {
   text-align: center;
-  margin-bottom: 20px;
-  color: var(--green);
+  margin-bottom: var(--space-4);
+  color: var(--color-green);
   text-decoration: underline;
 }
 
 .signup-form {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
-  gap: 1rem;
+  gap: var(--space-4);
 }
 
 .signup-form .form-group {
@@ -45,20 +30,20 @@
 
 .signup-form label {
   font-weight: bold;
-  margin-bottom: 5px;
+  margin-bottom: var(--space-2);
 }
 
 .signup-form input {
   width: 100%;
-  padding: 8px;
+  padding: var(--space-2);
   border: none;
   outline: 1px solid #ccc;
-  border-radius: 4px;
+  border-radius: var(--radius-sm);
   cursor: pointer;
 }
 
 .signup-form input:hover {
-  outline: 1px solid var(--orange);
+  outline: 1px solid var(--color-orange);
 }
 
 .modal-overlay {
@@ -75,9 +60,9 @@
 }
 
 .modal-content {
-  background: white;
-  padding: 1rem;
-  border-radius: 8px;
+  background: var(--color-white);
+  padding: var(--space-3);
+  border-radius: var(--radius-lg);
   width: 90%;
   max-width: 600px;
   position: relative;
@@ -93,7 +78,7 @@
   font-size: 4rem;
   cursor: pointer;
   z-index: 100;
-  color: var(--green);
+  color: var(--color-green);
 }
 
 .selectLocation{
@@ -101,21 +86,21 @@
 }
 
 .edit-location-button {
-  background-color: var(--green);
+  background-color: var(--color-green);
   color: white;
   border: none;
-  padding: 0.5rem 1rem;
+  padding: var(--space-2) var(--space-4);
   margin-top: 0.3rem;
   cursor: pointer;
-  border-radius: 4px;
+  border-radius: var(--radius-sm);
   outline: none;
 }
 
 .edit-location-button:hover {
-  background-color: var(--white);
-  outline: 1px solid var(--orange);
-  transition: all 0.3s ease-in-out;
-  color: var(--orange);
+  background-color: var(--color-white);
+  outline: 1px solid var(--color-orange);
+  transition: all var(--duration-fast) var(--ease-out);
+  color: var(--color-orange);
 }
 
 .signup-form .map-container {
@@ -130,21 +115,21 @@
 
 .signup-form .signup-button {
   width: 100%;
-  padding: 10px;
-  background-color: var(--green);
+  padding: var(--space-3);
+  background-color: var(--color-green);
   color: white;
   border: none;
   outline: none;
-  border-radius: 4px;
+  border-radius: var(--radius-sm);
   cursor: pointer;
-  margin-top: 15px;
+  margin-top: var(--space-3);
 }
 
 .signup-form .signup-button:hover {
-  transition: background-color 0.3s ease;
-  background-color: var(--white);
-  outline: 1px solid var(--orange);
-  color: var(--orange);
+  transition: background-color var(--duration-fast) var(--ease-out);
+  background-color: var(--color-white);
+  outline: 1px solid var(--color-orange);
+  color: var(--color-orange);
 }
   
 .signup-form .signup-button:disabled {
@@ -155,7 +140,7 @@
 @media (max-width: 425px) {
   .signup-form {
     grid-template-columns: 1fr; 
-    gap: 0.75rem; 
+    gap: var(--space-3); 
   }
 
   .signup-button {
