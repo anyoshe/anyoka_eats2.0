@@ -12,7 +12,7 @@ const passport = require('passport');
 const jwt = require('jsonwebtoken');
 const LocalStrategy = require('passport-local').Strategy;
 const session = require('express-session');
-const { upload, uploadMultiple, uploadFiles, uploadProfileImage, uploadBusinessPermit, uploadProductImages } = require('../config/multer');
+const { upload, uploadMultiple, uploadFiles, uploadProfileImage, uploadBusinessPermit, uploadProductImages, uploadSignupFiles } = require('../config/multer');
 const multer = require('multer');
 const path = require('path');
 const fs = require('fs');
@@ -23,6 +23,7 @@ const nodemailer = require('nodemailer');
 const { notifyPartner, notifyDriver } = require('../socketServer');
 const geolib = require('geolib');
 const fetch = require('node-fetch');
+const crypto = require('crypto');
 
 
 
@@ -84,10 +85,19 @@ const partnerSchema = new mongoose.Schema({
   businessName: { type: String, required: true, unique: true },
   businessType: { type: String, required: true },
   contactNumber: { type: String, required: true, unique: true },
+<<<<<<< HEAD
   email: { type: String, required: false, unique: true },
   town: { type: String, required: false },
   location: { type: String, required: false },
   password: { type: String, required: true },
+=======
+  email: { type: String, required: true, unique: true },
+  town: { type: String, required: true },
+  location: { type: String, required: true },
+  password: { type: String, required: true },
+  resetToken: { type: String },
+  resetTokenExpiry: { type: Number },
+>>>>>>> 5f1de614cf49e202effe5f99d9c95f7447fa6a2d
   profileImage: { type: String, required: false },
   idNumber: { type: String, required: true, unique: true },
   businessPermit: { type: String, required: false },
@@ -120,8 +130,10 @@ router.get('/partner', authenticateToken, async (req, res) => {
   }
 });
 
-// Partner Sign up  route
-router.post('/signup', uploadBusinessPermit, async (req, res) => {
+
+
+// Partner Sign up route
+router.post('/signup', uploadSignupFiles, async (req, res) => {
   try {
     const {
       businessName,
@@ -131,16 +143,14 @@ router.post('/signup', uploadBusinessPermit, async (req, res) => {
       email,
       town,
       location,
-      password
+      password,
+      role,
     } = req.body;
 
-    console.log('Received:', req.body);
+    console.log('Received:', req.body, 'Files:', req.files);
 
     const existingPartner = await Partner.findOne({
-      $or: [
-        { businessName },
-        { contactNumber }
-      ]
+      $or: [{ businessName }, { contactNumber }],
     });
 
     if (existingPartner) {
@@ -148,7 +158,7 @@ router.post('/signup', uploadBusinessPermit, async (req, res) => {
     }
 
     const hashedPassword = await bcrypt.hash(password, 10);
-    const role = (email === 'anyokaeats@gmail.com') ? 'admin' : 'partner';
+    const effectiveRole = email === 'anyokaeats@gmail.com' ? 'admin' : role || 'partner';
 
     const newPartnerData = {
       businessName,
@@ -159,21 +169,21 @@ router.post('/signup', uploadBusinessPermit, async (req, res) => {
       town,
       location,
       password: hashedPassword,
-      role
+      role: effectiveRole,
     };
 
-
-
-    // Check if business permit is uploaded
-    if (req.file && req.file.fieldname === 'businessPermit') {
-      newPartnerData.businessPermit = `/uploads/business-permits/${req.file.filename}`;
+    // Add file paths if uploaded
+    if (req.files && req.files.businessPermit) {
+      newPartnerData.businessPermit = `/uploads/business-permits/${req.files.businessPermit[0].filename}`;
+    }
+    if (req.files && req.files.profileImage) {
+      newPartnerData.profileImage = `/uploads/profile-images/${req.files.profileImage[0].filename}`;
     }
 
     const newPartner = new Partner(newPartnerData);
     await newPartner.save();
 
-
-    // Generate JWT token after partner is created
+    // Generate JWT token
     const token = jwt.sign(
       { _id: newPartner._id, role: newPartner.role },
       process.env.JWT_SECRET,
@@ -181,16 +191,15 @@ router.post('/signup', uploadBusinessPermit, async (req, res) => {
     );
 
     res.status(201).json({
+      message: 'Sign-up successful',
       token,
-      partner: newPartner
+      partner: newPartner,
     });
-
   } catch (error) {
     console.error('Sign-up failed:', error);
-    res.status(500).json({ message: 'Server error during sign-up.' });
+    res.status(500).json({ message: error.message || 'Server error during sign-up.' });
   }
 });
-
 
 
 // Retrieve Partner Route
@@ -286,7 +295,39 @@ router.post('/upload-profile-image', (req, res) => {
   });
 });
 
+// Update/Add Business permit
+router.post('/upload-business-permit', (req, res) => {
+  uploadBusinessPermit(req, res, async (err) => {
+    if (err) {
+      return res.status(400).json({ message: err.message });
+    }
 
+    try {
+      const { partnerId } = req.body;
+      if (!partnerId || !req.file) {
+        return res.status(400).json({ message: 'Partner ID and file are required' });
+      }
+
+      const updatedPartner = await Partner.findByIdAndUpdate(
+        partnerId,
+        { businessPermit: `/uploads/business-permits/${req.file.filename}` },
+        { new: true }
+      );
+
+      if (!updatedPartner) {
+        return res.status(404).json({ message: 'Partner not found' });
+      }
+
+      res.status(200).json({
+        message: 'Business permit uploaded and profile updated successfully',
+        businessPermit: `/uploads/business-permits/${req.file.filename}`,
+      });
+    } catch (error) {
+      console.error('Error uploading business permit:', error);
+      res.status(500).json({ message: 'Server error', error: error.message });
+    }
+  });
+});
 
 
 // Route to fetch all partners
@@ -408,7 +449,7 @@ router.post('/partners/:id/rate', async (req, res) => {
 const userSchema = new mongoose.Schema({
   username: { type: String, required: true, unique: true },
   names: { type: String, required: true },
-  email: { type: String, required: false, unique: true },
+  email: { type: String, required: true, unique: true },
   phoneNumber: { type: String, required: true, unique: true },
   town: { type: String, required: true },
   location: { type: String, required: true },
@@ -417,7 +458,9 @@ const userSchema = new mongoose.Schema({
     town: { type: String },
     location: { type: String },
   }],
-  password: { type: String, required: true }
+  password: { type: String, required: true },
+  resetToken: { type: String },
+  resetTokenExpiry: { type: Number },
 });
 
 const User = mongoose.model('User', userSchema);
@@ -754,7 +797,7 @@ const productSchema = new Schema({
   brand: { type: String, required: true }, // Product brand
   tags: [{ type: String, required: false }], // Optional tags for the product
   price: { type: Number, required: true }, // Product price
-  discountedPrice: { type: Number, required: false },
+  discountedPrice: { type: Number, required: false, default: null },
   quantity: { type: Number, required: true },
   unit: { type: String, required: true }, // Unit of measurement (e.g., kg, g, etc.)
   inventory: { type: Number, required: true }, // Inventory count
@@ -786,6 +829,8 @@ const Product = mongoose.model('Product', productSchema);
 // Route to add a new product
 router.post('/products', uploadProductImages, async (req, res) => {
   try {
+    console.log('Received body:', req.body);
+    console.log('Received files:', req.files);
     const {
       name,
       description,
@@ -798,37 +843,47 @@ router.post('/products', uploadProductImages, async (req, res) => {
       quantity,
       unit,
       inventory,
-      shopId, // Partner's ID
+      shopId,
+      primaryImage,
+      deletedImages,
     } = req.body;
 
+    const newImages = [...new Set(req.files?.images?.map((file) => `/uploads/products/${file.filename}`) || [])];
 
-    const images = req.files?.images?.map((file) => `/uploads/products/${file.filename}`) || [];
-    const primaryImageFile = req.files?.primaryImage?.[0]?.path;
-    const primaryImage = primaryImageFile
-      ? `/uploads/products/${primaryImageFile.split('/').pop()}`
-      : req.body.primaryImage;
-
-
-    // Fetch the partner details using the shopId
-    const partner = await Partner.findById(shopId);
-    if (!partner) {
-      return res.status(404).json({ message: 'Shop not found' });
+    if (newImages.length > 5) {
+      return res.status(400).json({ message: 'Maximum of 5 images allowed.' });
     }
 
-    // Generate a unique product ID
-    const productId = shortid.generate();
+    const partner = await Partner.findById(shopId);
+    if (!partner) return res.status(404).json({ message: 'Shop not found' });
 
-    // Create a new product
+    let resolvedPrimaryImage = null;
+    if (primaryImage) {
+      if (primaryImage.startsWith('new:')) {
+        const idx = parseInt(primaryImage.slice(4));
+        if (idx >= 0 && idx < newImages.length) {
+          resolvedPrimaryImage = newImages[idx];
+        }
+      } else if (newImages.includes(primaryImage)) {
+        resolvedPrimaryImage = primaryImage;
+      }
+    }
+
+    if (!resolvedPrimaryImage && newImages.length > 0) {
+      resolvedPrimaryImage = newImages[0];
+    }
+
+    const productId = shortid.generate();
     const newProduct = new Product({
       productId,
       name,
       description,
-      images,
-      primaryImage,
+      images: newImages,
+      primaryImage: resolvedPrimaryImage,
       category,
       subCategory,
       brand,
-      tags,
+      tags: tags ? tags.split(',').map((tag) => tag.trim()) : [],
       price,
       discountedPrice,
       quantity,
@@ -842,32 +897,94 @@ router.post('/products', uploadProductImages, async (req, res) => {
       },
     });
 
-    if (discountedPrice !== undefined) {
-      newProduct.discountedPrice = discountedPrice;
-    }
-
-    // Save the product to the database
     await newProduct.save();
-
     res.status(201).json({ message: 'Product added successfully', product: newProduct });
   } catch (error) {
-    console.error('Error adding product:', error);
+    console.error('Error adding product:', error, error.stack);
     res.status(500).json({ message: 'Failed to add product', error: error.message });
   }
 });
 
+router.put('/products/:id', uploadProductImages, async (req, res) => {
+  try {
+    console.log('Received body:', req.body);
+    console.log('Received files:', req.files);
+    const product = await Product.findById(req.params.id);
+    if (!product) return res.status(404).json({ message: 'Product not found' });
+
+    product.name = req.body.name || product.name;
+    product.description = req.body.description || product.description;
+    product.category = req.body.category || product.category;
+    product.subCategory = req.body.subCategory || product.subCategory;
+    product.brand = req.body.brand || product.brand;
+    product.tags = req.body.tags ? req.body.tags.split(',').map((tag) => tag.trim()) : product.tags;
+    product.price = req.body.price || product.price;
+
+  if (
+  req.body.discountedPrice === '' ||
+  req.body.discountedPrice === '0' ||
+  Number(req.body.discountedPrice) === 0
+) {
+  product.discountedPrice = null;
+} else if (req.body.discountedPrice !== undefined) {
+  product.discountedPrice = req.body.discountedPrice;
+}
+    product.quantity = req.body.quantity || product.quantity;
+    product.unit = req.body.unit || product.unit;
+    product.inventory = req.body.inventory || product.inventory;
+
+    const deletedImages = req.body.deletedImages ? JSON.parse(req.body.deletedImages) : [];
+    if (deletedImages.length > 0) {
+      product.images = product.images.filter((img) => !deletedImages.includes(img));
+      if (deletedImages.includes(product.primaryImage)) {
+        product.primaryImage = null;
+      }
+    }
+
+    const newImages = [...new Set(req.files?.images?.map((file) => `/uploads/products/${file.filename}`) || [])];
+    const existingImages = product.images.filter((img) => !newImages.includes(img));
+    product.images = [...existingImages, ...newImages];
+
+    if (product.images.length > 5) {
+      return res.status(400).json({ message: 'Total images cannot exceed 5.' });
+    }
+
+    let resolvedPrimaryImage = product.primaryImage;
+    const primaryFromBody = req.body.primaryImage;
+
+    if (primaryFromBody) {
+      if (primaryFromBody.startsWith('new:')) {
+        const idx = parseInt(primaryFromBody.slice(4));
+        if (idx >= 0 && idx < newImages.length) {
+          resolvedPrimaryImage = newImages[idx];
+        }
+      } else if (product.images.includes(primaryFromBody)) {
+        resolvedPrimaryImage = primaryFromBody;
+      }
+    }
+
+    if (!resolvedPrimaryImage && product.images.length > 0) {
+      resolvedPrimaryImage = product.images[0];
+    }
+
+    product.primaryImage = resolvedPrimaryImage;
+    product.updatedAt = Date.now();
+
+    await product.save();
+    res.status(200).json({ message: 'Product updated successfully', product });
+  } catch (error) {
+    console.error('Error updating product:', error, error.stack);
+    res.status(500).json({ message: 'Failed to update product', error: error.message });
+  }
+});
 
 router.get('/products', async (req, res) => {
   try {
-    const { partnerId } = req.query; // Get partnerId from query parameters
-
+    const { partnerId } = req.query;
     if (!partnerId) {
       return res.status(400).json({ message: 'Partner ID is required' });
     }
-
-    // Fetch products for the specific partner
     const products = await Product.find({ 'shop.shopId': partnerId });
-
     res.status(200).json({ products });
   } catch (error) {
     console.error('Error fetching products:', error);
@@ -895,184 +1012,6 @@ router.delete('/products/:id', async (req, res) => {
 });
 
 
-// router.put('/products/:id', uploadProductImages, async (req, res) => {
-//   try {
-//     const productId = req.params.id;
-//     const {
-//       name,
-//       description,
-//       category,
-//       subCategory,
-//       brand,
-//       tags,
-//       price,
-//       discountedPrice,
-//       quantity,
-//       unit,
-//       inventory,
-//       primaryImage,   // fallback primary image from req.body
-//       deletedImages,  // This should be a JSON string
-//     } = req.body;
-
-//     // Extract additional images (if any)
-//     const images = (req.files && req.files.images && Array.isArray(req.files.images))
-//       ? req.files.images.map((file) => `/uploads/products/${file.filename}`)
-//       : [];
-
-//     // Extract primary image file if uploaded
-//     const primaryImageFile = (req.files && req.files.primaryImage && Array.isArray(req.files.primaryImage))
-//       ? `/uploads/products/${req.files.primaryImage[0].filename}`
-//       : null;
-
-//     // Use the primary image file if available; otherwise, fallback to primaryImage from req.body.
-//     const finalPrimaryImage = primaryImageFile || primaryImage;
-
-//     // Normalize deleted image paths to match stored paths
-//     const deletedImagesArray = deletedImages
-//       ? JSON.parse(deletedImages).map((imgPath) => {
-//         const parts = imgPath.split('/uploads/');
-//         return parts.length > 1 ? `/uploads/${parts[1]}` : imgPath;
-//       })
-//       : [];
-
-//     const updatedProduct = await Product.findById(productId);
-//     if (!updatedProduct) {
-//       return res.status(404).json({ message: 'Product not found' });
-//     }
-
-//     // Update product fields
-//     updatedProduct.name = name || updatedProduct.name;
-//     updatedProduct.description = description || updatedProduct.description;
-//     updatedProduct.category = category || updatedProduct.category;
-//     updatedProduct.subCategory = subCategory || updatedProduct.subCategory;
-//     updatedProduct.brand = brand || updatedProduct.brand;
-//     updatedProduct.tags = tags ? tags.split(',').map((tag) => tag.trim()) : updatedProduct.tags;
-//     updatedProduct.price = price || updatedProduct.price;
-//     updatedProduct.quantity = quantity || updatedProduct.quantity;
-//     updatedProduct.unit = unit || updatedProduct.unit;
-//     updatedProduct.inventory = inventory || updatedProduct.inventory;
-//     updatedProduct.primaryImage = finalPrimaryImage || updatedProduct.primaryImage;
-
-//     // Add new images
-//     updatedProduct.images.push(...images);
-
-//     // Remove deleted images from the images array
-//     if (deletedImagesArray.length > 0) {
-//       updatedProduct.images = updatedProduct.images.filter(
-//         (image) => !deletedImagesArray.includes(image)
-//       );
-
-//       // Delete the files from the file system
-//       deletedImagesArray.forEach((imagePath) => {
-//         const fullPath = path.join(__dirname, '..', imagePath); // Resolve path relative to the project
-//         if (fs.existsSync(fullPath)) {
-//           fs.unlink(fullPath, (err) => {
-//             if (err) {
-//               console.error(`Failed to delete image file: ${fullPath}`, err);
-//             }
-//           });
-//         } else {
-//           console.warn(`File not found: ${fullPath}`);
-//         }
-//       });
-//     }
-//     if (discountedPrice !== undefined) {
-//       updatedProduct.discountedPrice = discountedPrice;
-//     }
-
-//     await updatedProduct.save();
-//     res.status(200).json({ message: 'Product updated successfully', product: updatedProduct });
-//   } catch (error) {
-//     console.error('Error updating product:', error);
-//     res.status(500).json({ message: 'Failed to update product', error: error.message });
-//   }
-// });
-
-
-router.put('/products/:id', uploadProductImages, async (req, res) => {
-  try {
-    const productId = req.params.id;
-    const {
-      name,
-      description,
-      category,
-      subCategory,
-      brand,
-      tags,
-      price,
-      discountedPrice,
-      quantity,
-      unit,
-      inventory,
-      primaryImage,   // fallback primary image (string from body)
-      deletedImages,  // JSON string
-    } = req.body;
-
-    const product = await Product.findById(productId);
-    if (!product) {
-      return res.status(404).json({ message: 'Product not found' });
-    }
-
-    // 1️⃣ Normalize deleted images
-    const deletedImagesArray = deletedImages
-      ? JSON.parse(deletedImages).map((imgPath) => {
-          const parts = imgPath.split('/uploads/');
-          return parts.length > 1 ? `/uploads/${parts[1]}` : imgPath;
-        })
-      : [];
-
-    // 2️⃣ Remove deleted images from DB + filesystem
-    if (deletedImagesArray.length > 0) {
-      product.images = product.images.filter((img) => !deletedImagesArray.includes(img));
-
-      deletedImagesArray.forEach((imgPath) => {
-        const fullPath = path.join(__dirname, '..', imgPath);
-        if (fs.existsSync(fullPath)) {
-          fs.unlink(fullPath, (err) => {
-            if (err) console.error(`Failed to delete: ${fullPath}`, err);
-          });
-        }
-      });
-    }
-
-    // 3️⃣ Handle new uploaded images
-    const newImages = (req.files?.images || []).map((file) => `/uploads/products/${file.filename}`);
-    if (newImages.length > 0) {
-      // Merge without duplicates
-      const uniqueImages = new Set([...product.images, ...newImages]);
-      product.images = Array.from(uniqueImages);
-    }
-
-    // 4️⃣ Handle primary image
-    const newPrimaryImage = req.files?.primaryImage?.[0]
-      ? `/uploads/products/${req.files.primaryImage[0].filename}`
-      : primaryImage;
-
-    if (newPrimaryImage) {
-      product.primaryImage = newPrimaryImage;
-    }
-
-    // 5️⃣ Update other fields
-    product.name = name || product.name;
-    product.description = description || product.description;
-    product.category = category || product.category;
-    product.subCategory = subCategory || product.subCategory;
-    product.brand = brand || product.brand;
-    product.tags = tags ? tags.split(',').map((tag) => tag.trim()) : product.tags;
-    product.price = price || product.price;
-    product.discountedPrice = discountedPrice !== undefined ? discountedPrice : product.discountedPrice;
-    product.quantity = quantity || product.quantity;
-    product.unit = unit || product.unit;
-    product.inventory = inventory || product.inventory;
-
-    await product.save();
-
-    res.status(200).json({ message: 'Product updated successfully', product });
-  } catch (error) {
-    console.error('Error updating product:', error);
-    res.status(500).json({ message: 'Failed to update product', error: error.message });
-  }
-});
 
 // Route to fetch all products
 router.get('/all-products', async (req, res) => {
@@ -1219,90 +1158,17 @@ router.post('/products/:id/rate', async (req, res) => {
   }
 });
 
-//Handling distance calculations.
-// router.get('/distance', async (req, res) => {
-//   const { origins, destinations } = req.query;
-
-//   try {
-//     const response = await fetch(`https://maps.googleapis.com/maps/api/distancematrix/json?origins=${origins}&destinations=${destinations}&key=${process.env.GOOGLE_API_KEY}`);
-//     const data = await response.json();
-//     res.json(data);
-//   } catch (err) {
-//     console.error('Error fetching from Google:', err);
-//     res.status(500).json({ error: 'Google API fetch failed' });
-//   }
-// });
-
-
-
+// Handling distance calculations.
 router.get('/distance', async (req, res) => {
   const { origins, destinations } = req.query;
-  const orsApiKey = process.env.ORS_API_KEY;
 
   try {
-    const originArr = origins.split('|');
-    const [destLng, destLat] = destinations.split(',').map(Number);
-
-    const snapToRoad = async (lng, lat) => {
-      const nearestUrl = `https://api.openrouteservice.org/v2/snap/driving-car?api_key=${orsApiKey}&point=${lat},${lng}`;
-      const snapRes = await fetch(nearestUrl);
-
-      if (!snapRes.ok) return { lng, lat }; // fallback to original
-      const snapData = await snapRes.json();
-
-      if (snapData?.coordinates) {
-        return {
-          lng: snapData.coordinates[0],
-          lat: snapData.coordinates[1]
-        };
-      }
-      return { lng, lat };
-    };
-
-    const results = await Promise.all(originArr.map(async (origin) => {
-      const [origLng, origLat] = origin.split(',').map(Number);
-
-      // Validate coordinates
-      if (
-        isNaN(origLng) || isNaN(origLat) ||
-        isNaN(destLng) || isNaN(destLat)
-      ) {
-        return { elements: [{ status: 'ERROR', message: 'Invalid coordinates' }] };
-      }
-
-      // Snap both origin & destination to roads
-      const snappedOrigin = await snapToRoad(origLng, origLat);
-      const snappedDest = await snapToRoad(destLng, destLat);
-
-      const url = `https://api.openrouteservice.org/v2/directions/driving-car?api_key=${orsApiKey}&start=${snappedOrigin.lng},${snappedOrigin.lat}&end=${snappedDest.lng},${snappedDest.lat}`;
-      const orsRes = await fetch(url);
-
-      if (!orsRes.ok) {
-        const errorText = await orsRes.text();
-        console.error(`ORS API error (${orsRes.status}):`, errorText);
-        return { elements: [{ status: 'ERROR', message: errorText }] };
-      }
-
-      const orsData = await orsRes.json();
-
-      if (orsData?.features?.[0]) {
-        return {
-          elements: [{
-            status: 'OK',
-            distance: { value: orsData.features[0].properties.summary.distance },
-            duration: { value: orsData.features[0].properties.summary.duration },
-          }]
-        };
-      } else {
-        return { elements: [{ status: 'ZERO_RESULTS' }] };
-      }
-    }));
-
-    res.json({ status: 'OK', rows: results });
-
+    const response = await fetch(`https://maps.googleapis.com/maps/api/distancematrix/json?origins=${origins}&destinations=${destinations}&key=${process.env.GOOGLE_API_KEY}`);
+    const data = await response.json();
+    res.json(data);
   } catch (err) {
-    console.error('ORS error:', err);
-    res.status(500).json({ status: 'ERROR', error: err.message });
+    console.error('Error fetching from Google:', err);
+    res.status(500).json({ error: 'Google API fetch failed' });
   }
 });
 
@@ -1815,9 +1681,10 @@ router.delete('/partner-notifications/:id', async (req, res) => {
 const DriverSchema = new mongoose.Schema({
   username: { type: String, required: true, unique: true },
   phoneNumber: { type: String, required: true, unique: true },
-  email: { type: String, unique: true },
+  email: { type: String, required: true, unique: true },
   password: { type: String, required: true },
-
+  resetToken: { type: String },
+  resetTokenExpiry: { type: Number },
   nationalId: { type: String, required: true, unique: true },
   driverLicenseNumber: { type: String, required: true, unique: true },
   profilePhotoUrl: { type: String },
@@ -2546,17 +2413,196 @@ router.post('/mpesa/status', async (req, res) => {
 
 
 
-
-//MAILS POST
-
-// Configure your email service
+// Configure nodemailer
 const transporter = nodemailer.createTransport({
   service: 'gmail',
   auth: {
-    user: 'anyokaeats@gmail.com',
-    pass: 'hsvu kcue lejt cmks',
+    user: process.env.GMAIL_USER,
+    pass: process.env.GMAIL_APP_PASSWORD,
   },
 });
+
+// Verify transporter configuration
+transporter.verify((error, success) => {
+  if (error) {
+    console.error('Nodemailer verification error:', error);
+  } else {
+    console.log('Nodemailer is ready to send emails');
+  }
+});
+
+// Request password reset (send email with reset link)
+router.post('/auth/request-reset', async (req, res) => {
+  const { email, accountType } = req.body;
+
+  try {
+    if (!email) {
+      return res.status(400).json({ message: 'Email is required' });
+    }
+    let account;
+    let role = accountType || 'user';
+
+    if (role === 'partner') {
+      account = await Partner.findOne({ email });
+    } else {
+      account = await User.findOne({ email });
+    }
+
+    if (!account) {
+      return res.status(404).json({ message: 'No account found with this email.' });
+    }
+
+    const resetToken = crypto.randomBytes(32).toString('hex');
+    const resetTokenExpiry = Date.now() + 3600000;
+
+    account.resetToken = resetToken;
+    account.resetTokenExpiry = resetTokenExpiry;
+    await account.save({ validateBeforeSave: false });
+
+    const resetUrl = `${process.env.FRONTEND_URL}/password-reset?token=${resetToken}&email=${email}&accountType=${role}`;
+    const mailOptions = {
+      from: 'anyokaeats@gmail.com',
+      to: email,
+      subject: 'Password Reset Request',
+      html: `
+        <p>You requested a password reset.</p>
+        <p>Click this <a href="${resetUrl}">link</a> to reset your password.</p>
+        <p>This link will expire in 1 hour.</p>
+      `,
+    };
+
+    console.log('Sending email to:', email);
+    await transporter.sendMail(mailOptions);
+    res.status(200).json({ message: 'Password reset link sent to your email.' });
+  } catch (error) {
+    console.error('Error during password reset request:', error.message, error.stack);
+    res.status(500).json({ message: 'Server error', error: error.message });
+  }
+});
+
+// Reset password (email-based)
+router.post('/auth/reset-password', async (req, res) => {
+  const { token, email, newPassword, accountType } = req.body;
+
+  try {
+    if (!token || !email || !newPassword) {
+      return res.status(400).json({ message: 'Token, email, and new password are required.' });
+    }
+
+    let account;
+    let role = accountType || 'user';
+
+    if (role === 'partner') {
+      account = await Partner.findOne({
+        email,
+        resetToken: token,
+        resetTokenExpiry: { $gt: Date.now() },
+      });
+    } else {
+      account = await User.findOne({
+        email,
+        resetToken: token,
+        resetTokenExpiry: { $gt: Date.now() },
+      });
+    }
+
+    if (!account) {
+      return res.status(400).json({ message: 'Invalid or expired reset token, or email does not match.' });
+    }
+
+    const hashedPassword = await bcrypt.hash(newPassword, 10);
+    account.password = hashedPassword;
+    account.resetToken = undefined;
+    account.resetTokenExpiry = undefined;
+    await account.save({ validateBeforeSave: false });
+
+    res.status(200).json({ message: 'Password reset successfully.' });
+  } catch (error) {
+    console.error('Error during password reset:', error.message, error.stack);
+    res.status(500).json({ message: 'Server error', error: error.message });
+  }
+});
+
+
+
+
+// Request driver password reset (send email with reset link)
+router.post('/driver/request-reset', async (req, res) => {
+  const { email } = req.body;
+
+  try {
+    if (!email) {
+      return res.status(400).json({ message: 'Email is required' });
+    }
+
+    const driver = await Driver.findOne({ email });
+    if (!driver) {
+      return res.status(404).json({ message: 'No driver found with this email.' });
+    }
+
+    const resetToken = crypto.randomBytes(32).toString('hex');
+    const resetTokenExpiry = Date.now() + 3600000; // 1 hour
+
+    driver.resetToken = resetToken;
+    driver.resetTokenExpiry = resetTokenExpiry;
+    await driver.save({ validateBeforeSave: false });
+
+    // frontend reset page with query params for auto-fill
+    const resetUrl = `${process.env.FRONTEND_URL}/driver/reset-password?token=${resetToken}&email=${email}`;
+    const mailOptions = {
+      from: 'anyokaeats@gmail.com',
+      to: email,
+      subject: 'Driver Password Reset Request',
+      html: `
+        <p>You requested a password reset.</p>
+        <p>Click this <a href="${resetUrl}">link</a> to reset your password.</p>
+        <p>This link will expire in 1 hour.</p>
+      `,
+    };
+
+    console.log('Sending reset email to driver:', email);
+    await transporter.sendMail(mailOptions);
+
+    res.status(200).json({ message: 'Password reset link sent to your email.' });
+  } catch (error) {
+    console.error('Error during driver password reset request:', error.message, error.stack);
+    res.status(500).json({ message: 'Server error', error: error.message });
+  }
+});
+
+// Reset password (email-based)
+router.post('/driver/reset-password', async (req, res) => {
+  const { token, email, newPassword } = req.body;
+
+  try {
+    if (!token || !email || !newPassword) {
+      return res.status(400).json({ message: 'Token, email, and new password are required.' });
+    }
+
+    const driver = await Driver.findOne({
+      email,
+      resetToken: token,
+      resetTokenExpiry: { $gt: Date.now() },
+    });
+
+    if (!driver) {
+      return res.status(400).json({ message: 'Invalid or expired reset token, or email does not match.' });
+    }
+
+    const hashedPassword = await bcrypt.hash(newPassword, 10);
+    driver.password = hashedPassword;
+    driver.resetToken = undefined;
+    driver.resetTokenExpiry = undefined;
+    await driver.save({ validateBeforeSave: false });
+
+    res.status(200).json({ message: 'Password reset successfully.' });
+  } catch (error) {
+    console.error('Error during driver password reset:', error.message, error.stack);
+    res.status(500).json({ message: 'Server error', error: error.message });
+  }
+});
+
+//MAILS POST
 
 // Route to handle form submission
 router.post('/send-email', (req, res) => {
@@ -2582,151 +2628,6 @@ router.post('/send-email', (req, res) => {
   });
 });
 
-// DRIVER FORGOT PASSWORD ROUTES
-
-router.post('/driverForgotPassword', async (req, res) => {
-  const { email, idNumber } = req.body; // Assuming you send both email and IDNumber from the frontend
-  console.log(email, idNumber); // For debugging
-
-  try {
-    // Find driver by IDNumber
-    const driver = await Driver.findOne({ IDNumber: idNumber }); // Find driver by both email and IDNumber
-    if (!driver) {
-      return res.status(404).json({ message: 'Driver with this email and IDNumber does not exist.' });
-    }
-    console.log(driver)
-    console.log(driver._id)
-    // Generate a reset token with driver ID
-    const resetToken = jwt.sign({ driverId: driver._id, idNumber: driver.IDNumber }, RESET_PASSWORD_SECRET, { expiresIn: RESET_PASSWORD_EXPIRY });
-
-    // Construct the reset link
-    const resetLink = `${process.env.FRONTEND_URL}/reset-password?token=${resetToken}`; // Ensure using backticks for string interpolation
-
-    // Send email
-    await transporter.sendMail({
-      from: process.env.EMAIL_USER,
-      to: email,
-      subject: 'Password Reset Request',
-      html: `<p>Click the link below to reset your password:</p><a href="${resetLink}">Reset Password</a>`, // Use backticks for HTML template
-    });
-
-    res.json({ message: 'Password reset email sent. Please check your inbox.' });
-  } catch (error) {
-    console.error('Error sending password reset email:', error);
-    res.status(500).json({ message: 'Error sending password reset email. Please try again.' });
-  }
-});
-
-
-// Password reset route
-router.post('/reset-password', async (req, res) => {
-  const { token, newPassword, idNumber } = req.body;
-  console.log(req.body);
-
-  try {
-    // Verify the token
-    const decoded = jwt.verify(token, RESET_PASSWORD_SECRET);
-    const driverId = decoded.driverId;
-    console.log("Decoded Driver ID:", driverId);
-
-    // Find driver by ID and verify ID number
-    const driver = await Driver.findById(driverId);
-    if (!driver || driver.IDNumber !== Number(idNumber)) {
-      return res.status(403).json({ message: 'Invalid ID number. Please try again.' });
-    }
-
-    // Hash the new password outside of the pre-save hook
-    const salt = await bcrypt.genSalt(10);
-    const hashedPassword = await bcrypt.hash(newPassword, salt);
-
-    // Update the password directly in the database
-    await Driver.findByIdAndUpdate(driverId, { password: hashedPassword });
-
-    res.json({ message: 'Password has been reset successfully' });
-  } catch (err) {
-    if (err.name === 'TokenExpiredError') {
-      return res.status(400).json({ message: 'Reset token has expired. Please request a new one.' });
-    }
-    console.error(err);
-    res.status(500).json({ message: 'Server error' });
-  }
-});
-
-
-// PARTNER FORGOT PASSWORD ROUTES
-
-router.post('/recover-password', async (req, res) => {
-  const { email, contactNumber } = req.body;
-  console.log(req.body);
-
-  try {
-    // Find the partner by email and contact number
-    const partner = await Partner.findOne({ contactNumber });
-    if (!partner) {
-      return res.status(404).json({ message: 'Partner not found with this email and contact number.' });
-    }
-
-    console.log(partner);
-
-    // Generate a reset token with partner ID
-    const resetToken = jwt.sign(
-      { partnerId: partner._id, contactNumber: partner.contactNumber },
-      RESET_PASSWORD_SECRET,
-      { expiresIn: RESET_PASSWORD_EXPIRY }
-    );
-
-    // Construct the reset link
-    const resetLink = `${process.env.FRONTEND_URL}/reset-partner-password?token=${resetToken}`; // Ensure using backticks for string interpolation
-
-
-
-    // Send email with reset link
-    await transporter.sendMail({
-      from: process.env.EMAIL_USER,
-      to: email,
-      subject: 'Password Reset Request',
-      html: `<p>You requested a password reset. Click the link below to reset your password:</p><a href="${resetLink}">Reset Password</a>`, // Use HTML for better formatting
-    });
-
-    res.status(200).json({ message: 'Password reset email sent. Please check your inbox.' });
-  } catch (error) {
-    console.error('Error in password recovery:', error);
-    res.status(500).json({ message: 'Internal server error' });
-  }
-});
-
-
-router.post('/reset-partner-password', async (req, res) => {
-  const { token, newPassword } = req.body;
-
-  try {
-    // Verify the token
-    const decoded = jwt.verify(token, RESET_PASSWORD_SECRET);
-    const { partnerId } = decoded;
-
-    // Find the partner by ID
-    const partner = await Partner.findById(partnerId);
-    if (!partner) {
-      return res.status(404).json({ message: 'Partner not found.' });
-    }
-
-    // Hash the new password
-    const salt = await bcrypt.genSalt(10);
-    const hashedPassword = await bcrypt.hash(newPassword, salt);
-
-    // Update the partner's password
-    partner.password = hashedPassword; // Store the hashed password
-    await partner.save();
-
-    res.status(200).json({ message: 'Password has been reset successfully.' });
-  } catch (error) {
-    if (error.name === 'TokenExpiredError') {
-      return res.status(400).json({ message: 'Reset token has expired. Please request a new one.' });
-    }
-    console.error('Error resetting password:', error);
-    res.status(500).json({ message: 'Failed to reset password. Please try again.' });
-  }
-});
 
 // ORDER CONFIRMATION FOR ORDERS
 

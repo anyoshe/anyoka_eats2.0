@@ -188,7 +188,6 @@ const DriverSignup = () => {
               <button type="submit" className={styles.submitButton}>
                 Login
               </button>
-
               {error && <div className={styles.errorMessage}>{error}</div>}
               {success && <div className={styles.successMessage}>{success}</div>}
             </form>

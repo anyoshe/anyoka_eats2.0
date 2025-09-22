@@ -44,15 +44,15 @@ function App() {
                         <Route path="/" element={<LandingPage />} />
                         <Route path="/sign-up-sign-in" element={<SignUpSignIn />} />
                         <Route path="/sign-in" element={<Login />} />
-                        <Route path="/reset-password" element={<ResetPassword />} />
                         <Route path="/product/:id" element={<ProductCard />} />
                         <Route path="/signup" element={<SignupPage />} />
                         <Route path="/driver-signup" element={<DriverSignup />} />
                         <Route path="/driver/profile-setup" element={<ProfileSetupPage />} />
                         <Route path="/driver/dashboard" element={<DriverDashboard />} />
-                        <Route path="/reset-partner-password" element={<ResetPartnerPassword />} />
                         <Route path="/dashboard" element={<AccountPage />} />
                         <Route path="/customer-dashboard" element={<CustomerDashboard />} />
+                        <Route path="/password-reset" element={<PasswordReset />} />
+                        <Route path="/driver/reset-password" element={<DriverPasswordReset />} />
                         
                         <Route path="/menu" element={
                             <CartProvider>
