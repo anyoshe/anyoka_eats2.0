@@ -85,19 +85,12 @@ const partnerSchema = new mongoose.Schema({
   businessName: { type: String, required: true, unique: true },
   businessType: { type: String, required: true },
   contactNumber: { type: String, required: true, unique: true },
-<<<<<<< HEAD
-  email: { type: String, required: false, unique: true },
-  town: { type: String, required: false },
-  location: { type: String, required: false },
-  password: { type: String, required: true },
-=======
   email: { type: String, required: true, unique: true },
   town: { type: String, required: true },
   location: { type: String, required: true },
   password: { type: String, required: true },
   resetToken: { type: String },
   resetTokenExpiry: { type: Number },
->>>>>>> 5f1de614cf49e202effe5f99d9c95f7447fa6a2d
   profileImage: { type: String, required: false },
   idNumber: { type: String, required: true, unique: true },
   businessPermit: { type: String, required: false },

@@ -23,6 +23,8 @@ import CustomerProfileDisplay from './components/Customer/CustomerProfileDisplay
 import CustomerDashboard from './components/Customer/CustomerDashboard';
 import AppFooter from './components/AppFooter';
 import AppHeader from './components/AppHeader';
+import PasswordReset from './components/User/PasswordReset';
+import DriverPasswordReset from './components/Menu/DriverDashboard/DriverPasswordReset';
 
 
 function App() {
