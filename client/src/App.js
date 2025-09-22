@@ -7,8 +7,6 @@ import SignUpSignIn from './components/Landing/SignUpSignIn';
 import AccountPage from './components/User/AccountPage';
 import { PartnerProvider } from './contexts/PartnerContext';
 import InstallPrompt from './components/Header/InstallPrompt';
-import ResetPassword from './components/Landing/ResetPassword';
-import ResetPartnerPassword from './components/Landing/ResetPartnerPassword';
 import SignupPage from './components/User/SignupPage';
 import ProductCard from './components/User/ProductCard';
 import Logout from './components/User/UserLogout';
