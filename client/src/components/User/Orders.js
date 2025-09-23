@@ -114,7 +114,23 @@ const Orders = () => {
     document.body.removeChild(link);
   };
 
-  if (loading) return <p>Loading orders...</p>;
+  if (loading) return (
+    <div className={styles["orders-container"]}>
+      <div className={styles.skeletonWrapperOrders}>
+        <div className={styles.skeletonGridOrders}>
+          {Array.from({ length: 6 }).map((_, i) => (
+            <div key={i} className={styles.skeletonCardOrders}>
+              <div className={styles.skeletonLineOrders} />
+              <div className={styles.skeletonLineShortOrders} />
+              <div className={styles.skeletonLineOrders} />
+              <div className={styles.skeletonLineShortOrders} />
+              <div className={styles.skeletonLineOrders} />
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
   if (orders.length === 0) return <p>No orders found.</p>;
 
   return (

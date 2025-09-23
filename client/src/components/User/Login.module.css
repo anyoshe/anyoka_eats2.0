@@ -88,6 +88,31 @@
   box-shadow: 0 0 0 3px rgba(255,165,0,0.25);
 }
 
+/* Improve selects to match inputs and enhance UX */
+.form select {
+  padding: var(--space-3);
+  font-size: 1rem;
+  border: 1px solid #ddd;
+  border-radius: var(--radius-md);
+  outline: none;
+  background: var(--color-white);
+  color: var(--color-text);
+  transition: border-color var(--duration-fast) var(--ease-out), box-shadow var(--duration-fast) var(--ease-out);
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  background-image: linear-gradient(45deg, transparent 50%, var(--color-gray-600) 50%),
+    linear-gradient(135deg, var(--color-gray-600) 50%, transparent 50%);
+  background-position: calc(100% - 18px) calc(50% + 2px), calc(100% - 12px) calc(50% + 2px);
+  background-size: 6px 6px, 6px 6px;
+  background-repeat: no-repeat;
+}
+
+.form select:focus {
+  border-color: var(--color-orange);
+  box-shadow: 0 0 0 3px rgba(255,165,0,0.25);
+}
+
 .form button {
   padding: var(--space-3);
   font-size: 1.2rem;

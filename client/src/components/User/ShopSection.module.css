@@ -2,6 +2,14 @@
   /* border: 2px solid green;   */
 
   margin-top: 0.4rem;
+  margin-bottom: 2.5rem; /* ensure space before footer */
+  background: var(--color-white);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-sm);
+  padding: 1rem;
+  position: relative; /* create stacking context above footer animations */
+  z-index: 5;
 }
   
 .titleBtn {
@@ -34,8 +42,8 @@
 .searchBar {
   padding: 0.5rem 2.2rem 0.5rem 1rem; 
   font-size: 0.9rem;
-  border: none;
-  border-radius: 0.3rem;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
   width: 100%;
   outline: 1px solid #ccc;
   background-color: #fff;
@@ -58,10 +66,10 @@
 .addItemButton {
   background-color: var(--green);
   border: none;
-  padding: 0.5rem;
-  font-size: 0.7rem;
+  padding: 0.6rem 0.9rem;
+  font-size: 0.85rem;
   color: var(--white);
-  border-radius: 0.3em;
+  border-radius: var(--radius-md);
   cursor: pointer;
   transition: background-color 0.3s ease, color 0.3s ease, transform 0.1s ease;
   z-index: 10;

@@ -75,12 +75,8 @@ const Login = () => {
   };
 
   return (
-<<<<<<< HEAD
    <div className={styles.loginBackDiv}>
-=======
-    <div className='loginBackDiv'>
->>>>>>> 6992c6cd306e871fa88bb72604e28451fbbf33a3
-      <div className={styles.backButton} onClick={() => navigate(-1)}>
+      <div className={styles.backButton} onClick={() => navigate('/', { replace: true })}>
         <FontAwesomeIcon icon={faCaretDown} rotation={90} /> Back
       </div>
 

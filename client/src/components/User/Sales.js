@@ -98,7 +98,7 @@ const Sales = () => {
   return (
     <div className={styles['sales-container']}>
       <div className={styles["sales-header"]}>
-        <h2>Completed Sales</h2>
+        {/* <h2>Completed Sales</h2> */}
         <div className={styles["sales-filters"]}>
           <label htmlFor="dateFilter">Filter by Date:</label>
           <input

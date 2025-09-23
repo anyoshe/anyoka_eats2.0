@@ -56,7 +56,8 @@ const ProductList = ({ onEditProduct, onDeleteProduct, refreshTrigger }) => {
             return `${config.backendUrl}/uploads/${product.images[0].split('/uploads/')[1]}`;
         }
 
-        return '/images/placeholder-image.png';
+        // No server image available
+        return '';
     };
 
     return (
@@ -72,16 +73,21 @@ const ProductList = ({ onEditProduct, onDeleteProduct, refreshTrigger }) => {
                         {productsByCategory[category].map((product) => (
                             <div className={styles.productItem} key={product._id}>
 
-                                <img
-                                    src={getImageSrc(product)}
-                                    alt={product.name}
-                                    className={styles.productImagePreview}
-
-                                    onError={(e) => {
-                                        e.target.onerror = null;
-                                        e.target.src = '/images/placeholder-image.png';
-                                    }}
-                                />
+                                {(() => {
+                                    const src = getImageSrc(product);
+                                    return (
+                                      <img
+                                        src={src || undefined}
+                                        alt={product.name}
+                                        className={`${styles.productImagePreview} ${!src ? styles.imageEmpty : ''}`}
+                                        onError={(e) => {
+                                          e.target.onerror = null;
+                                          e.target.src = '';
+                                          e.target.classList.add(styles.imageEmpty);
+                                        }}
+                                      />
+                                    );
+                                  })()}
                                 <div className={styles.productDetails}>
                                     <div className={styles.productField}>
                                         <strong>Name:</strong>

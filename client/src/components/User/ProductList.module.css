@@ -50,6 +50,19 @@
   border-radius: 5px;
   margin-bottom: 10px;
 }
+
+/* Empty image placeholder (shimmer/filter like LandingBodyContainer_storeImage) */
+.imageEmpty{
+  background: linear-gradient(90deg, var(--color-gray-100) 25%, var(--color-gray-200) 50%, var(--color-gray-100) 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+  filter: blur(0.5px) saturate(0.9);
+}
+
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
   
 #product-image-display {
   width: 100%;

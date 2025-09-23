@@ -6,6 +6,21 @@
 
 .orders-container {
   padding: 20px;
+  max-width: var(--container-lg);
+  margin: 0 auto;
+}
+
+/* Skeleton loading for Orders */
+.skeletonWrapperOrders{ padding: 0.5rem 0; }
+.skeletonGridOrders{ display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1rem; }
+.skeletonCardOrders{ background: var(--color-white); border: 1px solid var(--color-border); border-radius: var(--radius-lg); padding: 1rem; box-shadow: var(--shadow-sm); }
+.skeletonLineOrders{ height: 12px; width: 70%; background: var(--color-gray-100); border-radius: 6px; margin: 0.35rem 0; animation: pulseOrders 1.3s ease-in-out infinite; }
+.skeletonLineShortOrders{ height: 12px; width: 40%; background: var(--color-gray-100); border-radius: 6px; margin: 0.35rem 0; animation: pulseOrders 1.3s ease-in-out infinite; }
+
+@keyframes pulseOrders {
+  0% { opacity: 1; }
+  50% { opacity: 0.6; }
+  100% { opacity: 1; }
 }
 
 .yourOrderTitle{
@@ -29,23 +44,39 @@
 
 .orders-list{
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
   gap: 1rem;
 }
 
 .order-card {
-  border: 1px solid #ccc;
-  padding: 15px;
-  margin-bottom: 20px;
-  border-radius: 5px;
+  border: 1px solid var(--color-border);
+  background: var(--color-white);
+  padding: 16px;
+  margin-bottom: 0;
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-sm);
+  transition: box-shadow var(--duration-fast) var(--ease-out), transform var(--duration-fast) var(--ease-out), border-color var(--duration-fast) var(--ease-out);
+  display: flex;               /* allow bottom anchoring */
+  flex-direction: column;
+  min-height: 100%;
+}
+
+.order-card:hover {
+  box-shadow: var(--shadow-md);
+  transform: translateY(-2px);
+  border-color: var(--color-orange);
 }
 
 .order-card h3 {
   margin-top: 0;
+  margin-bottom: 0.5rem;
+  font-size: 1rem;
+  color: var(--color-gray-900);
 }
 
 .order-card p {
-  margin: 5px 0;
+  margin: 6px 0;
+  color: var(--color-gray-700);
 }
   
 .order-card ul {
@@ -54,7 +85,54 @@
 }
 
 .order-card li {
-  margin: 5px 0;
+  margin: 6px 0;
+}
+
+/* Subtle badge look for emphasized values without changing markup */
+.order-card p strong {
+  display: inline-block;
+  padding: 0.125rem 0.4rem;
+  border-radius: 0.4rem;
+  background: var(--color-gray-50);
+  color: var(--color-gray-900);
+}
+
+/* Anchor the status + action block to the card bottom without markup changes */
+.order-card > :last-child {
+  margin-top: auto;            /* push to bottom */
+  padding-top: 0.75rem;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem 0.75rem;
+  border-top: 1px dashed #eee;
+}
+
+/* Highlight the Status line for visibility */
+.order-card > :last-child p {
+  margin: 0;                   /* tighten line */
+  background: rgba(255, 165, 0, 0.12); /* soft orange */
+  color: var(--color-gray-900);
+  padding: 0.25rem 0.5rem;
+  border-radius: 0.5rem;
+  font-weight: 600;
+}
+
+/* Make the action button visually paired and aligned right */
+.order-card > :last-child button {
+  margin-left: auto;           /* push to the right */
+  border-radius: var(--radius-md);
+  padding: 0.45rem 0.8rem;
+}
+
+/* Header row styling present in markup */
+.orders-header{
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  margin-bottom: 0.75rem;
 }
   
 @media screen and (max-width: 320px) {
@@ -64,7 +142,7 @@
 
   .order-card{
     margin-bottom: 0rem;
-    padding: 0.3rem;
+    padding: 0.5rem;
   }
 
   .orders-list {
@@ -94,11 +172,29 @@
     padding: 0.5rem;
   }
   .orders-list {
-    gap: 0.2rem;
+    gap: 0.5rem;
   }
   .order-card {
-    padding: 0.4rem;
+    padding: 0.6rem;
     margin-bottom: 0.3rem;
     border-radius: 5px;
   }
+}
+
+/* Tablet */
+@media screen and (min-width: 768px) and (max-width: 1024px) {
+  .orders-list { gap: 1rem; }
+  .order-card { padding: 1rem; }
+}
+
+/* Large screens */
+@media screen and (min-width: 1440px) {
+  .orders-list { gap: 1.25rem; }
+  .order-card { padding: 1.1rem; }
+}
+
+/* Ultra-wide */
+@media screen and (min-width: 1920px) {
+  .orders-container { max-width: var(--container-xl); }
+  .orders-list { gap: 1.5rem; }
 }

@@ -54,6 +54,7 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
+    gap: 0.5rem;
   }
   
   .time {
@@ -103,10 +104,27 @@
   align-items: center; */
   border: none;
   padding: 0.3rem 0.5rem;
+  border-radius: 0.35rem;
+  transition: background var(--duration-fast) var(--ease-out), color var(--duration-fast) var(--ease-out);
 }
 
 .deleteBtn:hover {
   background-color: var(--white);
   color: var(--orange);
   outline: 1px solid var(--orange);
+}
+
+/* New view-only UI button (no logic) */
+.viewOnlyBtn{
+  background-color: var(--orange);
+  color: var(--white);
+  border: none;
+  padding: 0.3rem 0.6rem;
+  border-radius: 0.35rem;
+  opacity: 0.9;
+}
+
+.viewOnlyBtn:disabled{
+  opacity: 0.75;
+  cursor: default;
 }

@@ -411,7 +411,7 @@
     flex-direction: column;
     align-items: center;
     justify-content: center;
-  padding: 3rem 1rem;
+    padding: 3rem 1rem;
     text-align: center;
     color: var(--color-gray-500);
   }
@@ -425,8 +425,8 @@
   align-items: center;
   justify-content: center;
   box-shadow: 0 6px 20px rgba(0,0,0,0.06), inset 0 2px 6px rgba(255,255,255,0.8);
-  margin-bottom: 1rem;
-}
+    margin-bottom: 1rem;
+  }
 
 .emptyCartIcon {
   font-size: 1.6rem;
@@ -466,7 +466,7 @@
 
 .emptyCartCta:active {
   transform: translateY(1px);
-}
+  }
 }
 
 @media (max-width: 480px) {

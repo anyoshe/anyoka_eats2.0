@@ -89,7 +89,7 @@ const PasswordReset = () => {
         accountType,
       });
       setMessage(res.data.message);
-      setTimeout(() => navigate('/sign-in'), 2000);
+      setTimeout(() => navigate('/sign-in', { replace: true }), 2000);
     } catch (err) {
       setError(err.response?.data?.message || 'Failed to reset password. Please try again.');
     }
@@ -107,8 +107,8 @@ const PasswordReset = () => {
   };
 
   return (
-    <div className='loginBackDiv'>
-      <div className={styles.backButton} onClick={() => navigate('/sign-in')}>
+    <div className={styles.loginBackDiv}>
+      <div className={styles.backButton} onClick={() => navigate('/sign-in', { replace: true })}>
         <FontAwesomeIcon icon={faCaretDown} rotation={90} /> Back to Login
       </div>
 

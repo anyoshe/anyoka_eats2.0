@@ -1,4 +1,4 @@
-import React, { useState, useContext } from "react";
+import React, { useState, useContext, useEffect } from "react";
 import styles from './AccountPage.module.css';
 import { PartnerContext } from '../../contexts/PartnerContext';
 import Profile from './Profile';
@@ -12,14 +12,22 @@ import { faBars } from "@fortawesome/free-solid-svg-icons";
 import axios from 'axios';
 import config from '../../config';
 import Sales from "./Sales";
+import { useNavigate } from 'react-router-dom';
 
 
 const AccountPage = () => {
   const [menuOpen, setMenuOpen] = useState(false);
   const [activeTab, setActiveTab] = useState("profile")
   const [showNotifications, setShowNotifications] = useState(false);
-  const { notifications, addNotification, markAsRead, unreadCount } = useContext(PartnerContext);
+  const { notifications, addNotification, markAsRead, unreadCount, logout } = useContext(PartnerContext);
   const [orderDetails, setOrderDetails] = useState(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    const t = setTimeout(() => setIsLoading(false), 600);
+    return () => clearTimeout(t);
+  }, []);
 
 
 
@@ -67,13 +75,29 @@ const AccountPage = () => {
     }
   };
 
+  const logoutAndClose = () => {
+    setMenuOpen(false);
+    logout();
+    navigate('/');
+  };
+
   return (
     <div className={styles.accountPageWrapper}>
       <div className={styles.container}>
 
+        <button
+          type="button"
+          className={styles.backButton}
+          onClick={() => navigate('/', { replace: true })}
+          aria-label="Back to landing"
+        >
+          ← Back
+        </button>
+
         {/* Notification Dropdown */}
         {showNotifications && (
           <NotificationComponent
+            onClose={() => setShowNotifications(false)}
             onView={(id, isSubOrder) => {
               if (isSubOrder) {
                 handleViewSubOrder(id);
@@ -88,6 +112,15 @@ const AccountPage = () => {
 
         {/* Hamburger icon for small screens */}
         <div className={styles.hamburgerMenu}>
+          <div className={styles.notificationIconWrapper} onClick={() => setShowNotifications(!showNotifications)}>
+            <FontAwesomeIcon
+              icon={faBell}
+              className={`${styles.icon} ${styles.notificationIcon}`}
+            />
+            {unreadCount > 0 && (
+              <div className={styles.notificationBadge}>{unreadCount}</div>
+            )}
+          </div>
           <FontAwesomeIcon
             icon={faBars}
             className={styles.hamburgerIcon}
@@ -102,6 +135,8 @@ const AccountPage = () => {
             <div className={styles.mobileTab} onClick={() => handleTabChange("orders")}>Orders</div>
             <div className={styles.mobileTab} onClick={() => handleTabChange("sales")}>Sales</div>
             <div className={styles.mobileTab} onClick={() => handleTabChange("shop")}>Shop</div>
+            <div className={styles.mobileDivider}></div>
+            <div className={styles.mobileDanger} onClick={() => logoutAndClose()}>Logout</div>
           </div>
         )}
 
@@ -153,7 +188,27 @@ const AccountPage = () => {
 
         {/* Content */}
         <div className={`${styles.tabContent} ${styles.active}`}>
-          {renderTabContent()}
+          {isLoading ? (
+            <div className={styles.skeletonWrapper}>
+              <div className={styles.skeletonRow}>
+                <div className={styles.skeletonAvatar} />
+                <div className={styles.skeletonCol}>
+                  <div className={styles.skeletonLine} />
+                  <div className={styles.skeletonLineShort} />
+                </div>
+              </div>
+              <div className={styles.skeletonGrid}>
+                {Array.from({ length: 6 }).map((_, i) => (
+                  <div key={i} className={styles.skeletonCard}>
+                    <div className={styles.skeletonLine} />
+                    <div className={styles.skeletonLineShort} />
+                  </div>
+                ))}
+              </div>
+            </div>
+          ) : (
+            renderTabContent()
+          )}
         </div>
         {orderDetails && (
           <OrderDetailsModal

@@ -3,7 +3,7 @@
   .footer-section {
   overflow: hidden;
   background: #151414;
-  position: relative;
+  position: relative; /* stay in normal flow, not fixed */
   width: 100%;
   min-height: auto; /* allow page content to determine when footer enters view */
   display: flex;
@@ -260,7 +260,7 @@
     position: absolute;
     -webkit-animation: myfirst 30s linear infinite;
     animation: myfirst 30s linear infinite;
-    z-index: 2;
+    z-index: 0; /* keep behind page content */
 }
 
 @-moz-keyframes myfirst {

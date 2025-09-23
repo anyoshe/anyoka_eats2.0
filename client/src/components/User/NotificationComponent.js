@@ -1,16 +1,28 @@
-import React, { useContext } from 'react';
+import React, { useContext, useEffect, useRef } from 'react';
 import styles from './NotificationComponent.module.css';
 import { PartnerContext } from '../../contexts/PartnerContext';
 
-const NotificationComponent = ({ onView }) => {
+const NotificationComponent = ({ onView, onClose }) => {
   const { notifications, markNotificationAsRead, deleteNotification } = useContext(PartnerContext);
+  const containerRef = useRef(null);
+
+  // Close on click-away
+  useEffect(() => {
+    const handleClickAway = (event) => {
+      if (containerRef.current && !containerRef.current.contains(event.target)) {
+        if (onClose) onClose();
+      }
+    };
+    document.addEventListener('mousedown', handleClickAway);
+    return () => document.removeEventListener('mousedown', handleClickAway);
+  }, [onClose]);
 
    // Ensure it's an array no matter what
    const notifs = Array.isArray(notifications) ? notifications : [];
 
    if (notifs.length === 0) {
      return (
-       <div className={styles.container}>
+      <div className={styles.container} ref={containerRef}>
          <p className={styles.emptyText}>No notifications yet.</p>
        </div>
      );
@@ -26,7 +38,7 @@ const NotificationComponent = ({ onView }) => {
   };
   
   return (
-    <div className={styles.container}>
+    <div className={styles.container} ref={containerRef}>
       <h4 className={styles.title}>Notifications</h4>
       <ul className={styles.list}>
       {notifs.map((notif, index) => (
@@ -64,6 +76,13 @@ const NotificationComponent = ({ onView }) => {
                 >
                   {/* 🗑 */}
                   <i class="fas fa-trash"></i> 
+                </button>
+                <button
+                  className={styles.viewOnlyBtn}
+                  onClick={(e) => { e.stopPropagation(); }}
+                  disabled
+                >
+                  View
                 </button>
               </div>
             {/* </div> */}
