@@ -25,6 +25,9 @@ Thumbs.db
 .vscode/
 .idea/
 *.swp
+<<<<<<< HEAD
+=======
 
 client/node_modules/
 client/node_modules/.cache/
+>>>>>>> 85055e2a4b4c2099f0d478d70eed116d408553bd

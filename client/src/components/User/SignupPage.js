@@ -2,7 +2,7 @@ import React, { useState, useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { AuthContext } from '../../contexts/AuthContext';
 import MapSelector from './MapSelector';
-import styles from './SignupPage.module.css'; 
+import styles from './SignupPage.module.css';
 import config from '../../config';
 
 const SignupPage = () => {
@@ -65,8 +65,11 @@ const SignupPage = () => {
         localStorage.setItem('userToken', data.token);
         localStorage.setItem('user', JSON.stringify(data.user));
         alert('Signup successful!');
-        navigate(redirectPath || '/');
+        // navigate(redirectPath || '/');
+        // setRedirectPath('/');
+        const targetPath = redirectPath || '/';
         setRedirectPath('/');
+        navigate(targetPath);
       } else {
         alert(`Signup failed: ${data.message}`);
       }
@@ -118,6 +121,7 @@ const SignupPage = () => {
             name="email"
             value={formData.email}
             onChange={handleInputChange}
+            required
           />
         </div>
 
@@ -188,9 +192,9 @@ const SignupPage = () => {
           <div className={styles['modal-content']}>
             <button className={styles['close-button']} onClick={closeMapModal}>×</button>
 
-            <MapSelector onLocationSelect={(loc) => { 
-              handleLocationSelect(loc); 
-              closeMapModal(); 
+            <MapSelector onLocationSelect={(loc) => {
+              handleLocationSelect(loc);
+              closeMapModal();
             }} center={mapCenter} />
           </div>
         </div>

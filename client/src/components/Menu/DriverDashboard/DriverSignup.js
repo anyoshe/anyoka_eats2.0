@@ -106,6 +106,10 @@ const DriverSignup = () => {
                 required
               />
             </div>
+             {/* 👇 Place the forgot password link here */}
+    <p className={styles.forgotPassword}>
+      Forgot your password? <a href="/driver/reset-password">Reset it here</a>
+    </p>
           </>
         ) : (
           ['username', 'phoneNumber', 'email', 'password', 'nationalId', 'driverLicenseNumber'].map(field => (
@@ -188,6 +192,7 @@ const DriverSignup = () => {
               <button type="submit" className={styles.submitButton}>
                 Login
               </button>
+            
               {error && <div className={styles.errorMessage}>{error}</div>}
               {success && <div className={styles.successMessage}>{success}</div>}
             </form>

@@ -1,4 +1,4 @@
-// Removed global Bootstrap to avoid CSS bleed. Use component-scoped styles or local imports when necessary.
+import 'bootstrap/dist/css/bootstrap.min.css';
 import '@fortawesome/fontawesome-free/css/all.min.css';
 import React from 'react';
 import ReactDOM from 'react-dom/client';

@@ -8,7 +8,7 @@ import styles from './SignUpSignIn.module.css';
 import { FaMapMarkerAlt } from 'react-icons/fa';
 import { FaEye, FaEyeSlash } from 'react-icons/fa';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faCartShopping, faCaretDown } from '@fortawesome/free-solid-svg-icons';
+import { faCaretDown } from '@fortawesome/free-solid-svg-icons';
 
 const StoreSignUpForm = () => {
   const [formData, setFormData] = useState({
@@ -24,10 +24,10 @@ const StoreSignUpForm = () => {
     password: '',
     loginPassword: '',
   });
-  const [modalVisible, setModalVisible] = useState(false);
+  // const [modalVisible, setModalVisible] = useState(false);
   const [showMap, setShowMap] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
-  const [showLoginPassword, setShowLoginPassword] = useState(false);
+  // const [showLoginPassword, setShowLoginPassword] = useState(false);
   const [mapCenter, setMapCenter] = useState({ lat: -1.286389, lng: 36.817223 }); // Default to Nairobi
   const { setPartner,setToken } = useContext(PartnerContext);
   const navigate = useNavigate();
@@ -192,7 +192,7 @@ const StoreSignUpForm = () => {
           </div>
 
           <div className={styles.formGroup}>
-            <label htmlFor="email" className={styles.formSighUpLables}>Email (optional)</label>
+            <label htmlFor="email" className={styles.formSighUpLables}>Email <span className={styles.required}>*</span></label>
             <input
               type="email"
               id="email"
@@ -200,7 +200,7 @@ const StoreSignUpForm = () => {
               value={formData.email}
               onChange={handleInputChange}
               className={styles.formSighUpInputs}
-             
+              required
             />
           </div>
           <div className={styles.formGroup}>
@@ -249,7 +249,7 @@ const StoreSignUpForm = () => {
           </div>
 
           <div className={styles.formGroup}>
-            <label htmlFor="location" className={styles.formSighUpLables}>Location</label>
+            <label htmlFor="location" className={styles.formSighUpLables}>Location <span className={styles.required}>*</span></label>
 
             <div className={styles.inputWithIcon}>
               <input

@@ -6,7 +6,7 @@ import { PartnerContext } from '../../contexts/PartnerContext';
 import config from '../../config';
 import styles from './Login.module.css';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faCartShopping, faCaretDown } from '@fortawesome/free-solid-svg-icons';
+import { faCaretDown } from '@fortawesome/free-solid-svg-icons';
 
 const Login = () => {
   const [identifier, setIdentifier] = useState('');
@@ -14,7 +14,7 @@ const Login = () => {
   const [error, setError] = useState('');
   const navigate = useNavigate();
 
-  const { setIsLoggedIn, setUser, redirectPath, setToken } = useContext(AuthContext);
+  const { setIsLoggedIn, setUser, redirectPath, setRedirectPath, setToken } = useContext(AuthContext);
   const { setPartner, updatePartnerDetails } = useContext(PartnerContext);
 
   const handleSubmit = async (e) => {
@@ -41,7 +41,13 @@ const Login = () => {
         setUser(userData);
         setIsLoggedIn(true);
 
-        navigate(redirectPath || '/');
+        // navigate(redirectPath || '/');
+
+        // Navigate to the full redirect path
+        const targetPath = redirectPath || '/';
+        setRedirectPath('/'); // Reset for future use
+        navigate(targetPath);
+
 
       } else if (role === 'partner') {
         // ✅ Store partner token separately
@@ -69,7 +75,11 @@ const Login = () => {
   };
 
   return (
+<<<<<<< HEAD
    <div className={styles.loginBackDiv}>
+=======
+    <div className='loginBackDiv'>
+>>>>>>> 6992c6cd306e871fa88bb72604e28451fbbf33a3
       <div className={styles.backButton} onClick={() => navigate(-1)}>
         <FontAwesomeIcon icon={faCaretDown} rotation={90} /> Back
       </div>
@@ -77,7 +87,7 @@ const Login = () => {
       <form className={styles.form} onSubmit={handleSubmit}>
 
         <h2>Login</h2>
-        
+
         {error && <p className={styles.error}>{error}</p>}
 
         <div className={styles.field}>
@@ -101,8 +111,11 @@ const Login = () => {
         </div>
 
         <button type="submit">Login</button>
+        <p className={styles.forgotPassword}>
+          Forgot your password? <a href="/password-reset">Reset it here</a>
+        </p>
       </form>
-   </div>
+    </div>
   );
 };
 
