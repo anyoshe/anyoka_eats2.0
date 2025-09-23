@@ -1,4 +1,5 @@
 import React, { useContext, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {
   faCaretDown,
@@ -19,6 +20,7 @@ const CartSection = () => {
     const { cart, setCart, addToCart, removeFromCart } = useContext(CartContext);
   const { user } = useContext(AuthContext);
   const [showCheckout, setShowCheckout] = useState(false);
+  const navigate = useNavigate();
 
   const getLocationText = () => {
     if (!user) return 'Fetching delivery location...';
@@ -77,7 +79,9 @@ const CartSection = () => {
       <div className={styles.cartListDiv}>
         {cart.length === 0 ? (
           <div className={styles.emptyCartState}>
-            <FontAwesomeIcon icon={faCartShopping} className={styles.emptyCartIcon} />
+            <div className={styles.emptyCartIconWrap}>
+              <FontAwesomeIcon icon={faCartShopping} className={styles.emptyCartIcon} />
+            </div>
             <p className={styles.emptyCartText}>Your cart is empty</p>
             <p className={styles.emptyCartSubtext}>Add some items to get started</p>
           </div>
@@ -133,3 +137,6 @@ const CartSection = () => {
 };
 
 export default CartSection;
+
+
+

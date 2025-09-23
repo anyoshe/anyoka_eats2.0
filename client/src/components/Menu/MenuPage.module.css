@@ -19,6 +19,8 @@
   width: 100%;
   /* margin-top: 3rem; */
   padding: var(--space-1) var(--space-2);
+  /* Ensure product area fills the viewport height so footer stays below */
+  min-height: calc(100vh - var(--adsbar-height) - var(--controlsbar-height, 3.2rem) - 1rem);
 }
 
 
@@ -78,6 +80,9 @@
 .dispalySection{
   position: relative;
   padding-top: 0rem;
+  display: flex;
+  flex-direction: column;
+  min-height: 100%;
 }
 
 
@@ -381,6 +386,37 @@
 
 .emptyState{ text-align: center; color: var(--color-text-muted); padding: var(--space-6) 0; }
 
+/* Empty catalog presentation when a category has no items */
+.emptyCatalogState{
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 3rem 1rem;
+  text-align: center;
+  color: var(--color-gray-500);
+  /* Fill available vertical space inside the product area */
+  flex: 1;
+  min-height: 100%;
+}
+
+.emptyCatalogIconWrap{
+  width: 88px;
+  height: 88px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--color-gray-50), var(--color-gray-100));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.06), inset 0 2px 6px rgba(255,255,255,0.8);
+  margin-bottom: 1rem;
+}
+
+.emptyCatalogIcon{ font-size: 1.8rem; color: var(--color-gray-400); }
+
+.emptyCatalogTitle{ font-size: 1.125rem; font-weight: 600; margin-bottom: 0.25rem; color: var(--color-gray-800); }
+.emptyCatalogSubtext{ font-size: 0.95rem; color: var(--color-gray-500); }
+
 .categorySectionP {
   font-size: 0.9rem;
   margin: 0;
@@ -471,7 +507,7 @@
   box-shadow: -2px 0 6px rgba(0, 0, 0, 0.1);
   display: flex;
   flex-direction: column;
-  z-index: 50;
+  /* z-index: 50; */
   overflow: hidden;
 }
 

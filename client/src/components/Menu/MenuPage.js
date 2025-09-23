@@ -14,6 +14,7 @@ import { faStar as regularStar } from '@fortawesome/free-regular-svg-icons';
 import CartSection from '../User/CartSection';
 import { CartContext } from '../../contexts/CartContext';
 import { faTruck } from '@fortawesome/free-solid-svg-icons';
+import { faBoxOpen } from '@fortawesome/free-solid-svg-icons';
 import Logout from '../User/UserLogout';
 import TopAdsBar from '../common/TopAdsBar';
 import CategoryControlsBar from '../common/CategoryControlsBar';
@@ -329,7 +330,13 @@ const MenuPage = () => {
             <>
 
               {visibleProducts.length === 0 ? (
-                <div className={styles.emptyState}>No products match your filters.</div>
+                <div className={styles.emptyCatalogState} role="status" aria-live="polite">
+                  <div className={styles.emptyCatalogIconWrap}>
+                    <FontAwesomeIcon icon={faBoxOpen} className={styles.emptyCatalogIcon} />
+                  </div>
+                  <p className={styles.emptyCatalogTitle}>No items in this category yet</p>
+                  <p className={styles.emptyCatalogSubtext}>We’re curating great options. Please check back soon.</p>
+                </div>
               ) : (
               <section className={styles.categorySectionDisplay}>
                   {visibleProducts.map((product) => (

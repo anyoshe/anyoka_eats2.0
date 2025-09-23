@@ -182,6 +182,10 @@
   border-radius: var(--radius-md);
   cursor: pointer;
   transition: background var(--duration-fast) var(--ease-out), color var(--duration-fast) var(--ease-out);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
 }
 
 .addToCartButton:hover {
@@ -282,6 +286,9 @@
   border-radius: var(--radius-lg);
   padding: var(--space-4);
   border: 1px solid var(--color-border);
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
 }
 
 /* Override ProductCard styles when used in modal */
@@ -362,6 +369,9 @@
   border: 1px solid var(--color-border);
   border-radius: var(--radius-lg);
   padding: var(--space-3);
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
 }
 
 .rateTitle {
@@ -498,6 +508,40 @@
   display: flex;
   flex-direction: column;
   gap: 1rem;
+}
+
+/* Exact 768px adjustments */
+@media (width: 768px) {
+  .productCard :global(.productImageWrapper) {
+    display: flex !important;
+    justify-content: center !important;
+    align-items: center !important;
+  }
+
+  .productCard :global(.image-carousel) {
+    position: relative !important;
+    width: fit-content !important;
+    margin: 0 auto !important;
+  }
+
+  .productCard :global(.productImage) {
+    max-width: 140px !important;
+    height: auto !important;
+  }
+
+  .productCard :global(.prevButton),
+  .productCard :global(.nextButton) {
+    top: 50% !important;
+    transform: translateY(-50%) !important;
+  }
+
+  .productCard :global(.productDetails) {
+    display: grid !important;
+    grid-template-columns: 1fr 1fr !important;
+    column-gap: var(--space-2) !important;
+    row-gap: var(--space-1) !important;
+    text-align: left !important;
+  }
 }
 
 /* 2560px and above */
@@ -742,21 +786,23 @@
   
   .modalBody {
     grid-template-columns: 1fr;
-    grid-template-rows: auto 1fr;
+    grid-template-rows: auto auto;
     gap: var(--space-3);
-    overflow: hidden;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
   }
   
   .productSection {
     order: -1;
-    overflow-y: visible;
+    overflow: visible;
     max-height: none;
   }
   
   .reviewsSection {
-    overflow-y: auto;
-    max-height: 100%;
+    overflow: visible;
+    max-height: none;
   }
+  .reviewsList { overflow: visible; }
   
   .productCard {
     padding: var(--space-3);
@@ -824,22 +870,24 @@
   
   .modalBody {
     grid-template-columns: 1fr;
-    grid-template-rows: auto 1fr;
+    grid-template-rows: auto auto;
     gap: var(--space-2);
-    overflow: hidden;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
     padding: var(--space-2);
   }
   
   .productSection {
     order: -1;
-    overflow-y: visible;
+    overflow: visible;
     max-height: none;
   }
   
   .reviewsSection {
-    overflow-y: auto;
-    max-height: 100%;
+    overflow: visible;
+    max-height: none;
   }
+  .reviewsList { overflow: visible; }
   
   .productCard {
     padding: var(--space-2);
@@ -920,22 +968,24 @@
   
   .modalBody {
     grid-template-columns: 1fr;
-    grid-template-rows: auto 1fr;
+    grid-template-rows: auto auto;
     gap: var(--space-2);
-    overflow: hidden;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
     padding: var(--space-2);
   }
   
   .productSection {
     order: -1;
-    overflow-y: visible;
+    overflow: visible;
     max-height: none;
   }
   
   .reviewsSection {
-    overflow-y: auto;
-    max-height: 100%;
+    overflow: visible;
+    max-height: none;
   }
+  .reviewsList { overflow: visible; }
   
   .productCard {
     padding: var(--space-2);
@@ -1009,22 +1059,24 @@
   
   .modalBody {
     grid-template-columns: 1fr;
-    grid-template-rows: auto 1fr;
+    grid-template-rows: auto auto;
     gap: var(--space-1);
-    overflow: hidden;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
     padding: var(--space-1);
   }
   
   .productSection {
     order: -1;
-    overflow-y: visible;
+    overflow: visible;
     max-height: none;
   }
   
   .reviewsSection {
-    overflow-y: auto;
-    max-height: 100%;
+    overflow: visible;
+    max-height: none;
   }
+  .reviewsList { overflow: visible; }
   
   .productCard {
     padding: var(--space-1);

@@ -290,7 +290,7 @@
     .shop-detail-modal {
       width: 96%;
       max-width: 640px;
-      height: 500px;
+      height: 80vh;
       margin-top: 1rem;
       /* margin-top: 0.9rem; ensure visual clearance from app header */
       left: 50%;
@@ -301,15 +301,17 @@
     
     .modalBody {
       grid-template-columns: 1fr;
-      grid-template-rows: auto 1fr;
+      grid-template-rows: auto auto;
       gap: var(--space-3);
       overflow-y: auto; /* enable scrolling inside modal body */
+      -webkit-overflow-scrolling: touch;
     }
     
     .modalContentWrapper {
     height: 100%;
     }
 
+    .reviewsSection { overflow: visible; max-height: none; }
     .reviewsList { max-height: none; overflow: visible; }
 
     .profileSection {

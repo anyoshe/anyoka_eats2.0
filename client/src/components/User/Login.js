@@ -69,7 +69,7 @@ const Login = () => {
   };
 
   return (
-   <div className='loginBackDiv'>
+   <div className={styles.loginBackDiv}>
       <div className={styles.backButton} onClick={() => navigate(-1)}>
         <FontAwesomeIcon icon={faCaretDown} rotation={90} /> Back
       </div>
