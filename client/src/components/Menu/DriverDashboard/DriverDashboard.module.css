@@ -1,10 +1,10 @@
 .dashboardWrapper {
-  height: 100vh;
+  min-height: 100vh;
   width: 100%;
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
+  justify-content: flex-start; /* allow content to scroll and not hide behind footer */
   position: relative;
 }
 
@@ -13,6 +13,7 @@
   width: 85%;
   margin-top: 3.3rem;
   position: relative;
+  padding-bottom: 5rem; /* reserve space above footer */
 }
 
 .hamburgerMenu {
@@ -113,33 +114,84 @@
 .tabContent {
   width: 100%;
   height: 100%;
+  /* padding-top: 4rem; */ /* extra breathing room so bottom controls stay above footer */
+}
+
+/* ==========================================
+   Responsive footer clearance and spacing
+   ========================================== */
+
+/* 2560px and above */
+@media (min-width: 2560px) {
+  .container { padding-bottom: 8rem; }
+  .tabContent { padding-top: 4.5rem; padding-bottom: 6rem; }
+}
+
+/* 1920px to 2559px */
+@media (min-width: 1920px) and (max-width: 2559px) {
+  .container { padding-bottom: 7rem; }
+  .tabContent { padding-top: 4.25rem; padding-bottom: 5rem; }
+}
+
+/* 1440px to 1919px */
+@media (min-width: 1440px) and (max-width: 1919px) {
+  .container { padding-bottom: 6rem; }
+  .tabContent { padding-top: 4rem; padding-bottom: 4.5rem; }
+}
+
+/* 1024px to 1439px */
+@media (min-width: 1024px) and (max-width: 1439px) {
+  .container { padding-bottom: 5.5rem; }
+  .tabContent {  padding-bottom: 2.5rem; }
+}
+
+/* 768px to 1023px */
+@media (min-width: 768px) and (max-width: 1023px) {
+  .container { padding-bottom: 5rem; }
+  .tabContent { padding-top: 3.5rem; padding-bottom: 3.5rem; }
+}
+
+/* 426px to 767px */
+@media (min-width: 426px) and (max-width: 767px) {
+  .container { width: 92%; padding-bottom: 4.5rem; }
+  .tabContent { padding-top: 3.25rem; padding-bottom: 3rem; }
+}
+
+/* 320px to 425px */
+@media (min-width: 320px) and (max-width: 425px) {
+  .container { width: 95%; padding-bottom: 4rem; }
+  .tabContent { padding-top: 0.5rem; }
 }
 
 .mobileMenu {
   position: fixed;
   top: 3.5rem;
   right: 0;
-  width: 75%;
-  max-width: 300px;
-  background-color: var(--green);
-  color: var(--white);
+  width: 78%;
+  max-width: 320px;
+  background-color: #fff;
+  color: var(--color-text);
   padding: 1rem;
-  z-index: 1999;
+  z-index: 2001;
   display: flex;
   flex-direction: column;
-  gap: 1rem;
-  box-shadow: -2px 0 8px rgba(0, 0, 0, 0.15);
-  animation: slideIn 0.3s ease forwards;
+  gap: 0.5rem;
+  box-shadow: -8px 0 24px rgba(0, 0, 0, 0.18);
+  border-left: 1px solid var(--color-border);
+  animation: slideIn 0.25s ease forwards;
 }
 
 
 .mobileMenuDiv {
-color: var(--white); /* White text for menu items */
-font-weight: 600;
-cursor: pointer;
-background: var(--green);
-padding: 0.5rem 1rem;
+  color: var(--color-text);
+  font-weight: 600;
+  cursor: pointer;
+  background: var(--color-gray-50);
+  padding: 0.65rem 0.9rem;
+  border-radius: 8px;
+  border: 1px solid var(--color-border);
 }
+.mobileMenuDiv:hover { background: var(--color-white); outline: 1px solid var(--color-orange); color: var(--color-orange); }
 
 .mobileTab {
   font-size: 1rem;
@@ -175,9 +227,9 @@ padding: 0.5rem 1rem;
   background-color: var(--white);
   display: flex;
   align-items: center;
-  justify-content: flex-end;
+  justify-content: space-between;
   padding: 0 1rem;
-  z-index: 2000;
+  z-index: 3001; /* keep above all content in small screens */
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
 }
 
@@ -187,27 +239,16 @@ padding: 0.5rem 1rem;
   color: var(--green);
   transition: transform 0.3s ease;
 }
+.mobileHeaderLeft { display: flex; align-items: center; gap: 0.5rem; }
+.mobileHeaderLeft .notificationIcon { background: var(--color-gray-50); color: var(--color-green); border-radius: 999px; padding: 0.35rem; box-shadow: 0 2px 8px rgba(0,0,0,0.08); }
+.mobileHeaderLeft .notificationIcon:hover { background: var(--color-white); color: var(--color-orange); outline: 1px solid var(--color-orange); }
 
 .hamburgerIcon:hover {
   transform: scale(1.1);
   color: var(--orange);
 }
 
-.mobileMenu {
-  position: fixed;
-  top: 3.5rem;
-  right: 0;
-  width: 75%;
-  max-width: 300px;
-  background-color: #fff;
-  padding: 1rem;
-  z-index: 1999;
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
-  box-shadow: -2px 0 8px rgba(0, 0, 0, 0.15);
-  animation: slideIn 0.3s ease forwards;
-}
+.mobileMenu { width: 80%; max-width: 320px; gap: 0.5rem; }
 
   .mobileTab {
     font-size: 1rem;
@@ -224,6 +265,27 @@ padding: 0.5rem 1rem;
     background-color: var(--orange);
     color: #fff;
   }
+}
+
+/* Tap-friendly text logout */
+.mobileLogout {
+  background: var(--color-green);
+  color: var(--color-white);
+  border: none;
+  border-radius: 8px;
+  padding: 0.7rem 1rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background var(--duration-fast) var(--ease-out), color var(--duration-fast) var(--ease-out);
+}
+.mobileLogout:hover { background: var(--color-white); color: var(--color-orange); outline: 1px solid var(--color-orange); }
+
+/* Dimmed overlay to enable click-away close */
+.mobileMenuOverlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.35);
+  z-index: 2000;
 }
 
 @keyframes slideIn {

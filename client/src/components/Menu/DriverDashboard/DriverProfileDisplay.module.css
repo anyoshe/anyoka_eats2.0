@@ -5,8 +5,9 @@
     justify-content: center;
     align-items: center;
     /* padding-top: 4rem; */
-    padding-bottom: 2rem;
-    min-height: calc(100vh - 4rem); 
+    /* padding-bottom: 2rem;  */
+    /* min-height: calc(100vh - 4rem);  */
+    min-height: 100vh; 
     box-sizing: border-box;
   }
   
@@ -17,6 +18,7 @@
     border-radius: 0.5rem;
     border: 1px solid #ddd;
     background-color: #fff;
+    box-shadow: var(--shadow-sm);
   }
   
   /* Profile layout grid */
@@ -44,6 +46,10 @@
     color: #555;
     margin-top: 0.25rem;
   }
+
+  /* Soft separators between items for readability */
+  .profileItem{ padding-bottom: 0.6rem; border-bottom: 1px dashed var(--color-gray-200); }
+  .profileItem:last-child{ border-bottom: none; }
   
   .profileItem input,
   .profileItem textarea {
@@ -55,6 +61,13 @@
     background-color: #fff;
     color: #333;
     box-sizing: border-box;
+  }
+
+  .profileItem input:focus,
+  .profileItem textarea:focus{
+    border-color: var(--color-orange);
+    box-shadow: 0 0 0 3px rgba(255,165,0,0.2);
+    outline: none;
   }
   
   .profileDescriptionDiv {
@@ -180,6 +193,7 @@
     display: flex;
     gap: 0.5rem;
     margin-top: 1rem;
+    margin-bottom: 1rem; /* extra breathing room above footer */
   }
 
   
@@ -271,11 +285,16 @@
   @media screen and (max-width: 426px) {
     .profileContent{
       padding: 1rem;
+      margin-top: 1rem;
     }
 
     .profileImageContainer{
       /* border: 2px solid red; */
       width: 100%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.6rem;
     }
     
     .profileDetails {
@@ -309,6 +328,8 @@
   
     .image_buttons {
       justify-content: center;
+      width: 100%;
+      display: flex;
     }
   
     .mapModalContent {
@@ -327,6 +348,13 @@
   @media screen and (max-width: 376px) {
     .Profile_profileContent__ooFL5 {
       padding: 0rem;
+    }
+
+    .profileImageContainer{
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.5rem;
     }
 
     .profileDetails {
@@ -354,6 +382,13 @@
   
   /* 320px (Small Phone) */
   @media screen and (max-width: 320px) {
+    .profileImageContainer{
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
     .profileDetails {
       font-size: 0.9rem;
     }

@@ -83,10 +83,24 @@ const CompletedDriverOrders = () => {
                             ? new Date(order.deliveredAt).toLocaleDateString()
                             : 'N/A';
 
+                        const rawId = order.orderId || '';
+                        const parts = rawId.split('-');
+                        const prefix = 'ANYEAT-';
+                        const middle = parts.length > 1 ? parts[1] + '-' : '';
+                        const tail = parts.length > 2 ? parts[2] : (parts.length === 1 ? parts[0] : '');
+
                         return (
                             <tr key={order._id}>
                                 <td>{dateCompleted}</td>
-                                <td>{order.orderId || 'N/A'}</td>
+                                <td className={styles["order-id-cell"]}>
+                                    {rawId ? (
+                                        <>
+                                            <span className={styles["order-id-line"]}>{prefix}</span>
+                                            <span className={styles["order-id-line"]}>{middle}</span>
+                                            <span className={styles["order-id-line"]}>{tail}</span>
+                                        </>
+                                    ) : 'N/A'}
+                                </td>
                                 <td>{deliveryFee.toFixed(2)}</td>
                                 <td>{earnings.toFixed(2)}</td>
                             </tr>

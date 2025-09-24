@@ -22,3 +22,48 @@
 .completed-orders-table th {
   background-color: #f2f2f2;
 }
+
+/* Multi-line order id to reduce horizontal width */
+.order-id-cell { white-space: normal; }
+.order-id-line { display: block; line-height: 1.2; }
+
+/* On wider screens, keep Order ID on one line */
+@media (min-width: 426px) {
+  .order-id-cell { white-space: nowrap; }
+  .order-id-line { display: inline; }
+}
+
+
+/* Ensure only the table scrolls horizontally on small screens */
+@media (max-width: 425px) {
+  .completed-driver-orders-container { padding: 16px; }
+  .completed-orders-table {
+    display: block;
+    width: 100%;
+    max-width: 100%;
+    overflow-x: auto;
+    white-space: nowrap;
+    table-layout: fixed; /* lock column widths for consistent layout */
+  }
+  /* Keep header readable and allow wrapping within fixed cells */
+  .completed-orders-table thead th {
+    white-space: normal;
+    word-break: keep-all; /* break only at spaces */
+    line-height: 1.15;
+  }
+  /* Fixed column widths mirroring 425px layout; keep numeric columns on one line */
+  .completed-orders-table thead th:nth-child(1),
+  .completed-orders-table tbody td:nth-child(1) { width: 28%; }
+  .completed-orders-table thead th:nth-child(2),
+  .completed-orders-table tbody td:nth-child(2) { width: 32%; }
+  /* Narrower headers for 3 and 4 to encourage 3-line wraps */
+  .completed-orders-table thead th:nth-child(3),
+  .completed-orders-table tbody td:nth-child(3) { width: 18%; white-space: nowrap; }
+  .completed-orders-table thead th:nth-child(4),
+  .completed-orders-table tbody td:nth-child(4) { width: 18%; white-space: nowrap; }
+  /* Normalize compact padding for consistency */
+  .completed-orders-table th,
+  .completed-orders-table td { padding: 0.6rem; }
+}
+
+/* Maintain 425px styles down to 320px with no further overrides */

@@ -16,7 +16,7 @@ const DriverDashboard = () => {
   const [menuOpen, setMenuOpen] = useState(false);
   const [activeTab, setActiveTab] = useState("available"); 
   const [showNotifications, setShowNotifications] = useState(false);
-  const { driver, notifications } = useContext(DriverContext);
+  const { driver, notifications, logoutDriver } = useContext(DriverContext);
 
   const handleTabChange = (tab) => {
     setActiveTab(tab);
@@ -54,6 +54,14 @@ const DriverDashboard = () => {
 
         {/* Hamburger Menu */}
         <div className={styles.hamburgerMenu}>
+          <div className={styles.mobileHeaderLeft}>
+            <FontAwesomeIcon
+              icon={faBell}
+              className={`${styles.icon} ${styles.notificationIcon}`}
+              data-count={notifications?.length || 0}
+              onClick={() => setShowNotifications(!showNotifications)}
+            />
+          </div>
           <FontAwesomeIcon
             icon={faBars}
             className={styles.hamburgerIcon}
@@ -63,6 +71,8 @@ const DriverDashboard = () => {
 
         {/* Mobile Menu */}
         {menuOpen && (
+          <>
+          <div className={styles.mobileMenuOverlay} onClick={() => setMenuOpen(false)} />
           <div className={styles.mobileMenu}>
             <div onClick={() => handleTabChange("profile")} className={styles.mobileMenuDiv}>Profile</div>
 
@@ -72,10 +82,15 @@ const DriverDashboard = () => {
 
             <div onClick={() => handleTabChange("completed")} className={styles.mobileMenuDiv}>Completed Orders</div>
             
-            <div>
-              <DriverLogout />
-            </div>
+            <button
+              type="button"
+              className={styles.mobileLogout}
+              onClick={() => { logoutDriver(); navigate('/'); }}
+            >
+              Logout
+            </button>
           </div>
+          </>
         )}
 
         {/* Tabs */}

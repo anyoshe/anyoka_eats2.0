@@ -11,12 +11,12 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  margin: 40px auto;
-  padding: 20px;
-  max-width: 700px;
-  background-color: #ffffff;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-  border-radius: 12px;
+  justify-content: center;
+  box-sizing: border-box;
+  width: 100%;
+  min-height: 100vh;
+  margin: 0;
+  padding: 40px 20px;
 }
 
 .backButton {
@@ -47,15 +47,25 @@
   font-size: 28px;
   font-weight: bold;
   color: #333;
-  margin-bottom: 20px;
+  margin: 0 0 20px;
+  text-align: center;
 }
 
 .signupForm {
   width: 100%;
+  max-width: 700px;
+  margin: 0 auto;
   display: grid;
-  grid-template-columns: repeat(2, 1fr); 
+  grid-template-columns: 1fr; 
   gap: 1rem; 
+  background: #ffffff;
+  border: 1px solid #eee;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
+  padding: 24px;
 }
+
+.signupForm > * { grid-column: 1 / -1; }
 
 .formGroup {
   display: flex;
@@ -64,8 +74,10 @@
 }
 
 .formGroup label {
-  margin-bottom: 5px;
+  margin-bottom: 6px;
   font-size: 14px;
+  font-weight: 600;
+  color: #444;
 }
 
 .formGroup input {
@@ -74,11 +86,16 @@
   border: 1px solid #ccc;
   border-radius: 6px;
   transition: border-color 0.3s;
+  line-height: 1.4;
 }
 
 .formGroup input:focus {
   border: none;
   outline:1px solid  var(--green);;
+}
+
+.formGroup input::placeholder {
+  color: #9aa3ab;
 }
 
 .submitButton {
@@ -91,6 +108,7 @@
   cursor: pointer;
   transition: background-color 0.3s;
   grid-column: span 2;
+  width: 100%;
 }
 
 .submitButton:hover {
@@ -99,35 +117,67 @@
   outline: 1px solid var(--orange);
 }
 
+.submitButton:focus-visible {
+  outline: 3px solid rgba(30,165,9,0.35);
+  outline-offset: 2px;
+}
+
 .errorMessage {
-  color: #dc3545;
+  color: #7f1d1d;
+  background: #fee2e2;
+  border: 1px solid #fecaca;
+  border-radius: 6px;
+  padding: 8px 10px;
   margin-top: 10px;
   font-size: 14px;
   text-align: center;
 }
 
 .successMessage {
-  color: var(--green);
+  color: #065f46;
+  background: #d1fae5;
+  border: 1px solid #a7f3d0;
+  border-radius: 6px;
+  padding: 8px 10px;
   margin-top: 10px;
   font-size: 14px;
   text-align: center;
 }
 
 .switchForm{
-  margin-top: 2rem;
+  margin-top: 1rem;
+  text-align: center;
+}
+
+.switchForm:before {
+  content: "";
+  display: block;
+  height: 1px;
+  width: 100%;
+  background: #eee;
+  margin: 1rem 0;
 }
 
 .toggleButton{
-  background-color: var(--green);
+  background: transparent;
   border: none;
-  padding: 0.2rem 0.8rem;
+  padding: 0;
+  color: inherit;
+  cursor: pointer;
+  border-radius: 0;
 }
 
-.toggleButton:hover{
-  background-color: var(--white);
-  color: var(--orange);
-  outline: 1px solid var(--orange);
-}
+/* Driver reset page: reconstruct phrase with highlighted tail */
+.signupForm .toggleButton{ color: transparent; }
+.signupForm .toggleButton::before{ content: "Already have a reset token? "; color: #555; }
+.signupForm .toggleButton::after{ content: "Enter it here"; color: var(--green); text-decoration: none; }
+.signupForm .toggleButton:hover::after{ color: var(--orange); text-decoration: underline; }
+
+/* Driver signup switch line: highlight only the action word */
+.switchForm .toggleButton{ color: var(--green); font-weight: 600; }
+.switchForm .toggleButton:hover{ color: var(--orange); text-decoration: underline; }
+
+.signupForm p { text-align: center; margin: 0.25rem 0 0; }
 
 @media (max-width: 768px) {
   .backButton {
@@ -141,12 +191,26 @@
   .submitButton {
     grid-column: span 1; 
   }
+
+  .signupContainer {
+    width: 100%;
+    min-height: 100vh;
+    margin: 0;
+    padding: 24px 16px;
+  }
+}
+
+/* Re-enable back button exactly at 768px width */
+@media (width: 768px) {
+  .backButton {
+    display: flex;
+  }
 }
 
 @media (max-width: 425px) {
   .signupContainer {
-    padding: 15px;
-    margin: 20px auto;
+    padding: 20px 12px;
+    margin: 0;
     max-width: 95%;
   }
 
@@ -177,4 +241,18 @@
     padding: 0.3rem 0.6rem;
     font-size: 14px;
   }
+}
+
+/* 375px down to 321px: widen container, reduce form padding, ensure inputs full width */
+@media screen and (min-width: 321px) and (max-width: 375px) {
+  .signupContainer { max-width: 100%; padding: 16px 10px; }
+  .signupForm { padding: 12px; }
+  .formGroup input { width: 100%; }
+}
+
+/* 320px and below: maximize usable width, tighter padding */
+@media screen and (max-width: 320px) {
+  .signupContainer { max-width: 100%; padding: 14px 8px; }
+  .signupForm { padding: 10px; }
+  .formGroup input { width: 100%; }
 }

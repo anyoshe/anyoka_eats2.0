@@ -1,7 +1,7 @@
 .topAdsBar{
   position: sticky;
   top: 0;
-  z-index: 30;
+  z-index: 10; /* keep above content but below global modals */
   background: var(--color-white);
   border-bottom: 1px solid var(--color-border);
   min-height: var(--adsbar-height, 3.2rem);
@@ -165,6 +165,14 @@
     display: inline-flex !important; 
     visibility: visible !important;
     opacity: 1 !important;
+  }
+}
+
+/* When checkout modal is open, temporarily lower ads bar in stacking and disable interactions */
+@supports selector(:has(*)){
+  body:has(.checkoutModalBackdrop) .topAdsBar{
+    z-index: 1;
+    pointer-events: none;
   }
 }
 

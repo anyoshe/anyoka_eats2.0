@@ -10,7 +10,7 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  z-index: 1000;
+  z-index: 2147483000 !important; /* ensure it sits above any sticky bars */
   padding: var(--space-4);
   box-sizing: border-box;
   animation: fadeInOverlay var(--duration-base) var(--ease-out);
@@ -25,9 +25,12 @@
   overflow-y: auto;
   padding: var(--space-3) var(--space-8);
   box-shadow: var(--shadow-lg);
-  position: relative;
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
   animation: slideUpModal var(--duration-base) var(--ease-out);
-  z-index: 2500;
+  z-index: 2147483001 !important; /* above the backdrop and any app bars */
 }
 
 .checkoutModalH2{
