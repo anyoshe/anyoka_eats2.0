@@ -55,12 +55,12 @@
 
 .userIcon {
     font-size: 1.8rem;           
-    color: var(--color-white);        
+    color: var(--color-green);        /* Green when logged in */
     transition: color var(--duration-fast) var(--ease-out), transform var(--duration-fast) var(--ease-out);
 }
 
 .userIconButton:hover .userIcon {
-    color: var(--color-orange);        
+    color: var(--color-orange);        /* Orange on hover */
     transform: scale(1.15);     
 }
 

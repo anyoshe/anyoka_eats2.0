@@ -79,6 +79,7 @@
 
 .dispalySection{
   position: relative;
+  /* Removed z-index to prevent stacking context interference with modals */
   padding-top: 0rem;
   display: flex;
   flex-direction: column;
@@ -198,7 +199,7 @@
 .stickyControls{
   position: sticky;
   top: var(--adsbar-height);
-  z-index: 20;
+  z-index: var(--z-sticky-controls); /* 20 - above ads bar but below modals */
   background: var(--color-white);
   padding: var(--space-2) 0;
 }

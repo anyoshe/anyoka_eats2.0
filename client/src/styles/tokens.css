@@ -64,10 +64,15 @@
   --shadow-md: 0 4px 10px rgba(0,0,0,0.08);
   --shadow-lg: 0 10px 20px rgba(0,0,0,0.12);
 
-  /* Z-index */
+  /* Z-index hierarchy for proper layering */
+  --z-content: 1;
+  --z-ads-bar: 100;
+  --z-sticky-controls: 200;
   --z-nav: 1000;
   --z-modal: 1100;
   --z-toast: 1200;
+  --z-modal-backdrop: 99999;
+  --z-modal-content: 100000;
 
   /* Containers */
   --container-xs: 540px;
