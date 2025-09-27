@@ -29,13 +29,10 @@ const DriverOrders = () => {
           const order = res.status === 'fulfilled' ? res.value.data : null;
           if (!order) return;
         
-          console.log(`Order ${i}:`, order);
         
           if (!Array.isArray(order.subOrders)) {
-            console.warn(`Order ${order._id} has no subOrders array`);
           } else {
             order.subOrders.forEach((so, j) => {
-              console.log(`SubOrder ${j} of Order ${i}:`, so);
             });
           }
         });
@@ -58,7 +55,6 @@ const DriverOrders = () => {
       
         setOrders(availableOrders);
       } catch (error) {
-        console.error('Error fetching driver notifications or orders:', error);
         setOrders([]);
       } finally {
         setLoading(false);
@@ -79,7 +75,6 @@ const DriverOrders = () => {
       // Remove accepted order from the list
       setOrders((prevOrders) => prevOrders.filter((order) => order._id !== orderId));
     } catch (error) {
-      console.error('Error accepting order:', error);
     }
   };
 
@@ -98,7 +93,6 @@ const DriverOrders = () => {
         }))
       );
     } catch (error) {
-      console.error('Error updating suborder status:', error);
     }
   };
 

@@ -43,7 +43,6 @@ const AccountPage = () => {
       setOrderDetails(res.data);
       // Optionally show in a modal or route to detail page
     } catch (err) {
-      console.error('Failed to fetch order:', err);
     }
   };
 
@@ -55,7 +54,6 @@ const AccountPage = () => {
         isSubOrder: true,
       });
     } catch (err) {
-      console.error('Failed to fetch suborder:', err);
     }
   };
 

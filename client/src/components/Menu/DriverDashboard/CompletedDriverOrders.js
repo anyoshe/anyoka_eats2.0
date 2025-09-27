@@ -21,7 +21,6 @@ const CompletedDriverOrders = () => {
                 const filtered = response.data.filter(order => order.status === 'Confirmed Delivered');
                 setCompletedOrders(filtered);
             } catch (error) {
-                console.error('Error fetching completed driver orders:', error);
             } finally {
                 setLoading(false);
             }

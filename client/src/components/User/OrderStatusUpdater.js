@@ -44,7 +44,6 @@ const OrderStatusUpdater = ({
       );
       onStatusChange(response.data.status);
     } catch (error) {
-      console.error('Error auto-updating suborder status:', error);
     }
   };
 
@@ -60,7 +59,6 @@ const OrderStatusUpdater = ({
         await updateSubOrderStatus('Confirmed Delivered');
       }
     } catch (error) {
-      console.error('Polling error:', error);
     }
   };
 
@@ -91,7 +89,6 @@ const OrderStatusUpdater = ({
       );
       onStatusChange(response.data.status);
     } catch (error) {
-      console.error('Error updating status:', error);
     } finally {
       setLoading(false);
     }

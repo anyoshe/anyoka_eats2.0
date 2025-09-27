@@ -35,7 +35,6 @@ useEffect(() => {
       const data = await res.json();
       setReviews(data.reviews || []);
     } catch (error) {
-      console.error('Error fetching reviews:', error);
     }
   };
 
@@ -78,12 +77,10 @@ useEffect(() => {
         const refreshData = await refreshResponse.json();
         setReviews(refreshData.reviews || []);
       } else {
-        console.error('Failed to submit rating:', data.message);
         // Show user-friendly error message
         alert(`Failed to submit rating: ${data.message}`);
       }
     } catch (error) {
-      console.error('Error submitting rating:', error);
       alert('An error occurred while submitting your rating. Please try again.');
     } finally {
       setIsSubmittingRating(false);
@@ -126,12 +123,10 @@ useEffect(() => {
         const refreshData = await refreshResponse.json();
         setReviews(refreshData.reviews || []);
       } else {
-        console.error('Failed to submit comment:', data.message);
         // Show user-friendly error message
         alert(`Failed to submit comment: ${data.message}`);
       }
     } catch (error) {
-      console.error('Error submitting comment:', error);
       alert('An error occurred while submitting your comment. Please try again.');
     } finally {
       setIsSubmittingComment(false);

@@ -30,7 +30,6 @@ export const DriverProvider = ({ children }) => {
       setLoading(false);
     }
   }, [token]);
-  console.log("Token being sent:", token);  // Add this line before the fetch
 
   const fetchDriverProfile = async () => {
     try {
@@ -41,7 +40,6 @@ export const DriverProvider = ({ children }) => {
       });
 
       const data = await response.json();
-      console.log(data);
       if (!response.ok) throw new Error(data.message || 'Failed to fetch profile');
 
       setDriver(data);  // Store driver details in context
@@ -53,7 +51,6 @@ export const DriverProvider = ({ children }) => {
         navigate('/driver/profile-setup');  // Redirect to profile setup if incomplete
       }
     } catch (error) {
-      console.error('Error fetching driver profile:', error);
       setLoading(false);
     }
   };
@@ -73,7 +70,6 @@ export const DriverProvider = ({ children }) => {
       navigate('/driver/profile-setup');
       return { success: true };
     } catch (error) {
-      console.error('Signup Error:', error.message);
       return { success: false, message: error.message };
     }
   };
@@ -98,7 +94,6 @@ export const DriverProvider = ({ children }) => {
       }
       return { success: true };
     } catch (error) {
-      console.error('Login Error:', error.message);
       return { success: false, message: error.message };
     }
   };

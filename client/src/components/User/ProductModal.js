@@ -102,7 +102,6 @@ const ProductModal = ({ isOpen, onClose, onSubmit, editingProduct, onProductUpda
     if (partner && partner._id) {
       formData.append('shopId', partner._id);
     } else {
-      console.error('Shop ID not found. Ensure the partner is logged in.');
       return;
     }
 
@@ -128,7 +127,6 @@ const ProductModal = ({ isOpen, onClose, onSubmit, editingProduct, onProductUpda
 
     // Debug: Log FormData
     for (let [key, value] of formData.entries()) {
-      console.log(`FormData: ${key} = ${value}`);
     }
 
     try {
@@ -140,17 +138,14 @@ const ProductModal = ({ isOpen, onClose, onSubmit, editingProduct, onProductUpda
       });
       if (response.ok) {
         const result = await response.json();
-        console.log(editingProduct ? 'Product updated successfully:' : 'Product added successfully:', result);
         if (onProductUpdated) {
           onProductUpdated();
         }
         onClose();
       } else {
         const error = await response.json();
-        console.error(editingProduct ? 'Failed to update product:' : 'Failed to add product:', error.message);
       }
     } catch (error) {
-      console.error(editingProduct ? 'Error updating product:' : 'Error adding product:', error);
     }
   };
 

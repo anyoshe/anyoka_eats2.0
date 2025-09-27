@@ -26,7 +26,6 @@ const Sales = () => {
         setSales(completed);
         setFilteredSales(completed); // Initially, show all sales
       } catch (error) {
-        console.error('Error fetching sales:', error);
       } finally {
         setLoading(false);
       }

@@ -35,7 +35,6 @@ const Login = () => {
           headers: { Authorization: `Bearer ${token}` },
         });
         const userData = userRes.data;
-        console.log('✅ User data from /me:', userData);
 
         localStorage.setItem('user', JSON.stringify(userData));
         setUser(userData);
@@ -59,7 +58,6 @@ const Login = () => {
           headers: { Authorization: `Bearer ${token}` },
         });
         const partnerData = partnerRes.data;
-        console.log('✅ Partner data from /me:', partnerData);
 
         localStorage.setItem('partnerDetails', JSON.stringify(partnerData));
         setPartner(partnerData);
@@ -69,7 +67,6 @@ const Login = () => {
       }
 
     } catch (err) {
-      console.error('Login error:', err);
       setError(err.response?.data?.message || 'Login failed. Please try again.');
     }
   };

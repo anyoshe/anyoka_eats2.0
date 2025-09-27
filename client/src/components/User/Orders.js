@@ -58,7 +58,6 @@ const Orders = () => {
       );
       setOrders(filteredOrders);
     } catch (error) {
-      console.error('Error syncing suborders with parent orders:', error);
     }
   };
 
@@ -70,7 +69,6 @@ const Orders = () => {
         const response = await axios.get(`${config.backendUrl}/api/partners/${partner._id}/orders`);
         setOrders(response.data);
       } catch (error) {
-        console.error('Error fetching orders:', error);
       } finally {
         setLoading(false);
       }

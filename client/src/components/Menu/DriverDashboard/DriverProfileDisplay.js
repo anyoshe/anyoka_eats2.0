@@ -48,7 +48,6 @@ const DriverProfileDisplay = () => {
   }, [driver]);
 
   useEffect(() => {
-    console.log('formData has been updated:', formData);
   }, [formData]);
 
   if (loading) return <p>Loading driver profile...</p>;
@@ -85,10 +84,8 @@ const DriverProfileDisplay = () => {
           const { lat, lng } = data.results[0].geometry.location;
           setMapCenter({ lat, lng });
         } else {
-          console.warn('Could not find location for updated town');
         }
       } catch (error) {
-        console.error('Failed to update map center dynamically:', error);
       }
     }
   };
@@ -110,7 +107,6 @@ const DriverProfileDisplay = () => {
         alert('Could not find location for town');
       }
     } catch (error) {
-      console.error('Failed to fetch map center:', error);
     }
   };
 
@@ -165,7 +161,6 @@ const DriverProfileDisplay = () => {
     try {
       const token = localStorage.getItem('driverToken');
       if (!token) {
-        console.error('No authentication token found');
         return;
       }
 
@@ -197,7 +192,6 @@ const DriverProfileDisplay = () => {
       setNewProfilePhoto(null);
       await fetchDriverProfile(); // Refresh profile
     } catch (error) {
-      console.error('Failed to save driver profile:', error);
     }
   };
 

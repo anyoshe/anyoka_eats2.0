@@ -44,7 +44,6 @@ export const AuthProvider = ({ children }) => {
       setUser(res.data.user);
       localStorage.setItem('user', JSON.stringify(res.data.user));
     } catch (err) {
-      console.error('Error fetching user profile:', err);
     }
   };
 

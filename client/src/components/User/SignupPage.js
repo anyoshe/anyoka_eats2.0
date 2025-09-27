@@ -59,7 +59,6 @@ const SignupPage = () => {
       const data = await response.json();
 
       if (response.ok) {
-        console.log('User after signup:', data.user);
         setUser(data.user);
         setIsLoggedIn(true);
         localStorage.setItem('userToken', data.token);
@@ -74,7 +73,6 @@ const SignupPage = () => {
         alert(`Signup failed: ${data.message}`);
       }
     } catch (error) {
-      console.error('Error during signup:', error);
       alert('An error occurred. Please try again.');
     } finally {
       setIsSubmitting(false);

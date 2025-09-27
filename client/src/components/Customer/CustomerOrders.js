@@ -23,8 +23,7 @@
 //         const activeOrders = res.data.filter(order => order.status !== 'Confirmed Delivered');
 //         setOrders(activeOrders);
 //       } catch (err) {
-//         console.error('Failed to fetch orders:', err);
-//       } finally {
+// //       } finally {
 //         setLoading(false);
 //       }
 //     };
@@ -48,8 +47,7 @@
 
 //       setOrders((prevOrders) => prevOrders.filter((order) => order._id !== orderId));
 //     } catch (err) {
-//       console.error('Error confirming delivery:', err);
-//     }
+// //     }
 //   };
 
 //   const getOrderButtonStatus = (order) => {
@@ -187,7 +185,6 @@ const CustomerOrders = () => {
         const activeOrders = res.data.filter(order => order.status !== 'Confirmed Delivered');
         setOrders(activeOrders);
       } catch (err) {
-        console.error('Failed to fetch orders:', err);
       } finally {
         setLoading(false);
       }
@@ -212,7 +209,6 @@ const CustomerOrders = () => {
 
       setOrders((prevOrders) => prevOrders.filter((order) => order._id !== orderId));
     } catch (err) {
-      console.error('Error confirming delivery:', err);
     }
   };
 

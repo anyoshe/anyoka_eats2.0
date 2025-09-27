@@ -69,7 +69,6 @@ const Profile = ({ onSave }) => {
             }
           }
         } catch (error) {
-          console.error('Error fetching partner details:', error);
         }
       };
       fetchPartnerDetails();
@@ -152,10 +151,8 @@ const Profile = ({ onSave }) => {
         setEditImageMode(false);
         setPreviewImage(null);
       } else {
-        console.error('Error uploading image:', data.message);
       }
     } catch (error) {
-      console.error('Error uploading image:', error);
     }
   };
 
@@ -179,7 +176,6 @@ const Profile = ({ onSave }) => {
         if (permitResponse.ok) {
           businessPermitUrl = `${config.backendUrl}${permitData.businessPermit.replace(/\\/g, '/')}`;
         } else {
-          console.error('Error uploading business permit:', permitData.message);
           return;
         }
       }
@@ -196,7 +192,6 @@ const Profile = ({ onSave }) => {
       setEditSectionMode(false);
       setPermitPreview(null); // Clear permit preview after save
     } catch (error) {
-      console.error('Error updating partner details:', error);
     }
   };
 

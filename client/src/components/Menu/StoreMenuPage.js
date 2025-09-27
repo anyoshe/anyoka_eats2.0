@@ -31,7 +31,6 @@ const StoreMenuPage = () => {
     const [showCart, setShowCart] = useState(false);
 
     useEffect(() => {
-        console.log('User in MenuPage:', user);
     }, [user]);
 
 
@@ -54,7 +53,6 @@ const StoreMenuPage = () => {
 
                 setProductsByCategory(groupedProducts);
             } catch (error) {
-                console.error('Error fetching products:', error);
             } finally {
                 setLoading(false); // End loading
             }

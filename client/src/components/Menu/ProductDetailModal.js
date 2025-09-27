@@ -38,15 +38,12 @@ const ProductDetailModal = ({ isOpen, onRequestClose, product, onAddToCart }) =>
     try {
       const response = await fetch(`${config.backendUrl}/api/products/${product._id}/reviews`); // Presumed endpoint for fetching reviews
       const data = await response.json();
-      console.log(data);
 
       if (response.ok) {
         setReviews(data.reviews);
       } else {
-        console.error('Failed to fetch reviews:', data.message);
       }
     } catch (error) {
-      console.error('Error fetching reviews:', error);
     }
   };
 
@@ -73,10 +70,8 @@ const ProductDetailModal = ({ isOpen, onRequestClose, product, onAddToCart }) =>
       if (response.ok) {
         fetchReviews(); // Refetch reviews after rating to keep them updated
       } else {
-        console.error('Failed to submit rating:', data.message);
       }
     } catch (error) {
-      console.error('Error submitting rating:', error);
     }
   };
 
@@ -106,10 +101,8 @@ const ProductDetailModal = ({ isOpen, onRequestClose, product, onAddToCart }) =>
         fetchReviews(); // Refetch reviews after comment submission to keep them synchronized
         setComment(''); // Clear the text input after submitting a comment
       } else {
-        console.error('Failed to submit comment:', data.message);
       }
     } catch (error) {
-      console.error('Error submitting comment:', error);
     }
   };
 

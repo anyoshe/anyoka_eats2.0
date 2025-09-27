@@ -9,7 +9,6 @@ const InstallPrompt = () => {
     const isInstalled = window.matchMedia('(display-mode: standalone)').matches;
 
     if (isInstalled) {
-      console.log('App is already installed');
       return; 
     }
 
@@ -31,9 +30,7 @@ const InstallPrompt = () => {
       deferredPrompt.prompt();
       const choiceResult = await deferredPrompt.userChoice;
       if (choiceResult.outcome === 'accepted') {
-        console.log('User accepted the install prompt');
       } else {
-        console.log('User dismissed the install prompt');
       }
       setDeferredPrompt(null);
       setShowInstallButton(false);

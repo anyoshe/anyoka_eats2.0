@@ -32,7 +32,6 @@ const handleSubmit = async (event) => {
       alert('Failed to send email. Please try again.');
     }
   } catch (error) {
-    console.error('Error sending email:', error);
     alert('An error occurred. Please try again later.');
   }
 };

@@ -24,13 +24,6 @@ const PaymentMethods = ({
   const navigate = useNavigate();
 
   const handlePlaceOrder = async () => {
-    console.log("Submitting order with:", {
-      deliveryOption,
-      deliveryTown,
-      deliveryLocation,
-      deliveryFee,
-    });
-
     if (loading) return;
 
     if (!isDeliveryFeeReady) {
@@ -83,7 +76,6 @@ const PaymentMethods = ({
       onSuccess?.();
       navigate(`/orders/${data.orderId}`);
     } catch (err) {
-      console.error(err);
       onError?.(err.message);
     } finally {
       setLoading(false);

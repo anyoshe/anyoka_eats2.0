@@ -69,7 +69,6 @@ const CustomerProfileDisplay = () => {
         setMapCenter({ lat, lng });
       }
     } catch (err) {
-      console.error('Error fetching map center:', err);
     }
   };
 
@@ -117,7 +116,6 @@ const CustomerProfileDisplay = () => {
 
       setEditing(false);
     } catch (err) {
-      console.error('Error saving profile:', err);
     }
   };
 

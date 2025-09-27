@@ -22,10 +22,8 @@ const ShopSection = () => {
                 const sortedProducts = data.products.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
                 setProducts(sortedProducts);
             } else {
-                console.error('Failed to fetch products');
             }
         } catch (error) {
-            console.error('Error fetching products:', error);
         }
     };
 
@@ -49,13 +47,10 @@ const ShopSection = () => {
                 method: 'DELETE',
             });
             if (response.ok) {
-                console.log('Product deleted successfully');
                 setRefreshTrigger((prev) => prev + 1);
             } else {
-                console.error('Failed to delete product');
             }
         } catch (error) {
-            console.error('Error deleting product:', error);
         }
     };
 

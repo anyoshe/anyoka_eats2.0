@@ -16,7 +16,6 @@ const ProductList = ({ onEditProduct, onDeleteProduct, refreshTrigger }) => {
     useEffect(() => {
         const fetchProducts = async () => {
             if (!partner || !partner._id) {
-                console.error('Partner ID is missing. Please log in.');
                 return;
             }
 
@@ -37,10 +36,8 @@ const ProductList = ({ onEditProduct, onDeleteProduct, refreshTrigger }) => {
                     setProductsByCategory(groupedProducts);
                 } else {
                     const errorText = await response.text();
-                    console.error('Failed to fetch products:', errorText);
                 }
             } catch (error) {
-                console.error('Error fetching products:', error);
             }
         };
 

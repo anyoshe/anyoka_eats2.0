@@ -45,10 +45,8 @@ export const PartnerProvider = ({ children }) => {
       setSocket(newSocket);
   
       newSocket.emit('joinPartnerRoom', partner._id);
-      console.log("Joined socket room:", partner._id);
   
       newSocket.on('newSubOrder', (data) => {
-        console.log("🎉 Notification received!", data);
         if (audioEnabledRef.current) {
           playNotificationSound();
         }
@@ -95,7 +93,6 @@ export const PartnerProvider = ({ children }) => {
   
       setNotifications(normalized);
     } catch (err) {
-      console.error('Failed to fetch notifications:', err);
     }
   };
   
@@ -124,7 +121,6 @@ export const PartnerProvider = ({ children }) => {
       );
       
     } catch (err) {
-      console.error('Failed to mark notification as read:', err);
     }
   };
 
@@ -136,7 +132,6 @@ export const PartnerProvider = ({ children }) => {
       });
       setNotifications((prev) => prev.filter((n) => n._id !== notifId));
     } catch (err) {
-      console.error('Failed to delete notification:', err);
     }
   };
 

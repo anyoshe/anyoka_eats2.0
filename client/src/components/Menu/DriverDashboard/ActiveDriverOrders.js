@@ -18,7 +18,6 @@ const ActiveDriverOrders = () => {
                 const response = await axiosInstance.get(`${config.backendUrl}/api/driver-active-orders/${driver._id}`);
                 setOrders(response.data.filter(order => order.status !== 'Confirmed Delivered'));
             } catch (error) {
-                console.error('Error fetching active driver orders:', error);
             } finally {
                 setLoading(false);
             }
@@ -46,7 +45,6 @@ const ActiveDriverOrders = () => {
                 });
             });
         } catch (error) {
-            console.error('Error updating suborder status:', error);
         }
     };
 
@@ -65,7 +63,6 @@ const ActiveDriverOrders = () => {
 
             setJustDeliveredOrders(prev => new Set(prev).add(order._id));
         } catch (error) {
-            console.error('Error marking order as delivered:', error);
         }
     };
 
@@ -79,7 +76,6 @@ const ActiveDriverOrders = () => {
             // Remove the order from the current list
             setOrders((prevOrders) => prevOrders.filter((order) => order._id !== orderId));
         } catch (error) {
-            console.error('Error declining order:', error);
         }
     };
 

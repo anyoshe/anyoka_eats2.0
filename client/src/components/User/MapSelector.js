@@ -11,7 +11,6 @@ function MapSelector({ onLocationSelect, center }) {
     id: 'google-map-script',
     googleMapsApiKey: process.env.REACT_APP_GOOGLE_API_KEY,
   });
- console.log("Frontend key:", process.env.REACT_APP_GOOGLE_API_KEY);
 
   const mapRef = useRef(null);
 

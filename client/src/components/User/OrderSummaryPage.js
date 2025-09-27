@@ -13,7 +13,6 @@ const OrderSummaryPage = () => {
   useEffect(() => {
     const fetchOrder = async () => {
       if (!token) {
-        console.warn('User token missing');
         setLoading(false);
         return;
       }
@@ -24,7 +23,6 @@ const OrderSummaryPage = () => {
             Authorization: `Bearer ${token}`,
           },
         });
-        console.log('Response:', res);
         const text = await res.text();
         let data;
         try {
@@ -36,7 +34,6 @@ const OrderSummaryPage = () => {
         if (!res.ok) throw new Error(data.error || 'Failed to fetch order');
         setOrder(data);
       } catch (err) {
-        console.error('Error fetching order:', err.message);
       } finally {
         setLoading(false);
       }

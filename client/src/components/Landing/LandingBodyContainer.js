@@ -23,7 +23,6 @@ const LandingBodyContainer = () => {
                 const data = await response.json();
                 setStores(Array.isArray(data) ? data : []);
             } catch (err) {
-                console.error('Error fetching partners:', err);
                 setError("We couldn't load stores right now. Please try again.");
             } finally {
                 setLoading(false);

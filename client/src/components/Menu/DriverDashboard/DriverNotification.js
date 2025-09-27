@@ -43,7 +43,6 @@ const DriverNotification = ({ onView, onClose }) => {
         const data = await res.json();
         setNotifications(data);
       } catch (err) {
-        console.error('Failed to fetch notifications:', err);
       }
     };
 

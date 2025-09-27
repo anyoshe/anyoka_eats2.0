@@ -28,7 +28,6 @@ const DeliveryOptions = ({ cart, userLocation, deliveryTown, onDeliveryOptionSel
     const data = await response.json();
 
     if (data.status !== 'OK') {
-      console.error('Geocoding error response:', data);
     }
 
     if (data.status === 'OK' && data.results.length > 0) {
@@ -49,7 +48,6 @@ const DeliveryOptions = ({ cart, userLocation, deliveryTown, onDeliveryOptionSel
       throw new Error(`Geocoding failed for: ${address}`);
     }
   } catch (error) {
-    console.error('Error in geocodeAddress:', error);
     throw error;
   }
 };
@@ -79,7 +77,6 @@ const DeliveryOptions = ({ cart, userLocation, deliveryTown, onDeliveryOptionSel
       const data = await response.json();
   
       if (currentRequestId !== latestRequestRef.current) {
-        console.log('Ignored stale delivery calculation.');
         return;
       }
   
@@ -95,7 +92,6 @@ const DeliveryOptions = ({ cart, userLocation, deliveryTown, onDeliveryOptionSel
             maxDistanceInKm = distanceInKm;
           }
         } else {
-          console.warn(`Invalid distance for shop at index ${idx}:`, el);
         }
       });
   
@@ -151,7 +147,6 @@ const DeliveryOptions = ({ cart, userLocation, deliveryTown, onDeliveryOptionSel
   
     } catch (error) {
       if (currentRequestId === latestRequestRef.current) {
-        console.error('Error calculating delivery:', error);
         alert('Could not calculate delivery cost. Try again.');
         onDeliveryOptionSelected(null, 'platform', false);
       }

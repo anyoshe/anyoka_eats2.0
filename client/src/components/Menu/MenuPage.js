@@ -44,7 +44,6 @@ const MenuPage = () => {
   const [imageLoadingStates, setImageLoadingStates] = useState({});
 
   useEffect(() => {
-    console.log('User in MenuPage:', user);
   }, [user]);
 
   useEffect(() => {
@@ -64,7 +63,6 @@ const MenuPage = () => {
         } else {
           const response = await axios.get(`${config.backendUrl}/api/all-products`);
           const products = response.data.products || [];
-          console.log(products);
           const groupedProducts = products.reduce((acc, product) => {
             if (!acc[product.category]) {
               acc[product.category] = [];
@@ -85,7 +83,6 @@ const MenuPage = () => {
           }
         }
       } catch (error) {
-        console.error('Error fetching products:', error);
       } finally {
         setLoading(false); // End loading
       }

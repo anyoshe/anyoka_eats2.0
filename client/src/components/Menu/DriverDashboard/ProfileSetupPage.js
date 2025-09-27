@@ -339,7 +339,6 @@ const handleMapClick = (event) => {
       setDriver(updatedDriver);
       navigate('/driver/dashboard');
     } catch (err) {
-      console.error('Update failed', err);
     } finally {
       setUploading(false);
     }
@@ -409,7 +408,6 @@ const handleMapClick = (event) => {
           setMapVisible(true);
         });
       } catch (err) {
-        console.error("Geocoding failed", err);
         setMapCenter({ lat: -1.2921, lng: 36.8219 });
         setMapVisible(true);
       }

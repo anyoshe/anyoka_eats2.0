@@ -49,7 +49,6 @@ const CheckoutModal = ({ isOpen, onClose, cart, total }) => {
         const data = await response.json();
         setSavedLocations(data.locations || []);
       } catch (error) {
-        console.error('Error fetching saved locations:', error);
       }
     };
 
@@ -69,7 +68,6 @@ const CheckoutModal = ({ isOpen, onClose, cart, total }) => {
           setMapCenter({ lat, lng });
         }
       } catch (error) {
-        console.error('Error fetching town coordinates:', error);
         alert('Unable to get coordinates for the town.');
       }
     };
@@ -138,7 +136,6 @@ const CheckoutModal = ({ isOpen, onClose, cart, total }) => {
       alert('Location saved successfully!');
       setIsEditingLocation(false);
     } catch (error) {
-      console.error('Error saving location:', error);
       alert('There was an error saving your location.');
     }
   };

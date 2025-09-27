@@ -47,7 +47,6 @@ const StoreSignUpForm = () => {
           navigate(partnerData.role === 'admin' ? '/superuserdashboard' : '/dashboard');
         })
         .catch((error) => {
-          console.error('Error fetching partner data:', error);
         });
     }
   }, [navigate, setPartner]);
@@ -112,7 +111,6 @@ const StoreSignUpForm = () => {
       alert('Sign up Successful, Welcome!');
       navigate(partner.role === 'admin' ? '/superuserdashboard' : '/dashboard');
     } catch (error) {
-      console.error("Sign up error:", error);
       alert(
         error.response?.data?.message ||
         JSON.stringify(error.response?.data) ||

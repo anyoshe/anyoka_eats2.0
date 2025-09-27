@@ -23,8 +23,7 @@
 //         const pastOrders = res.data.filter(order => order.status === 'Confirmed Delivered');
 //         setOrders(pastOrders);
 //       } catch (err) {
-//         console.error('Failed to fetch past orders:', err);
-//       } finally {
+// //       } finally {
 //         setLoading(false);
 //       }
 //     };
@@ -128,7 +127,6 @@ const CustomerPastOrders = () => {
         const pastOrders = res.data.filter(order => order.status === 'Confirmed Delivered');
         setOrders(pastOrders);
       } catch (err) {
-        console.error('Failed to fetch past orders:', err);
       } finally {
         setLoading(false);
       }

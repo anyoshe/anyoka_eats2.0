@@ -7,7 +7,6 @@ export function playNotificationSound() {
     audio.currentTime = 0;      // rewind to start
     audio.play();
   } catch (err) {
-    console.error("Audio play error:", err);
   }
 }
 
