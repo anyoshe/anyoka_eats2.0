@@ -385,10 +385,10 @@ destroy@1.2.0:
 detect-libc@^2.0.0:
   version "2.0.3"
 
-dotenv@^16.4.5, dotenv@^16.5.0:
-  version "16.5.0"
-  resolved "https://registry.npmjs.org/dotenv/-/dotenv-16.5.0.tgz"
-  integrity sha512-m/C+AwOAr9/W1UOIZUo232ejMNnJAJtYQjUbHoNTBNTJSvqzzDh7vnrei3o3r3m9blf6ZoDkvcw0VmozNRFJxg==
+dotenv@^16.4.5, dotenv@^16.6.1:
+  version "16.6.1"
+  resolved "https://registry.npmjs.org/dotenv/-/dotenv-16.6.1.tgz"
+  integrity sha512-uBq4egWHTcTt33a72vpSG0z3HnPuIl6NqYcTrKEg2azoEyl2hpW0zqlxysq2pK9HlDIHyHyakeYaYnSAwd8bow==
 
 ecdsa-sig-formatter@1.0.11:
   version "1.0.11"
@@ -410,11 +410,6 @@ encodeurl@~2.0.0:
   version "2.0.0"
   resolved "https://registry.npmjs.org/encodeurl/-/encodeurl-2.0.0.tgz"
   integrity sha512-Q0n9HRi4m6JuGIV1eFlmvJB7ZEVxu93IrMyiMsGC0lrMJMWzRgx6WGquyfQgZVb31vhGgXnfmPNNXmxnOkRBrg==
-
-encoding@^0.1.0:
-  version "0.1.13"
-  dependencies:
-    iconv-lite "^0.6.2"
 
 engine.io-parser@~5.2.1:
   version "5.2.3"
@@ -671,11 +666,6 @@ https-proxy-agent@^5.0.0:
     agent-base "6"
     debug "4"
 
-iconv-lite@^0.6.2:
-  version "0.6.3"
-  dependencies:
-    safer-buffer ">= 2.1.2 < 3.0.0"
-
 iconv-lite@0.4.24:
   version "0.4.24"
   dependencies:
@@ -701,12 +691,6 @@ inflight@^1.0.4:
 inherits@^2.0.3, inherits@~2.0.3, inherits@2, inherits@2.0.4:
   version "2.0.4"
 
-ip-address@^9.0.5:
-  version "9.0.5"
-  dependencies:
-    jsbn "1.1.0"
-    sprintf-js "^1.1.3"
-
 ipaddr.js@1.9.1:
   version "1.9.1"
 
@@ -731,9 +715,6 @@ is-number@^7.0.0:
 
 isarray@~1.0.0:
   version "1.0.0"
-
-jsbn@1.1.0:
-  version "1.1.0"
 
 jsonwebtoken@^9.0.2:
   version "9.0.2"
@@ -1132,7 +1113,7 @@ safe-buffer@^5.0.1, safe-buffer@~5.2.0, safe-buffer@5.2.1:
 safe-buffer@~5.1.0, safe-buffer@~5.1.1:
   version "5.1.2"
 
-"safer-buffer@>= 2.1.2 < 3", "safer-buffer@>= 2.1.2 < 3.0.0":
+"safer-buffer@>= 2.1.2 < 3":
   version "2.1.2"
 
 semver@^6.0.0:
@@ -1214,9 +1195,6 @@ simple-update-notifier@^2.0.0:
   dependencies:
     semver "^7.5.3"
 
-smart-buffer@^4.2.0:
-  version "4.2.0"
-
 socket.io-adapter@~2.5.2:
   version "2.5.5"
   resolved "https://registry.npmjs.org/socket.io-adapter/-/socket.io-adapter-2.5.5.tgz"
@@ -1246,21 +1224,12 @@ socket.io@^4.8.1:
     socket.io-adapter "~2.5.2"
     socket.io-parser "~4.2.4"
 
-socks@^2.7.1:
-  version "2.8.3"
-  dependencies:
-    ip-address "^9.0.5"
-    smart-buffer "^4.2.0"
-
 sparse-bitfield@^3.0.3:
   version "3.0.3"
   resolved "https://registry.npmjs.org/sparse-bitfield/-/sparse-bitfield-3.0.3.tgz"
   integrity sha512-kvzhi7vqKTfkh0PZU+2D2PIllw2ymqJKujUcyPMd9Y75Nv4nPbGJZXNhxsgdQab2BmlDct1YnfQCguEvHr7VsQ==
   dependencies:
     memory-pager "^1.0.2"
-
-sprintf-js@^1.1.3:
-  version "1.1.3"
 
 statuses@2.0.1:
   version "2.0.1"

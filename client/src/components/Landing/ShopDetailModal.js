@@ -16,6 +16,8 @@ const ShopDetailModal = ({ isOpen, onRequestClose, store }) => {
   const { isLoggedIn, user, setCurrentStore, setRedirectPath } = useContext(AuthContext);
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
   const [reviews, setReviews] = useState([]);
+  const [isSubmittingComment, setIsSubmittingComment] = useState(false);
+  const [isSubmittingRating, setIsSubmittingRating] = useState(false);
   const location = useLocation();
 
   useEffect(() => {
@@ -52,7 +54,14 @@ useEffect(() => {
       return;
     }
 
+    // Validate rating
+    if (!rating || rating < 1 || rating > 5) {
+      alert('Please select a valid rating between 1 and 5 stars.');
+      return;
+    }
+
     setSelectedRating(rating);
+    setIsSubmittingRating(true);
     try {
       const response = await fetch(`${config.backendUrl}/api/partners/${store._id}/rate`, {
         method: 'POST',
@@ -64,11 +73,20 @@ useEffect(() => {
       const data = await response.json();
       if (response.ok) {
         // Handle rating success (maybe show confirmation, etc.)
+        // Refresh reviews to show the new rating
+        const refreshResponse = await fetch(`${config.backendUrl}/api/partners/${store._id}/reviews`);
+        const refreshData = await refreshResponse.json();
+        setReviews(refreshData.reviews || []);
       } else {
         console.error('Failed to submit rating:', data.message);
+        // Show user-friendly error message
+        alert(`Failed to submit rating: ${data.message}`);
       }
     } catch (error) {
       console.error('Error submitting rating:', error);
+      alert('An error occurred while submitting your rating. Please try again.');
+    } finally {
+      setIsSubmittingRating(false);
     }
   };
 
@@ -82,6 +100,13 @@ useEffect(() => {
       return;
     }
 
+    // Validate comment
+    if (!comment.trim()) {
+      alert('Please enter a comment before submitting.');
+      return;
+    }
+
+    setIsSubmittingComment(true);
     try {
       const response = await fetch(`${config.backendUrl}/api/partners/${store._id}/comments`, {
         method: 'POST',
@@ -95,11 +120,21 @@ useEffect(() => {
       if (response.ok) {
         // Handle comment success (e.g., update comments)
         setComment(''); // Clear comment box
+        
+        // Refresh reviews to show the new comment
+        const refreshResponse = await fetch(`${config.backendUrl}/api/partners/${store._id}/reviews`);
+        const refreshData = await refreshResponse.json();
+        setReviews(refreshData.reviews || []);
       } else {
         console.error('Failed to submit comment:', data.message);
+        // Show user-friendly error message
+        alert(`Failed to submit comment: ${data.message}`);
       }
     } catch (error) {
       console.error('Error submitting comment:', error);
+      alert('An error occurred while submitting your comment. Please try again.');
+    } finally {
+      setIsSubmittingComment(false);
     }
   };
 
@@ -170,13 +205,13 @@ useEffect(() => {
               key={star}
                     role="radio"
                     aria-checked={star <= (hoverRating || selectedRating)}
-                    tabIndex={0}
-                    className={`fas fa-star ${styles.star} ${star <= (hoverRating || selectedRating) ? styles.filled : ''}`}
-              onMouseEnter={() => setHoverRating(star)}
-              onMouseLeave={() => setHoverRating(0)}
-              onClick={() => handleStarClick(star)}
+                    tabIndex={isSubmittingRating ? -1 : 0}
+                    className={`fas fa-star ${styles.star} ${star <= (hoverRating || selectedRating) ? styles.filled : ''} ${isSubmittingRating ? styles.disabled : ''}`}
+              onMouseEnter={() => !isSubmittingRating && setHoverRating(star)}
+              onMouseLeave={() => !isSubmittingRating && setHoverRating(0)}
+              onClick={() => !isSubmittingRating && handleStarClick(star)}
                     onKeyDown={(e) => {
-                      if (e.key === 'Enter' || e.key === ' ') handleStarClick(star);
+                      if (!isSubmittingRating && (e.key === 'Enter' || e.key === ' ')) handleStarClick(star);
                     }}
                   />
           ))}
@@ -223,8 +258,12 @@ useEffect(() => {
                 placeholder="Share your experience..."
           className={styles.commentBox}
         />
-        <button onClick={handleAddComment} className={styles.submitComment}>
-          Submit Comment
+        <button 
+          onClick={handleAddComment} 
+          className={styles.submitComment}
+          disabled={isSubmittingComment}
+        >
+          {isSubmittingComment ? 'Submitting...' : 'Submit Comment'}
         </button>
             </div>
           </div>

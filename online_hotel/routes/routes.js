@@ -1612,6 +1612,7 @@ router.put('/suborders/:id/status', async (req, res) => {
 });
 
 
+
 const PartnerNotificationSchema = new mongoose.Schema({
   shop: { type: mongoose.Schema.Types.ObjectId, ref: 'Partner', required: true },
   message: { type: String, required: true },
@@ -1985,6 +1986,7 @@ router.put('/driver/update-profile', authenticateToken, uploadProfileImage, asyn
     res.status(500).json({ error: 'Server error while updating profile' });
   }
 });
+
 
 const DriverNotificationSchema = new mongoose.Schema({
   driver: { type: mongoose.Schema.Types.ObjectId, ref: 'Driver', required: true },
