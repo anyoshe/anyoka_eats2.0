@@ -14,9 +14,11 @@ import Login from './components/User/Login';
 import OrderSummaryPage from './components/User/OrderSummaryPage';
 import StoreMenuPage from './components/Menu/StoreMenuPage';
 import DriverSignup from './components/Menu/DriverDashboard/DriverSignup';
+import DriverLogin from './components/Menu/DriverDashboard/DriverLogin';
 import { DriverProvider } from './contexts/DriverContext';
 import ProfileSetupPage from './components/Menu/DriverDashboard/ProfileSetupPage';
 import DriverDashboard from './components/Menu/DriverDashboard/DriverDashboard';
+import AccountTypeSelection from './components/Landing/AccountTypeSelection';
 import CustomerProfileDisplay from './components/Customer/CustomerProfileDisplay';
 import CustomerDashboard from './components/Customer/CustomerDashboard';
 import AppFooter from './components/AppFooter';
@@ -42,11 +44,13 @@ function App() {
                     <Routes>
 
                         <Route path="/" element={<LandingPage />} />
+                        <Route path="/account-type-selection" element={<AccountTypeSelection />} />
                         <Route path="/sign-up-sign-in" element={<SignUpSignIn />} />
                         <Route path="/sign-in" element={<Login />} />
                         <Route path="/product/:id" element={<ProductCard />} />
                         <Route path="/signup" element={<SignupPage />} />
                         <Route path="/driver-signup" element={<DriverSignup />} />
+                        <Route path="/driver-login" element={<DriverLogin />} />
                         <Route path="/driver/profile-setup" element={<ProfileSetupPage />} />
                         <Route path="/driver/dashboard" element={<DriverDashboard />} />
                         <Route path="/dashboard" element={<AccountPage />} />

@@ -13,6 +13,7 @@ const CustomerProfileDisplay = () => {
   const [showMapSelector, setShowMapSelector] = useState(false);
   const [mapCenter, setMapCenter] = useState(null);
   const [markerPosition, setMarkerPosition] = useState(null);
+  const [showMapPopup, setShowMapPopup] = useState(false);
 
   useEffect(() => {
     if (!user && !loading) {
@@ -38,6 +39,7 @@ const CustomerProfileDisplay = () => {
 
   const handleCancelClick = () => {
     setEditing(false);
+    setShowMapPopup(false);
     if (user) {
       setFormData({
         username: user.username,
@@ -83,6 +85,8 @@ const CustomerProfileDisplay = () => {
     geocoder.geocode({ location: latlng }, (results, status) => {
       if (status === 'OK' && results[0]) {
         setFormData(prev => ({ ...prev, location: results[0].formatted_address }));
+        // Close the popup after selecting location
+        setShowMapPopup(false);
       } else {
         alert('Geocoder failed: ' + status);
       }
@@ -129,19 +133,6 @@ const CustomerProfileDisplay = () => {
           onSelect={handleLocationSelect}
           onCancel={() => setShowMapSelector(false)}
         />
-      )}
-
-      {editing && mapCenter && (
-        <div className={styles.mapContainer}>
-          <GoogleMap
-            mapContainerStyle={{ width: '100%', height: '400px' }}
-            center={mapCenter}
-            zoom={15}
-            onClick={handleMapClick}
-          >
-            {markerPosition && <Marker position={markerPosition} />}
-          </GoogleMap>
-        </div>
       )}
 
       <div className={styles.profileContent}>
@@ -203,7 +194,17 @@ const CustomerProfileDisplay = () => {
                 name="location"
                 value={formData.location}
                 readOnly
-                onClick={() => setShowMapSelector(true)}
+                onClick={() => {
+                  // Show map popup and set center
+                  setShowMapPopup(true);
+                  if (formData.town) {
+                    // Use existing town to center the map
+                    handleTownChange({ target: { value: formData.town } });
+                  } else {
+                    // Default center if no town
+                    setMapCenter({ lat: 0, lng: 0 });
+                  }
+                }}
               />
             ) : (
               <span>{formData.location}</span>
@@ -222,6 +223,33 @@ const CustomerProfileDisplay = () => {
           )}
         </div>
       </div>
+
+      {/* Modern map popup overlay */}
+      {editing && showMapPopup && (
+        <div className={styles.mapPopupOverlay}>
+          <div className={styles.mapPopupContent}>
+            <div className={styles.mapPopupHeader}>
+              <h3>Select Your Location</h3>
+              <button 
+                className={styles.mapPopupCloseBtn}
+                onClick={() => setShowMapPopup(false)}
+              >
+                ×
+              </button>
+            </div>
+            <div className={styles.mapPopupContainer}>
+              <GoogleMap
+                mapContainerStyle={{ width: '100%', height: '100%' }}
+                center={mapCenter}
+                zoom={15}
+                onClick={handleMapClick}
+              >
+                {markerPosition && <Marker position={markerPosition} />}
+              </GoogleMap>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
 
   );

@@ -170,7 +170,7 @@ const HeroHeader = () => {
                     <InstallPrompt />
 
                     {!isLoggedIn ? (
-                        <Link to="/sign-in">
+                        <Link to="/account-type-selection">
                             <button className={styles.logInButton}>LOG IN</button>
                         </Link>
                     ) : (

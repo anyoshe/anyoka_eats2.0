@@ -1,0 +1,252 @@
+.selectionContainer {
+  min-height: 100vh;
+  background: var(--color-orange);
+  display: flex;
+  flex-direction: column;
+  padding: var(--space-4);
+  position: relative;
+}
+
+.backButton {
+  position: absolute;
+  top: var(--space-4);
+  left: var(--space-4);
+  background: var(--color-green);
+  border: none;
+  color: var(--color-white);
+  padding: var(--space-2) var(--space-3);
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  font-size: var(--font-size-sm);
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  transition: background var(--duration-fast) var(--ease-out), color var(--duration-fast) var(--ease-out);
+}
+
+.backButton:hover {
+  background: var(--color-white);
+  color: var(--color-orange);
+  outline: 1px solid var(--color-orange);
+}
+
+.selectionContent {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  max-width: var(--container-lg);
+  margin: 0 auto;
+  width: 100%;
+  padding: var(--space-12) var(--space-4);
+}
+
+.title {
+  color: var(--color-white);
+  font-size: var(--font-size-2xl);
+  font-weight: 700;
+  margin-bottom: var(--space-2);
+  text-align: center;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.subtitle {
+  color: rgba(255, 255, 255, 0.9);
+  font-size: var(--font-size-lg);
+  margin-bottom: var(--space-10);
+  text-align: center;
+  max-width: 500px;
+}
+
+.accountTypes {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: var(--space-8);
+  width: 100%;
+  max-width: 1000px;
+}
+
+/* 3-column grid from 768px to 2560px */
+@media (min-width: 768px) and (max-width: 2560px) {
+  .accountTypes {
+    grid-template-columns: repeat(3, 1fr);
+    max-width: 1200px;
+  }
+}
+
+.accountTypeCard {
+  background: var(--color-white);
+  border-radius: var(--radius-xl);
+  padding: var(--space-10) var(--space-8);
+  text-align: center;
+  cursor: pointer;
+  transition: transform var(--duration-base) var(--ease-out), box-shadow var(--duration-base) var(--ease-out);
+  box-shadow: var(--shadow-md);
+  border: 1px solid var(--color-border);
+}
+
+.accountTypeCard:hover {
+  transform: translateY(-8px);
+  box-shadow: var(--shadow-lg);
+}
+
+.iconContainer {
+  width: 80px;
+  height: 80px;
+  margin: 0 auto var(--space-6);
+  background: var(--color-green);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: var(--shadow-md);
+}
+
+.accountIcon {
+  font-size: 2rem;
+  color: var(--color-white);
+}
+
+.accountTitle {
+  color: var(--color-text);
+  font-size: var(--font-size-xl);
+  font-weight: 600;
+  margin-bottom: var(--space-4);
+}
+
+.accountDescription {
+  color: var(--color-text-muted);
+  font-size: var(--font-size-md);
+  line-height: var(--line-height);
+  margin-bottom: var(--space-8);
+  min-height: 48px;
+}
+
+.selectButton {
+  background: var(--color-green);
+  color: var(--color-white);
+  border: none;
+  padding: var(--space-4) var(--space-6);
+  border-radius: var(--radius-lg);
+  font-size: var(--font-size-md);
+  font-weight: 600;
+  cursor: pointer;
+  transition: background var(--duration-fast) var(--ease-out), color var(--duration-fast) var(--ease-out), transform var(--duration-fast) var(--ease-out);
+  width: 100%;
+  box-shadow: var(--shadow-sm);
+}
+
+.selectButton:hover {
+  background: var(--color-white);
+  color: var(--color-orange);
+  outline: 1px solid var(--color-orange);
+  transform: scale(1.05);
+}
+
+.signupLink {
+  margin-top: var(--space-4);
+  text-align: center;
+}
+
+.signupLink p {
+  color: var(--color-text-muted);
+  font-size: var(--font-size-sm);
+  margin: 0;
+}
+
+.signupLink a {
+  color: var(--color-green);
+  text-decoration: underline;
+  font-weight: 600;
+  transition: color var(--duration-fast) var(--ease-out);
+}
+
+.signupLink a:hover {
+  color: var(--color-orange);
+}
+
+
+/* Mobile Responsive */
+@media (max-width: 768px) {
+  .selectionContainer {
+    padding: var(--space-3);
+  }
+
+  .backButton {
+    top: var(--space-3);
+    left: var(--space-3);
+    padding: var(--space-2) var(--space-3);
+    font-size: var(--font-size-xs);
+  }
+
+  .selectionContent {
+    padding: var(--space-10) var(--space-3);
+  }
+
+  .title {
+    font-size: var(--font-size-xl);
+  }
+
+  .subtitle {
+    font-size: var(--font-size-md);
+    margin-bottom: var(--space-10);
+  }
+
+  .accountTypes {
+    grid-template-columns: 1fr;
+    gap: var(--space-5);
+  }
+
+  .accountTypeCard {
+    padding: var(--space-8) var(--space-5);
+  }
+
+  .iconContainer {
+    width: 70px;
+    height: 70px;
+    margin-bottom: var(--space-5);
+  }
+
+  .accountIcon {
+    font-size: 1.8rem;
+  }
+
+  .accountTitle {
+    font-size: var(--font-size-lg);
+  }
+
+  .accountDescription {
+    font-size: var(--font-size-sm);
+    margin-bottom: var(--space-6);
+  }
+
+  .selectButton {
+    padding: var(--space-3) var(--space-6);
+    font-size: var(--font-size-sm);
+  }
+
+  .signupLink p {
+    font-size: var(--font-size-xs);
+  }
+}
+
+@media (max-width: 480px) {
+  .title {
+    font-size: var(--font-size-lg);
+  }
+
+  .accountTypeCard {
+    padding: var(--space-6) var(--space-4);
+  }
+
+  .iconContainer {
+    width: 60px;
+    height: 60px;
+  }
+
+  .accountIcon {
+    font-size: 1.5rem;
+  }
+}
