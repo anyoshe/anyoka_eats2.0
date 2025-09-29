@@ -118,10 +118,14 @@ import rightAd from '../../assets/Ecommerce_ADs 2.png';
 import styles from './HeroHeader.module.css';
 import InstallPrompt from '../Header/InstallPrompt';
 import { AuthContext } from '../../contexts/AuthContext';
+import { PartnerContext } from '../../contexts/PartnerContext';
+import { DriverContext } from '../../contexts/DriverContext';
 import HeroHeaderSearch from './HeroHeaderSearch';
 
 const HeroHeader = () => {
     const { isLoggedIn, logout } = useContext(AuthContext);
+    const { partner, token: partnerToken } = useContext(PartnerContext);
+    const { driver, token: driverToken } = useContext(DriverContext);
     const [dropdownOpen, setDropdownOpen] = useState(false);
     const dropdownRef = useRef(null);
     const navigate = useNavigate();
@@ -146,6 +150,17 @@ const HeroHeader = () => {
         navigate('/');
     };
 
+    const userLoggedIn = !!isLoggedIn;
+    const vendorLoggedIn = !!partner || !!partnerToken || !!localStorage.getItem('partnerToken');
+    const driverLoggedIn = !!driver || !!driverToken || !!localStorage.getItem('driverToken');
+    const isAnyLoggedIn = userLoggedIn || vendorLoggedIn || driverLoggedIn;
+
+    const dashboardPath = driverLoggedIn
+        ? '/driver/dashboard'
+        : vendorLoggedIn
+        ? '/dashboard'
+        : '/customer-dashboard';
+
     return (
         <header className={styles.heroHeader}>
             <nav className={styles.landingNav}>
@@ -169,13 +184,13 @@ const HeroHeader = () => {
                 <div className={styles.installLogIn}>
                     <InstallPrompt />
 
-                    {!isLoggedIn ? (
+                    {!isAnyLoggedIn ? (
                         <Link to="/account-type-selection">
                             <button className={styles.logInButton}>LOG IN</button>
                         </Link>
                     ) : (
                         <div ref={dropdownRef} className={styles.userDropdown}>
-                            <Link to="/customer-dashboard" className={styles.userLinkToDashboard}>
+                            <Link to={dashboardPath} className={styles.userLinkToDashboard}>
                                 <button
                                     className={styles.userIconButton}
                                     onClick={() => setDropdownOpen((open) => !open)}

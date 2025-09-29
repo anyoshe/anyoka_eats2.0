@@ -81,7 +81,15 @@ const SignupPage = () => {
 
   return (
     <div className={styles['signup-page']}>
-
+      <button
+        type="button"
+        className={styles['back-button']}
+        onClick={() => navigate(-1)}
+        aria-label="Go back"
+        title="Go back"
+      >
+        ← Back
+      </button>
       <h1>Sign Up</h1>
 
       <form onSubmit={handleSubmit} className={styles['signup-form']}>

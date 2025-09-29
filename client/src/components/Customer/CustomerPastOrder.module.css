@@ -34,28 +34,7 @@
   box-sizing: border-box;
 }
 
-.title {
-  color: var(--green);
-  font-size: 2rem;
-  font-weight: 700;
-  margin-bottom: 2rem;
-  text-align: center;
-  text-decoration: none;
-  position: relative;
-  padding-bottom: 0.5rem;
-}
-
-.title::after {
-  content: '';
-  position: absolute;
-  bottom: 0;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 100px;
-  height: 3px;
-  background: linear-gradient(90deg, var(--green) 0%, var(--orange) 100%);
-  border-radius: 2px;
-}
+.title { display: none; }
 
 .noOrders {
   color: var(--muted);
@@ -76,7 +55,7 @@
 
 .ordersList {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(2, 1fr);
   gap: 1.5rem;
   margin-top: 1rem;
 }
@@ -109,8 +88,9 @@
 
 .orderHeader {
   display: flex;
-  justify-content: space-between;
-  align-items: center;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 0.75rem;
 }
 
 .orderSummary {
@@ -253,14 +233,7 @@
     padding: 3rem 2rem;
   }
 
-  .title {
-    font-size: 2.5rem;
-  }
-
-  .ordersList {
-    grid-template-columns: repeat(4, 1fr);
-    gap: 2rem;
-  }
+  .ordersList { grid-template-columns: repeat(4, 1fr); gap: 2rem; }
 
   .orderCard {
     padding: 2rem;
@@ -279,14 +252,7 @@
     padding: 2.5rem 1.5rem;
   }
 
-  .title {
-    font-size: 2.25rem;
-  }
-
-  .ordersList {
-    grid-template-columns: repeat(3, 1fr);
-    gap: 1.75rem;
-  }
+  .ordersList { grid-template-columns: repeat(4, 1fr); gap: 1.75rem; }
 
   .orderCard {
     padding: 1.75rem;
@@ -305,14 +271,7 @@
     padding: 2rem 1.25rem;
   }
 
-  .title {
-    font-size: 2rem;
-  }
-
-  .ordersList {
-    grid-template-columns: repeat(3, 1fr);
-    gap: 1.5rem;
-  }
+  .ordersList { grid-template-columns: repeat(4, 1fr); gap: 1.5rem; }
 
   .orderCard {
     padding: 1.5rem;
@@ -331,14 +290,7 @@
     padding: 1.75rem 1rem;
   }
 
-  .title {
-    font-size: 1.75rem;
-  }
-
-  .ordersList {
-    grid-template-columns: repeat(3, 1fr);
-    gap: 1.25rem;
-  }
+  .ordersList { grid-template-columns: repeat(4, 1fr); gap: 1.25rem; }
 
   .orderCard {
     padding: 1.25rem;

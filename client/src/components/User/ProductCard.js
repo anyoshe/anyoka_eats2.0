@@ -8,6 +8,7 @@ import { faStar as regularStar } from '@fortawesome/free-regular-svg-icons';
 
 const ProductCard = ({ product }) => {
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
+  const [isLoaded, setIsLoaded] = useState(false);
   const [showReviews, setShowReviews] = useState(false); // Toggle for reviews section
 
   const images = product.primaryImage
@@ -56,7 +57,7 @@ const getImageSrc = (imagePath) => {
               <img
                 src={getImageSrc(images[currentImageIndex])}
                 alt={`Product Image ${currentImageIndex + 1}`}
-                className={styles.productImage}
+                className={`${styles.productImage} ${isLoaded ? styles.isLoaded : ''}`}
                 // onError={(e) => {
                 //   e.target.onerror = null;
                 //   e.target.src = '/path/to/placeholder-image.jpg';
@@ -65,6 +66,7 @@ const getImageSrc = (imagePath) => {
   e.target.onerror = null;
   e.target.src = '/images/placeholder.png'; // put this in /public/images/
 }}
+                onLoad={() => setIsLoaded(true)}
 
               />
               <button className={styles.nextButton} onClick={handleNextImage}>
@@ -113,7 +115,6 @@ const getImageSrc = (imagePath) => {
           <p className={styles.productInventory}>Available : {product.inventory}</p>
 
           <div className={styles.rating}>
-            Ratings : 
             {[...Array(5)].map((_, index) => {
               const star = index + 1;
               return (
@@ -173,4 +174,3 @@ const getImageSrc = (imagePath) => {
 };
 
 export default ProductCard;
-

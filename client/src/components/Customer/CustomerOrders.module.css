@@ -47,23 +47,35 @@
 }
 
 .orderCard {
-  border: 0.0625rem solid rgba(76, 76, 76, 0.536);
-  border-radius: 0.75rem;
+  border: 0.0625rem solid rgba(0, 0, 0, 0.08);
+  border-radius: 0.9rem;
   margin-bottom: 0.5rem;
   padding: 1rem;
   background: var(--white);
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.05);
+  transition: box-shadow 0.25s ease, transform 0.2s ease, border-color 0.2s ease;
+  display: flex;
+  flex-direction: column;
+}
+
+.orderCard:hover {
+  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.08);
+  transform: translateY(-2px);
+  border-color: rgba(0, 0, 0, 0.12);
 }
 
 .orderId {
   font-size: 1.1rem;
   color: var(--green);
-  margin-bottom: 0.5rem;
-  font-weight: 600;
+  margin-bottom: 0.75rem;
+  font-weight: 700;
+  padding-bottom: 0.5rem;
+  border-bottom: 1px dashed rgba(0, 0, 0, 0.1);
 }
 
 .orderInfo {
   color: #222;
-  margin-bottom: 0.3rem;
+  margin-bottom: 0.35rem;
   font-size: 1rem;
 }
 
@@ -80,11 +92,13 @@
   padding: 0;
   margin: 0.5rem 0 0 0;
   /* background: red; */
+  margin-top: auto; /* stick this section to the bottom of the card */
 }
 
 .subOrder {
   margin-bottom: 1rem;
-  border-bottom: 0.0625rem solid  black;
+  border-bottom: 0.0625rem solid rgba(0, 0, 0, 0.08);
+  padding-bottom: 0.75rem;
 }
 
 .shopName {
@@ -98,17 +112,18 @@
   padding: 0;
   margin: 0.3rem 0 0.5rem 0;
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: 1fr; /* make items full width */
   gap: 0.2rem;
 }
 
 .item {
   font-size: 0.98rem;
   margin-bottom: 0.2rem;
-  padding: 0.2rem 0;
+  padding: 0.35rem 0.3rem;
   border: 0.0625rem solid #eee;
   padding-left: 0.2rem;
     padding-right: 0.2rem; 
+  width: 100%;
   
 }
 
@@ -128,7 +143,8 @@
   margin-top: 0.2rem;
   margin-bottom: 0.2rem;
   cursor: pointer;
-  transition: background 0.2s, color 0.2s, opacity 0.2s;
+  transition: background 0.2s, color 0.2s, opacity 0.2s, transform 0.15s ease, box-shadow 0.2s ease;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
 }
 
 .viewButton {
@@ -157,6 +173,40 @@
   display: flex;
   gap: 0.5rem;
   margin-top: 0.5rem;
+}
+
+.button:hover:not(.disabledButton) {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.12);
+}
+
+/* 4-column grid from 1024px to 2560px+ */
+@media (min-width: 1024px) {
+  .ordersGrid {
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1.25rem;
+  }
+  .orderCard {
+    padding: 1rem;
+  }
+}
+
+@media (min-width: 1440px) {
+  .ordersGrid {
+    gap: 1.5rem;
+  }
+  .orderCard {
+    padding: 1.1rem;
+  }
+}
+
+@media (min-width: 1920px) {
+  .ordersGrid {
+    gap: 1.75rem;
+  }
+  .orderCard {
+    padding: 1.2rem;
+  }
 }
 
 /* @media (max-width: 1024px) {

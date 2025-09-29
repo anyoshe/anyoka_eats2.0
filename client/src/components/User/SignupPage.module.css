@@ -10,6 +10,22 @@
   box-shadow: var(--shadow-sm);
 }
 
+.back-button{
+  background: linear-gradient(135deg, var(--color-green) 0%, #1ea509 100%);
+  color: var(--color-white);
+  border: none;
+  border-radius: 999px;
+  padding: 0.4rem 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  box-shadow: 0 2px 8px rgba(30, 165, 9, 0.18);
+  margin-bottom: var(--space-3);
+}
+
+.back-button:hover{
+  background: linear-gradient(135deg, var(--color-orange) 0%, #ff8c00 100%);
+}
+
 .signup-page h1 {
   text-align: center;
   margin-bottom: var(--space-4);

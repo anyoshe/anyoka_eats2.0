@@ -4,7 +4,7 @@ import { AuthContext } from '../../contexts/AuthContext';
 import CustomerProfileDisplay from './CustomerProfileDisplay';
 import AuthPromptModal from '../../components/User/AuthPromptModal';
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faBars, faSignOutAlt } from "@fortawesome/free-solid-svg-icons";
+import { faBars, faSignOutAlt, faHome } from "@fortawesome/free-solid-svg-icons";
 import { useLocation } from 'react-router-dom';
 import { useNavigate } from 'react-router-dom';
 import CustomerOrders from './CustomerOrders';
@@ -54,6 +54,18 @@ const CustomerDashboard = () => {
       <div className={styles.dashboardWrapper}>
         <div className={styles.container}>
 
+          {/* Back to Home */}
+          <button
+            type="button"
+            className={styles.backHomeBtn}
+            onClick={() => navigate('/')}
+            aria-label="Back to home"
+            title="Back to home"
+          >
+            <FontAwesomeIcon icon={faHome} />
+            <span className={styles.backHomeText}>Home</span>
+          </button>
+
           {/* Hamburger */}
           <div className={styles.hamburgerMenu}>
             <FontAwesomeIcon
@@ -66,6 +78,9 @@ const CustomerDashboard = () => {
           {/* Mobile Menu */}
           {menuOpen && (
             <div className={styles.mobileMenu}>
+              <div className={styles.mobileTab} onClick={() => { navigate('/'); setMenuOpen(false); }}>
+                Home
+              </div>
               <div className={styles.mobileTab} onClick={() => handleTabChange("profile")}>
                 Profile
               </div>

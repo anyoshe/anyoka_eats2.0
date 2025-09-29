@@ -41,6 +41,33 @@
   backdrop-filter: blur(10px);
 }
 
+.backHomeBtn {
+  position: fixed;
+  top: 0.75rem;
+  left: 1rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 0.9rem;
+  background: linear-gradient(135deg, var(--green) 0%, #1ea509 100%);
+  color: var(--white);
+  border: none;
+  border-radius: 999px;
+  font-weight: 600;
+  cursor: pointer;
+  z-index: 1100;
+  box-shadow: 0 2px 8px rgba(30, 165, 9, 0.25);
+}
+
+.backHomeBtn:hover {
+  background: linear-gradient(135deg, var(--orange) 0%, #ff8c00 100%);
+  box-shadow: 0 4px 14px rgba(255, 165, 0, 0.35);
+}
+
+.backHomeText {
+  display: inline-block;
+}
+
 .tab {
   padding: 0.75rem 1.5rem;
   background: linear-gradient(135deg, var(--green) 0%, #1ea509 100%);
@@ -177,6 +204,14 @@
     padding: 0 1rem;
     z-index: 2000;
     box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+  }
+
+  .backHomeBtn {
+    top: 0.5rem;
+    left: 0.5rem;
+    padding: 0.45rem 0.8rem;
+    font-size: 0.9rem;
+    z-index: 2100;
   }
 
   .hamburgerIcon {
