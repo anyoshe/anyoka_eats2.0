@@ -7,7 +7,7 @@ import DriverLogout from './DriverLogout';
 import DriverOrders from './DriverOrders'; 
 import ActiveDriverOrders from './ActiveDriverOrders'; 
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faBell, faBars } from "@fortawesome/free-solid-svg-icons";
+import { faBell, faBars, faHome } from "@fortawesome/free-solid-svg-icons";
 import CompletedDriverOrders from "./CompletedDriverOrders";
 import { useNavigate } from "react-router-dom";
 
@@ -41,6 +41,11 @@ const DriverDashboard = () => {
   const navigate = useNavigate();
 
 
+  const handleToggleNotifications = (e) => {
+    if (e && e.stopPropagation) e.stopPropagation();
+    setShowNotifications((prev) => !prev);
+  };
+
   return (
     <div className={styles.dashboardWrapper}>
       <div className={styles.container}>
@@ -49,6 +54,7 @@ const DriverDashboard = () => {
         {showNotifications && (
           <DriverNotification
             notifications={notifications}
+            onClose={() => setShowNotifications(false)}
           />
         )}
 
@@ -59,7 +65,7 @@ const DriverDashboard = () => {
               icon={faBell}
               className={`${styles.icon} ${styles.notificationIcon}`}
               data-count={notifications?.length || 0}
-              onClick={() => setShowNotifications(!showNotifications)}
+              onClick={handleToggleNotifications}
             />
           </div>
           <FontAwesomeIcon
@@ -96,7 +102,8 @@ const DriverDashboard = () => {
         {/* Tabs */}
         <div className={styles.tabs}>
           <button className={styles.backButton} onClick={() => navigate("/")}>
-            Back
+            <FontAwesomeIcon icon={faHome} />
+            <span style={{ marginLeft: '0.4rem' }}>Home</span>
           </button>
 
           <div
@@ -129,7 +136,7 @@ const DriverDashboard = () => {
               icon={faBell}
               className={`${styles.icon} ${styles.notificationIcon}`}
               data-count={notifications?.length || 0}
-              onClick={() => setShowNotifications(!showNotifications)}
+              onClick={handleToggleNotifications}
             />
             <DriverLogout />
           </div>

@@ -20,6 +20,30 @@
     background-color: #fff;
     box-shadow: var(--shadow-sm);
   }
+
+  /* Layout enhancement: larger screens use grid */
+  @media screen and (min-width: 1024px) {
+    .profileContent {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 2rem;
+      align-items: start;
+    }
+
+    .profileDetails {
+      display: contents;
+    }
+
+    .profileImageContainer {
+      align-items: center;
+      justify-content: flex-start;
+    }
+
+    /* Ensure action buttons span full width below the grid */
+    .details_buttons {
+      grid-column: 1 / -1;
+    }
+  }
   
   /* Profile layout grid */
   .profileDetails {
@@ -150,7 +174,7 @@
     width: 100vw;
     height: 100vh;
     background-color: rgba(0, 0, 0, 0.4);
-    z-index: 99;
+    z-index: 3002; /* above fixed tabs/header */
     display: flex;
     justify-content: center;
     align-items: center;
@@ -165,6 +189,7 @@
     max-height: 90vh;
     overflow-y: auto;
     position: relative;
+    z-index: 3003; /* ensure content is on top */
   }
   
 .mapModalClose {
@@ -237,10 +262,17 @@
 
 /* 1024px (Tablet) */
 @media screen and (max-width: 1024px) {
-    .profileDetails {
+    /* Ensure 3-column layout at 1024 including image as one column */
+    .profileContent {
+      display: grid;
       grid-template-columns: repeat(3, 1fr);
+      gap: 1.6rem;
+      align-items: start;
+    }
+
+    .profileDetails {
+      display: contents;
       font-size: 1.2rem;
-      gap: 1.3rem;
     }
   
     .profileImage {
@@ -256,12 +288,43 @@
   
   /* 768px (Small Tablet) */
   @media screen and (max-width: 768px) {
-    .profileDetails {
+    /* Combine image and details in one grid */
+    .profileContent{
+      display: grid;
       grid-template-columns: repeat(2, 1fr);
+      gap: 1.6rem;
+      align-items: start;
+    }
+
+    /* Let children of profileDetails participate in parent grid */
+    .profileDetails {
+      display: contents;
       font-size: 1.1rem;
-      gap: 1.2rem;
     }
   
+    /* Center image container horizontally */
+    .profileImageContainer{
+      justify-content: center;
+      align-items: center;
+      width: 100%;
+      margin-bottom: 1.5rem; /* increased space between image and details */
+      grid-column: 1 / -1; /* span two columns above details */
+    }
+
+    /* Center each profile item content horizontally */
+    .profileItem{
+      align-items: center;
+      text-align: center;
+      width: 100%;
+    }
+
+    /* Center action buttons */
+    .details_buttons{
+      justify-content: center;
+      width: 100%;
+      grid-column: 1 / -1;
+    }
+
     .profileImage {
       width: 8.5rem;
       height: 8.5rem;
@@ -284,6 +347,12 @@
   /* 425px (Large Phone) */
   @media screen and (max-width: 426px) {
     .profileContent{
+      display: grid;
+      grid-template-columns: 1fr; /* single column layout */
+      gap: 1rem;
+      width: 100%;
+    }
+    .profileContent{
       padding: 1rem;
       margin-top: 1rem;
     }
@@ -300,10 +369,10 @@
     .profileDetails {
       display: flex;
       flex-direction: column;
-      align-items: start;
+      align-items: center; /* center horizontally */
+      width: 100%; /* take full width */
       font-size: 1rem;
       gap: 1rem;
-
       padding: 1rem;
     }
 
@@ -330,6 +399,11 @@
       justify-content: center;
       width: 100%;
       display: flex;
+    }
+
+    .details_buttons {
+      grid-column: 1 / -1; /* span full width at bottom */
+      justify-content: center;
     }
   
     .mapModalContent {
@@ -414,6 +488,32 @@
     }
   }
   
+  /* Ensure 3-column layout applies from 1024px up to 2560px */
+  @media screen and (min-width: 1024px) and (max-width: 2560px) {
+    .profileContent {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 2rem;
+      align-items: start;
+    }
+
+    /* Let detail items participate in parent grid with the image as a column */
+    .profileDetails {
+      display: contents;
+      font-size: 1.2rem;
+    }
+
+    /* Image spans full width above the 4-column details grid */
+    .profileImageContainer {
+      grid-column: 1 / -1;
+      justify-content: center;
+    }
+
+    .details_buttons {
+      grid-column: 1 / -1;
+    }
+  }
+
   .mapContainer {
     width: 100%;
     height: 400px;

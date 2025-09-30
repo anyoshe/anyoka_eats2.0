@@ -53,7 +53,7 @@ const CompletedDriverOrders = () => {
 
     return (
         <div className={styles["completed-driver-orders-container"]}>
-            <h2>Completed Orders</h2>
+           
 
             <div className={styles["filter-section"]}>
                 <label htmlFor="dateFilter">Filter by Date:</label>

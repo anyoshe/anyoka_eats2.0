@@ -15,11 +15,10 @@ const DriverLogout = () => {
   };
 
   return (
-    <FontAwesomeIcon
-      icon={faSignOutAlt}
-      className={styles.logoutIcon}
-      onClick={handleLogout}
-    />
+    <button type="button" className={styles.logoutButton} onClick={handleLogout} title="Logout">
+      <FontAwesomeIcon icon={faSignOutAlt} />
+      <span className={styles.logoutText}>Logout</span>
+    </button>
   );
 };
 

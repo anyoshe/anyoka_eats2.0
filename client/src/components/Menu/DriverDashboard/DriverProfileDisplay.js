@@ -78,35 +78,41 @@ const DriverProfileDisplay = () => {
     // If the map is already showing, update center dynamically
     if (showMapSelector || (editing && mapCenter)) {
       try {
-        const response = await fetch(`https://maps.googleapis.com/maps/api/geocode/json?address=${encodeURIComponent(town)}&key=${process.env.REACT_APP_GOOGLE_API_KEY}`);
-        const data = await response.json();
-        if (data.status === 'OK' && data.results[0]) {
-          const { lat, lng } = data.results[0].geometry.location;
-          setMapCenter({ lat, lng });
-        } else {
-        }
+        const geocoder = new window.google.maps.Geocoder();
+        geocoder.geocode({ address: town }, (results, status) => {
+          if (status === 'OK' && results[0]) {
+            const loc = results[0].geometry.location;
+            setMapCenter({ lat: loc.lat(), lng: loc.lng() });
+          }
+        });
       } catch (error) {
       }
     }
   };
 
   const handleLocationInputClick = async () => {
-    if (!formData.currentLocation.town.trim()) {
+    const town = formData?.currentLocation?.town || '';
+    if (!town.trim()) {
       alert('Please enter a town first');
       return;
     }
 
     try {
-      const response = await fetch(`https://maps.googleapis.com/maps/api/geocode/json?address=${encodeURIComponent(formData.currentLocation.town)}&key=${process.env.REACT_APP_GOOGLE_API_KEY}`);
-      const data = await response.json();
-      if (data.status === 'OK' && data.results[0]) {
-        const { lat, lng } = data.results[0].geometry.location;
-        setMapCenter({ lat, lng });
-        setShowMapSelector(true);
-      } else {
-        alert('Could not find location for town');
-      }
+      const geocoder = new window.google.maps.Geocoder();
+      geocoder.geocode({ address: town }, (results, status) => {
+        if (status === 'OK' && results[0]) {
+          const loc = results[0].geometry.location;
+          const center = { lat: loc.lat(), lng: loc.lng() };
+          setMapCenter(center);
+          setShowMapSelector(true);
+        } else {
+          setMapCenter({ lat: -1.286389, lng: 36.817223 }); // Nairobi fallback
+          setShowMapSelector(true);
+        }
+      });
     } catch (error) {
+      setMapCenter({ lat: -1.286389, lng: 36.817223 });
+      setShowMapSelector(true);
     }
   };
 

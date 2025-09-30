@@ -5,9 +5,9 @@
 }
 
 .notificationDropdown {
-  position: absolute;
-  top: 4rem;
-  right: 1.25rem;
+  position: fixed; /* keep anchored to viewport near icon header */
+  top: 3.25rem; /* closer to header icons */
+  right: 1rem;
   width: 18.75rem; /* 300px */
   max-height: 25rem; /* 400px */
   overflow-y: auto;
