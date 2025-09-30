@@ -234,7 +234,23 @@ const CustomerOrders = () => {
     setOrders((prevOrders) => prevOrders.filter((order) => order._id !== orderId));
   };
 
-  if (loading) return <div className={styles.loading}>Loading your orders...</div>;
+  if (loading) return (
+    <div className={styles.container}>
+      <div className={styles.skeletonGrid}>
+        {[...Array(6)].map((_, i) => (
+          <div key={i} className={styles.skeletonCard}>
+            <div className={`${styles.skeletonBar} ${styles.wide}`}></div>
+            <div className={styles.skeletonSpacer}></div>
+            <div className={styles.skeletonBar}></div>
+            <div className={styles.skeletonSpacer}></div>
+            <div className={`${styles.skeletonBar} ${styles.thin}`}></div>
+            <div className={styles.skeletonSpacer}></div>
+            <div className={`${styles.skeletonBar} ${styles.thin}`}></div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
 
   return (
     <div className={styles.container}>

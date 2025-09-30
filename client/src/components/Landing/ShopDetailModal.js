@@ -11,7 +11,8 @@ Modal.setAppElement('#root'); // For accessibility
 
 const ShopDetailModal = ({ isOpen, onRequestClose, store }) => {
   const [hoverRating, setHoverRating] = useState(0);
-  const [selectedRating, setSelectedRating] = useState(store.ratings?.average || 0);
+  const [selectedRating, setSelectedRating] = useState(0);
+  const [averageRating, setAverageRating] = useState(store.ratings?.average || 0);
   const [comment, setComment] = useState('');
   const { isLoggedIn, user, setCurrentStore, setRedirectPath } = useContext(AuthContext);
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
@@ -20,20 +21,41 @@ const ShopDetailModal = ({ isOpen, onRequestClose, store }) => {
   const [isSubmittingRating, setIsSubmittingRating] = useState(false);
   const location = useLocation();
 
+  const resolveUserId = async () => {
+    const storedUser = (() => { try { return JSON.parse(localStorage.getItem('user')); } catch { return null; } })();
+    if (storedUser?._id) return storedUser._id;
+    if (user?._id) return user._id;
+    const token = localStorage.getItem('userToken');
+    if (!token) return null;
+    try {
+      const res = await fetch(`${config.backendUrl}/api/user/me`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      const data = await res.json();
+      if (res.ok && data?._id) {
+        localStorage.setItem('user', JSON.stringify(data));
+        return data._id;
+      }
+    } catch (_) {}
+    return null;
+  };
+
   useEffect(() => {
     if (isOpen) {
-      // Fetch store reviews or ratings if needed
+      // modal opened
+      setSelectedRating(0);
+      setComment('');
     }
   }, [isOpen]);
 
  
 
-useEffect(() => {
+  useEffect(() => {
   const fetchReviews = async () => {
     try {
       const res = await fetch(`${config.backendUrl}/api/partners/${store._id}/reviews`);
       const data = await res.json();
-      setReviews(data.reviews || []);
+      setReviews(Array.isArray(data.reviews) ? data.reviews : []);
     } catch (error) {
     }
   };
@@ -62,20 +84,26 @@ useEffect(() => {
     setSelectedRating(rating);
     setIsSubmittingRating(true);
     try {
+      const userId = await resolveUserId();
+      if (!userId) {
+        setIsSubmittingRating(false);
+        setIsAuthModalOpen(true);
+        return;
+      }
       const response = await fetch(`${config.backendUrl}/api/partners/${store._id}/rate`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ user: user._id, rating }), // Ensure user ID and rating are sent
+        body: JSON.stringify({ user: userId, rating }),
       });
       const data = await response.json();
       if (response.ok) {
-        // Handle rating success (maybe show confirmation, etc.)
-        // Refresh reviews to show the new rating
+        setAverageRating(typeof data.averageRating === 'number' ? data.averageRating : averageRating);
+        // Refresh reviews with defensive parsing
         const refreshResponse = await fetch(`${config.backendUrl}/api/partners/${store._id}/reviews`);
         const refreshData = await refreshResponse.json();
-        setReviews(refreshData.reviews || []);
+        setReviews(Array.isArray(refreshData.reviews) ? refreshData.reviews : []);
       } else {
         // Show user-friendly error message
         alert(`Failed to submit rating: ${data.message}`);
@@ -105,26 +133,36 @@ useEffect(() => {
 
     setIsSubmittingComment(true);
     try {
-      const response = await fetch(`${config.backendUrl}/api/partners/${store._id}/comments`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ user: user._id, comment }),
-      });
-
-      const data = await response.json();
-      if (response.ok) {
-        // Handle comment success (e.g., update comments)
-        setComment(''); // Clear comment box
-        
-        // Refresh reviews to show the new comment
-        const refreshResponse = await fetch(`${config.backendUrl}/api/partners/${store._id}/reviews`);
-        const refreshData = await refreshResponse.json();
-        setReviews(refreshData.reviews || []);
+      const userId = await resolveUserId();
+      if (selectedRating && selectedRating >= 1 && selectedRating <= 5 && userId) {
+        const rateRes = await fetch(`${config.backendUrl}/api/partners/${store._id}/rate`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ user: userId, rating: selectedRating, comment }),
+        });
+        const rateData = await rateRes.json();
+        if (rateRes.ok) {
+          setAverageRating(typeof rateData.averageRating === 'number' ? rateData.averageRating : averageRating);
+          setComment('');
+          const refreshResponse = await fetch(`${config.backendUrl}/api/partners/${store._id}/reviews`);
+          const refreshData = await refreshResponse.json();
+          setReviews(Array.isArray(refreshData.reviews) ? refreshData.reviews : []);
+        }
       } else {
-        // Show user-friendly error message
-        alert(`Failed to submit comment: ${data.message}`);
+        const response = await fetch(`${config.backendUrl}/api/partners/${store._id}/comments`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ user: user._id, comment }),
+        });
+        const data = await response.json();
+        if (response.ok) {
+          setComment('');
+          const refreshResponse = await fetch(`${config.backendUrl}/api/partners/${store._id}/reviews`);
+          const refreshData = await refreshResponse.json();
+          setReviews(Array.isArray(refreshData.reviews) ? refreshData.reviews : []);
+        } else {
+          alert(`Failed to submit comment: ${data.message}`);
+        }
       }
     } catch (error) {
       alert('An error occurred while submitting your comment. Please try again.');
@@ -152,7 +190,23 @@ useEffect(() => {
         </button>
         </div>
 
-        <div className={styles.modalBody}>
+        <div className={`${styles.modalBody} ${styles.carouselBody}`}>
+          <div className={styles.stepIndicator}>
+            <span className={`${styles.stepDot} ${styles.active}`} onClick={() => {
+              const dots = document.querySelectorAll(`.${styles.stepDot}`);
+              const panels = document.querySelectorAll(`.${styles.stepContent}`);
+              dots[0].classList.add(styles.active); dots[1].classList.remove(styles.active);
+              panels[0].classList.add(styles.active); panels[1].classList.remove(styles.active);
+            }}></span>
+            <span className={styles.stepDot} onClick={() => {
+              const dots = document.querySelectorAll(`.${styles.stepDot}`);
+              const panels = document.querySelectorAll(`.${styles.stepContent}`);
+              dots[1].classList.add(styles.active); dots[0].classList.remove(styles.active);
+              panels[1].classList.add(styles.active); panels[0].classList.remove(styles.active);
+            }}></span>
+          </div>
+
+          <div className={`${styles.stepContent} ${styles.active}`}>
           <div className={styles.profileSection}>
             <div className={styles.profileCard}>
               <div className={styles.profileImage}>
@@ -186,7 +240,7 @@ useEffect(() => {
                     ))}
                   </div>
                   <span className={styles.ratingText}>
-                    {store.ratings?.average?.toFixed(1) || '0.0'} ({store.ratings?.reviews?.length || 0} reviews)
+                    {(averageRating ?? store.ratings?.average ?? 0).toFixed(1)} ({store.ratings?.reviews?.length || reviews.length || 0} reviews)
                   </span>
                 </div>
               </div>
@@ -211,10 +265,14 @@ useEffect(() => {
                   />
           ))}
               </div>
+              <div className={styles.averageInline}>Average: {(averageRating ?? 0).toFixed(2)}</div>
             </div>
 
         </div>
 
+          </div>
+
+          <div className={styles.stepContent}>
           <div className={styles.reviewsSection}>
             <h3 className={styles.reviewsTitle}>Customer Reviews</h3>
             <div className={styles.reviewsList}>
@@ -222,7 +280,7 @@ useEffect(() => {
                 reviews.map((review, index) => (
                   <div key={index} className={styles.reviewItem}>
                     <div className={styles.reviewHeader}>
-                      <span className={styles.reviewerName}>{review.user?.name || 'Anonymous'}</span>
+                      <span className={styles.reviewerName}>{review.user?.username || review.user?.names || 'Anonymous'}</span>
                       <div className={styles.reviewStars}>
                         {[1, 2, 3, 4, 5].map((star) => (
                           <i
@@ -236,7 +294,7 @@ useEffect(() => {
                       <p className={styles.reviewComment}>{review.comment}</p>
                     )}
                     <span className={styles.reviewDate}>
-                      {new Date(review.createdAt).toLocaleDateString()}
+                      {new Date(review.date || review.createdAt || review.updatedAt).toLocaleDateString()}
                     </span>
                   </div>
                 ))
@@ -261,6 +319,23 @@ useEffect(() => {
           {isSubmittingComment ? 'Submitting...' : 'Submit Comment'}
         </button>
             </div>
+          </div>
+          </div>
+
+          <div className={styles.stepNavigation}>
+            <button className={styles.stepButton} onClick={() => {
+              const dots = document.querySelectorAll(`.${styles.stepDot}`);
+              const panels = document.querySelectorAll(`.${styles.stepContent}`);
+              dots[0].classList.add(styles.active); dots[1].classList.remove(styles.active);
+              panels[0].classList.add(styles.active); panels[1].classList.remove(styles.active);
+            }}>Back</button>
+            <span className={styles.stepCounter}>{document.querySelector(`.${styles.stepContent}.${styles.active}`) === document.querySelectorAll(`.${styles.stepContent}`)[0] ? '1 / 2' : '2 / 2'}</span>
+            <button className={`${styles.stepButton} ${styles.primary}`} onClick={() => {
+              const dots = document.querySelectorAll(`.${styles.stepDot}`);
+              const panels = document.querySelectorAll(`.${styles.stepContent}`);
+              dots[1].classList.add(styles.active); dots[0].classList.remove(styles.active);
+              panels[1].classList.add(styles.active); panels[0].classList.remove(styles.active);
+            }}>Next</button>
           </div>
         </div>
       </div>

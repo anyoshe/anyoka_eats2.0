@@ -141,13 +141,29 @@ const CustomerPastOrders = () => {
     setExpandedOrderId((prev) => (prev === orderId ? null : orderId));
   };
 
-  if (loading) return <div className={styles.loading}>Loading past orders...</div>;
+  if (loading) return (
+    <div className={styles.container}>
+      <div className={styles.skeletonGrid}>
+        {[...Array(6)].map((_, i) => (
+          <div key={i} className={styles.skeletonCard}>
+            <div className={`${styles.skeletonBar} ${styles.wide}`}></div>
+            <div className={styles.skeletonSpacer}></div>
+            <div className={styles.skeletonBar}></div>
+            <div className={styles.skeletonSpacer}></div>
+            <div className={`${styles.skeletonBar} ${styles.thin}`}></div>
+            <div className={styles.skeletonSpacer}></div>
+            <div className={`${styles.skeletonBar} ${styles.thin}`}></div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
   if (orders.length === 0) return <p className={styles.noOrders}>No past orders found.</p>;
 
   return (
     <div className={styles.container}>
 
-      <h2 className={styles.title}>Past Orders</h2>
+      {/* Title removed */}
       <div className={styles.ordersList}>
         
         {orders.map((order) => {

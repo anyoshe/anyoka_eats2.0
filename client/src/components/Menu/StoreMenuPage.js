@@ -176,6 +176,7 @@ const StoreMenuPage = () => {
                                         {productsByCategory[category].map((product, index) => (
                                             <div key={index} className={styles.categorySectionDisplayDivs}
                                                 onClick={() => handleProductClick(product)}
+                                                aria-label={`View ${product.name}`}
                                             >
 
                                                  {typeof product.discountedPrice === 'number' && product.discountedPrice > 0 && (
@@ -188,12 +189,13 @@ const StoreMenuPage = () => {
 
                                                 <img
                                                     src={getImageSrc(product)}
-                                                    alt={product.name}
+                                                    alt=""
                                                     className={styles.categorySectionImage}
-
+                                                    onLoad={(e) => e.currentTarget.classList.add('isLoaded')}
                                                     onError={(e) => {
                                                         e.target.onerror = null;
                                                         e.target.src = '/path/to/placeholder-image.jpg';
+                                                        e.currentTarget.classList.add('isLoaded');
                                                     }}
                                                 />
 

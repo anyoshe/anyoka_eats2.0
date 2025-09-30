@@ -345,13 +345,7 @@
   z-index: var(--z-modal-content); /* 100000 - ensure content is above everything */
 }
 
-.orderSummaryH4{
-  font-size: 1.5rem;
-  font-weight: 600;
-  color: var(--color-green);
-  margin-bottom: var(--space-3);
-  text-decoration: underline;
-}
+.orderSummaryH4{ display: none; }
 
 .customerDetails{
   /* border: 2px solid red; */

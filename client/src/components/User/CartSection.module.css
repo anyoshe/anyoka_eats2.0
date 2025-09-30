@@ -68,6 +68,13 @@
   margin-bottom: var(--space-2);
 }
 
+/* Prevent scrollbar from overlaying price text */
+.cartListDiv { scrollbar-gutter: stable; }
+
+.cartItemTop { padding-right: 0.25rem; }
+
+.cartItemPrice { white-space: nowrap; }
+
 /* Base Empty Cart Presentation (applies to all breakpoints) */
 .emptyCartState {
   display: flex;

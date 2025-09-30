@@ -265,7 +265,7 @@ const CheckoutModal = ({ isOpen, onClose, cart, total }) => {
           <div className={`${styles.stepContent} ${currentStep === 2 ? styles.active : ''}`}>
             <h3 className={styles.stepTitle}>Order Details</h3>
             <div className={styles.orderSummary}>
-              <h4 className={styles.orderSummaryH4}>Order Items:</h4>
+              {/* Heading removed as requested */}
 
               <div className={styles.orderItemDiv}>
                 {cart.map((item, index) => (
@@ -289,7 +289,7 @@ const CheckoutModal = ({ isOpen, onClose, cart, total }) => {
 
           {/* Step 3: Payment Method */}
           <div className={`${styles.stepContent} ${currentStep === 3 ? styles.active : ''}`}>
-            <h3 className={styles.stepTitle}>Select Payment Method</h3>
+            {/* Keep step title; inner heading in PaymentMethods will be hidden via CSS */}
             <div className={styles.paymentOptions}>
               <PaymentMethods
                 cart={cart}

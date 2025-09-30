@@ -41,8 +41,8 @@ export const AuthProvider = ({ children }) => {
         headers: { Authorization: `Bearer ${token}` },
       });
 
-      setUser(res.data.user);
-      localStorage.setItem('user', JSON.stringify(res.data.user));
+      setUser(res.data);
+      localStorage.setItem('user', JSON.stringify(res.data));
     } catch (err) {
     }
   };
