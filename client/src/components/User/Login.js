@@ -1,4 +1,4 @@
-import React, { useState, useContext } from 'react';
+import React, { useEffect, useState, useContext } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import { AuthContext } from '../../contexts/AuthContext';
@@ -12,6 +12,11 @@ const Login = () => {
   const [identifier, setIdentifier] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
+  const [loading, setLoading] = useState(true);
+  useEffect(() => {
+    const t = setTimeout(() => setLoading(false), 400);
+    return () => clearTimeout(t);
+  }, []);
   const navigate = useNavigate();
 
   const { setIsLoggedIn, setUser, redirectPath, setRedirectPath, setToken } = useContext(AuthContext);
@@ -79,31 +84,47 @@ const Login = () => {
 
       <form className={styles.form} onSubmit={handleSubmit}>
 
-        <h2>Login</h2>
+        {loading ? (
+          <div className={styles.skeletonHeader} />
+        ) : (
+          <h2>Login</h2>
+        )}
 
         {error && <p className={styles.error}>{error}</p>}
 
-        <div className={styles.field}>
-          <label>Username / Phone / Business Name:</label>
-          <input
-            type="text"
-            value={identifier}
-            onChange={(e) => setIdentifier(e.target.value)}
-            required
-          />
-        </div>
+        {loading ? (
+          <div className={styles.skeletonField} />
+        ) : (
+          <div className={styles.field}>
+            <label>Username / Phone / Business Name:</label>
+            <input
+              type="text"
+              value={identifier}
+              onChange={(e) => setIdentifier(e.target.value)}
+              required
+            />
+          </div>
+        )}
 
-        <div className={styles.field}>
-          <label>Password:</label>
-          <input
-            type="password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            required
-          />
-        </div>
+        {loading ? (
+          <div className={styles.skeletonField} />
+        ) : (
+          <div className={styles.field}>
+            <label>Password:</label>
+            <input
+              type="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              required
+            />
+          </div>
+        )}
 
-        <button type="submit">Login</button>
+        {loading ? (
+          <div className={styles.skeletonButton} />
+        ) : (
+          <button type="submit">Login</button>
+        )}
         <p className={styles.forgotPassword}>
           Forgot your password? <a href="/password-reset">Reset it here</a>
         </p>

@@ -1,0 +1,15 @@
+/* Skeleton styles for ActiveDriverOrders */
+.skeletonContainer { padding: 1rem; }
+.skeletonTitle { width: 40%; height: 18px; background: #eee; border-radius: 6px; margin-bottom: 0.75rem; }
+.skeletonList { display: grid; gap: 0.75rem; }
+.skeletonCard { background: #fff; border: 1px solid #e5e7eb; border-radius: 8px; padding: 0.75rem; }
+.skeletonLine { height: 12px; width: 100%; background: #eee; border-radius: 6px; margin-bottom: 8px; }
+.skeletonLineShort { height: 12px; width: 60%; background: #eee; border-radius: 6px; }
+
+@keyframes skeletonPulse {
+  0% { opacity: 0.6; }
+  50% { opacity: 1; }
+  100% { opacity: 0.6; }
+}
+.skeletonTitle, .skeletonLine, .skeletonLineShort { animation: skeletonPulse 1.5s ease-in-out infinite; }
+

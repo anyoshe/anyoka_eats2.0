@@ -59,6 +59,21 @@
   position: relative;
 }
 
+/* Skeletons for display section */
+.skeletonContainer { padding: 0.75rem; }
+.skeletonHeader { height: 22px; width: 35%; background: #eee; border-radius: 10px; margin: 0.5rem 0 1rem; animation: skeletonPulse 1.5s ease-in-out infinite; }
+.skeletonGrid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 1rem; }
+.skeletonCard { background: #fff; border: 1px solid #e5e7eb; border-radius: 8px; padding: 0.5rem; }
+.skeletonImage { width: 100%; height: 8rem; background: #eee; border-radius: 6px; margin-bottom: 0.6rem; animation: skeletonPulse 1.5s ease-in-out infinite; }
+.skeletonLine { height: 12px; width: 80%; background: #eee; border-radius: 6px; margin-bottom: 6px; animation: skeletonPulse 1.5s ease-in-out infinite; }
+.skeletonLineShort { height: 12px; width: 50%; background: #eee; border-radius: 6px; animation: skeletonPulse 1.5s ease-in-out infinite; }
+
+@keyframes skeletonPulse {
+  0% { opacity: 0.6; }
+  50% { opacity: 1; }
+  100% { opacity: 0.6; }
+}
+
 .cartModal {
   position: fixed;
   top: 0;

@@ -1,4 +1,4 @@
-import { useContext, useState } from 'react';
+import { useContext, useEffect, useState } from 'react';
 import { DriverContext } from '../../../contexts/DriverContext';
 import styles from './DriverSignup.module.css';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
@@ -29,6 +29,12 @@ const DriverSignup = () => {
   const [success, setSuccess] = useState('');
   const [isLogin, setIsLogin] = useState(false); 
   const [showModal, setShowModal] = useState(false); 
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const t = setTimeout(() => setLoading(false), 400);
+    return () => clearTimeout(t);
+  }, []);
 
   const handleChange = (e, isLoginForm = false) => {
     const targetData = isLoginForm ? setLoginData : setFormData;
@@ -80,11 +86,16 @@ const DriverSignup = () => {
         <FontAwesomeIcon icon={faCaretDown} rotation={90} /> Back
       </div>
 
-      <h1 className={styles.signupTitle}>{isLogin ? 'Driver Login' : 'Driver Signup'}</h1>
+      {loading ? (
+        <div className={styles.skeletonHeader} />
+      ) : (
+        <h1 className={styles.signupTitle}>{isLogin ? 'Driver Login' : 'Driver Signup'}</h1>
+      )}
 
       <form onSubmit={handleSubmit} className={styles.signupForm}>
         {isLogin ? (
           <>
+            {loading ? <div className={styles.skeletonField} /> : (
             <div className={styles.formGroup}>
               <label>Username / Phone Number</label>
               <input
@@ -94,8 +105,9 @@ const DriverSignup = () => {
                 onChange={(e) => handleChange(e, true)}
                 required
               />
-            </div>
+            </div>)}
 
+            {loading ? <div className={styles.skeletonField} /> : (
             <div className={styles.formGroup}>
               <label>Password</label>
               <input
@@ -105,7 +117,7 @@ const DriverSignup = () => {
                 onChange={(e) => handleChange(e, true)}
                 required
               />
-            </div>
+            </div>)}
              {/* 👇 Place the forgot password link here */}
     <p className={styles.forgotPassword}>
       Forgot your password? <a href="/driver/reset-password">Reset it here</a>
@@ -113,6 +125,7 @@ const DriverSignup = () => {
           </>
         ) : (
           ['username', 'phoneNumber', 'email', 'password', 'nationalId', 'driverLicenseNumber'].map(field => (
+            loading ? <div key={field} className={styles.skeletonField} /> : (
             <div key={field} className={styles.formGroup}>
               <label>{field.replace(/([A-Z])/g, ' $1').toUpperCase()}</label>
               <input
@@ -123,12 +136,14 @@ const DriverSignup = () => {
                 required={field !== 'email'} // email is optional
               />
             </div>
-          ))
+          )))
         )}
 
+        {loading ? <div className={styles.skeletonButton} /> : (
         <button type="submit" className={styles.submitButton}>
           {isLogin ? 'Login' : 'Sign Up'}
         </button>
+        )}
 
         {error && <div className={styles.errorMessage}>{error}</div>}
         {success && <div className={styles.successMessage}>{success}</div>}

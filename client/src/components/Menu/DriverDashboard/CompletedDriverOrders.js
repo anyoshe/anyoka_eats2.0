@@ -48,7 +48,21 @@ const CompletedDriverOrders = () => {
 
     const totalDriverEarnings = totalDeliveryCharge * 0.8;
 
-    if (loading) return <p>Loading completed orders...</p>;
+    if (loading) return (
+        <div className={styles.skeletonContainer}>
+            <div className={styles.skeletonTitle} />
+            <div className={styles.skeletonList}>
+                {[...Array(5)].map((_, i) => (
+                    <div key={i} className={styles.skeletonRow}>
+                        <div className={styles.skeletonCell} />
+                        <div className={styles.skeletonCell} />
+                        <div className={styles.skeletonCellShort} />
+                        <div className={styles.skeletonCellShort} />
+                    </div>
+                ))}
+            </div>
+        </div>
+    );
     if (completedOrders.length === 0) return <p>No completed orders found.</p>;
 
     return (

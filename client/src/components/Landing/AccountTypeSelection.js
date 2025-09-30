@@ -1,11 +1,17 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faUser, faStore, faTruck, faCaretDown } from '@fortawesome/free-solid-svg-icons';
 import styles from './AccountTypeSelection.module.css';
 
 const AccountTypeSelection = () => {
+  const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
+
+  useEffect(() => {
+    const t = setTimeout(() => setLoading(false), 500);
+    return () => clearTimeout(t);
+  }, []);
 
   const handleAccountTypeSelect = (accountType) => {
     switch (accountType) {
@@ -30,6 +36,22 @@ const AccountTypeSelection = () => {
       </div>
 
       <div className={styles.selectionContent}>
+        {loading && (
+          <div className={styles.skeletonContent}>
+            <div className={styles.skeletonTitle} />
+            <div className={styles.skeletonSubtitle} />
+            <div className={styles.skeletonCards}>
+              {[...Array(3)].map((_, i) => (
+                <div key={i} className={styles.skeletonCard}>
+                  <div className={styles.skeletonAvatar} />
+                  <div className={styles.skeletonLine} />
+                  <div className={styles.skeletonLineShort} />
+                  <div className={styles.skeletonBtn} />
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
         <h1 className={styles.title}>Choose Your Account Type</h1>
         <p className={styles.subtitle}>Select the type of account you want to log into</p>
 

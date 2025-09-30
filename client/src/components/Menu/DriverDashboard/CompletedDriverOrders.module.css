@@ -2,6 +2,20 @@
 .completed-driver-orders-container {
   padding: 20px;
 }
+/* Skeleton styles for CompletedDriverOrders */
+.skeletonContainer { padding: 1rem; }
+.skeletonTitle { width: 30%; height: 18px; background: #eee; border-radius: 6px; margin-bottom: 0.75rem; }
+.skeletonList { display: grid; gap: 0.5rem; }
+.skeletonRow { display: grid; grid-template-columns: 2fr 3fr 2fr 2fr; gap: 0.5rem; align-items: center; background: #fff; border: 1px solid #e5e7eb; border-radius: 8px; padding: 0.5rem; }
+.skeletonCell { height: 14px; background: #eee; border-radius: 6px; }
+.skeletonCellShort { height: 14px; width: 60%; background: #eee; border-radius: 6px; }
+
+@keyframes skeletonPulse {
+  0% { opacity: 0.6; }
+  50% { opacity: 1; }
+  100% { opacity: 0.6; }
+}
+.skeletonTitle, .skeletonCell, .skeletonCellShort { animation: skeletonPulse 1.5s ease-in-out infinite; }
 
 .filter-section {
   margin-bottom: 1rem;

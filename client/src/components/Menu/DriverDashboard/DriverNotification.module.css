@@ -72,6 +72,19 @@
   outline: 1px solid var(--orange);
 }
 
+/* Skeletons for notification dropdown */
+.skeletonList { display: grid; gap: 0.5rem; margin-top: 0.5rem; }
+.skeletonItem { display: flex; justify-content: space-between; align-items: center; background: #f9f9f9; border-radius: 0.5rem; padding: 0.5rem 0.6rem; }
+.skeletonLine { height: 12px; width: 65%; background: #eee; border-radius: 6px; }
+.skeletonBtn { height: 28px; width: 80px; background: #eee; border-radius: 6px; }
+
+@keyframes skeletonPulse {
+  0% { opacity: 0.6; }
+  50% { opacity: 1; }
+  100% { opacity: 0.6; }
+}
+.skeletonLine, .skeletonBtn { animation: skeletonPulse 1.5s ease-in-out infinite; }
+
 @keyframes fadeIn {
   from {
     opacity: 0;

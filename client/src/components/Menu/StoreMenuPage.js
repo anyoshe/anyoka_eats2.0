@@ -147,9 +147,17 @@ const StoreMenuPage = () => {
             <div className={styles.bodyWrapper}>
                   
                 {loading ? (
-                <div className={styles.loadingWrapper}>
-                    <div className={styles.spinner}></div>
-                    <p>Loading store products...</p>
+                <div className={styles.skeletonContainer}>
+                    <div className={styles.skeletonHeader} />
+                    <div className={styles.skeletonGrid}>
+                        {[...Array(8)].map((_, i) => (
+                            <div key={i} className={styles.skeletonCard}>
+                                <div className={styles.skeletonImage} />
+                                <div className={styles.skeletonLine} />
+                                <div className={styles.skeletonLineShort} />
+                            </div>
+                        ))}
+                    </div>
                 </div>
                 ) : (
                     <>

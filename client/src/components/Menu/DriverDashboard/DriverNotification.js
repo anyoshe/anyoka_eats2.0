@@ -90,6 +90,18 @@ const DriverNotification = ({ onView, onClose }) => {
           ))}
         </ul>
       )}
+
+      {/* Skeleton when notifications are being fetched in parent or soon after mount */}
+      {notifications.length === 0 && (
+        <div className={styles.skeletonList}>
+          {[...Array(3)].map((_, i) => (
+            <div key={i} className={styles.skeletonItem}>
+              <div className={styles.skeletonLine} />
+              <div className={styles.skeletonBtn} />
+            </div>
+          ))}
+        </div>
+      )}
     </div>
   );
 };

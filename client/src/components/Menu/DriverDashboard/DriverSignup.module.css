@@ -51,6 +51,17 @@
   text-align: center;
 }
 
+/* Skeletons */
+.skeletonHeader { height: 28px; width: 40%; background: #eee; border-radius: 8px; margin: 0.5rem auto 0.75rem; animation: skeletonPulse 1.5s ease-in-out infinite; }
+.skeletonField { height: 44px; width: 100%; background: #eee; border-radius: 10px; animation: skeletonPulse 1.5s ease-in-out infinite; }
+.skeletonButton { height: 46px; width: 100%; background: #eee; border-radius: 10px; animation: skeletonPulse 1.5s ease-in-out infinite; }
+
+@keyframes skeletonPulse {
+  0% { opacity: 0.6; }
+  50% { opacity: 1; }
+  100% { opacity: 0.6; }
+}
+
 .signupForm {
   width: 100%;
   max-width: 700px;

@@ -5,9 +5,9 @@
 }
 
 .container {
-    position: absolute;
-    top: 60px;
-    right: 20px;
+    position: fixed; /* keep aligned to viewport header */
+    top: 3.25rem; /* closer to header icons */
+    right: 1rem;
     width: 300px;
     background-color: #ffffff;
     border: 1px solid #ddd;

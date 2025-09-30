@@ -79,7 +79,20 @@ const ActiveDriverOrders = () => {
         }
     };
 
-    if (loading) return <p>Loading active orders...</p>;
+    if (loading) return (
+        <div className={styles.skeletonContainer}>
+            <div className={styles.skeletonTitle} />
+            <div className={styles.skeletonList}>
+                {[...Array(3)].map((_, i) => (
+                    <div key={i} className={styles.skeletonCard}>
+                        <div className={styles.skeletonLine} />
+                        <div className={styles.skeletonLine} />
+                        <div className={styles.skeletonLineShort} />
+                    </div>
+                ))}
+            </div>
+        </div>
+    );
     if (orders.length === 0) return <p>No active orders found.</p>;
 
     return (
