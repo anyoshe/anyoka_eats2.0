@@ -1,9 +1,6 @@
-// import React, { useEffect, useState, useContext } from 'react';
-// import axios from 'axios';
-// import { AuthContext } from '../../contexts/AuthContext';
-// import config from '../../config';
+ 
 
-// const CustomerOrders = () => {
+ 
 //   const { user, token } = useContext(AuthContext);
 //   const [orders, setOrders] = useState([]);
 //   const [loading, setLoading] = useState(true);
@@ -155,7 +152,7 @@
 //   opacity: disabled ? 0.6 : 1,
 // });
 
-// export default CustomerOrders;
+ 
 
 
 

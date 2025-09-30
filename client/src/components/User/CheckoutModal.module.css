@@ -437,6 +437,38 @@
   background-color: var(--color-gray-50);
 }
 
+/* Improve layout when editing location: place controls in two columns neatly */
+.customerDetails .locationDropdown,
+.customerDetails .labelDropdown,
+.customerDetails .locationInput {
+  grid-column: span 1;
+}
+
+.customerDetails .locationDropdown + button {
+  grid-column: span 1;
+  justify-self: end;
+}
+
+/* When adding new location, stack inputs and actions clearly */
+.customerDetails .locationInput { grid-column: 1 / -1; }
+.customerDetails .labelDropdown { grid-column: 1 / span 1; }
+.customerDetails .locationInput + .labelDropdown + div, /* Map container wrapper */
+.customerDetails .labelDropdown + div { grid-column: 1 / -1; }
+.customerDetails .labelDropdown + div + p { grid-column: 1 / -1; }
+.customerDetails .labelDropdown + div + p + button { grid-column: 1 / span 1; }
+.customerDetails .labelDropdown + div + p + button + button { grid-column: 2 / span 1; justify-self: end; }
+
+@media (max-width: 768px) {
+  .customerDetails { grid-template-columns: 1fr; }
+  .changeLocationBtn { grid-column: 1 / -1; }
+  .customerDetails .locationDropdown,
+  .customerDetails .labelDropdown,
+  .customerDetails .locationInput { grid-column: 1 / -1; }
+  .customerDetails .locationDropdown + button { grid-column: 1 / -1; justify-self: stretch; }
+  .customerDetails .labelDropdown + div + p + button { grid-column: 1 / -1; }
+  .customerDetails .labelDropdown + div + p + button + button { grid-column: 1 / -1; }
+}
+
 /* Animations */
 @keyframes fadeInOverlay {
   0% { opacity: 0; }

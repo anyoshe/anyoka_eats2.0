@@ -9,7 +9,6 @@ import {
   faCartShopping,
 } from '@fortawesome/free-solid-svg-icons';
 import styles from './CartSection.module.css';
-// import styles from '../Menu/MenuPage.module.css';
 import { AuthContext } from '../../contexts/AuthContext';
 import CheckoutModal from './CheckoutModal';
 import { CartContext } from '../../contexts/CartContext';

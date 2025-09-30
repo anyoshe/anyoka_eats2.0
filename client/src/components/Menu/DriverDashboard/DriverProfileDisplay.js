@@ -207,25 +207,6 @@ const DriverProfileDisplay = () => {
     <div className={styles.profile_wrapper}>
 
       {/* Map Selector */}
-      {/* {showMapSelector && (
-        <MapSelector
-          onSelect={handleLocationSelect}
-          onCancel={() => setShowMapSelector(false)}
-        />
-      )}
-
-      {editing && mapCenter && (
-        <div className={styles.mapContainer}>
-          <GoogleMap
-            mapContainerStyle={{ width: '100%', height: '400px' }}
-            center={mapCenter}
-            zoom={15}
-            onClick={handleMapClick}
-          >
-            {markerPosition && <Marker position={markerPosition} />}
-          </GoogleMap>
-        </div>
-      )} */}
 
       {editing && mapCenter && (
         <div className={styles.mapModalOverlay}>

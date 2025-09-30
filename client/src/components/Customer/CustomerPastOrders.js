@@ -1,7 +1,4 @@
-// import React, { useEffect, useState, useContext } from 'react';
-// import axios from 'axios';
-// import { AuthContext } from '../../contexts/AuthContext';
-// import config from '../../config';
+ 
 
 // const CustomerPastOrders = () => {
 //   const { user, token } = useContext(AuthContext);
@@ -98,7 +95,7 @@
 //   opacity: disabled ? 0.6 : 1,
 // });
 
-// export default CustomerPastOrders;
+ 
 
 
 import React, { useEffect, useState, useContext } from 'react';

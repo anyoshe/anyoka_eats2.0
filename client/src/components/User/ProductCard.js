@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import config from '../../config';
 import styles from './ProductCard.module.css';
-// import styles from './Menu/ProductDetailModal.module.css';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faStar as solidStar } from '@fortawesome/free-solid-svg-icons';
 import { faStar as regularStar } from '@fortawesome/free-regular-svg-icons';
@@ -58,10 +57,6 @@ const getImageSrc = (imagePath) => {
                 src={getImageSrc(images[currentImageIndex])}
                 alt={`Product Image ${currentImageIndex + 1}`}
                 className={`${styles.productImage} ${isLoaded ? styles.isLoaded : ''}`}
-                // onError={(e) => {
-                //   e.target.onerror = null;
-                //   e.target.src = '/path/to/placeholder-image.jpg';
-                // }}
                 onError={(e) => {
   e.target.onerror = null;
   e.target.src = '/images/placeholder.png'; // put this in /public/images/
@@ -168,7 +163,6 @@ const getImageSrc = (imagePath) => {
           )}
         </div>
       )}
-    {/* <hr /> */}
   </div>
   );
 };

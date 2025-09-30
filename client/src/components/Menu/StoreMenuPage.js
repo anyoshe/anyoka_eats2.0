@@ -163,12 +163,6 @@ const StoreMenuPage = () => {
                     <>
                         <section className={styles.dispalySection}>
 
-                            {/* <div className={styles.cartTopDiv}>
-                                <button className={styles.floatingCartIcon} onClick={() => setShowCart(true)}>
-                                    <FontAwesomeIcon icon={faCartShopping} />
-                                </button>
-                            </div> */}
-
                             {showCart && (
                                 <div className={styles.cartModal}>
                                 <button className={styles.closeCartBtn} onClick={() => setShowCart(false)}>×</button>
