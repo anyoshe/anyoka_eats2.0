@@ -329,7 +329,7 @@
     position: relative;
     width: 100%;
     max-width: clamp(220px, 50vw, 560px);
-    margin: var(--space-4) auto;
+  margin: 1.2rem auto; /* provide vertical breathing space */
 }
 
 .searchInput {
@@ -546,6 +546,9 @@
 }
 
 @media (max-width: 768px) {
+    .heroHeader {
+        min-height: auto; /* avoid forcing large vertical space on small screens */
+    }
     .adSlot { display: none; }
     .adBar { display: block; margin-top: 4.8rem; }
     .installLogIn { min-width: 10rem; gap: var(--space-3); }
@@ -586,6 +589,8 @@
     }
     .searchContainer{
         margin-bottom: 0.5rem;
+        width: 75vw;
+        max-width: 75vw; /* make search input 3/4 screen width */
     }
 
     .searchInput {
@@ -667,6 +672,8 @@
 
     .searchContainer{
         margin-top: 0.5rem;
+        width: 75vw;
+        max-width: 75vw; /* keep 3/4 width on very small screens */
     }
 
     .searchInput {
@@ -722,6 +729,8 @@
 
     .searchContainer{
         padding: 0rem 0.2rem;
+        width: 75vw;
+        max-width: 75vw;
     }
 
     .categoryDivs{
