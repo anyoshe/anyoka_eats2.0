@@ -141,6 +141,11 @@
 @media (max-width: 768px){
   .topAdsBar{ min-height: 5.8rem; }
   .adsContent{ min-height: 3rem; }
+  .backButton{
+    display: none !important;
+    visibility: hidden !important;
+    opacity: 0 !important;
+  }
   .cartButton{ 
     display: inline-flex !important; 
     visibility: visible !important;
@@ -151,6 +156,11 @@
 @media (max-width: 480px){
   .topAdsBar{ min-height: 5.6rem; }
   .adsContent{ min-height: 3rem; }
+  .backButton{
+    display: none !important;
+    visibility: hidden !important;
+    opacity: 0 !important;
+  }
   .cartButton{ 
     display: inline-flex !important; 
     visibility: visible !important;
@@ -161,6 +171,11 @@
 @media (max-width: 320px){
   .topAdsBar{ min-height: 5.4rem; }
   .adsContent{ min-height: 2.8rem; }
+  .backButton{
+    display: none !important;
+    visibility: hidden !important;
+    opacity: 0 !important;
+  }
   .cartButton{ 
     display: inline-flex !important; 
     visibility: visible !important;

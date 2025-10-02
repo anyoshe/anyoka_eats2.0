@@ -45,7 +45,7 @@
   padding: 0.4rem 1rem;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
   cursor: pointer;
-  z-index: 1000;
+  z-index: 3000; /* sit above TopAdsBar animations */
   font-size: 1rem;
   transition: background-color 0.3s ease, transform 0.2s ease;
   display: none;
@@ -181,7 +181,6 @@
   background-color: var(--gray-light);
   border-radius: 0.3rem;
   margin-bottom: 0.8rem;
-  filter: blur(8px);
   transform: scale(1.02);
   opacity: 0.85;
   transition: filter 0.6s ease-out, transform 0.6s ease-out, opacity 0.4s ease-in-out;
@@ -326,6 +325,8 @@
 
   .floatingCartIcon {
     display: block;
+    top: 0.6rem; /* align within TopAdsBar like its cart button */
+    right: 0.6rem; /* tuck closer to corner on small screens */
   }
 }
 
@@ -352,6 +353,8 @@
 
   .floatingCartIcon {
     display: block;
+    top: 0.55rem;
+    right: 0.5rem;
   }
 
   .closeCartBtn {
@@ -376,6 +379,8 @@
 
   .floatingCartIcon {
     display: block;
+    top: 0.5rem;
+    right: 0.45rem;
   }
 
   .closeCartBtn {
@@ -410,6 +415,8 @@
 
   .floatingCartIcon {
     display: block;
+    top: 0.45rem;
+    right: 0.35rem;
   }
 
   .closeCartBtn {

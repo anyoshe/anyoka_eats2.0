@@ -124,6 +124,6 @@
 	.imageDiv { width: 6rem; height: 6rem; }
 	.topRestaurantH1 { font-size: var(--font-size-md); margin-left: 0; text-align: center; }
 	.storeDivsWrapper { grid-template-columns: repeat(2,1fr); gap: var(--space-2); }
-	.landingBodyContainer{ margin: 0; }
+	.landingBodyContainer{ margin: 0; width: 98%; }
 }
   
