@@ -361,7 +361,7 @@
     color: var(--color-green);
     font-size: 1.2rem;
     cursor: pointer;
-    pointer-events: none; 
+    pointer-events: auto; 
 }
 
 .searchResults {

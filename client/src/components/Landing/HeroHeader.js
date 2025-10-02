@@ -48,8 +48,8 @@ const HeroHeader = () => {
     const dashboardPath = driverLoggedIn
         ? '/driver/dashboard'
         : vendorLoggedIn
-        ? '/dashboard'
-        : '/customer-dashboard';
+            ? '/dashboard'
+            : '/customer-dashboard';
 
     return (
         <header className={styles.heroHeader}>
@@ -119,23 +119,17 @@ const HeroHeader = () => {
             <div className={styles.heroAdsDiv}>
                 <div className={`${styles.leftAd} ${styles.adsDiv}`}>
                     {/* Left Ad Content */}
-                    <img src={leftAd} alt="Left Ad"  className={styles.adImage}/>
+                    <img src={leftAd} alt="Left Ad" className={styles.adImage} />
                 </div>
 
                 <div className={`${styles.rightAd} ${styles.adsDiv}`}>
                     {/* Right Ad Content */}
-                    <img src={rightAd} alt="Right Ad"  className={styles.adImage}/>
+                    <img src={rightAd} alt="Right Ad" className={styles.adImage} />
                 </div>
             </div>
 
             <section className={styles.categorySection}>
-                <HeroHeaderSearch
-                    onSearchSelect={(item, type) => {
-                        if (type === 'category') navigate(`/menu?category=${encodeURIComponent(item)}`);
-                        else if (type === 'product') navigate(`/menu?product=${encodeURIComponent(item.name)}`);
-                        else if (type === 'partner') navigate(`/menu?shop=${item._id}`);
-                    }}
-                />
+                <HeroHeaderSearch />
                 <div className={styles.chipRow}>
                     <Link to="/menu?category=Food" className={styles.chip}>
                         <i className={`fas fa-utensils ${styles.chipIcon}`}></i>

@@ -25,6 +25,7 @@ const MenuPage = () => {
   const location = useLocation();
   const params = new URLSearchParams(location.search);
   const selectedCategory = params.get('category');
+  const selectedSubcategory = params.get('subcategory');
   const selectedProductQuery = params.get('product');
   const shopId = params.get("shop");
   const { currentProduct, setCurrentProduct, user, setRedirectPath } = useContext(AuthContext);
@@ -42,6 +43,22 @@ const MenuPage = () => {
   const [ratingThreshold, setRatingThreshold] = useState('0');
   const [searchQuery, setSearchQuery] = useState('');
   const [imageLoadingStates, setImageLoadingStates] = useState({});
+  
+
+
+  // single helper to normalize vendor/shop names
+const getVendorName = React.useCallback((p) => {
+  return (
+    p?.vendor?.shopName ||
+    p?.shop?.businessName ||
+    p?.store?.businessName ||
+    p?.partner?.businessName ||
+    p?.shopName ||
+    p?.businessName ||
+    ''
+  );
+}, []);
+
 
   useEffect(() => {
   }, [user]);
@@ -58,6 +75,12 @@ const MenuPage = () => {
           const res = await axios.get(`${config.backendUrl}/api/products/by-shop/${shopId}`);
           products = res.data.products || [];
           setProductsByCategory({ Shop: products });
+          setProducts(products);
+        } else if (selectedSubcategory) {
+          // ✅ fetch products by subcategory
+          const res = await axios.get(`${config.backendUrl}/api/product/search?subcategory=${encodeURIComponent(selectedSubcategory)}`);
+          products = res.data.products || [];
+          setProductsByCategory({ [selectedSubcategory]: products });
           setProducts(products);
 
         } else {
@@ -89,7 +112,9 @@ const MenuPage = () => {
     };
 
     fetchProducts();
-  }, [selectedCategory, selectedProductQuery, shopId]);
+  }, [selectedCategory, selectedSubcategory, selectedProductQuery, shopId]);
+
+  
 
   // Decide base list according to current context (category, shop, search)
   const baseList = useMemo(() => {
@@ -97,8 +122,9 @@ const MenuPage = () => {
     if (shopId && productsByCategory['Shop']) return productsByCategory['Shop'];
     if (selectedProductQuery && productsByCategory['Search']) return productsByCategory['Search'];
     if (selectedCategory && productsByCategory[selectedCategory]) return productsByCategory[selectedCategory];
+    if (selectedSubcategory && productsByCategory[selectedSubcategory]) return productsByCategory[selectedSubcategory];
     return [];
-  }, [loading, productsByCategory, selectedCategory, selectedProductQuery, shopId]);
+  }, [loading, productsByCategory, selectedCategory, selectedSubcategory, selectedProductQuery, shopId]);
 
   // Apply filters and sorting
   const visibleProducts = useMemo(() => {
@@ -117,7 +143,7 @@ const MenuPage = () => {
     }
 
     // Vendor filter (by vendor/shop name heuristic)
-    const getVendorName = (p) => p?.vendor?.name || p?.shop?.businessName || p?.store?.businessName || p?.partner?.businessName || p?.shopName || p?.businessName || '';
+    // const getVendorName = (p) => p?.vendor?.name || p?.shop?.businessName || p?.store?.businessName || p?.partner?.businessName || p?.shopName || p?.businessName || '';
     if (selectedVendor) {
       list = list.filter((p) => getVendorName(p) === selectedVendor);
     }
@@ -158,7 +184,7 @@ const MenuPage = () => {
     }
 
     return list;
-  }, [baseList, sortBy, priceMin, priceMax]);
+  }, [baseList, sortBy, priceMin, priceMax, searchQuery, selectedVendor, ratingThreshold, getVendorName]);
 
   // Compute category chips list and vendor options
   const categoryChips = useMemo(() => {
@@ -169,13 +195,13 @@ const MenuPage = () => {
   const vendorOptions = useMemo(() => {
     const source = baseList.length ? baseList : products;
     const names = new Set();
-    const getVendorName = (p) => p?.vendor?.name || p?.shop?.businessName || p?.store?.businessName || p?.partner?.businessName || p?.shopName || p?.businessName || '';
+    // const getVendorName = (p) => p?.vendor?.name || p?.shop?.businessName || p?.store?.businessName || p?.partner?.businessName || p?.shopName || p?.businessName || '';
     source.forEach((p) => {
       const n = getVendorName(p);
       if (n) names.add(n);
     });
     return Array.from(names).sort();
-  }, [baseList, products]);
+  }, [baseList, products, getVendorName]);
 
 
   const handleProductClick = (product) => {
@@ -305,7 +331,7 @@ const MenuPage = () => {
                 <div className={styles.controlsGroup}>
                   <select className={styles.select} disabled>
                     <option>Sort by</option>
-                  </select>
+                  </select> 
                   <input className={styles.input} placeholder="Min" disabled />
                   <span className={styles.rangeDash}>-</span>
                   <input className={styles.input} placeholder="Max" disabled />
