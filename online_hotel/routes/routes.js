@@ -2206,7 +2206,7 @@ function sendEmailNotification(email, message) {
 
 router.get('/search', async (req, res) => {
   const { q } = req.query;
-  if (!q) return res.json({ products: [], partners: [], categories: [] });
+  if (!q) return res.json({ products: [], partners: [], categories: [], subcategories: [], });
 
   // Search products
   const products = await Product.find({
@@ -2223,17 +2223,39 @@ router.get('/search', async (req, res) => {
     category: { $regex: q, $options: 'i' }
   });
 
-  res.json({ products, partners, categories });
+   // Search subcategories
+  const subcategories = await Product.distinct('subCategory', {
+    subCategory: { $regex: q, $options: 'i' }
+  });
+
+  res.json({ products, partners, categories, subcategories });
 });
 
-router.get('/products/search', async (req, res) => {
-  const { q } = req.query;
-  if (!q) return res.json({ products: [] });
-  const products = await Product.find({
-    name: { $regex: q, $options: 'i' }
-  });
-  res.json({ products });
+
+// ✅ Full product search endpoint
+router.get('/product/search', async (req, res) => {
+  const { q, category, subcategory } = req.query;
+  let filter = {};
+
+  if (q) {
+    filter.name = { $regex: q, $options: 'i' }; // matches tomato, tomatoes, toma, etc
+  }
+  if (category) {
+    filter.category = { $regex: category, $options: 'i' };
+  }
+  if (subcategory) {
+    filter.subCategory = { $regex: subcategory, $options: 'i' };
+  }
+
+  try {
+    const products = await Product.find(filter); // ✅ actually fetch products
+    res.json({ products });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Search failed' });
+  }
 });
+
 // Get all products by shopId
 router.get('/products/by-shop/:shopId', async (req, res) => {
   try {
