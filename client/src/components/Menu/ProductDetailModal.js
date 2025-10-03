@@ -50,14 +50,12 @@ const ProductDetailModal = ({ isOpen, onRequestClose, product, onAddToCart }) =>
   };
 
   const handleStarClick = async (rating) => {
-    if (!isLoggedIn) {
-      // Redirect to sign-up page
-      setCurrentProduct(product);
-      setRedirectPath(location.pathname);
-      // navigate('/signup'); // Redirect to sign-up page
-      setIsAuthModalOpen(true);
-      return;
-    }
+  if (!isLoggedIn) {
+    setCurrentProduct(product);
+    setRedirectPath(`${location.pathname}${location.search}`);
+    setIsAuthModalOpen(true);
+    return;
+  }
 
     setSelectedRating(rating);
     try {
@@ -81,13 +79,11 @@ const ProductDetailModal = ({ isOpen, onRequestClose, product, onAddToCart }) =>
 
   const handleAddComment = async () => {
     if (!isLoggedIn) {
-      setCurrentProduct(product);
-      setRedirectPath(location.pathname);
-      // navigate('/signup'); // Redirect to sign-up page
-      setIsAuthModalOpen(true);
-
-      return;
-    }
+    setCurrentProduct(product);
+    setRedirectPath(`${location.pathname}${location.search}`);
+    setIsAuthModalOpen(true);
+    return;
+  }
 
     // Submit the comment to the backend
 
@@ -154,7 +150,7 @@ const ProductDetailModal = ({ isOpen, onRequestClose, product, onAddToCart }) =>
           {/* Product Page */}
           <div className={styles.productSection}>
             <div className={styles.productCard}>
-              <ProductCard product={{ ...product, ratings: { ...product.ratings, reviews } }} />
+              <ProductCard product={{ ...product, ratings: { ...product.ratings,  average: averageRating, reviews } }} />
             </div>
 
             <div className={styles.rateSection}>

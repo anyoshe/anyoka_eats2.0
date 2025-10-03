@@ -43,21 +43,20 @@ const MenuPage = () => {
   const [ratingThreshold, setRatingThreshold] = useState('0');
   const [searchQuery, setSearchQuery] = useState('');
   const [imageLoadingStates, setImageLoadingStates] = useState({});
-  
 
+  const getVendorName = React.useCallback((p) => {
+    return (
+      p?.shop?.shopName ||
+      p?.vendor?.shopName ||
+      p?.vendor?.name ||
+      p?.store?.businessName ||
+      p?.partner?.businessName ||
+      p?.shopName ||
+      p?.businessName ||
+      ''
+    );
+  }, []);
 
-  // single helper to normalize vendor/shop names
-const getVendorName = React.useCallback((p) => {
-  return (
-    p?.vendor?.shopName ||
-    p?.shop?.businessName ||
-    p?.store?.businessName ||
-    p?.partner?.businessName ||
-    p?.shopName ||
-    p?.businessName ||
-    ''
-  );
-}, []);
 
 
   useEffect(() => {
@@ -114,7 +113,7 @@ const getVendorName = React.useCallback((p) => {
     fetchProducts();
   }, [selectedCategory, selectedSubcategory, selectedProductQuery, shopId]);
 
-  
+
 
   // Decide base list according to current context (category, shop, search)
   const baseList = useMemo(() => {
@@ -143,7 +142,6 @@ const getVendorName = React.useCallback((p) => {
     }
 
     // Vendor filter (by vendor/shop name heuristic)
-    // const getVendorName = (p) => p?.vendor?.name || p?.shop?.businessName || p?.store?.businessName || p?.partner?.businessName || p?.shopName || p?.businessName || '';
     if (selectedVendor) {
       list = list.filter((p) => getVendorName(p) === selectedVendor);
     }
@@ -193,15 +191,14 @@ const getVendorName = React.useCallback((p) => {
   }, [productsByCategory]);
 
   const vendorOptions = useMemo(() => {
-    const source = baseList.length ? baseList : products;
     const names = new Set();
-    // const getVendorName = (p) => p?.vendor?.name || p?.shop?.businessName || p?.store?.businessName || p?.partner?.businessName || p?.shopName || p?.businessName || '';
-    source.forEach((p) => {
+    baseList.forEach((p) => {
       const n = getVendorName(p);
       if (n) names.add(n);
     });
     return Array.from(names).sort();
-  }, [baseList, products, getVendorName]);
+  }, [baseList, getVendorName]);
+
 
 
   const handleProductClick = (product) => {
@@ -211,7 +208,7 @@ const getVendorName = React.useCallback((p) => {
 
   const closeModal = () => {
     setIsModalOpen(false);
-    setCurrentProduct(null); // Clear the current product
+    setCurrentProduct(null);
   };
 
 
@@ -220,7 +217,7 @@ const getVendorName = React.useCallback((p) => {
     const productToAdd = {
       ...product,
       price: priceToUse,
-      quantity: 1, // Initialize quantity to 1
+      quantity: 1,
     };
     addToCart(productToAdd);
   };
@@ -280,7 +277,7 @@ const getVendorName = React.useCallback((p) => {
 
   return (
     <div className={styles.storeWrapper}>
-      <TopAdsBar 
+      <TopAdsBar
         onBack={() => navigate(-1)}
         showControls={true}
         searchQuery={searchQuery}
@@ -322,7 +319,7 @@ const getVendorName = React.useCallback((p) => {
             </div>
           )}
 
-          
+
 
           {loading ? (
             <>
@@ -331,13 +328,13 @@ const getVendorName = React.useCallback((p) => {
                 <div className={styles.controlsGroup}>
                   <select className={styles.select} disabled>
                     <option>Sort by</option>
-                  </select> 
+                  </select>
                   <input className={styles.input} placeholder="Min" disabled />
                   <span className={styles.rangeDash}>-</span>
                   <input className={styles.input} placeholder="Max" disabled />
                   <input className={styles.searchInput} placeholder="Search items..." disabled />
                 </div>
-            </div>
+              </div>
               <section className={styles.categorySectionDisplay}>
                 {Array.from({ length: 12 }).map((_, i) => (
                   <div key={i} className={styles.skeletonCard}>
@@ -345,7 +342,7 @@ const getVendorName = React.useCallback((p) => {
                     <div className={styles.skeletonLine} />
                     <div className={styles.skeletonLineShort} />
                     <div className={styles.skeletonButton} />
-                      </div>
+                  </div>
                 ))}
               </section>
             </>
@@ -361,87 +358,86 @@ const getVendorName = React.useCallback((p) => {
                   <p className={styles.emptyCatalogSubtext}>We’re curating great options. Please check back soon.</p>
                 </div>
               ) : (
-              <section className={styles.categorySectionDisplay}>
+                <section className={styles.categorySectionDisplay}>
                   {visibleProducts.map((product) => (
-                  <div
+                    <div
                       key={product._id || product.name}
-                    className={styles.categorySectionDisplayDivs}
-                    onClick={() => handleProductClick(product)}
-                  >
-                    {typeof product.discountedPrice === 'number' && product.discountedPrice > 0 && (
-                      <div className={styles.discountBadge}>
-                        <span>Ksh {product.discountedPrice.toFixed(1)}</span>
-                      </div>
-                    )}
-
-                    <div className={styles.imageContainer}>
-                      {imageLoadingStates[product._id] === 'loading' && (
-                        <div className={styles.imageSkeleton}>
-                          <div className={styles.skeletonShimmer}></div>
+                      className={styles.categorySectionDisplayDivs}
+                      onClick={() => handleProductClick(product)}
+                    >
+                      {typeof product.discountedPrice === 'number' && product.discountedPrice > 0 && (
+                        <div className={styles.discountBadge}>
+                          <span>Ksh {product.discountedPrice.toFixed(1)}</span>
                         </div>
                       )}
-                      <img
-                        src={getImageSrc(product)}
-                        alt={product.name}
-                        loading="lazy"
-                        className={`${styles.categorySectionImage} ${
-                          imageLoadingStates[product._id] === 'loaded' ? styles.isLoaded : ''
-                        }`}
-                        onLoadStart={() => handleImageStart(product._id)}
-                        onLoad={() => handleImageLoad(product._id)}
-                        onError={(e) => {
-                          e.target.onerror = null;
-                          e.target.src = '/path/to/placeholder-image.jpg';
-                          handleImageError(product._id);
-                        }}
-                        style={{
-                          opacity: imageLoadingStates[product._id] === 'loaded' ? 1 : 0,
-                          transition: 'opacity 0.3s ease-in-out'
-                        }}
-                      />
-                    </div>
 
-                    <p className={`${styles.categorySectionName} ${styles.categorySectionP}`}>
-                      {product.name}
-                    </p>
+                      <div className={styles.imageContainer}>
+                        {imageLoadingStates[product._id] === 'loading' && (
+                          <div className={styles.imageSkeleton}>
+                            <div className={styles.skeletonShimmer}></div>
+                          </div>
+                        )}
+                        <img
+                          src={getImageSrc(product)}
+                          alt={product.name}
+                          loading="lazy"
+                          className={`${styles.categorySectionImage} ${imageLoadingStates[product._id] === 'loaded' ? styles.isLoaded : ''
+                            }`}
+                          onLoadStart={() => handleImageStart(product._id)}
+                          onLoad={() => handleImageLoad(product._id)}
+                          onError={(e) => {
+                            e.target.onerror = null;
+                            e.target.src = '/path/to/placeholder-image.jpg';
+                            handleImageError(product._id);
+                          }}
+                          style={{
+                            opacity: imageLoadingStates[product._id] === 'loaded' ? 1 : 0,
+                            transition: 'opacity 0.3s ease-in-out'
+                          }}
+                        />
+                      </div>
 
-                    <div className={styles.priceQuantityRow}>
-                      {product.discountedPrice ? (
-                        <span className={styles.originalPriceOffer}>
-                          <span className={`${styles.diagonalStrikethrough} ${styles.linePrice}`}>
-                            Ksh {product.price.toFixed(1)}
-                          </span>
-                        </span>
-                      ) : (
-                        <p className={styles.productPrice}>Ksh {product.price.toFixed(1)}</p>
-                      )}
-
-                      <p className={`${styles.categorySectionQuantity} ${styles.categorySectionP}`}>
-                        <span>{product.quantity}</span> {product.unit}
+                      <p className={`${styles.categorySectionName} ${styles.categorySectionP}`}>
+                        {product.name}
                       </p>
-                    </div>
 
-                    <div className={`${styles.ratingsDiv} ${styles.starIcon}`}>
-                      {product.ratings?.average
-                        ? renderStars(product.ratings.average)
-                        : 'No ratings yet'}
-                    </div>
+                      <div className={styles.priceQuantityRow}>
+                        {product.discountedPrice ? (
+                          <span className={styles.originalPriceOffer}>
+                            <span className={`${styles.diagonalStrikethrough} ${styles.linePrice}`}>
+                              Ksh {product.price.toFixed(1)}
+                            </span>
+                          </span>
+                        ) : (
+                          <p className={styles.productPrice}>Ksh {product.price.toFixed(1)}</p>
+                        )}
 
-                    <div className={styles.addCartBtn}>
-                      <button
-                        className={styles.addToCartBtn}
-                        aria-label={`Add ${product.name} to cart`}
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          handleAddToCart(product);
-                        }}
-                      >
-                        <FontAwesomeIcon icon={faCartShopping} />
-                      </button>
+                        <p className={`${styles.categorySectionQuantity} ${styles.categorySectionP}`}>
+                          <span>{product.quantity}</span> {product.unit}
+                        </p>
+                      </div>
+
+                      <div className={`${styles.ratingsDiv} ${styles.starIcon}`}>
+                        {product.ratings?.average
+                          ? renderStars(product.ratings.average)
+                          : 'No ratings yet'}
+                      </div>
+
+                      <div className={styles.addCartBtn}>
+                        <button
+                          className={styles.addToCartBtn}
+                          aria-label={`Add ${product.name} to cart`}
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleAddToCart(product);
+                          }}
+                        >
+                          <FontAwesomeIcon icon={faCartShopping} />
+                        </button>
+                      </div>
                     </div>
-                  </div>
-                ))}
-              </section>
+                  ))}
+                </section>
               )}
             </>
           )}

@@ -41,19 +41,22 @@ const LandingBodyContainer = () => {
         setSelectedStore(null);
     };
 
+
     const renderRatingStars = (rating) => {
         const filledStars = Math.round(rating);
+
         return (
             <>
                 {[...Array(5)].map((_, index) => (
                     <i
                         key={index}
-                        className={`fas fa-star ${styles.starIcon} ${index < filledStars ? styles.filled : ''}`}
+                        className={`${index < filledStars ? 'fas' : 'far'} fa-star ${styles.starIcon}`}
                     />
                 ))}
             </>
         );
     };
+
 
     return (
         <section className={styles.landingBodyContainer}>

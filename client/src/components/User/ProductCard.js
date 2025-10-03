@@ -26,22 +26,22 @@ const ProductCard = ({ product }) => {
     setCurrentImageIndex(index);
   };
 
- 
-const getImageSrc = (imagePath) => {
-  if (!imagePath) return '/images/placeholder-image.png';
 
-  // If path already starts with http (absolute URL), just return it
-  if (imagePath.startsWith('http')) return imagePath;
+  const getImageSrc = (imagePath) => {
+    if (!imagePath) return '/images/placeholder-image.png';
 
-  // If the path contains "/uploads", strip everything before it
-  const relativePath = imagePath.includes('/uploads')
-    ? imagePath.substring(imagePath.indexOf('/uploads'))
-    : `/uploads/products/${imagePath}`; // fallback if only filename is saved
+    // If path already starts with http (absolute URL), just return it
+    if (imagePath.startsWith('http')) return imagePath;
 
-  return `${config.backendUrl}${relativePath}`;
-};
+    // If the path contains "/uploads", strip everything before it
+    const relativePath = imagePath.includes('/uploads')
+      ? imagePath.substring(imagePath.indexOf('/uploads'))
+      : `/uploads/products/${imagePath}`; // fallback if only filename is saved
 
-  
+    return `${config.backendUrl}${relativePath}`;
+  };
+
+
 
   return (
     <div className={styles.productCard}>
@@ -58,9 +58,9 @@ const getImageSrc = (imagePath) => {
                 alt={`Product Image ${currentImageIndex + 1}`}
                 className={`${styles.productImage} ${isLoaded ? styles.isLoaded : ''}`}
                 onError={(e) => {
-  e.target.onerror = null;
-  e.target.src = '/images/placeholder.png'; // put this in /public/images/
-}}
+                  e.target.onerror = null;
+                  e.target.src = '/images/placeholder.png'; // put this in /public/images/
+                }}
                 onLoad={() => setIsLoaded(true)}
 
               />
@@ -109,7 +109,7 @@ const getImageSrc = (imagePath) => {
           <p className={styles.productInventory}>Town : {product.shop.town}</p>
           <p className={styles.productInventory}>Available : {product.inventory}</p>
 
-          <div className={styles.rating}>
+          {/* <div className={styles.rating}>
             {[...Array(5)].map((_, index) => {
               const star = index + 1;
               return (
@@ -121,8 +121,18 @@ const getImageSrc = (imagePath) => {
                 </span>
               );
             })}
-          </div>
-          
+          </div> */}
+          <div className={styles.rating}>
+  {[1, 2, 3, 4, 5].map((star) => (
+    <FontAwesomeIcon
+      key={star}
+      icon={star <= (product.ratings?.average || 0) ? solidStar : regularStar}
+      className={`${styles.starIcon} ${star <= (product.ratings?.average || 0) ? styles.filled : ''}`}
+    />
+  ))}
+</div>
+
+
           <p className={styles.average}>
             Average Rating: {product.ratings?.average?.toFixed(2) || 0}
             <br />
@@ -163,7 +173,7 @@ const getImageSrc = (imagePath) => {
           )}
         </div>
       )}
-  </div>
+    </div>
   );
 };
 

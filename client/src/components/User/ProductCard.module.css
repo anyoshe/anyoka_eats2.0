@@ -109,8 +109,8 @@
 }
 
 .filled{
-  color: var(--color-white);
-  background: var(--color-orange);
+  background: var(--color-white);
+  color: var(--color-orange);
 }
 
 .toggleReviewsButton {
