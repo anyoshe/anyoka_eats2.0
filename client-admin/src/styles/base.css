@@ -1,0 +1,20 @@
+@import url('https://fonts.googleapis.com/css2?family=Winky+Sans:ital,wght@0,300..900;1,300..900&display=swap');
+
+*, *::before, *::after { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+body { margin: 0; font-family: var(--font-sans); color: var(--color-text); background: var(--color-bg); line-height: var(--line-height); }
+img, picture, video, canvas, svg { display: block; max-width: 100%; }
+input, button, textarea, select { font: inherit; }
+
+.container { width: min(100% - 2rem, var(--container-lg)); margin-inline: auto; }
+.stack > * + * { margin-top: var(--space-4); }
+.card { background: var(--color-white); border: 1px solid var(--color-border); border-radius: var(--radius-lg); box-shadow: var(--shadow-sm); padding: var(--space-4); }
+.btn { display: inline-flex; align-items: center; gap: var(--space-2); border: 1px solid transparent; border-radius: var(--radius-pill); padding: 0.5rem 1rem; font-weight: 600; cursor: pointer; transition: background var(--duration-base) var(--ease-out), color var(--duration-base) var(--ease-out), transform var(--duration-fast) var(--ease-out), box-shadow var(--duration-fast) var(--ease-out); }
+.btn--primary { background: var(--color-orange); color: #000; }
+.btn--emphasis { background: var(--color-green); color: var(--color-white); }
+.input { width: 100%; border: 1px solid var(--color-border); border-radius: var(--radius-md); padding: 0.6rem 0.8rem; background: var(--color-white); color: var(--color-text); }
+
+
+
+
+

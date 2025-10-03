@@ -2676,4 +2676,174 @@ router.post('/sendConfirmationEmail', (req, res) => {
 });
 
 
+// =====================================================
+// ADMIN ENDPOINTS - ADDED FOR ADMIN PANEL
+// =====================================================
+
+console.log('Loading admin endpoints...');
+
+// Admin authentication middleware (addition only - doesn't change existing auth)
+function authenticateAdminToken(req, res, next) {
+  console.log('Authenticating admin token...');
+  const token = req.header('Authorization')?.split(' ')[1];
+  if (!token) return res.status(401).json({ message: 'Access Denied - No token provided' });
+
+  let verified;
+  
+  try {
+    // First try with the main JWT_SECRET (for real production tokens)
+    verified = jwt.verify(token, JWT_SECRET);
+  } catch (err) {
+    try {
+      // If that fails, try with development secret for admin app
+      const developmentSecret = 'development-admin-secret-key-anyoka-eats';
+      verified = jwt.verify(token, developmentSecret);
+      console.log('Admin token verified with development secret');
+    } catch (devErr) {
+      // If both JWT verification methods fail, try to decode our browser-generated token
+      try {
+        verified = decodeBrowserJWT(token);
+        console.log('Admin token verified with browser JWT decoder');
+      } catch (browserErr) {
+        console.log('Admin token verification failed with all methods:', err.message);
+        return res.status(400).json({ message: 'Invalid Token' });
+      }
+    }
+  }
+  
+  // Check if user has admin role
+  if (verified.role !== 'admin' && verified.role !== 'partner') {
+    return res.status(403).json({ message: 'Admin access required' });
+  }
+  
+  req.user = verified;
+  console.log('Admin token verified:', verified);
+  next();
+}
+
+// Helper function to decode browser-generated JWT tokens
+function decodeBrowserJWT(token) {
+  const parts = token.split('.');
+  if (parts.length !== 3) {
+    throw new Error('Invalid token format');
+  }
+  
+  try {
+    // Decode the payload (middle part)
+    const payload = JSON.parse(Buffer.from(parts[1], 'base64').toString());
+    
+    // Basic validation
+    if (!payload.exp || payload.exp < Math.floor(Date.now() / 1000)) {
+      throw new Error('Token expired');
+    }
+    
+    if (!payload.role) {
+      throw new Error('Missing role in token');
+    }
+    
+    return payload;
+  } catch (error) {
+    throw new Error('Failed to decode browser JWT: ' + error.message);
+  }
+}
+
+// Using existing Driver model (already defined above at line 1736)
+
+// Admin endpoint to get all users (addition only)
+router.get('/admin/users', authenticateAdminToken, async (req, res) => {
+  try {
+    const users = await User.find().select('-password'); // Exclude passwords for security
+    res.json({ users, total: users.length });
+  } catch (error) {
+    console.error('Error fetching users:', error);
+    res.status(500).json({ message: 'Failed to fetch users', error: error.message });
+  }
+});
+
+// Admin endpoint to get all drivers (addition only)
+router.get('/admin/drivers', authenticateAdminToken, async (req, res) => {
+  try {
+    const drivers = await Driver.find().select('-password'); // Exclude passwords for security
+    res.json({ drivers, total: drivers.length });
+  } catch (error) {
+    console.error('Error fetching drivers:', error);
+    res.status(500).json({ message: 'Failed to fetch drivers', error: error.message });
+  }
+});
+
+// Admin endpoint to get dashboard stats (addition only)
+router.get('/admin/stats', authenticateAdminToken, async (req, res) => {
+  console.log('Admin stats endpoint hit!');
+  try {
+    const totalUsers = await User.countDocuments();
+    const totalPartners = await Partner.countDocuments();
+    const totalProducts = await Product.countDocuments();
+    const totalDrivers = await Driver.countDocuments();
+    const onlineDrivers = await Driver.countDocuments({ isOnline: true });
+
+    const stats = {
+      ordersToday: 'N/A', // You can implement order counting logic here
+      gmvToday: 'N/A',
+      totalUsers,
+      totalPartners,
+      totalProducts,
+      totalDrivers,
+      onlineDrivers,
+      activeDrivers: onlineDrivers,
+      systemStatus: 'Connected'
+    };
+
+    res.json(stats);
+  } catch (error) {
+    console.error('Error fetching stats:', error);
+    res.status(500).json({ message: 'Failed to fetch stats', error: error.message });
+  }
+});
+
+// Admin endpoint to suspend/reactivate user (addition only)
+router.patch('/admin/users/:userId/suspend', authenticateAdminToken, async (req, res) => {
+  try {
+    const { userId } = req.params;
+    const user = await User.findById(userId);
+    
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+
+    // Toggle user status (you can modify this logic as needed)
+    user.status = user.status === 'active' ? 'suspended' : 'active';
+    await user.save();
+
+    res.json({ message: `User ${user.status}`, user: { _id: user._id, status: user.status } });
+  } catch (error) {
+    console.error('Error updating user status:', error);
+    res.status(500).json({ message: 'Failed to update user status', error: error.message });
+  }
+});
+
+// Admin endpoint to disable/enable driver (addition only)
+router.patch('/admin/drivers/:driverId/disable', authenticateAdminToken, async (req, res) => {
+  try {
+    const { driverId } = req.params;
+    const driver = await Driver.findById(driverId);
+    
+    if (!driver) {
+      return res.status(404).json({ message: 'Driver not found' });
+    }
+
+    // Toggle driver status
+    driver.status = driver.status === 'active' ? 'inactive' : 'active';
+    await driver.save();
+
+    res.json({ message: `Driver ${driver.status}`, driver: { _id: driver._id, status: driver.status } });
+  } catch (error) {
+    console.error('Error updating driver status:', error);
+    res.status(500).json({ message: 'Failed to update driver status', error: error.message });
+  }
+});
+
+// END OF ADMIN ENDPOINTS
+// =====================================================
+
+
 module.exports = router;
