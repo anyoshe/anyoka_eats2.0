@@ -1,0 +1,183 @@
+.section {
+  padding: var(--space-6) 0;
+}
+.grid-auto {
+  display: grid;
+  gap: var(--space-4);
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+}
+
+/* Specific responsive layout for 375px-425px screens */
+@media (min-width: 375px) and (max-width: 425px) {
+  .grid-auto {
+    grid-template-columns: repeat(2, 1fr);
+    gap: var(--space-3);
+  }
+  
+  /* Ensure cards have proper spacing and don't get too cramped */
+  .card {
+    min-height: auto;
+    padding: var(--space-3);
+  }
+  
+  /* Keep the Recent Products and System Status sections unchanged */
+  .grid-2-1 {
+    grid-template-columns: 1fr;
+    gap: var(--space-4);
+  }
+}
+.grid-2-1 {
+  display: grid;
+  gap: var(--space-4);
+  grid-template-columns: 2fr 1fr;
+}
+
+/* Three-column grid for categorized KPI sections */
+.grid-3 {
+  display: grid;
+  gap: var(--space-4);
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.section-title {
+  margin: 0 0 var(--space-3);
+  font-size: var(--font-size-lg);
+}
+
+.subsection-title {
+  margin: 0 0 var(--space-2);
+  font-size: var(--font-size-md);
+}
+
+/* Compact KPI row presentation */
+.kpi-row {
+  display: grid;
+  gap: var(--space-3);
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  align-items: stretch;
+}
+
+/* Performance list styling */
+.performance-list {
+  list-style: none;
+  padding-left: 0;
+  margin: 0;
+  display: grid;
+  gap: var(--space-2);
+}
+
+.performance-item {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-2) var(--space-3);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: var(--color-bg);
+}
+
+.rank-badge {
+  min-width: 2rem;
+  height: 2rem;
+  border-radius: var(--radius-pill);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  color: var(--color-white);
+  background: var(--color-orange);
+  box-shadow: var(--shadow-sm);
+}
+
+.item-title {
+  font-weight: 600;
+}
+
+.item-meta {
+  color: var(--color-text-muted);
+  font-size: var(--font-size-sm);
+}
+
+.rating-badge {
+  padding: 0.25rem 0.5rem;
+  border-radius: var(--radius-pill);
+  font-weight: 600;
+  border: 1px solid var(--color-border);
+}
+
+.rating-badge--good {
+  background: #ECFDF5;
+  color: #047857;
+  border-color: #A7F3D0;
+}
+
+.rating-badge--bad {
+  background: #FEF2F2;
+  color: #B91C1C;
+  border-color: #FECACA;
+}
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}
+.card-title {
+  margin: 0 0 var(--space-2);
+}
+.muted { color: var(--color-text-muted); }
+
+/* Responsive helpers */
+.hide-lg { display: none; }
+.hide-sm { display: block; }
+
+/* Responsive breakpoints */
+@media (max-width: 768px){
+  .grid-2-1 { grid-template-columns: 1fr; }
+  .hide-lg { display: block; }
+  .hide-sm { display: none; }
+}
+
+/* Collapse 3-col grid responsively */
+/* Removed 2-column rule at 1024px to switch to single column earlier */
+
+@media (max-width: 640px){
+  .grid-3 { grid-template-columns: 1fr; }
+}
+
+/* Ensure .grid-3 is single column from tablets upward */
+@media (min-width: 768px){
+  .grid-3 { grid-template-columns: 1fr; }
+}
+
+/* Additional responsive adjustments for better mobile experience */
+@media (max-width: 480px) {
+  .grid-auto {
+    grid-template-columns: 1fr;
+    gap: var(--space-2);
+  }
+  
+  .section {
+    padding: var(--space-4) 0;
+  }
+}
+
+@media (max-width: 320px) {
+  .grid-auto {
+    gap: var(--space-1);
+  }
+  
+  .card {
+    padding: var(--space-2);
+  }
+}
+
+/* Card list */
+.card-list { display: grid; gap: var(--space-3); grid-template-columns: 1fr; }
+.card-row { display: grid; gap: var(--space-2); grid-template-columns: 1fr 1fr; }
+@media (max-width: 480px){ .card-row { grid-template-columns: 1fr; } }
+
+
+
+
+
