@@ -8,6 +8,7 @@ import StatusBadge from '../components/StatusBadge';
 import SlideOver from '../components/SlideOver';
 import EmptyState from '../components/EmptyState';
 import { useApi } from '../hooks/useApi';
+import { useAuth } from '../contexts/AuthContext';
 import apiService from '../services/api';
 import { orders as mockOrders } from '../mocks/data';
 
@@ -17,30 +18,17 @@ export default function Orders(){
   const [selected, setSelected] = useState(null);
   const [page, setPage] = useState(1);
   const pageSize = 10;
+  const { user } = useAuth();
 
   // Reset page when filters change
   React.useEffect(() => {
     setPage(1);
   }, [status, searchQuery]);
 
-  // Try to get real orders data from multiple endpoints, fallback to mock if all fail
-  const { data: ordersData, loading, error, refetch } = useApi(async () => {
-    try {
-      // Try the main orders endpoint first
-      return await apiService.getOrders();
-    } catch (err) {
-      try {
-        // Try alternative orders endpoint
-        return await apiService.getAllOrders();
-      } catch (err2) {
-        // If both fail, return mock data instead of throwing error
-        console.warn('Orders API failed, using mock data:', err.message);
-        return { orders: mockOrders };
-      }
-    }
-  });
+  // Use real API call for admin
+  const { data: ordersData, loading, error, refetch } = useApi(() => apiService.request('/api/admin/orders'));
   
-  // Use real data if available, otherwise fallback to mock data
+  // Use real data when authenticated, fallback to mock data
   const allOrders = ordersData?.orders || ordersData || mockOrders;
   
   // Apply filters
@@ -86,8 +74,8 @@ export default function Orders(){
     );
   }
 
-  // Show error only if we have no data at all
-  if (error && allOrders.length === 0) {
+  // Show error if we can't load data
+  if (error) {
     return (
       <section className="stack section">
         <h2>Orders</h2>
@@ -102,7 +90,7 @@ export default function Orders(){
 
   return (
     <section className="stack section">
-      <h2>Orders {error && allOrders.length > 0 && <small style={{ color: 'var(--color-text-muted)', fontWeight: 'normal' }}>(using demo data)</small>}</h2>
+      <h2>Orders {!user && <small style={{ color: 'var(--color-text-muted)', fontWeight: 'normal' }}>(demo data - requires authentication for real data)</small>}</h2>
       <FilterBar>
         {/* Search input - always visible */}
         <input 

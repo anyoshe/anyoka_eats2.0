@@ -7,6 +7,7 @@ import Pagination from '../components/Pagination';
 import ResponsiveList from '../components/ResponsiveList';
 import EmptyState from '../components/EmptyState';
 import { useApi } from '../hooks/useApi';
+import { useAuth } from '../contexts/AuthContext';
 import apiService from '../services/api';
 import { users as mockUsers } from '../mocks/data';
 
@@ -16,30 +17,17 @@ export default function Users(){
   const [selected, setSelected] = useState(null);
   const [page, setPage] = useState(1);
   const pageSize = 8;
+  const { user } = useAuth();
 
   // Reset page when filters change
   React.useEffect(() => {
     setPage(1);
   }, [statusFilter, query]);
 
-  // Try to get real users data from multiple endpoints, fallback to mock if all fail
-  const { data: usersData, loading, error, refetch } = useApi(async () => {
-    try {
-      // Try the admin users endpoint first
-      return await apiService.getUsers();
-    } catch (err) {
-      try {
-        // Try alternative users endpoint
-        return await apiService.request('/api/users');
-      } catch (err2) {
-        // If both fail, return mock data instead of throwing error
-        console.warn('Users API failed, using mock data:', err.message);
-        return { users: mockUsers };
-      }
-    }
-  });
+  // Use real API call when authenticated
+  const { data: usersData, loading, error, refetch } = useApi(() => apiService.getUsers());
   
-  // Use real data if available, otherwise fallback to mock data
+  // Use real data when authenticated, fallback to mock data
   const allUsers = usersData?.users || usersData || mockUsers;
 
   const filtered = allUsers.filter(u => {
@@ -85,8 +73,8 @@ export default function Users(){
     );
   }
 
-  // Show error only if we have no data at all
-  if (error && allUsers.length === 0) {
+  // Show error if we can't load data
+  if (error) {
     return (
       <section className="stack section">
         <h2>Users</h2>
@@ -101,7 +89,7 @@ export default function Users(){
 
   return (
     <section className="stack section">
-      <h2>Users {error && allUsers.length > 0 && <small style={{ color: 'var(--color-text-muted)', fontWeight: 'normal' }}>(using demo data)</small>}</h2>
+      <h2>Users {!user && <small style={{ color: 'var(--color-text-muted)', fontWeight: 'normal' }}>(demo data - requires authentication for real data)</small>}</h2>
       <FilterBar>
         {/* Search input - always visible */}
         <input 

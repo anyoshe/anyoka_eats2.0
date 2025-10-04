@@ -9,19 +9,18 @@ class ApiService {
 
   async request(endpoint, options = {}) {
     const url = `${this.baseURL}${endpoint}`;
-    const defaultOptions = {
-      headers: {
-        'Content-Type': 'application/json',
-      },
+    // Merge headers, add Authorization if token exists
+    const headers = {
+      'Content-Type': 'application/json',
+      ...(this.adminToken ? { 'Authorization': `Bearer ${this.adminToken}` } : {}),
+      ...(options.headers || {})
     };
-
+    const finalOptions = { ...options, headers };
     try {
-      const response = await fetch(url, { ...defaultOptions, ...options });
-      
+      const response = await fetch(url, finalOptions);
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
-      
       return await response.json();
     } catch (error) {
       console.error('API request failed:', error);
@@ -80,7 +79,7 @@ class ApiService {
     return this.request(endpoint);
   }
 
-  // Users/Customers (using new admin endpoints)
+  // Users/Customers - use configured admin endpoint
   async getUsers(params = {}) {
     return this.request(config.api.adminUsers, {
       headers: {
@@ -97,12 +96,21 @@ class ApiService {
     return this.request(config.api.suspendUser(userId), {
       method: 'PATCH',
       headers: {
-      ...(this.adminToken ? { 'Authorization': `Bearer ${this.adminToken}` } : {}),
+        ...(this.adminToken ? { 'Authorization': `Bearer ${this.adminToken}` } : {}),
       },
     });
   }
 
-  // Partners/Vendors
+  // Drivers - use configured admin endpoint
+  async getDrivers(params = {}) {
+    return this.request(config.api.adminDrivers, {
+      headers: {
+        ...(this.adminToken ? { 'Authorization': `Bearer ${this.adminToken}` } : {}),
+      },
+    });
+  }
+
+  // Partners/Vendors - use configured endpoint
   async getPartners(params = {}) {
     const queryString = new URLSearchParams(params).toString();
     const endpoint = queryString ? `${config.api.partners}?${queryString}` : config.api.partners;
@@ -143,7 +151,18 @@ class ApiService {
   }
 
   async getAllProducts() {
-    return this.request(config.api.allProducts);
+    try {
+      // Try the configured all-products endpoint first
+      return await this.request(config.api.allProducts);
+    } catch (error) {
+      try {
+        // Try the configured products endpoint
+        return await this.request(config.api.products);
+      } catch (error2) {
+        // If both fail, throw the original error
+        throw error;
+      }
+    }
   }
 
   async getProductsByPartner(partnerId) {

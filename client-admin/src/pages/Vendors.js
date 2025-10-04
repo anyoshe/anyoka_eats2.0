@@ -7,6 +7,7 @@ import Pagination from '../components/Pagination';
 import ResponsiveList from '../components/ResponsiveList';
 import EmptyState from '../components/EmptyState';
 import { useApi } from '../hooks/useApi';
+import { useAuth } from '../contexts/AuthContext';
 import apiService from '../services/api';
 import { vendors as mockVendors } from '../mocks/data';
 
@@ -17,30 +18,17 @@ export default function Vendors(){
   const [selected, setSelected] = useState(null);
   const [page, setPage] = useState(1);
   const pageSize = 8;
+  const { user } = useAuth();
 
   // Reset page when filters change
   React.useEffect(() => {
     setPage(1);
   }, [statusFilter, kycFilter, query]);
 
-  // Try to get real partners data from multiple endpoints, fallback to mock if all fail
-  const { data: partnersData, loading, error, refetch } = useApi(async () => {
-    try {
-      // Try the main partners endpoint first
-      return await apiService.getPartners();
-    } catch (err) {
-      try {
-        // Try alternative partners endpoint
-        return await apiService.request('/api/vendors');
-      } catch (err2) {
-        // If both fail, return mock data instead of throwing error
-        console.warn('Partners API failed, using mock data:', err.message);
-        return { partners: mockVendors };
-      }
-    }
-  });
+  // Use real API call when authenticated
+  const { data: partnersData, loading, error, refetch } = useApi(() => apiService.getPartners());
   
-  // Use real data if available, otherwise fallback to mock data
+  // Use real data when authenticated, fallback to mock data
   const allVendors = partnersData?.partners || partnersData || mockVendors;
 
   const filtered = allVendors.filter(v => {
@@ -98,8 +86,8 @@ export default function Vendors(){
     );
   }
 
-  // Show error only if we have no data at all
-  if (error && allVendors.length === 0) {
+  // Show error if we can't load data
+  if (error) {
     return (
       <section className="stack section">
         <h2>Vendors</h2>
@@ -114,7 +102,7 @@ export default function Vendors(){
 
   return (
     <section className="stack section">
-      <h2>Vendors {error && allVendors.length > 0 && <small style={{ color: 'var(--color-text-muted)', fontWeight: 'normal' }}>(using demo data)</small>}</h2>
+      <h2>Vendors {!user && <small style={{ color: 'var(--color-text-muted)', fontWeight: 'normal' }}>(demo data - requires authentication for real data)</small>}</h2>
       <FilterBar>
         {/* Search input - always visible */}
         <input 

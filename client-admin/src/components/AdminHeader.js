@@ -1,9 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { NavLink } from 'react-router-dom';
+import { useAuth } from '../contexts/AuthContext';
 import styles from './AdminHeader.module.css';
 
 export default function AdminHeader() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const { user, logout } = useAuth();
 
   const toggleMobileMenu = () => {
     setIsMobileMenuOpen(!isMobileMenuOpen);
@@ -36,17 +38,16 @@ export default function AdminHeader() {
         {/* Logo Section */}
         <div className={styles.logoSection}>
           <div className={styles.logoIcon}>AE</div>
-          <span className={styles.logoText}>Admin</span>
+          <span className={styles.logoText}>Anyoka Eats Admin</span>
         </div>
 
         {/* Desktop Navigation */}
         <nav className={styles.nav}>
           <NavLink 
-            to="/" 
+            to="/dashboard" 
             className={({ isActive }) => 
               isActive ? `${styles.navLink} ${styles.active}` : styles.navLink
             }
-            end
           >
             Dashboard
           </NavLink>
@@ -92,6 +93,18 @@ export default function AdminHeader() {
           </NavLink>
         </nav>
 
+        {/* User Section */}
+        <div className={styles.userSection}>
+          <span className={styles.userName}>Welcome, {user?.name || 'Admin'}</span>
+          <button 
+            onClick={logout}
+            className={styles.logoutBtn}
+            title="Logout"
+          >
+            Logout
+          </button>
+        </div>
+
         {/* Mobile Menu Toggle */}
         <button 
           className={styles.mobileMenuToggle}
@@ -105,12 +118,11 @@ export default function AdminHeader() {
       {/* Mobile Navigation */}
       <nav className={`${styles.mobileNav} ${isMobileMenuOpen ? styles.open : ''}`}>
         <NavLink 
-          to="/" 
+          to="/dashboard" 
           className={({ isActive }) => 
             isActive ? `${styles.mobileNavLink} ${styles.active}` : styles.mobileNavLink
           }
           onClick={closeMobileMenu}
-          end
         >
           Dashboard
         </NavLink>
@@ -159,6 +171,15 @@ export default function AdminHeader() {
         >
           System
         </NavLink>
+        <div className={styles.mobileUserSection}>
+          <span className={styles.mobileUserName}>Welcome, {user?.name || 'Admin'}</span>
+          <button 
+            onClick={() => { logout(); closeMobileMenu(); }}
+            className={styles.mobileLogoutBtn}
+          >
+            Logout
+          </button>
+        </div>
       </nav>
     </header>
   );

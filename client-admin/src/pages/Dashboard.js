@@ -1,29 +1,27 @@
 import React from 'react';
 import KpiCard from '../components/KpiCard';
 import { useApi } from '../hooks/useApi';
+import { useAuth } from '../contexts/AuthContext';
 import apiService from '../services/api';
 import { users as mockUsers, drivers as mockDrivers } from '../mocks/data';
 
 export default function Dashboard(){
-  // Use real API calls for data that doesn't require authentication
+  const { user } = useAuth();
+  
+  // Use real API calls for all data when authenticated
   const { data: products, loading: productsLoading, error: productsError } = useApi(() => apiService.getAllProducts());
   const { data: partners, loading: partnersLoading, error: partnersError } = useApi(() => apiService.getPartners());
+  const { data: users, loading: usersLoading, error: usersError } = useApi(() => apiService.getUsers());
+  const { data: drivers, loading: driversLoading, error: driversError } = useApi(() => apiService.getDrivers());
   
-  // For users and drivers, we'll use mock data since they require authentication
-  // You can uncomment these when authentication is added:
-  // const { data: users, loading: usersLoading, error: usersError } = useApi(() => apiService.getUsers());
-  // const { data: drivers, loading: driversLoading, error: driversError } = useApi(() => apiService.getDrivers());
-  
-  const loading = productsLoading || partnersLoading;
-  const statsError = productsError || partnersError;
+  const loading = productsLoading || partnersLoading || usersLoading || driversLoading;
+  const statsError = productsError || partnersError || usersError || driversError;
   
   // Process real data
   const productsArray = products?.products || products || [];
   const partnersArray = partners?.partners || partners?.data || partners || [];
-  
-  // Use mock data for users and drivers (until authentication is added)
-  const usersArray = mockUsers;
-  const driversArray = mockDrivers;
+  const usersArray = users?.users || users || [];
+  const driversArray = drivers?.drivers || drivers || [];
   
   // Calculate stats from real data
   const stats = {
@@ -88,12 +86,6 @@ export default function Dashboard(){
       .map(({ it }) => it);
   };
 
-  const rankBySales = (items, salesKeys) => {
-    return [...items]
-      .map((it) => ({ it, s: getNumeric(it, salesKeys, 0) }))
-      .sort((a, b) => b.s - a.s)
-      .map(({ it }) => it);
-  };
 
   // Prepare rankings for products, vendors, drivers
   const productsByRating = rankByRating(productsArray, ['averageRating', 'ratingsAverage', 'rating', 'avgRating']);

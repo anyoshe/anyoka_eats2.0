@@ -7,6 +7,7 @@ import Pagination from '../components/Pagination';
 import ResponsiveList from '../components/ResponsiveList';
 import EmptyState from '../components/EmptyState';
 import { useApi } from '../hooks/useApi';
+import { useAuth } from '../contexts/AuthContext';
 import apiService from '../services/api';
 import { drivers as mockDrivers } from '../mocks/data';
 
@@ -16,30 +17,17 @@ export default function Drivers(){
   const [selected, setSelected] = useState(null);
   const [page, setPage] = useState(1);
   const pageSize = 8;
+  const { user } = useAuth();
 
   // Reset page when filters change
   React.useEffect(() => {
     setPage(1);
   }, [onlineFilter, query]);
 
-  // Try to get real drivers data from multiple endpoints, fallback to mock if all fail
-  const { data: driversData, loading, error, refetch } = useApi(async () => {
-    try {
-      // Try the admin drivers endpoint first
-      return await apiService.request('/api/admin/drivers');
-    } catch (err) {
-      try {
-        // Try alternative drivers endpoint
-        return await apiService.request('/api/drivers');
-      } catch (err2) {
-        // If both fail, return mock data instead of throwing error
-        console.warn('Drivers API failed, using mock data:', err.message);
-        return { drivers: mockDrivers };
-      }
-    }
-  });
+  // Use real API call when authenticated
+  const { data: driversData, loading, error, refetch } = useApi(() => apiService.getDrivers());
   
-  // Use real data if available, otherwise fallback to mock data
+  // Use real data when authenticated, fallback to mock data
   const allDrivers = driversData?.drivers || driversData || mockDrivers;
 
   const filtered = allDrivers.filter(d => {
@@ -87,8 +75,8 @@ export default function Drivers(){
     );
   }
 
-  // Show error only if we have no data at all
-  if (error && allDrivers.length === 0) {
+  // Show error if we can't load data
+  if (error) {
     return (
       <section className="stack section">
         <h2>Drivers</h2>
@@ -103,7 +91,7 @@ export default function Drivers(){
 
   return (
     <section className="stack section">
-      <h2>Drivers {error && allDrivers.length > 0 && <small style={{ color: 'var(--color-text-muted)', fontWeight: 'normal' }}>(using demo data)</small>}</h2>
+      <h2>Drivers {!user && <small style={{ color: 'var(--color-text-muted)', fontWeight: 'normal' }}>(demo data - requires authentication for real data)</small>}</h2>
       <FilterBar>
         {/* Search input - always visible */}
         <input 
