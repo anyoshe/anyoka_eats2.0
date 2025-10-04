@@ -51,14 +51,6 @@ export default function AdminHeader() {
             Dashboard
           </NavLink>
           <NavLink 
-            to="/login" 
-            className={({ isActive }) => 
-              isActive ? `${styles.navLink} ${styles.active}` : styles.navLink
-            }
-          >
-            Sign In
-          </NavLink>
-          <NavLink 
             to="/orders" 
             className={({ isActive }) => 
               isActive ? `${styles.navLink} ${styles.active}` : styles.navLink

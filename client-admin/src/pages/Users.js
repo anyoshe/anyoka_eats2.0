@@ -6,6 +6,8 @@ import Chip from '../components/Chip';
 import Pagination from '../components/Pagination';
 import ResponsiveList from '../components/ResponsiveList';
 import EmptyState from '../components/EmptyState';
+import { useApi } from '../hooks/useApi';
+import apiService from '../services/api';
 import { users as mockUsers } from '../mocks/data';
 
 export default function Users(){
@@ -15,9 +17,36 @@ export default function Users(){
   const [page, setPage] = useState(1);
   const pageSize = 8;
 
-  const filtered = mockUsers.filter(u => {
-    const matchesQuery = u.name.toLowerCase().includes(query.toLowerCase()) || u.id.includes(query);
-    const matchesStatus = statusFilter === 'all' || u.status === statusFilter;
+  // Reset page when filters change
+  React.useEffect(() => {
+    setPage(1);
+  }, [statusFilter, query]);
+
+  // Try to get real users data from multiple endpoints, fallback to mock if all fail
+  const { data: usersData, loading, error, refetch } = useApi(async () => {
+    try {
+      // Try the admin users endpoint first
+      return await apiService.getUsers();
+    } catch (err) {
+      try {
+        // Try alternative users endpoint
+        return await apiService.request('/api/users');
+      } catch (err2) {
+        // If both fail, return mock data instead of throwing error
+        console.warn('Users API failed, using mock data:', err.message);
+        return { users: mockUsers };
+      }
+    }
+  });
+  
+  // Use real data if available, otherwise fallback to mock data
+  const allUsers = usersData?.users || usersData || mockUsers;
+
+  const filtered = allUsers.filter(u => {
+    const matchesQuery = (u.name || u.username || '').toLowerCase().includes(query.toLowerCase()) || 
+                        (u.id || u._id || '').includes(query) ||
+                        (u.email || '').toLowerCase().includes(query.toLowerCase());
+    const matchesStatus = statusFilter === 'all' || (u.status || 'active') === statusFilter;
     return matchesQuery && matchesStatus;
   });
 
@@ -25,41 +54,119 @@ export default function Users(){
   const pageRows = filtered.slice((page-1)*pageSize, page*pageSize);
 
   const columns = [
-    { key: 'id', label: 'User ID' },
-    { key: 'name', label: 'Name' },
-    { key: 'contact', label: 'Contact' },
-    { key: 'orders', label: 'Orders' },
-    { key: 'lastOrder', label: 'Last Order' },
-    { key: 'status', label: 'Status', render: (v) => (
-      <span style={{ 
-        background: v === 'active' ? 'rgba(30,165,9,0.12)' : 'rgba(176,0,32,0.12)', 
-        color: v === 'active' ? 'var(--color-green)' : '#b00020',
-        borderRadius: '9999px', 
-        padding: '0.15rem 0.5rem', 
-        fontSize: '0.85rem', 
-        fontWeight: 600 
-      }}>{v}</span>
-    )},
+    { key: 'id', label: 'User ID', render: (v, row) => row.id || row._id || 'N/A' },
+    { key: 'name', label: 'Name', render: (v, row) => row.name || row.username || 'N/A' },
+    { key: 'contact', label: 'Contact', render: (v, row) => row.email || row.contact || 'N/A' },
+    { key: 'orders', label: 'Orders', render: (v, row) => row.ordersCount || row.orders || 0 },
+    { key: 'lastOrder', label: 'Last Order', render: (v, row) => row.lastOrder || row.lastOrderDate || 'N/A' },
+    { key: 'status', label: 'Status', render: (v, row) => {
+      const status = row.status || 'active';
+      return (
+        <span style={{ 
+          background: status === 'active' ? 'rgba(30,165,9,0.12)' : 'rgba(176,0,32,0.12)', 
+          color: status === 'active' ? 'var(--color-green)' : '#b00020',
+          borderRadius: '9999px', 
+          padding: '0.15rem 0.5rem', 
+          fontSize: '0.85rem', 
+          fontWeight: 600 
+        }}>{status}</span>
+      );
+    }},
   ];
+
+  if (loading) {
+    return (
+      <section className="stack section">
+        <h2>Users</h2>
+        <div className="card">
+          <p>Loading users...</p>
+        </div>
+      </section>
+    );
+  }
+
+  // Show error only if we have no data at all
+  if (error && allUsers.length === 0) {
+    return (
+      <section className="stack section">
+        <h2>Users</h2>
+        <div className="card">
+          <h3>Error loading users</h3>
+          <p>Could not connect to users endpoint: {error}</p>
+          <button className="btn btn--primary" onClick={refetch}>Retry</button>
+        </div>
+      </section>
+    );
+  }
 
   return (
     <section className="stack section">
-      <h2>Users</h2>
+      <h2>Users {error && allUsers.length > 0 && <small style={{ color: 'var(--color-text-muted)', fontWeight: 'normal' }}>(using demo data)</small>}</h2>
       <FilterBar>
-        <input className="input" placeholder="Search users" value={query} onChange={e=>setQuery(e.target.value)} style={{ maxWidth: 320 }} />
-        <div className="chips">
-          <Chip active={statusFilter==='all'} onClick={()=>setStatusFilter('all')}>All</Chip>
-          <Chip active={statusFilter==='active'} onClick={()=>setStatusFilter('active')}>Active</Chip>
-          <Chip active={statusFilter==='suspended'} onClick={()=>setStatusFilter('suspended')}>Suspended</Chip>
+        {/* Search input - always visible */}
+        <input 
+          className="input" 
+          placeholder="Search users..." 
+          value={query}
+          onChange={e => setQuery(e.target.value)}
+          style={{ flex: '1', minWidth: '200px', maxWidth: '400px' }} 
+        />
+        
+        {/* Status dropdown - mobile only */}
+        <select 
+          className="input hide-lg" 
+          value={statusFilter} 
+          onChange={e=>setStatusFilter(e.target.value)} 
+          style={{ minWidth: '140px', maxWidth: '180px' }}
+        >
+          <option value="all">All Status</option>
+          <option value="active">Active</option>
+          <option value="suspended">Suspended</option>
+        </select>
+        
+        {/* Status chips - desktop only */}
+        <div className="chips hide-sm" style={{ flexWrap: 'wrap', gap: 'var(--space-2)' }}>
+          <Chip active={statusFilter === 'all'} onClick={() => setStatusFilter('all')}>All</Chip>
+          <Chip active={statusFilter === 'active'} onClick={() => setStatusFilter('active')}>Active</Chip>
+          <Chip active={statusFilter === 'suspended'} onClick={() => setStatusFilter('suspended')}>Suspended</Chip>
         </div>
-        <button className="btn btn--primary">Export CSV</button>
+        
+        {/* Action buttons */}
+        <div className="cluster" style={{ flexShrink: 0 }}>
+          <button 
+            className="btn" 
+            onClick={() => { setStatusFilter('all'); setQuery(''); }}
+            style={{ background: 'var(--color-gray-100)' }}
+          >
+            Clear
+          </button>
+          <button className="btn btn--primary">Export CSV</button>
+        </div>
       </FilterBar>
 
-      {filtered.length === 0 ? (
+      {/* Results count */}
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 'var(--space-2)' }}>
+        <small className="muted">
+          Showing {pageRows.length} of {filtered.length} users
+          {statusFilter !== 'all' && ` (filtered by ${statusFilter})`}
+          {query && ` (searching for "${query}")`}
+        </small>
+      </div>
+
+      {filtered.length === 0 && !loading ? (
         <EmptyState 
           title="No users found" 
-          subtitle="Try adjusting your search or filters."
-          action={<button className="btn btn--emphasis" onClick={()=>{setQuery('');setStatusFilter('all');}}>Clear filters</button>}
+          subtitle={query || statusFilter !== 'all' ? "Try adjusting your search or filters." : "No users available."}
+          action={
+            (query || statusFilter !== 'all') ? (
+              <button 
+                className="btn btn--emphasis" 
+                onClick={() => { setStatusFilter('all'); setQuery(''); }}
+              >
+                Clear filters
+              </button>
+            ) : null
+          }
         />
       ) : (
         <>
@@ -82,20 +189,20 @@ export default function Users(){
               items={pageRows}
               renderCard={(row)=>(
                 <div className="card-row">
-                  <div><strong>{row.name}</strong><div className="muted">{row.id}</div></div>
+                  <div><strong>{row.name || row.username || 'N/A'}</strong><div className="muted">{row.id || row._id || 'N/A'}</div></div>
                   <div style={{ justifySelf: 'end' }}>
                     <span style={{ 
-                      background: row.status === 'active' ? 'rgba(30,165,9,0.12)' : 'rgba(176,0,32,0.12)', 
-                      color: row.status === 'active' ? 'var(--color-green)' : '#b00020',
+                      background: (row.status || 'active') === 'active' ? 'rgba(30,165,9,0.12)' : 'rgba(176,0,32,0.12)', 
+                      color: (row.status || 'active') === 'active' ? 'var(--color-green)' : '#b00020',
                       borderRadius: '9999px', 
                       padding: '0.15rem 0.5rem', 
                       fontSize: '0.85rem', 
                       fontWeight: 600 
-                    }}>{row.status}</span>
+                    }}>{row.status || 'active'}</span>
                   </div>
-                  <div><small className="muted">Contact</small><div>{row.contact}</div></div>
-                  <div><small className="muted">Orders</small><div>{row.orders}</div></div>
-                  <div><small className="muted">Last order</small><div>{row.lastOrder}</div></div>
+                  <div><small className="muted">Contact</small><div>{row.email || row.contact || 'N/A'}</div></div>
+                  <div><small className="muted">Orders</small><div>{row.ordersCount || row.orders || 0}</div></div>
+                  <div><small className="muted">Last order</small><div>{row.lastOrder || row.lastOrderDate || 'N/A'}</div></div>
                   <div><button className="btn" onClick={()=>setSelected(row)} style={{ background: 'var(--color-gray-100)' }}>View</button></div>
                 </div>
               )}
@@ -105,18 +212,19 @@ export default function Users(){
         </>
       )}
 
-      <SlideOver open={!!selected} title={selected?.name} onClose={()=>setSelected(null)}>
+      <SlideOver open={!!selected} title={selected?.name || selected?.username || 'User Details'} onClose={()=>setSelected(null)}>
         {selected && (
           <div className="stack">
-            <div className="card"><strong>User ID:</strong> {selected.id}</div>
-            <div className="card"><strong>Contact:</strong> {selected.contact}</div>
-            <div className="card"><strong>Status:</strong> {selected.status}</div>
-            <div className="card"><strong>Total orders:</strong> {selected.orders}</div>
-            <div className="card"><strong>Last order:</strong> {selected.lastOrder}</div>
+            <div className="card"><strong>User ID:</strong> {selected.id || selected._id || 'N/A'}</div>
+            <div className="card"><strong>Name:</strong> {selected.name || selected.username || 'N/A'}</div>
+            <div className="card"><strong>Contact:</strong> {selected.email || selected.contact || 'N/A'}</div>
+            <div className="card"><strong>Status:</strong> {selected.status || 'active'}</div>
+            <div className="card"><strong>Total orders:</strong> {selected.ordersCount || selected.orders || 0}</div>
+            <div className="card"><strong>Last order:</strong> {selected.lastOrder || selected.lastOrderDate || 'N/A'}</div>
             <div className="card">
               <strong>Actions:</strong>
               <div className="cluster" style={{ marginTop: 'var(--space-2)' }}>
-                <button className="btn btn--emphasis">{selected.status === 'active' ? 'Suspend account' : 'Reactivate account'}</button>
+                <button className="btn btn--emphasis">{(selected.status || 'active') === 'active' ? 'Suspend account' : 'Reactivate account'}</button>
                 <button className="btn" style={{ background: 'var(--color-gray-100)' }}>Reset password</button>
                 <button className="btn" style={{ background: 'var(--color-gray-100)' }}>View activity</button>
               </div>

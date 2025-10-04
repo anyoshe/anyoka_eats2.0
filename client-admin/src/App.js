@@ -7,7 +7,6 @@ import Vendors from './pages/Vendors';
 import Drivers from './pages/Drivers';
 import System from './pages/System';
 import AdminHeader from './components/AdminHeader';
-import Login from './pages/Login';
 
 function App() {
   return (
@@ -16,7 +15,6 @@ function App() {
 
       <main className="container stack" style={{ padding: 'var(--space-6) 0' }}>
         <Routes>
-          <Route path="/login" element={<Login />} />
           <Route path="/" element={<Dashboard />} />
           <Route path="/orders" element={<Orders />} />
           <Route path="/users" element={<Users />} />

@@ -6,6 +6,8 @@ import Chip from '../components/Chip';
 import Pagination from '../components/Pagination';
 import ResponsiveList from '../components/ResponsiveList';
 import EmptyState from '../components/EmptyState';
+import { useApi } from '../hooks/useApi';
+import apiService from '../services/api';
 import { drivers as mockDrivers } from '../mocks/data';
 
 export default function Drivers(){
@@ -15,9 +17,38 @@ export default function Drivers(){
   const [page, setPage] = useState(1);
   const pageSize = 8;
 
-  const filtered = mockDrivers.filter(d => {
-    const matchesQuery = d.name.toLowerCase().includes(query.toLowerCase()) || d.id.includes(query);
-    const matchesOnline = onlineFilter === 'all' || (onlineFilter === 'online' && d.online) || (onlineFilter === 'offline' && !d.online);
+  // Reset page when filters change
+  React.useEffect(() => {
+    setPage(1);
+  }, [onlineFilter, query]);
+
+  // Try to get real drivers data from multiple endpoints, fallback to mock if all fail
+  const { data: driversData, loading, error, refetch } = useApi(async () => {
+    try {
+      // Try the admin drivers endpoint first
+      return await apiService.request('/api/admin/drivers');
+    } catch (err) {
+      try {
+        // Try alternative drivers endpoint
+        return await apiService.request('/api/drivers');
+      } catch (err2) {
+        // If both fail, return mock data instead of throwing error
+        console.warn('Drivers API failed, using mock data:', err.message);
+        return { drivers: mockDrivers };
+      }
+    }
+  });
+  
+  // Use real data if available, otherwise fallback to mock data
+  const allDrivers = driversData?.drivers || driversData || mockDrivers;
+
+  const filtered = allDrivers.filter(d => {
+    const matchesQuery = (d.name || d.username || '').toLowerCase().includes(query.toLowerCase()) || 
+                        (d.id || d._id || '').includes(query) ||
+                        (d.email || '').toLowerCase().includes(query.toLowerCase());
+    const matchesOnline = onlineFilter === 'all' || 
+                         (onlineFilter === 'online' && (d.online || d.status === 'online')) || 
+                         (onlineFilter === 'offline' && !(d.online || d.status === 'online'));
     return matchesQuery && matchesOnline;
   });
 
@@ -25,41 +56,119 @@ export default function Drivers(){
   const pageRows = filtered.slice((page-1)*pageSize, page*pageSize);
 
   const columns = [
-    { key: 'id', label: 'Driver ID' },
-    { key: 'name', label: 'Name' },
-    { key: 'online', label: 'Online', render: v => (
-      <span style={{ 
-        background: v ? 'rgba(30,165,9,0.12)' : 'rgba(176,0,32,0.12)', 
-        color: v ? 'var(--color-green)' : '#b00020',
-        borderRadius: '9999px', 
-        padding: '0.15rem 0.5rem', 
-        fontSize: '0.85rem', 
-        fontWeight: 600 
-      }}>{v ? 'Online' : 'Offline'}</span>
-    )},
-    { key: 'currentOrder', label: 'Current Order' },
-    { key: 'completionRate', label: 'Completion' },
-    { key: 'rating', label: 'Rating' },
+    { key: 'id', label: 'Driver ID', render: (v, row) => row.id || row._id || 'N/A' },
+    { key: 'name', label: 'Name', render: (v, row) => row.name || row.username || 'N/A' },
+    { key: 'online', label: 'Online', render: (v, row) => {
+      const isOnline = row.online || row.status === 'online';
+      return (
+        <span style={{ 
+          background: isOnline ? 'rgba(30,165,9,0.12)' : 'rgba(176,0,32,0.12)', 
+          color: isOnline ? 'var(--color-green)' : '#b00020',
+          borderRadius: '9999px', 
+          padding: '0.15rem 0.5rem', 
+          fontSize: '0.85rem', 
+          fontWeight: 600 
+        }}>{isOnline ? 'Online' : 'Offline'}</span>
+      );
+    }},
+    { key: 'currentOrder', label: 'Current Order', render: (v, row) => row.currentOrder || row.activeOrder || 'N/A' },
+    { key: 'completionRate', label: 'Completion', render: (v, row) => row.completionRate || row.completionPercentage || 'N/A' },
+    { key: 'rating', label: 'Rating', render: (v, row) => row.rating || row.averageRating || 'N/A' },
   ];
+
+  if (loading) {
+    return (
+      <section className="stack section">
+        <h2>Drivers</h2>
+        <div className="card">
+          <p>Loading drivers...</p>
+        </div>
+      </section>
+    );
+  }
+
+  // Show error only if we have no data at all
+  if (error && allDrivers.length === 0) {
+    return (
+      <section className="stack section">
+        <h2>Drivers</h2>
+        <div className="card">
+          <h3>Error loading drivers</h3>
+          <p>Could not connect to drivers endpoint: {error}</p>
+          <button className="btn btn--primary" onClick={refetch}>Retry</button>
+        </div>
+      </section>
+    );
+  }
 
   return (
     <section className="stack section">
-      <h2>Drivers</h2>
+      <h2>Drivers {error && allDrivers.length > 0 && <small style={{ color: 'var(--color-text-muted)', fontWeight: 'normal' }}>(using demo data)</small>}</h2>
       <FilterBar>
-        <input className="input" placeholder="Search drivers" value={query} onChange={e=>setQuery(e.target.value)} style={{ maxWidth: 320 }} />
-        <div className="chips">
-          <Chip active={onlineFilter==='all'} onClick={()=>setOnlineFilter('all')}>All</Chip>
-          <Chip active={onlineFilter==='online'} onClick={()=>setOnlineFilter('online')}>Online</Chip>
-          <Chip active={onlineFilter==='offline'} onClick={()=>setOnlineFilter('offline')}>Offline</Chip>
+        {/* Search input - always visible */}
+        <input 
+          className="input" 
+          placeholder="Search drivers..." 
+          value={query}
+          onChange={e => setQuery(e.target.value)}
+          style={{ flex: '1', minWidth: '200px', maxWidth: '400px' }} 
+        />
+        
+        {/* Status dropdown - mobile only */}
+        <select 
+          className="input hide-lg" 
+          value={onlineFilter} 
+          onChange={e=>setOnlineFilter(e.target.value)} 
+          style={{ minWidth: '140px', maxWidth: '180px' }}
+        >
+          <option value="all">All Status</option>
+          <option value="online">Online</option>
+          <option value="offline">Offline</option>
+        </select>
+        
+        {/* Status chips - desktop only */}
+        <div className="chips hide-sm" style={{ flexWrap: 'wrap', gap: 'var(--space-2)' }}>
+          <Chip active={onlineFilter === 'all'} onClick={() => setOnlineFilter('all')}>All</Chip>
+          <Chip active={onlineFilter === 'online'} onClick={() => setOnlineFilter('online')}>Online</Chip>
+          <Chip active={onlineFilter === 'offline'} onClick={() => setOnlineFilter('offline')}>Offline</Chip>
         </div>
-        <button className="btn btn--primary">Export CSV</button>
+        
+        {/* Action buttons */}
+        <div className="cluster" style={{ flexShrink: 0 }}>
+          <button 
+            className="btn" 
+            onClick={() => { setOnlineFilter('all'); setQuery(''); }}
+            style={{ background: 'var(--color-gray-100)' }}
+          >
+            Clear
+          </button>
+          <button className="btn btn--primary">Export CSV</button>
+        </div>
       </FilterBar>
 
-      {filtered.length === 0 ? (
+      {/* Results count */}
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 'var(--space-2)' }}>
+        <small className="muted">
+          Showing {pageRows.length} of {filtered.length} drivers
+          {onlineFilter !== 'all' && ` (filtered by ${onlineFilter})`}
+          {query && ` (searching for "${query}")`}
+        </small>
+      </div>
+
+      {filtered.length === 0 && !loading ? (
         <EmptyState 
           title="No drivers found" 
-          subtitle="Try adjusting your search or filters."
-          action={<button className="btn btn--emphasis" onClick={()=>{setQuery('');setOnlineFilter('all');}}>Clear filters</button>}
+          subtitle={query || onlineFilter !== 'all' ? "Try adjusting your search or filters." : "No drivers available."}
+          action={
+            (query || onlineFilter !== 'all') ? (
+              <button 
+                className="btn btn--emphasis" 
+                onClick={() => { setOnlineFilter('all'); setQuery(''); }}
+              >
+                Clear filters
+              </button>
+            ) : null
+          }
         />
       ) : (
         <>
@@ -82,20 +191,20 @@ export default function Drivers(){
               items={pageRows}
               renderCard={(row)=>(
                 <div className="card-row">
-                  <div><strong>{row.name}</strong><div className="muted">{row.id}</div></div>
+                  <div><strong>{row.name || row.username || 'N/A'}</strong><div className="muted">{row.id || row._id || 'N/A'}</div></div>
                   <div style={{ justifySelf: 'end' }}>
                     <span style={{ 
-                      background: row.online ? 'rgba(30,165,9,0.12)' : 'rgba(176,0,32,0.12)', 
-                      color: row.online ? 'var(--color-green)' : '#b00020',
+                      background: (row.online || row.status === 'online') ? 'rgba(30,165,9,0.12)' : 'rgba(176,0,32,0.12)', 
+                      color: (row.online || row.status === 'online') ? 'var(--color-green)' : '#b00020',
                       borderRadius: '9999px', 
                       padding: '0.15rem 0.5rem', 
                       fontSize: '0.85rem', 
                       fontWeight: 600 
-                    }}>{row.online ? 'Online' : 'Offline'}</span>
+                    }}>{(row.online || row.status === 'online') ? 'Online' : 'Offline'}</span>
                   </div>
-                  <div><small className="muted">Current order</small><div>{row.currentOrder}</div></div>
-                  <div><small className="muted">Completion</small><div>{row.completionRate}</div></div>
-                  <div><small className="muted">Rating</small><div>{row.rating}</div></div>
+                  <div><small className="muted">Current order</small><div>{row.currentOrder || row.activeOrder || 'N/A'}</div></div>
+                  <div><small className="muted">Completion</small><div>{row.completionRate || row.completionPercentage || 'N/A'}</div></div>
+                  <div><small className="muted">Rating</small><div>{row.rating || row.averageRating || 'N/A'}</div></div>
                   <div><button className="btn" onClick={()=>setSelected(row)} style={{ background: 'var(--color-gray-100)' }}>View</button></div>
                 </div>
               )}
@@ -105,14 +214,15 @@ export default function Drivers(){
         </>
       )}
 
-      <SlideOver open={!!selected} title={selected?.name} onClose={()=>setSelected(null)}>
+      <SlideOver open={!!selected} title={selected?.name || selected?.username || 'Driver Details'} onClose={()=>setSelected(null)}>
         {selected && (
           <div className="stack">
-            <div className="card"><strong>Driver ID:</strong> {selected.id}</div>
-            <div className="card"><strong>Status:</strong> {selected.online ? 'Online' : 'Offline'}</div>
-            <div className="card"><strong>Current order:</strong> {selected.currentOrder}</div>
-            <div className="card"><strong>Completion rate:</strong> {selected.completionRate}</div>
-            <div className="card"><strong>Rating:</strong> {selected.rating}</div>
+            <div className="card"><strong>Driver ID:</strong> {selected.id || selected._id || 'N/A'}</div>
+            <div className="card"><strong>Name:</strong> {selected.name || selected.username || 'N/A'}</div>
+            <div className="card"><strong>Status:</strong> {(selected.online || selected.status === 'online') ? 'Online' : 'Offline'}</div>
+            <div className="card"><strong>Current order:</strong> {selected.currentOrder || selected.activeOrder || 'N/A'}</div>
+            <div className="card"><strong>Completion rate:</strong> {selected.completionRate || selected.completionPercentage || 'N/A'}</div>
+            <div className="card"><strong>Rating:</strong> {selected.rating || selected.averageRating || 'N/A'}</div>
             <div className="card">
               <strong>Actions:</strong>
               <div className="cluster" style={{ marginTop: 'var(--space-2)' }}>

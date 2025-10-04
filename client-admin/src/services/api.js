@@ -54,15 +54,30 @@ class ApiService {
     return !!this.adminToken;
   }
 
-  // Orders
+  // Orders - try public endpoint first, fallback to authenticated
   async getOrders(params = {}) {
-    const queryString = new URLSearchParams(params).toString();
-    const endpoint = queryString ? `${config.api.orders}?${queryString}` : config.api.orders;
-    return this.request(endpoint);
+    try {
+      // Try public orders endpoint first
+      const queryString = new URLSearchParams(params).toString();
+      const endpoint = queryString ? `/api/orders?${queryString}` : '/api/orders';
+      return await this.request(endpoint);
+    } catch (error) {
+      // If public endpoint fails, try the authenticated one
+      const queryString = new URLSearchParams(params).toString();
+      const endpoint = queryString ? `${config.api.orders}?${queryString}` : config.api.orders;
+      return this.request(endpoint);
+    }
   }
 
   async getOrderById(id) {
     return this.request(config.api.orderById(id));
+  }
+
+  // Alternative orders endpoint that might be public
+  async getAllOrders(params = {}) {
+    const queryString = new URLSearchParams(params).toString();
+    const endpoint = queryString ? `/api/all-orders?${queryString}` : '/api/all-orders';
+    return this.request(endpoint);
   }
 
   // Users/Customers (using new admin endpoints)
@@ -156,11 +171,6 @@ class ApiService {
     });
   }
 
-  async suspendUser(userId) {
-    return this.request(`/api/users/${userId}/suspend`, {
-      method: 'PATCH',
-    });
-  }
 
   async verifyPartnerKYC(partnerId) {
     return this.request(`/api/partners/${partnerId}/verify-kyc`, {

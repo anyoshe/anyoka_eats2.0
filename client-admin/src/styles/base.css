@@ -12,7 +12,10 @@ input, button, textarea, select { font: inherit; }
 .btn { display: inline-flex; align-items: center; gap: var(--space-2); border: 1px solid transparent; border-radius: var(--radius-pill); padding: 0.5rem 1rem; font-weight: 600; cursor: pointer; transition: background var(--duration-base) var(--ease-out), color var(--duration-base) var(--ease-out), transform var(--duration-fast) var(--ease-out), box-shadow var(--duration-fast) var(--ease-out); }
 .btn--primary { background: var(--color-orange); color: #000; }
 .btn--emphasis { background: var(--color-green); color: var(--color-white); }
+.btn:hover { transform: translateY(-1px); box-shadow: var(--shadow-md); }
+.btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
 .input { width: 100%; border: 1px solid var(--color-border); border-radius: var(--radius-md); padding: 0.6rem 0.8rem; background: var(--color-white); color: var(--color-text); }
+.cluster { display: flex; align-items: center; gap: var(--space-2); }
 
 
 
