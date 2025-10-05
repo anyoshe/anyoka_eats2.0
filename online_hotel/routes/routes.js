@@ -1,3 +1,4 @@
+
 const express = require("express");
 const router = express.Router();
 const mongoose = require('mongoose');
@@ -30,6 +31,17 @@ const crypto = require('crypto');
 const JWT_SECRET = process.env.JWT_SECRET;
 const RESET_PASSWORD_SECRET = process.env.RESET_PASSWORD_SECRET;
 const RESET_PASSWORD_EXPIRY = process.env.RESET_PASSWORD_EXPIRY;
+
+// Admin endpoint to get all orders
+router.get('/admin/orders', authenticateAdminToken, async (req, res) => {
+  try {
+    const orders = await Order.find().populate('subOrders');
+    res.json({ orders, total: orders.length });
+  } catch (error) {
+    console.error('Error fetching orders:', error);
+    res.status(500).json({ message: 'Failed to fetch orders', error: error.message });
+  }
+});
 
 function authenticateToken(req, res, next) {
   console.log('Authenticating token...');
@@ -618,6 +630,35 @@ router.post('/login', async (req, res) => {
     console.error('Error during login:', error);
     res.status(500).json({ message: 'Login error', error: error.message });
   }
+});
+
+// Admin login route
+router.post('/admin/login', async (req, res) => {
+  const { email, password } = req.body;
+  const adminEmail = 'anyokaeats@gmail.com';
+  // You can set the admin password here or load from env
+  const adminPassword = process.env.ADMIN_PASSWORD || 'AnyokaEats2024!';
+
+  if (email !== adminEmail) {
+    return res.status(401).json({ message: 'Invalid admin email' });
+  }
+  // Compare password
+  if (password !== adminPassword) {
+    return res.status(401).json({ message: 'Invalid admin password' });
+  }
+
+  // Generate JWT token for admin
+  const token = jwt.sign(
+    { email: adminEmail, role: 'admin' },
+    process.env.JWT_SECRET,
+    { expiresIn: '12h' }
+  );
+
+  res.status(200).json({
+    message: 'Admin login successful',
+    token,
+    role: 'admin'
+  });
 });
 
 router.post('/users/addSavedLocation', async (req, res) => {

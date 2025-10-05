@@ -177,6 +177,46 @@
 .card-row { display: grid; gap: var(--space-2); grid-template-columns: 1fr 1fr; }
 @media (max-width: 480px){ .card-row { grid-template-columns: 1fr; } }
 
+/* Filter bar responsive improvements */
+@media (max-width: 768px) {
+  .filter-bar {
+    gap: var(--space-2) !important;
+    padding: var(--space-2) 0 !important;
+  }
+  
+  .filter-bar .chips {
+    order: 3;
+    width: 100%;
+    justify-content: center;
+    margin-top: var(--space-2);
+  }
+  
+  .filter-bar .cluster {
+    order: 4;
+    width: 100%;
+    justify-content: center;
+    margin-top: var(--space-2);
+  }
+}
+
+@media (max-width: 480px) {
+  .filter-bar input[type="text"] {
+    min-width: 150px !important;
+    max-width: 100% !important;
+  }
+  
+  .filter-bar select {
+    min-width: 120px !important;
+    max-width: 100% !important;
+  }
+}
+
+@media (min-width: 1200px) {
+  .filter-bar {
+    gap: var(--space-4) !important;
+  }
+}
+
 
 
 

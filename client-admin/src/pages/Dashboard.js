@@ -1,16 +1,37 @@
 import React from 'react';
 import KpiCard from '../components/KpiCard';
 import { useApi } from '../hooks/useApi';
+import { useAuth } from '../contexts/AuthContext';
 import apiService from '../services/api';
+import { users as mockUsers, drivers as mockDrivers } from '../mocks/data';
 
 export default function Dashboard(){
-  // Use real admin stats endpoint
-  const { data: stats, loading: statsLoading, error: statsError } = useApi(() => apiService.getStats());
-  const { data: products, loading: productsLoading } = useApi(() => apiService.getAllProducts());
-  const { data: partners, loading: partnersLoading } = useApi(() => apiService.getPartners());
-  const { data: drivers, loading: driversLoading } = useApi(() => apiService.getDrivers());
-
-  const loading = statsLoading || productsLoading || partnersLoading || driversLoading;
+  const { user } = useAuth();
+  
+  // Use real API calls for all data when authenticated
+  const { data: products, loading: productsLoading, error: productsError } = useApi(() => apiService.getAllProducts());
+  const { data: partners, loading: partnersLoading, error: partnersError } = useApi(() => apiService.getPartners());
+  const { data: users, loading: usersLoading, error: usersError } = useApi(() => apiService.getUsers());
+  const { data: drivers, loading: driversLoading, error: driversError } = useApi(() => apiService.getDrivers());
+  
+  const loading = productsLoading || partnersLoading || usersLoading || driversLoading;
+  const statsError = productsError || partnersError || usersError || driversError;
+  
+  // Process real data
+  const productsArray = products?.products || products || [];
+  const partnersArray = partners?.partners || partners?.data || partners || [];
+  const usersArray = users?.users || users || [];
+  const driversArray = drivers?.drivers || drivers || [];
+  
+  // Calculate stats from real data
+  const stats = {
+    totalUsers: usersArray.length,
+    totalPartners: partnersArray.length,
+    totalProducts: productsArray.length,
+    totalDrivers: driversArray.length,
+    activeDrivers: driversArray.filter(d => d.online).length,
+    systemStatus: 'Connected'
+  };
 
   if (loading) {
     return (
@@ -25,11 +46,6 @@ export default function Dashboard(){
       </section>
     );
   }
-
-  // Use real stats from admin endpoint
-  const productsArray = products?.products || products || [];
-  const partnersArray = partners?.partners || partners?.data || partners || [];
-  const driversArray = drivers?.drivers || drivers?.data || drivers || [];
   
   if (statsError) {
     return (
@@ -43,14 +59,7 @@ export default function Dashboard(){
     );
   }
   
-  const kpis = stats || {
-    totalUsers: 0,
-    totalPartners: 0,
-    totalProducts: productsArray.length,
-    totalDrivers: 0,
-    activeDrivers: 0,
-    systemStatus: 'Connected'
-  };
+  const kpis = stats;
 
   // Helpers to compute top/bottom items safely
   const getNumeric = (obj, keys, defaultValue = 0) => {
@@ -77,16 +86,9 @@ export default function Dashboard(){
       .map(({ it }) => it);
   };
 
-  const rankBySales = (items, salesKeys) => {
-    return [...items]
-      .map((it) => ({ it, s: getNumeric(it, salesKeys, 0) }))
-      .sort((a, b) => b.s - a.s)
-      .map(({ it }) => it);
-  };
 
   // Prepare rankings for products, vendors, drivers
   const productsByRating = rankByRating(productsArray, ['averageRating', 'ratingsAverage', 'rating', 'avgRating']);
-  const productsBySales = rankBySales(productsArray, ['ordersCount', 'totalOrders', 'soldCount']);
   const partnersByRating = rankByRating(partnersArray, ['averageRating', 'ratingsAverage', 'rating']);
   const driversByRating = rankByRating(driversArray, ['averageRating', 'ratingsAverage', 'rating']);
 
@@ -107,27 +109,6 @@ export default function Dashboard(){
         <KpiCard label="System Status" value={kpis.systemStatus} hint="backend" />
       </div>
 
-      {/* System info and services */}
-      <div className="grid-2-1" style={{ marginTop: '1rem' }}>
-        <div className="card">
-          <h3 className="subsection-title">System Info</h3>
-          <ul style={{ margin: 0, paddingLeft: '1rem' }}>
-            <li>✅ Backend connected</li>
-            <li>✅ Database accessible</li>
-            <li>✅ Admin panel operational</li>
-          </ul>
-        </div>
-        <div className="card">
-          <h3 className="subsection-title">System Products</h3>
-          <ul style={{ margin: 0, paddingLeft: '1rem' }}>
-            <li>🛍️ Marketplace products</li>
-            <li>🏪 Vendor management</li>
-            <li>🚚 Driver delivery network</li>
-            <li>👤 Customer accounts</li>
-            <li>💳 Orders and payments</li>
-          </ul>
-        </div>
-      </div>
 
       {/* Financial Overview (placeholders for now) */}
       <h2 className="section-title">Financial</h2>
@@ -251,8 +232,8 @@ export default function Dashboard(){
         </div>
       </div>
 
-      {/* Recent and system sections remain */}
-      <div className="grid-2-1">
+      {/* Recent and system sections */}
+      <div className="grid-3">
         <div className="card">
           <h2>Recent Products</h2>
           {productsArray && productsArray.length > 0 ? (
@@ -266,6 +247,16 @@ export default function Dashboard(){
           ) : (
             <p>No products found</p>
           )}
+        </div>
+        <div className="card">
+          <h2>System Products</h2>
+          <ul style={{ margin: 0, paddingLeft: '1rem' }}>
+            <li>🛍️ Marketplace products</li>
+            <li>🏪 Vendor management</li>
+            <li>🚚 Driver delivery network</li>
+            <li>👤 Customer accounts</li>
+            <li>💳 Orders and payments</li>
+          </ul>
         </div>
         <div className="card">
           <h2>System Status</h2>

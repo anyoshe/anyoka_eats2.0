@@ -8,37 +8,60 @@ import StatusBadge from '../components/StatusBadge';
 import SlideOver from '../components/SlideOver';
 import EmptyState from '../components/EmptyState';
 import { useApi } from '../hooks/useApi';
+import { useAuth } from '../contexts/AuthContext';
 import apiService from '../services/api';
+import { orders as mockOrders } from '../mocks/data';
 
 export default function Orders(){
   const [status, setStatus] = useState('all');
+  const [searchQuery, setSearchQuery] = useState('');
   const [selected, setSelected] = useState(null);
   const [page, setPage] = useState(1);
   const pageSize = 10;
+  const { user } = useAuth();
 
-  // Since orders require authentication, let's show products as a demo
-  // You can change this back to orders once authentication is implemented
-  const { data: productsData, loading, error, refetch } = useApi(() => 
-    apiService.getAllProducts(), 
-    [status, page]
-  );
+  // Reset page when filters change
+  React.useEffect(() => {
+    setPage(1);
+  }, [status, searchQuery]);
 
-  const allProducts = productsData?.products || productsData || [];
-  const filtered = allProducts.slice((page-1)*pageSize, page*pageSize);
-  const total = allProducts.length;
+  // Use real API call for admin
+  const { data: ordersData, loading, error, refetch } = useApi(() => apiService.request('/api/admin/orders'));
+  
+  // Use real data when authenticated, fallback to mock data
+  const allOrders = ordersData?.orders || ordersData || mockOrders;
+  
+  // Apply filters
+  const filteredOrders = allOrders.filter(order => {
+    // Status filter
+    const statusMatch = status === 'all' || order.status === status;
+    
+    // Search filter (search in order ID, customer, vendor, driver)
+    const searchMatch = searchQuery === '' || 
+      (order.id && order.id.toLowerCase().includes(searchQuery.toLowerCase())) ||
+      (order.customer && order.customer.toLowerCase().includes(searchQuery.toLowerCase())) ||
+      (order.vendor && order.vendor.toLowerCase().includes(searchQuery.toLowerCase())) ||
+      (order.driver && order.driver.toLowerCase().includes(searchQuery.toLowerCase()));
+    
+    return statusMatch && searchMatch;
+  });
+  
+  // Pagination
+  const paginatedOrders = filteredOrders.slice((page-1)*pageSize, page*pageSize);
+  const total = filteredOrders.length;
 
-  // Temporarily showing products instead of orders (demo purposes)
+  // Order columns
   const columns = [
-    { key: 'productId', label: 'Product ID' },
-    { key: 'name', label: 'Name' },
-    { key: 'category', label: 'Category' },
-    { key: 'shop', label: 'Shop', render: (v, row) => row.shop?.shopName || 'N/A' },
-    { key: 'price', label: 'Price', render: (v) => `Ksh ${v || 'N/A'}` },
-    { key: 'quantity', label: 'Quantity' },
-    { key: 'inventory', label: 'Stock', render: (v) => v || 'N/A' },
+    { key: 'id', label: 'Order ID' },
+    { key: 'created', label: 'Created' },
+    { key: 'customer', label: 'Customer' },
+    { key: 'vendor', label: 'Vendor' },
+    { key: 'driver', label: 'Driver' },
+    { key: 'items', label: 'Items' },
+    { key: 'amount', label: 'Amount' },
+    { key: 'status', label: 'Status', render: (v) => <StatusBadge status={v} /> },
   ];
   const pageCount = Math.ceil(total / pageSize);
-  const pageRows = filtered;
 
   if (loading) {
     return (
@@ -51,13 +74,14 @@ export default function Orders(){
     );
   }
 
+  // Show error if we can't load data
   if (error) {
     return (
       <section className="stack section">
-        <h2>Products (Demo - Orders require auth)</h2>
+        <h2>Orders</h2>
         <div className="card">
-          <h3>Error loading products</h3>
-          <p>{error}</p>
+          <h3>Error loading orders</h3>
+          <p>Could not connect to orders endpoint: {error}</p>
           <button className="btn btn--primary" onClick={refetch}>Retry</button>
         </div>
       </section>
@@ -66,30 +90,87 @@ export default function Orders(){
 
   return (
     <section className="stack section">
-      <h2>Products (Demo - Orders require auth)</h2>
+      <h2>Orders {!user && <small style={{ color: 'var(--color-text-muted)', fontWeight: 'normal' }}>(demo data - requires authentication for real data)</small>}</h2>
       <FilterBar>
-        <select className="input" value={status} onChange={e=>setStatus(e.target.value)} style={{ maxWidth: 220 }}>
-          <option value="all">All statuses</option>
+        {/* Search input - always visible */}
+        <input 
+          className="input" 
+          placeholder="Search orders..." 
+          value={searchQuery}
+          onChange={e => setSearchQuery(e.target.value)}
+          style={{ flex: '1', minWidth: '200px', maxWidth: '400px' }} 
+        />
+        
+        {/* Status dropdown - mobile only */}
+        <select 
+          className="input hide-lg" 
+          value={status} 
+          onChange={e=>setStatus(e.target.value)} 
+          style={{ minWidth: '140px', maxWidth: '180px' }}
+        >
+          <option value="all">All Status</option>
           <option value="pending">Pending</option>
           <option value="accepted">Accepted</option>
-          <option value="transit">In transit</option>
+          <option value="transit">In Transit</option>
           <option value="delivered">Delivered</option>
           <option value="cancelled">Cancelled</option>
           <option value="refunded">Refunded</option>
         </select>
-        <input className="input" placeholder="Search order ID or customer" style={{ maxWidth: 320 }} />
-        <div className="chips hide-sm">
-          <Chip>Today</Chip>
-          <Chip>Last 7d</Chip>
-          <Chip>High value</Chip>
+        
+        {/* Status chips - desktop only */}
+        <div className="chips hide-sm" style={{ flexWrap: 'wrap', gap: 'var(--space-2)' }}>
+          <Chip active={status === 'all'} onClick={() => setStatus('all')}>All</Chip>
+          <Chip active={status === 'pending'} onClick={() => setStatus('pending')}>Pending</Chip>
+          <Chip active={status === 'accepted'} onClick={() => setStatus('accepted')}>Accepted</Chip>
+          <Chip active={status === 'transit'} onClick={() => setStatus('transit')}>Transit</Chip>
+          <Chip active={status === 'delivered'} onClick={() => setStatus('delivered')}>Delivered</Chip>
+          <Chip active={status === 'cancelled'} onClick={() => setStatus('cancelled')}>Cancelled</Chip>
+          <Chip active={status === 'refunded'} onClick={() => setStatus('refunded')}>Refunded</Chip>
         </div>
-        <button className="btn btn--primary">Export CSV</button>
+        
+        {/* Action buttons */}
+        <div className="cluster" style={{ flexShrink: 0 }}>
+          <button 
+            className="btn" 
+            onClick={() => { setStatus('all'); setSearchQuery(''); }}
+            style={{ background: 'var(--color-gray-100)' }}
+          >
+            Clear
+          </button>
+          <button className="btn btn--primary">Export</button>
+        </div>
       </FilterBar>
 
-      <div className="hide-sm">
+      {/* Results count */}
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 'var(--space-2)' }}>
+        <small className="muted">
+          Showing {paginatedOrders.length} of {total} orders
+          {status !== 'all' && ` (filtered by ${status})`}
+          {searchQuery && ` (searching for "${searchQuery}")`}
+        </small>
+      </div>
+
+      {paginatedOrders.length === 0 && !loading ? (
+        <EmptyState 
+          title="No orders found" 
+          subtitle={searchQuery || status !== 'all' ? "Try adjusting your search or filters." : "No orders available."}
+          action={
+            (searchQuery || status !== 'all') ? (
+              <button 
+                className="btn btn--emphasis" 
+                onClick={() => { setStatus('all'); setSearchQuery(''); }}
+              >
+                Clear filters
+              </button>
+            ) : null
+          }
+        />
+      ) : (
+        <>
+          <div className="hide-sm">
       <DataTable
         columns={columns}
-        rows={pageRows}
+        rows={paginatedOrders}
         renderActions={row => (
           <div className="cluster">
             <button className="btn" onClick={()=>setSelected(row)} style={{ background: 'var(--color-gray-100)' }}>View</button>
@@ -99,9 +180,9 @@ export default function Orders(){
       <Pagination page={page} pageCount={pageCount} onPage={setPage} />
       </div>
 
-      <div className="hide-lg">
-        <ResponsiveList
-          items={pageRows}
+          <div className="hide-lg">
+            <ResponsiveList
+              items={paginatedOrders}
           renderCard={(row)=>(
             <div className="card-row">
               <div><strong>{row.id}</strong><div className="muted">{row.created}</div></div>
@@ -116,6 +197,8 @@ export default function Orders(){
         />
         <Pagination page={page} pageCount={pageCount} onPage={setPage} />
       </div>
+        </>
+      )}
 
       <SlideOver open={!!selected} title={selected?.id} onClose={()=>setSelected(null)}>
         {selected && (
