@@ -13,7 +13,7 @@ const passport = require('passport');
 const jwt = require('jsonwebtoken');
 const LocalStrategy = require('passport-local').Strategy;
 const session = require('express-session');
-const { upload, uploadMultiple, uploadFiles, uploadProfileImage, uploadBusinessPermit, uploadProductImages, processProductImages, uploadSignupFiles } = require('../config/multer');
+const { upload, uploadMultiple, uploadFiles, uploadProfileImage, processProfileImage, uploadBusinessPermit, processBusinessPermit, uploadProductImages, processProductImages, uploadSignupFiles, processSignupFiles } = require('../config/multer');
 const multer = require('multer');
 const path = require('path');
 const fs = require('fs');
@@ -138,7 +138,7 @@ router.get('/partner', authenticateToken, async (req, res) => {
 
 
 // Partner Sign up route
-router.post('/signup', uploadSignupFiles, async (req, res) => {
+router.post('/signup', uploadSignupFiles, processSignupFiles, async (req, res) => {
   try {
     const {
       businessName,
@@ -269,15 +269,46 @@ router.put('/partners/:id', async (req, res) => {
 });
 
 // Update /Add Partner profile Image
-router.post('/upload-profile-image', (req, res) => {
-  uploadProfileImage(req, res, async (err) => {
-    if (err) {
-      return res.status(400).json({ message: err.message });
-    }
+// router.post('/upload-profile-image', (req, res) => {
+//   uploadProfileImage, processProfileImage(req, res, async (err) => {
+//     if (err) {
+//       return res.status(400).json({ message: err.message });
+//     }
 
-    const imagePath = req.file.path;
+//     const imagePath = req.file.path;
 
+//     try {
+//       const { partnerId } = req.body;
+//       const updatedPartner = await Partner.findByIdAndUpdate(
+//         partnerId,
+//         { profileImage: `/uploads/profile-images/${req.file.filename}` },
+//         { new: true }
+//       );
+
+//       if (!updatedPartner) {
+//         return res.status(404).json({ message: 'Partner not found' });
+//       }
+
+//       res.status(200).json({
+//         message: 'Image uploaded and profile updated successfully',
+//         profileImage: `/uploads/profile-images/${req.file.filename}`,
+//       });
+//     } catch (error) {
+//       console.error('Error updating partner profile image:', error);
+//       res.status(500).json({ message: 'Server error' });
+//     }
+//   });
+// });
+router.post(
+  '/upload-profile-image',
+  uploadProfileImage,       // Multer middleware
+  processProfileImage,      // Optional: your image processor middleware
+  async (req, res) => {
     try {
+      if (!req.file) {
+        return res.status(400).json({ message: 'Profile image is required' });
+      }
+
       const { partnerId } = req.body;
       const updatedPartner = await Partner.findByIdAndUpdate(
         partnerId,
@@ -295,18 +326,51 @@ router.post('/upload-profile-image', (req, res) => {
       });
     } catch (error) {
       console.error('Error updating partner profile image:', error);
-      res.status(500).json({ message: 'Server error' });
+      res.status(500).json({ message: 'Server error', error: error.message });
     }
-  });
-});
+  }
+);
+
 
 // Update/Add Business permit
-router.post('/upload-business-permit', (req, res) => {
-  uploadBusinessPermit(req, res, async (err) => {
-    if (err) {
-      return res.status(400).json({ message: err.message });
-    }
+// router.post('/upload-business-permit', (req, res) => {
+//   uploadBusinessPermit, processBusinessPermit(req, res, async (err) => {
+//     if (err) {
+//       return res.status(400).json({ message: err.message });
+//     }
 
+//     try {
+//       const { partnerId } = req.body;
+//       if (!partnerId || !req.file) {
+//         return res.status(400).json({ message: 'Partner ID and file are required' });
+//       }
+
+//       const updatedPartner = await Partner.findByIdAndUpdate(
+//         partnerId,
+//         { businessPermit: `/uploads/business-permits/${req.file.filename}` },
+//         { new: true }
+//       );
+
+//       if (!updatedPartner) {
+//         return res.status(404).json({ message: 'Partner not found' });
+//       }
+
+//       res.status(200).json({
+//         message: 'Business permit uploaded and profile updated successfully',
+//         businessPermit: `/uploads/business-permits/${req.file.filename}`,
+//       });
+//     } catch (error) {
+//       console.error('Error uploading business permit:', error);
+//       res.status(500).json({ message: 'Server error', error: error.message });
+//     }
+//   });
+// });
+
+router.post(
+  '/upload-business-permit',
+  uploadBusinessPermit,        // Multer middleware
+  processBusinessPermit,       // Your processing middleware
+  async (req, res) => {
     try {
       const { partnerId } = req.body;
       if (!partnerId || !req.file) {
@@ -331,8 +395,8 @@ router.post('/upload-business-permit', (req, res) => {
       console.error('Error uploading business permit:', error);
       res.status(500).json({ message: 'Server error', error: error.message });
     }
-  });
-});
+  }
+);
 
 
 // Route to fetch all partners
@@ -715,7 +779,7 @@ router.get('/users/profile', async (req, res) => {
   }
 });
 
-router.put('/users/update-profile', uploadProfileImage, async (req, res) => {
+router.put('/users/update-profile', uploadProfileImage, processProfileImage, async (req, res) => {
   try {
     const { userId, formData } = req.body;
     if (!userId || !formData) return res.status(400).json({ error: 'User ID and formData are required.' });
@@ -1918,7 +1982,7 @@ router.get('/driver/profile', authenticateToken, async (req, res) => {
 // Update driver profile with photo upload
 
 // Route for updating the driver profile
-router.put('/driver/updates-profile', authenticateToken, uploadProfileImage, async (req, res) => {
+router.put('/driver/updates-profile', authenticateToken, uploadProfileImage, processProfileImage, async (req, res) => {
   try {
     console.log("Received data:", req.body);
     const driverId = req.user.driverId;  // <-- Use driverId from the JWT payload
@@ -1989,7 +2053,7 @@ router.put('/driver/updates-profile', authenticateToken, uploadProfileImage, asy
 });
 
 
-router.put('/driver/update-profile', authenticateToken, uploadProfileImage, async (req, res) => {
+router.put('/driver/update-profile', authenticateToken, uploadProfileImage, processProfileImage, async (req, res) => {
   try {
     const driverId = req.user.id; // Assuming your authenticate middleware attaches driver id
     const driver = await Driver.findById(driverId);
