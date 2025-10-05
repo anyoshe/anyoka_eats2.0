@@ -12,7 +12,7 @@ const passport = require('passport');
 const jwt = require('jsonwebtoken');
 const LocalStrategy = require('passport-local').Strategy;
 const session = require('express-session');
-const { upload, uploadMultiple, uploadFiles, uploadProfileImage, uploadBusinessPermit, uploadProductImages, uploadSignupFiles } = require('../config/multer');
+const { upload, uploadMultiple, uploadFiles, uploadProfileImage, uploadBusinessPermit, uploadProductImages, processProductImages, uploadSignupFiles } = require('../config/multer');
 const multer = require('multer');
 const path = require('path');
 const fs = require('fs');
@@ -820,7 +820,7 @@ const Product = mongoose.model('Product', productSchema);
 
 
 // Route to add a new product
-router.post('/products', uploadProductImages, async (req, res) => {
+router.post('/products', uploadProductImages, processProductImages, async (req, res) => {
   try {
     console.log('Received body:', req.body);
     console.log('Received files:', req.files);
@@ -898,7 +898,7 @@ router.post('/products', uploadProductImages, async (req, res) => {
   }
 });
 
-router.put('/products/:id', uploadProductImages, async (req, res) => {
+router.put('/products/:id', uploadProductImages, processProductImages, async (req, res) => {
   try {
     console.log('Received body:', req.body);
     console.log('Received files:', req.files);
