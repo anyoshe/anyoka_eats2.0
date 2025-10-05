@@ -1703,7 +1703,8 @@ router.put('/suborders/:id/status', async (req, res) => {
           try {
             await DriverNotification.create({
               driver: driver._id,
-              orderId: parentOrder._id,
+              // orderId: parentOrder._id,
+              orderId: parentOrder.orderId,
               message: 'All suborders for an order are ready for pickup',
               status: 'ReadyForPickup',
             });
