@@ -1018,15 +1018,15 @@ router.put('/products/:id', uploadProductImages, processProductImages, async (re
     product.tags = req.body.tags ? req.body.tags.split(',').map((tag) => tag.trim()) : product.tags;
     product.price = req.body.price || product.price;
 
-    if (
-      req.body.discountedPrice === '' ||
-      req.body.discountedPrice === '0' ||
-      Number(req.body.discountedPrice) === 0
-    ) {
-      product.discountedPrice = null;
-    } else if (req.body.discountedPrice !== undefined) {
-      product.discountedPrice = req.body.discountedPrice;
-    }
+  if (
+  req.body.discountedPrice === '' ||
+  req.body.discountedPrice === '0' ||
+  Number(req.body.discountedPrice) === 0
+) {
+  product.discountedPrice = null;
+} else if (req.body.discountedPrice !== undefined) {
+  product.discountedPrice = req.body.discountedPrice;
+}
     product.quantity = req.body.quantity || product.quantity;
     product.unit = req.body.unit || product.unit;
     product.inventory = req.body.inventory || product.inventory;
@@ -1654,12 +1654,7 @@ router.put('/suborders/:id/status', async (req, res) => {
     const allReady = parentOrder.subOrders.every((so) => so.status === 'ReadyForPickup');
     // After updating suborder status and fetching parentOrder work for own delivery
     const allOutForDelivery = parentOrder.subOrders.every((so) => so.status === 'OutForDelivery');
-
-    // Update parent order status if needed
-    if (allReady && parentOrder.status !== 'ReadyForPickup') {
-      parentOrder.status = 'ReadyForPickup';
-      await parentOrder.save();
-    }
+  
     if (
       allOutForDelivery &&
       parentOrder.delivery.option === 'own' &&
@@ -1703,8 +1698,7 @@ router.put('/suborders/:id/status', async (req, res) => {
           try {
             await DriverNotification.create({
               driver: driver._id,
-              // orderId: parentOrder._id,
-              orderId: parentOrder.orderId,
+              orderId: parentOrder._id,
               message: 'All suborders for an order are ready for pickup',
               status: 'ReadyForPickup',
             });
@@ -2334,7 +2328,7 @@ router.get('/search', async (req, res) => {
     category: { $regex: q, $options: 'i' }
   });
 
-  // Search subcategories
+   // Search subcategories
   const subcategories = await Product.distinct('subCategory', {
     subCategory: { $regex: q, $options: 'i' }
   });
@@ -2800,7 +2794,7 @@ function authenticateAdminToken(req, res, next) {
   if (!token) return res.status(401).json({ message: 'Access Denied - No token provided' });
 
   let verified;
-
+  
   try {
     // First try with the main JWT_SECRET (for real production tokens)
     verified = jwt.verify(token, JWT_SECRET);
@@ -2821,12 +2815,12 @@ function authenticateAdminToken(req, res, next) {
       }
     }
   }
-
+  
   // Check if user has admin role
   if (verified.role !== 'admin' && verified.role !== 'partner') {
     return res.status(403).json({ message: 'Admin access required' });
   }
-
+  
   req.user = verified;
   console.log('Admin token verified:', verified);
   next();
@@ -2838,20 +2832,20 @@ function decodeBrowserJWT(token) {
   if (parts.length !== 3) {
     throw new Error('Invalid token format');
   }
-
+  
   try {
     // Decode the payload (middle part)
     const payload = JSON.parse(Buffer.from(parts[1], 'base64').toString());
-
+    
     // Basic validation
     if (!payload.exp || payload.exp < Math.floor(Date.now() / 1000)) {
       throw new Error('Token expired');
     }
-
+    
     if (!payload.role) {
       throw new Error('Missing role in token');
     }
-
+    
     return payload;
   } catch (error) {
     throw new Error('Failed to decode browser JWT: ' + error.message);
@@ -2916,7 +2910,7 @@ router.patch('/admin/users/:userId/suspend', authenticateAdminToken, async (req,
   try {
     const { userId } = req.params;
     const user = await User.findById(userId);
-
+    
     if (!user) {
       return res.status(404).json({ message: 'User not found' });
     }
@@ -2937,7 +2931,7 @@ router.patch('/admin/drivers/:driverId/disable', authenticateAdminToken, async (
   try {
     const { driverId } = req.params;
     const driver = await Driver.findById(driverId);
-
+    
     if (!driver) {
       return res.status(404).json({ message: 'Driver not found' });
     }
