@@ -1985,7 +1985,9 @@ router.get('/driver/profile', authenticateToken, async (req, res) => {
 router.put('/driver/updates-profile', authenticateToken, uploadProfileImage, processProfileImage, async (req, res) => {
   try {
     console.log("Received data:", req.body);
-    const driverId = req.user.driverId;  // <-- Use driverId from the JWT payload
+    // const driverId = req.user.driverId;  // <-- Use driverId from the JWT payload
+    const driverId = req.user.id;
+
     console.log('Driver ID from JWT:', driverId);
     // Check if formData is provided in the request
     let parsedFormData = {};
