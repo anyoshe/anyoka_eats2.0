@@ -27,9 +27,96 @@ export default function Orders(){
 
   // Use real API call for admin
   const { data: ordersData, loading, error, refetch } = useApi(() => apiService.request('/api/admin/orders'));
-  
-  // Use real data when authenticated, fallback to mock data
-  const allOrders = ordersData?.orders || ordersData || mockOrders;
+  // Fetch users once to map user IDs -> readable names/usernames
+  const { data: usersData } = useApi(() => apiService.getUsers(), []);
+
+  const usersArray = usersData?.users || usersData || [];
+  const usersById = Array.isArray(usersArray)
+    ? usersArray.reduce((acc, u) => {
+        const id = u._id || u.id;
+        if (id) acc[id] = u;
+        return acc;
+      }, {})
+    : {};
+
+  // Normalize various backend shapes into flat rows for the table
+  const normalizeOrders = (data) => {
+    if (!data) return [];
+    const source = Array.isArray(data)
+      ? data
+      : Array.isArray(data?.orders)
+        ? data.orders
+        : Array.isArray(data?.data)
+          ? data.data
+          : Array.isArray(data?.items)
+            ? data.items
+            : [];
+
+    return source.map((o) => {
+      const id = o.id || o._id || o.orderId || o.reference || o.code || '';
+      const createdIso = o.createdAt || o.created_on || o.date || o.created || o.timestamp;
+      const created = createdIso ? new Date(createdIso).toLocaleString() : '';
+      // Customer: backend OrderSchema stores ref in `user` (not populated on /admin/orders)
+      // Try populated shapes first, then fall back to identifier
+      let customer = '';
+      if (o.customer) {
+        customer = o.customer.name || o.customer.fullName || o.customer.username || o.customer.names || '';
+      } else if (o.user) {
+        if (typeof o.user === 'object') {
+          customer = o.user.names || o.user.name || o.user.fullName || o.user.username || o.user.email || '';
+        } else {
+          const uid = String(o.user);
+          const u = usersById[uid];
+          customer = (u && (u.names || u.username || u.email)) || uid; // map id -> readable
+        }
+      }
+      if (!customer) customer = o.customerName || o.customer_email || o.customerPhone || '';
+
+      // Vendor: admin endpoint doesn't populate partner; derive from items' embedded shopName
+      let vendor = '';
+      if (Array.isArray(o.items) && o.items.length) {
+        const names = Array.from(new Set(
+          o.items
+            .map((i) => i?.shop?.shopName)
+            .filter(Boolean)
+        ));
+        vendor = names.slice(0, 2).join(', ') + (names.length > 2 ? ` +${names.length - 2}` : '');
+      }
+      // Fallback: if subOrders are populated with shop docs containing businessName
+      if (!vendor && Array.isArray(o.subOrders) && o.subOrders.length) {
+        const names = Array.from(new Set(
+          o.subOrders
+            .map((so) => so?.shop?.businessName || so?.shop?.shopName)
+            .filter(Boolean)
+        ));
+        vendor = names.slice(0, 2).join(', ') + (names.length > 2 ? ` +${names.length - 2}` : '');
+      }
+      if (!vendor) vendor = o.vendorName || '';
+      const driver = (o.driver && (o.driver.name || o.driver.fullName))
+        || (o.rider && (o.rider.name || o.rider.fullName))
+        || (o.courier && (o.courier.name || o.courier.fullName))
+        || o.driverName || 'Unassigned';
+      const itemsCount = Array.isArray(o.items) ? o.items.length : (o.itemsCount || o.totalItems || (typeof o.items === 'number' ? o.items : 0));
+      const rawAmount = o.total || o.amount || o.totalAmount || o.price || 0;
+      const currency = o.currency || 'Ksh';
+      const amount = typeof rawAmount === 'number' ? `${currency} ${rawAmount.toFixed(2)}` : String(rawAmount);
+      const status = String((o.status || o.orderStatus || o.state || 'pending')).toLowerCase();
+      return {
+        id,
+        created,
+        customer,
+        vendor,
+        driver,
+        items: itemsCount,
+        amount,
+        status,
+        _raw: o,
+      };
+    });
+  };
+
+  // Use normalized real data when available, else fallback to mock data
+  const allOrders = (ordersData ? normalizeOrders(ordersData) : mockOrders);
   
   // Apply filters
   const filteredOrders = allOrders.filter(order => {

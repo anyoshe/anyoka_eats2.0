@@ -31,12 +31,14 @@ export default function Drivers(){
   const allDrivers = driversData?.drivers || driversData || mockDrivers;
 
   const filtered = allDrivers.filter(d => {
-    const matchesQuery = (d.name || d.username || '').toLowerCase().includes(query.toLowerCase()) || 
+    const matchesQuery = (d.username || d.name || '').toLowerCase().includes(query.toLowerCase()) || 
                         (d.id || d._id || '').includes(query) ||
-                        (d.email || '').toLowerCase().includes(query.toLowerCase());
+                        (d.email || '').toLowerCase().includes(query.toLowerCase()) ||
+                        (d.phoneNumber || '').includes(query);
+    const isOnline = (d.status === 'Available') || d.online === true;
     const matchesOnline = onlineFilter === 'all' || 
-                         (onlineFilter === 'online' && (d.online || d.status === 'online')) || 
-                         (onlineFilter === 'offline' && !(d.online || d.status === 'online'));
+                         (onlineFilter === 'online' && isOnline) || 
+                         (onlineFilter === 'offline' && !isOnline);
     return matchesQuery && matchesOnline;
   });
 
@@ -45,9 +47,12 @@ export default function Drivers(){
 
   const columns = [
     { key: 'id', label: 'Driver ID', render: (v, row) => row.id || row._id || 'N/A' },
-    { key: 'name', label: 'Name', render: (v, row) => row.name || row.username || 'N/A' },
-    { key: 'online', label: 'Online', render: (v, row) => {
-      const isOnline = row.online || row.status === 'online';
+    { key: 'name', label: 'Name', render: (v, row) => row.username || row.name || 'N/A' },
+    { key: 'phone', label: 'Phone', render: (v, row) => row.phoneNumber || 'N/A' },
+    { key: 'email', label: 'Email', render: (v, row) => row.email || 'N/A' },
+    { key: 'town', label: 'Town', render: (v, row) => row.currentLocation?.town || 'N/A' },
+    { key: 'status', label: 'Online', render: (v, row) => {
+      const isOnline = (row.status === 'Available') || row.online === true;
       return (
         <span style={{ 
           background: isOnline ? 'rgba(30,165,9,0.12)' : 'rgba(176,0,32,0.12)', 
@@ -59,9 +64,7 @@ export default function Drivers(){
         }}>{isOnline ? 'Online' : 'Offline'}</span>
       );
     }},
-    { key: 'currentOrder', label: 'Current Order', render: (v, row) => row.currentOrder || row.activeOrder || 'N/A' },
-    { key: 'completionRate', label: 'Completion', render: (v, row) => row.completionRate || row.completionPercentage || 'N/A' },
-    { key: 'rating', label: 'Rating', render: (v, row) => row.rating || row.averageRating || 'N/A' },
+    { key: 'verificationStatus', label: 'Verification', render: (v, row) => row.verificationStatus || 'Pending' },
   ];
 
   if (loading) {
@@ -179,20 +182,21 @@ export default function Drivers(){
               items={pageRows}
               renderCard={(row)=>(
                 <div className="card-row">
-                  <div><strong>{row.name || row.username || 'N/A'}</strong><div className="muted">{row.id || row._id || 'N/A'}</div></div>
+                  <div><strong>{row.username || row.name || 'N/A'}</strong><div className="muted">{row.id || row._id || 'N/A'}</div></div>
                   <div style={{ justifySelf: 'end' }}>
                     <span style={{ 
-                      background: (row.online || row.status === 'online') ? 'rgba(30,165,9,0.12)' : 'rgba(176,0,32,0.12)', 
-                      color: (row.online || row.status === 'online') ? 'var(--color-green)' : '#b00020',
+                      background: ((row.status === 'Available') || row.online === true) ? 'rgba(30,165,9,0.12)' : 'rgba(176,0,32,0.12)', 
+                      color: ((row.status === 'Available') || row.online === true) ? 'var(--color-green)' : '#b00020',
                       borderRadius: '9999px', 
                       padding: '0.15rem 0.5rem', 
                       fontSize: '0.85rem', 
                       fontWeight: 600 
-                    }}>{(row.online || row.status === 'online') ? 'Online' : 'Offline'}</span>
+                    }}>{((row.status === 'Available') || row.online === true) ? 'Online' : 'Offline'}</span>
                   </div>
-                  <div><small className="muted">Current order</small><div>{row.currentOrder || row.activeOrder || 'N/A'}</div></div>
-                  <div><small className="muted">Completion</small><div>{row.completionRate || row.completionPercentage || 'N/A'}</div></div>
-                  <div><small className="muted">Rating</small><div>{row.rating || row.averageRating || 'N/A'}</div></div>
+                  <div><small className="muted">Phone</small><div>{row.phoneNumber || 'N/A'}</div></div>
+                  <div><small className="muted">Email</small><div>{row.email || 'N/A'}</div></div>
+                  <div><small className="muted">Town</small><div>{row.currentLocation?.town || 'N/A'}</div></div>
+                  <div><small className="muted">Verification</small><div>{row.verificationStatus || 'Pending'}</div></div>
                   <div><button className="btn" onClick={()=>setSelected(row)} style={{ background: 'var(--color-gray-100)' }}>View</button></div>
                 </div>
               )}

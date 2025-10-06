@@ -95,7 +95,6 @@ export default function AdminHeader() {
 
         {/* User Section */}
         <div className={styles.userSection}>
-          <span className={styles.userName}>Welcome, {user?.name || 'Admin'}</span>
           <button 
             onClick={logout}
             className={styles.logoutBtn}
@@ -172,7 +171,6 @@ export default function AdminHeader() {
           System
         </NavLink>
         <div className={styles.mobileUserSection}>
-          <span className={styles.mobileUserName}>Welcome, {user?.name || 'Admin'}</span>
           <button 
             onClick={() => { logout(); closeMobileMenu(); }}
             className={styles.mobileLogoutBtn}

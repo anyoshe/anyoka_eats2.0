@@ -29,7 +29,7 @@ export default function Dashboard(){
     totalPartners: partnersArray.length,
     totalProducts: productsArray.length,
     totalDrivers: driversArray.length,
-    activeDrivers: driversArray.filter(d => d.online).length,
+    activeDrivers: driversArray.filter(d => d.status === 'Available' || d.online === true).length,
     systemStatus: 'Connected'
   };
 
@@ -88,9 +88,19 @@ export default function Dashboard(){
 
 
   // Prepare rankings for products, vendors, drivers
-  const productsByRating = rankByRating(productsArray, ['averageRating', 'ratingsAverage', 'rating', 'avgRating']);
-  const partnersByRating = rankByRating(partnersArray, ['averageRating', 'ratingsAverage', 'rating']);
-  const driversByRating = rankByRating(driversArray, ['averageRating', 'ratingsAverage', 'rating']);
+  const productsByRating = rankByRating(productsArray.map(p => ({
+    ...p,
+    // normalize rating to a top-level numeric if nested
+    rating: (p.ratings && p.ratings.average) ?? p.averageRating ?? p.ratingsAverage ?? p.rating,
+  })), ['rating']);
+  const partnersByRating = rankByRating(partnersArray.map(v => ({
+    ...v,
+    rating: (v.ratings && v.ratings.average) ?? v.averageRating ?? v.ratingsAverage ?? v.rating,
+  })), ['rating']);
+  const driversByRating = rankByRating(driversArray.map(d => ({
+    ...d,
+    rating: d.averageRating ?? d.ratingsAverage ?? d.rating ?? 0,
+  })), ['rating']);
 
   const top5 = (arr) => arr.slice(0, 5);
   const bottom5 = (arr) => arr.slice(-5).reverse();
@@ -137,7 +147,7 @@ export default function Dashboard(){
                         <div className="item-title">{getName(p, ['name'])}</div>
                         <div className="item-meta">{p.shop?.shopName || 'Unknown Shop'}</div>
                       </div>
-                      <span className="rating-badge rating-badge--good">⭐ {getNumeric(p, ['averageRating','ratingsAverage','rating'], 0)}</span>
+                      <span className="rating-badge rating-badge--good">⭐ {getNumeric(p, ['rating'], 0)}</span>
                     </li>
                   ))}
                 </ul>
@@ -154,7 +164,7 @@ export default function Dashboard(){
                         <div className="item-title">{getName(p, ['name'])}</div>
                         <div className="item-meta">{p.shop?.shopName || 'Unknown Shop'}</div>
                       </div>
-                      <span className="rating-badge rating-badge--bad">⭐ {getNumeric(p, ['averageRating','ratingsAverage','rating'], 0)}</span>
+                      <span className="rating-badge rating-badge--bad">⭐ {getNumeric(p, ['rating'], 0)}</span>
                     </li>
                   ))}
                 </ul>
@@ -173,8 +183,8 @@ export default function Dashboard(){
                   {top5(partnersByRating).map((v, idx) => (
                     <li key={v._id || `v-top-${idx}`} className="performance-item">
                       <span className="rank-badge">{idx + 1}</span>
-                      <div className="item-title">{getName(v, ['shopName','name'])}</div>
-                      <span className="rating-badge rating-badge--good">⭐ {getNumeric(v, ['averageRating','ratingsAverage','rating'], 0)}</span>
+                      <div className="item-title">{getName(v, ['businessName','shopName','name'])}</div>
+                      <span className="rating-badge rating-badge--good">⭐ {getNumeric(v, ['rating'], 0)}</span>
                     </li>
                   ))}
                 </ul>
@@ -187,8 +197,8 @@ export default function Dashboard(){
                   {bottom5(partnersByRating).map((v, idx) => (
                     <li key={v._id || `v-bot-${idx}`} className="performance-item">
                       <span className="rank-badge">{idx + 1}</span>
-                      <div className="item-title">{getName(v, ['shopName','name'])}</div>
-                      <span className="rating-badge rating-badge--bad">⭐ {getNumeric(v, ['averageRating','ratingsAverage','rating'], 0)}</span>
+                      <div className="item-title">{getName(v, ['businessName','shopName','name'])}</div>
+                      <span className="rating-badge rating-badge--bad">⭐ {getNumeric(v, ['rating'], 0)}</span>
                     </li>
                   ))}
                 </ul>
@@ -207,8 +217,8 @@ export default function Dashboard(){
                   {top5(driversByRating).map((d, idx) => (
                     <li key={d._id || `d-top-${idx}`} className="performance-item">
                       <span className="rank-badge">{idx + 1}</span>
-                      <div className="item-title">{getName(d, ['name','fullName','driverName'])}</div>
-                      <span className="rating-badge rating-badge--good">⭐ {getNumeric(d, ['averageRating','ratingsAverage','rating'], 0)}</span>
+                      <div className="item-title">{getName(d, ['username','name','fullName','driverName'])}</div>
+                      <span className="rating-badge rating-badge--good">⭐ {getNumeric(d, ['rating'], 0)}</span>
                     </li>
                   ))}
                 </ul>
@@ -221,8 +231,8 @@ export default function Dashboard(){
                   {bottom5(driversByRating).map((d, idx) => (
                     <li key={d._id || `d-bot-${idx}`} className="performance-item">
                       <span className="rank-badge">{idx + 1}</span>
-                      <div className="item-title">{getName(d, ['name','fullName','driverName'])}</div>
-                      <span className="rating-badge rating-badge--bad">⭐ {getNumeric(d, ['averageRating','ratingsAverage','rating'], 0)}</span>
+                      <div className="item-title">{getName(d, ['username','name','fullName','driverName'])}</div>
+                      <span className="rating-badge rating-badge--bad">⭐ {getNumeric(d, ['rating'], 0)}</span>
                     </li>
                   ))}
                 </ul>
