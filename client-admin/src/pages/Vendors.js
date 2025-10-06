@@ -32,7 +32,16 @@ export default function Vendors(){
   const allVendors = partnersData?.partners || partnersData || mockVendors;
 
   const filtered = allVendors.filter(v => {
-    const matchesQuery = (v.name || v.shopName || '').toLowerCase().includes(query.toLowerCase()) || (v.id || v._id || '').includes(query);
+    const matchesQuery = (
+      (v.businessName || v.name || v.shopName || '')
+        .toLowerCase()
+        .includes(query.toLowerCase())
+      || (v.email || '').toLowerCase().includes(query.toLowerCase())
+      || (v.contactNumber || '').includes(query)
+      || (v.town || '').toLowerCase().includes(query.toLowerCase())
+      || (v.location || '').toLowerCase().includes(query.toLowerCase())
+      || (v.id || v._id || '').includes(query)
+    );
     const matchesStatus = statusFilter === 'all' || (v.status || 'active') === statusFilter;
     const matchesKyc = kycFilter === 'all' || (v.kyc || 'verified') === kycFilter;
     return matchesQuery && matchesStatus && matchesKyc;
@@ -43,7 +52,11 @@ export default function Vendors(){
 
   const columns = [
     { key: 'id', label: 'Vendor ID', render: (v, row) => row.id || row._id || 'N/A' },
-    { key: 'name', label: 'Name', render: (v, row) => row.name || row.shopName || 'N/A' },
+    { key: 'name', label: 'Name', render: (v, row) => row.businessName || row.name || row.shopName || 'N/A' },
+    { key: 'email', label: 'Email', render: (v, row) => row.email || 'N/A' },
+    { key: 'contactNumber', label: 'Phone', render: (v, row) => row.contactNumber || 'N/A' },
+    { key: 'town', label: 'Town', render: (v, row) => row.town || 'N/A' },
+    { key: 'location', label: 'Location', render: (v, row) => row.location || 'N/A' },
     { key: 'kyc', label: 'KYC', render: (v) => {
       const kycStatus = v || 'verified';
       return (
@@ -57,9 +70,7 @@ export default function Vendors(){
         }}>{kycStatus}</span>
       );
     }},
-    { key: 'products', label: 'Products', render: (v) => v || 'N/A' },
-    { key: 'orders7d', label: 'Orders (7d)', render: (v) => v || 'N/A' },
-    { key: 'rating', label: 'Rating', render: (v) => v || 'N/A' },
+    { key: 'rating', label: 'Rating', render: (v, row) => (row.ratings && row.ratings.average) || v || 'N/A' },
     { key: 'status', label: 'Status', render: (v) => {
       const status = v || 'active';
       return (
@@ -210,7 +221,7 @@ export default function Vendors(){
               items={pageRows}
               renderCard={(row)=>(
                 <div className="card-row">
-                  <div><strong>{row.name || row.shopName || 'N/A'}</strong><div className="muted">{row.id || row._id || 'N/A'}</div></div>
+                  <div><strong>{row.businessName || row.name || row.shopName || 'N/A'}</strong><div className="muted">{row.id || row._id || 'N/A'}</div></div>
                   <div style={{ justifySelf: 'end' }}>
                     <span style={{ 
                       background: (row.status || 'active') === 'active' ? 'rgba(30,165,9,0.12)' : 'rgba(176,0,32,0.12)', 
@@ -221,6 +232,10 @@ export default function Vendors(){
                       fontWeight: 600 
                     }}>{row.status || 'active'}</span>
                   </div>
+                  <div><small className="muted">Email</small><div>{row.email || 'N/A'}</div></div>
+                  <div><small className="muted">Phone</small><div>{row.contactNumber || 'N/A'}</div></div>
+                  <div><small className="muted">Town</small><div>{row.town || 'N/A'}</div></div>
+                  <div><small className="muted">Location</small><div>{row.location || 'N/A'}</div></div>
                   <div><small className="muted">KYC</small><div>
                     <span style={{ 
                       background: (row.kyc || 'verified') === 'verified' ? 'rgba(30,165,9,0.12)' : 'rgba(255,165,0,0.14)', 
@@ -231,9 +246,7 @@ export default function Vendors(){
                       fontWeight: 600 
                     }}>{row.kyc || 'verified'}</span>
                   </div></div>
-                  <div><small className="muted">Products</small><div>{row.products || 'N/A'}</div></div>
-                  <div><small className="muted">Orders (7d)</small><div>{row.orders7d || 'N/A'}</div></div>
-                  <div><small className="muted">Rating</small><div>{row.rating || 'N/A'}</div></div>
+                  <div><small className="muted">Rating</small><div>{(row.ratings && row.ratings.average) || row.rating || 'N/A'}</div></div>
                   <div><button className="btn" onClick={()=>setSelected(row)} style={{ background: 'var(--color-gray-100)' }}>View</button></div>
                 </div>
               )}

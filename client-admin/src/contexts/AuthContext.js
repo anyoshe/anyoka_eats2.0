@@ -1,8 +1,5 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import apiService from '../services/api';
-import { ADMIN_CREDENTIALS } from '../config/adminCredentials';
-
-console.log('ADMIN_CREDENTIALS loaded:', ADMIN_CREDENTIALS);
 
 const AuthContext = createContext();
 
@@ -19,30 +16,23 @@ export function AuthProvider({ children }) {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    try {
-      // Check if user is already logged in (from localStorage)
-      const savedUser = localStorage.getItem('admin_user');
-      const savedToken = localStorage.getItem('admin_token');
-      
-      if (savedUser && savedToken) {
-        const userData = JSON.parse(savedUser);
-        setUser(userData);
-        apiService.setToken(savedToken);
+    // On mount, attempt to validate existing session via a lightweight admin endpoint
+    (async () => {
+      try {
+        await apiService.request('/api/admin/stats', { method: 'GET' });
+        setUser({ name: 'Anyoka Eats Administrator', role: 'admin' });
+      } catch (_err) {
+        setUser(null);
+      } finally {
+        setLoading(false);
       }
-    } catch (error) {
-      console.error('Error loading saved user data:', error);
-      // Clear corrupted data
-      localStorage.removeItem('admin_user');
-      localStorage.removeItem('admin_token');
-    } finally {
-      setLoading(false);
-    }
+    })();
   }, []);
 
   const login = async (username, password) => {
     try {
-      // Always authenticate with backend /admin/login endpoint
-  const response = await fetch(`${apiService.baseURL}/api/admin/login`, {
+      // Authenticate with backend /admin/login endpoint
+      const response = await fetch(`${apiService.baseURL}/api/admin/login`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -52,19 +42,12 @@ export function AuthProvider({ children }) {
 
       if (response.ok) {
         const data = await response.json();
-        const userData = {
-          id: '1',
-          username: username,
-          name: 'Anyoka Eats Administrator',
-          role: data.role || 'admin'
-        };
-        // Save to localStorage
-        localStorage.setItem('admin_user', JSON.stringify(userData));
-        localStorage.setItem('admin_token', data.token);
-        // Set token in API service
-        apiService.setToken(data.token);
-        setUser(userData);
-        return userData;
+        // Keep token only in memory for subsequent requests
+        if (data?.token) {
+          apiService.setToken(data.token);
+        }
+        setUser({ username, name: 'Anyoka Eats Administrator', role: data?.role || 'admin' });
+        return { username };
       } else {
         throw new Error('Invalid credentials');
       }
@@ -75,9 +58,7 @@ export function AuthProvider({ children }) {
   };
 
   const logout = () => {
-    localStorage.removeItem('admin_user');
-    localStorage.removeItem('admin_token');
-    apiService.setToken(null);
+    apiService.clearToken();
     setUser(null);
   };
 

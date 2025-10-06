@@ -1,10 +1,10 @@
 import React, { useState } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { useNavigate } from 'react-router-dom';
-import { ADMIN_CREDENTIALS } from '../config/adminCredentials';
+ 
 
 export default function Login() {
-  const [credentials, setCredentials] = useState({ username: ADMIN_CREDENTIALS.email, password: '' });
+  const [credentials, setCredentials] = useState({ username: '', password: '' });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const { login } = useAuth();
@@ -15,10 +15,7 @@ export default function Login() {
     setLoading(true);
     setError('');
 
-    console.log('Login attempt with:', { 
-      username: credentials.username, 
-      password: credentials.password 
-    });
+    // Do not log sensitive credentials
 
     try {
       const result = await login(credentials.username, credentials.password);
@@ -133,104 +130,7 @@ export default function Login() {
           </button>
         </form>
 
-        <div style={{
-          marginTop: 'var(--space-6)',
-          padding: 'var(--space-4)',
-          background: '#f9fafb',
-          borderRadius: 'var(--radius)',
-          fontSize: '0.875rem',
-          color: '#6b7280'
-        }}>
-          <strong>Official Admin Credentials:</strong><br />
-          Email: <code>{ADMIN_CREDENTIALS.email}</code><br />
-          Password: <code>{ADMIN_CREDENTIALS.password}</code>
-        </div>
-
-        <div style={{
-          marginTop: 'var(--space-4)',
-          padding: 'var(--space-3)',
-          background: '#fef3c7',
-          borderRadius: 'var(--radius)',
-          fontSize: '0.875rem',
-          color: '#92400e',
-          border: '1px solid #f59e0b'
-        }}>
-          <strong>Quick Test:</strong><br />
-          Current form values: {JSON.stringify(credentials)}<br />
-          <button
-            type="button"
-            onClick={() => {
-              setCredentials({
-                username: ADMIN_CREDENTIALS.email,
-                password: ADMIN_CREDENTIALS.password
-              });
-            }}
-            style={{
-              background: '#10b981',
-              color: 'white',
-              border: 'none',
-              padding: '4px 8px',
-              borderRadius: '4px',
-              cursor: 'pointer',
-              fontSize: '0.75rem',
-              marginTop: '4px'
-            }}
-          >
-            Fill Form Now
-          </button>
-        </div>
-
-        <div style={{
-          marginTop: 'var(--space-4)',
-          padding: 'var(--space-3)',
-          background: '#f3f4f6',
-          borderRadius: 'var(--radius)',
-          fontSize: '0.875rem',
-          color: '#6b7280'
-        }}>
-          <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
-            <button
-              type="button"
-              onClick={() => {
-                setCredentials({
-                  username: ADMIN_CREDENTIALS.email,
-                  password: ADMIN_CREDENTIALS.password
-                });
-              }}
-              style={{
-                background: '#10b981',
-                color: 'white',
-                border: 'none',
-                padding: '8px 12px',
-                borderRadius: '6px',
-                cursor: 'pointer',
-                fontSize: '0.875rem'
-              }}
-            >
-              Auto-Fill Credentials
-            </button>
-            <button
-              type="button"
-              onClick={() => {
-                console.log('Current form values:', credentials);
-                console.log('Expected credentials:', ADMIN_CREDENTIALS);
-                console.log('Email match:', credentials.username === ADMIN_CREDENTIALS.email);
-                console.log('Password match:', credentials.password === ADMIN_CREDENTIALS.password);
-              }}
-              style={{
-                background: '#3b82f6',
-                color: 'white',
-                border: 'none',
-                padding: '8px 12px',
-                borderRadius: '6px',
-                cursor: 'pointer',
-                fontSize: '0.875rem'
-              }}
-            >
-              Debug Login (Check Console)
-            </button>
-          </div>
-        </div>
+        {/* Removed credential hints and debug helpers */}
       </div>
     </div>
   );
