@@ -1921,11 +1921,16 @@ router.post('/driver/login', async (req, res) => {
       return res.status(400).json({ message: 'Invalid password' });
     }
 
+    // Mark driver online/available on successful login
+    driver.status = 'Available';
+    driver.lastActiveAt = new Date();
+    await driver.save();
+
     // Create JWT token
     const token = jwt.sign(
       { driverId: driver._id },
-      process.env.JWT_SECRET, // Use a secret key from .env
-      { expiresIn: '1d' } // Token expiration time
+      process.env.JWT_SECRET,
+      { expiresIn: '1d' }
     );
 
     // Respond with driver data and token
@@ -1935,6 +1940,7 @@ router.post('/driver/login', async (req, res) => {
         username: driver.username,
         phoneNumber: driver.phoneNumber,
         profileCompleted: driver.profileCompleted,
+        status: driver.status,
       },
       token,
     });
@@ -1944,10 +1950,54 @@ router.post('/driver/login', async (req, res) => {
   }
 });
 
+// Driver logout: mark offline
+router.post('/driver/logout', authenticateToken, async (req, res) => {
+  try {
+    const driver = await Driver.findById(req.user.driverId || req.user.id || req.user._id);
+    if (!driver) {
+      return res.status(404).json({ message: 'Driver not found' });
+    }
+    driver.status = 'Offline';
+    driver.lastActiveAt = new Date();
+    await driver.save();
+    res.json({ message: 'Logged out', status: driver.status });
+  } catch (error) {
+    res.status(500).json({ message: 'Server error during logout' });
+  }
+});
+
+// Driver set online
+router.post('/driver/online', authenticateToken, async (req, res) => {
+  try {
+    const driver = await Driver.findById(req.user.driverId || req.user.id || req.user._id);
+    if (!driver) return res.status(404).json({ message: 'Driver not found' });
+    driver.status = 'Available';
+    driver.lastActiveAt = new Date();
+    await driver.save();
+    res.json({ status: driver.status });
+  } catch (err) {
+    res.status(500).json({ message: 'Server error' });
+  }
+});
+
+// Driver set offline
+router.post('/driver/offline', authenticateToken, async (req, res) => {
+  try {
+    const driver = await Driver.findById(req.user.driverId || req.user.id || req.user._id);
+    if (!driver) return res.status(404).json({ message: 'Driver not found' });
+    driver.status = 'Offline';
+    driver.lastActiveAt = new Date();
+    await driver.save();
+    res.json({ status: driver.status });
+  } catch (err) {
+    res.status(500).json({ message: 'Server error' });
+  }
+});
+
 // get driver details
 router.get('/driver/profile', authenticateToken, async (req, res) => {
   try {
-    const driver = await Driver.findById(req.user.driverId);
+    const driver = await Driver.findById(req.user.driverId || req.user.id || req.user._id);
 
     console.log(driver);
 
@@ -1985,8 +2035,8 @@ router.get('/driver/profile', authenticateToken, async (req, res) => {
 router.put('/driver/updates-profile', authenticateToken, uploadProfileImage, processProfileImage, async (req, res) => {
   try {
     console.log("Received data:", req.body);
-    // const driverId = req.user.driverId;  // <-- Use driverId from the JWT payload
-    const driverId = req.user.id;
+    // Support tokens that include either driverId or id
+    const driverId = req.user?.driverId || req.user?.id || req.user?._id;
 
     console.log('Driver ID from JWT:', driverId);
     // Check if formData is provided in the request

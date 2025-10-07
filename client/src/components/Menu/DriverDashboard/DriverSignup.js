@@ -41,12 +41,51 @@ const DriverSignup = () => {
     targetData(prev => ({ ...prev, [e.target.name]: e.target.value }));
   };
 
+  const validateForm = () => {
+    const requiredFields = ['username', 'phoneNumber', 'password', 'nationalId', 'driverLicenseNumber'];
+    const missingFields = [];
+    
+    for (const field of requiredFields) {
+      if (!formData[field] || formData[field].trim() === '') {
+        missingFields.push(field.replace(/([A-Z])/g, ' $1').toLowerCase());
+      }
+    }
+    
+    if (missingFields.length > 0) {
+      setError(`Please fill in all required fields: ${missingFields.join(', ')}`);
+      return false;
+    }
+    
+    // Additional validation
+    if (formData.password.length < 6) {
+      setError('Password must be at least 6 characters long');
+      return false;
+    }
+    
+    if (formData.phoneNumber && !/^[\d\s\-\+\(\)]+$/.test(formData.phoneNumber)) {
+      setError('Please enter a valid phone number');
+      return false;
+    }
+    
+    if (formData.email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
+      setError('Please enter a valid email address');
+      return false;
+    }
+    
+    return true;
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
     setSuccess('');
 
     if (isLogin) {
+      if (!loginData.username || !loginData.password) {
+        setError('Please fill in username and password');
+        return;
+      }
+      
       const result = await loginDriver(loginData);
       if (result.success) {
         setSuccess('Logged in successfully!');
@@ -54,9 +93,23 @@ const DriverSignup = () => {
         setError(result.message || 'Login failed');
       }
     } else {
+      // Validate signup form
+      if (!validateForm()) {
+        return;
+      }
+      
       const result = await signupDriver(formData);
       if (result.success) {
         setSuccess('Driver signed up successfully!');
+        // Clear form after successful signup
+        setFormData({
+          username: '',
+          phoneNumber: '',
+          email: '',
+          password: '',
+          nationalId: '',
+          driverLicenseNumber: '',
+        });
       } else {
         setError(result.message || 'Signup failed');
       }
@@ -127,13 +180,17 @@ const DriverSignup = () => {
           ['username', 'phoneNumber', 'email', 'password', 'nationalId', 'driverLicenseNumber'].map(field => (
             loading ? <div key={field} className={styles.skeletonField} /> : (
             <div key={field} className={styles.formGroup}>
-              <label>{field.replace(/([A-Z])/g, ' $1').toUpperCase()}</label>
+              <label>
+                {field.replace(/([A-Z])/g, ' $1').toUpperCase()}
+                {field !== 'email' && <span style={{ color: 'red', marginLeft: '4px' }}>*</span>}
+              </label>
               <input
-                type={field.includes('password') ? 'password' : 'text'}
+                type={field.includes('password') ? 'password' : field === 'email' ? 'email' : 'text'}
                 name={field}
                 value={formData[field]}
                 onChange={handleChange}
                 required={field !== 'email'} // email is optional
+                placeholder={`Enter ${field.replace(/([A-Z])/g, ' $1').toLowerCase()}`}
               />
             </div>
           )))
