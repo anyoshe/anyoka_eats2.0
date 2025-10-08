@@ -109,6 +109,7 @@ const partnerSchema = new mongoose.Schema({
   description: { type: String, default: '' },
   role: { type: String, enum: ['admin', 'partner'], default: 'partner' },
   suspended: { type: Boolean, default: false },
+  slug: { type: String, unique: true, index: true },
   ratings: {
     average: { type: Number, default: 0 },
     reviews: [
@@ -124,12 +125,39 @@ const partnerSchema = new mongoose.Schema({
 
 const Partner = mongoose.model('Partner', partnerSchema);
 
+function slugify(name) {
+  if (!name) return null;
+  return name.toString().toLowerCase().trim()
+    .replace(/[^a-z0-9\s-]/g, '')
+    .replace(/\s+/g, '-')
+    .replace(/-+/g, '-');
+}
+
+async function ensureUniquePartnerSlug(base) {
+  let candidate = base;
+  let counter = 1;
+  // loop until unique
+  // eslint-disable-next-line no-constant-condition
+  while (true) {
+    const exists = await Partner.findOne({ slug: candidate });
+    if (!exists) return candidate;
+    counter += 1;
+    candidate = `${base}-${counter}`;
+  }
+}
+
 // Find the partner before adding one
 router.get('/partner', authenticateToken, async (req, res) => {
   try {
     console.log('User ID:', req.user._id);
     const partner = await Partner.findById(req.user._id);
     if (!partner) return res.status(404).send('Partner not found.');
+    // backfill slug if missing
+    if (!partner.slug && partner.businessName) {
+      const base = slugify(partner.businessName);
+      partner.slug = await ensureUniquePartnerSlug(base || `store-${Date.now()}`);
+      await partner.save();
+    }
     res.json(partner);
   } catch (error) {
     res.status(500).send(error.message);
@@ -184,6 +212,12 @@ router.post('/signup', uploadSignupFiles, processSignupFiles, async (req, res) =
     }
     if (req.files && req.files.profileImage) {
       newPartnerData.profileImage = `/uploads/profile-images/${req.files.profileImage[0].filename}`;
+    }
+
+    // generate slug
+    if (!newPartnerData.slug) {
+      const base = slugify(businessName);
+      newPartnerData.slug = await ensureUniquePartnerSlug(base || `store-${Date.now()}`);
     }
 
     const newPartner = new Partner(newPartnerData);
@@ -408,6 +442,17 @@ router.get('/partners', async (req, res) => {
   } catch (error) {
     console.error('Error fetching partners:', error);
     res.status(500).json({ message: 'Failed to fetch partners', error });
+  }
+});
+
+// Lookup partner by slug
+router.get('/partners/slug/:slug', async (req, res) => {
+  try {
+    const partner = await Partner.findOne({ slug: req.params.slug });
+    if (!partner) return res.status(404).json({ message: 'Partner not found' });
+    res.json(partner);
+  } catch (error) {
+    res.status(500).json({ message: 'Failed to fetch partner', error: error.message });
   }
 });
 

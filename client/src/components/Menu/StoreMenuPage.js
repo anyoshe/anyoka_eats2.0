@@ -12,6 +12,7 @@ import { AuthContext } from '../../contexts/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import { faStar as solidStar } from '@fortawesome/free-solid-svg-icons';
 import { faStar as regularStar } from '@fortawesome/free-regular-svg-icons';
+import { faBoxOpen } from '@fortawesome/free-solid-svg-icons';
 import CartSection from '../User/CartSection';
 import { CartContext } from '../../contexts/CartContext';
 import { faTruck } from '@fortawesome/free-solid-svg-icons';
@@ -21,6 +22,7 @@ import CategoryControlsBar from '../common/CategoryControlsBar';
 
 const StoreMenuPage = () => {
     const { storeId } = useParams();
+    const [resolvedPartnerId, setResolvedPartnerId] = useState(null);
     const navigate = useNavigate();
     const { currentProduct, setCurrentProduct, user, setRedirectPath } = useContext(AuthContext);
     const [productsByCategory, setProductsByCategory] = useState({});
@@ -35,11 +37,34 @@ const StoreMenuPage = () => {
 
 
     useEffect(() => {
+        const isHex24 = (val) => /^[a-fA-F0-9]{24}$/.test(val || '');
+
+        const resolveStore = async () => {
+            // Resolve slug to partner _id when necessary
+            if (isHex24(storeId)) {
+                setResolvedPartnerId(storeId);
+                return storeId;
+            }
+            try {
+                const res = await axios.get(`${config.backendUrl}/api/partners/slug/${encodeURIComponent(storeId)}`);
+                const partner = res.data;
+                setResolvedPartnerId(partner._id);
+                return partner._id;
+            } catch (_e) {
+                setResolvedPartnerId(null);
+                return null;
+            }
+        };
 
         const fetchProducts = async () => {
             try {
                 setLoading(true); // Start loading
-                const response = await axios.get(`${config.backendUrl}/api/products-by-partner/${storeId}`);
+                const partnerId = await resolveStore();
+                if (!partnerId) {
+                    setProductsByCategory({});
+                    return;
+                }
+                const response = await axios.get(`${config.backendUrl}/api/products-by-partner/${partnerId}`);
 
                 const products = response.data.products || [];
 
@@ -59,7 +84,8 @@ const StoreMenuPage = () => {
         };
 
         fetchProducts();
-    }, []);
+        // re-run when storeId changes
+    }, [storeId]);
 
 
     const handleProductClick = (product) => {
@@ -114,6 +140,8 @@ const StoreMenuPage = () => {
         }
         return stars;
     };
+
+    const hasAnyProducts = Object.values(productsByCategory || {}).some(arr => (arr || []).length > 0);
 
     return (
         <div className={styles.storeWrapper}>
@@ -170,11 +198,27 @@ const StoreMenuPage = () => {
                                 </div>
                             )}
 
+                            {!hasAnyProducts && (
+                                <div className={styles.emptyCatalogState} role="status" aria-live="polite">
+                                    <div className={styles.emptyCatalogIconWrap}>
+                                        <FontAwesomeIcon icon={faBoxOpen} className={styles.emptyCatalogIcon} />
+                                    </div>
+                                    <p className={styles.emptyCatalogTitle}>This store has no items yet</p>
+                                    <p className={styles.emptyCatalogSubtext}>Please check back soon.</p>
+                                </div>
+                            )}
+
                             {Object.keys(productsByCategory).map((category) => (
                                 <div key={category}>
                                     <h3 className={styles.categorySectiontitle}>{category}</h3>
                                     
-                                    <section className={styles.categorySectionDisplay}>
+                                    {productsByCategory[category].length === 0 ? (
+                                        <div className={styles.emptyCategoryState}>
+                                            <FontAwesomeIcon icon={faBoxOpen} className={styles.emptyCategoryIcon} />
+                                            <p>No items in this category yet</p>
+                                        </div>
+                                    ) : (
+                                        <section className={styles.categorySectionDisplay}>
                                         {productsByCategory[category].map((product, index) => (
                                             <div key={index} className={styles.categorySectionDisplayDivs}
                                                 onClick={() => handleProductClick(product)}
@@ -249,6 +293,7 @@ const StoreMenuPage = () => {
                                             </div>
                                         ))}
                                     </section>
+                                    )}
                                 </div>
                             ))}
                         </section>

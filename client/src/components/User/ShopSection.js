@@ -97,7 +97,7 @@
 
 // export default ShopSection;
 
-import React, { useState, useEffect, useContext } from 'react';
+import React, { useState } from 'react';
 import styles from './ShopSection.module.css';
 import ProductModal from './ProductModal';
 import ProductList from './ProductList';
