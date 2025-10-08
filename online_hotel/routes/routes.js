@@ -1791,7 +1791,7 @@ const DriverSchema = new mongoose.Schema({
   vehicleDetails: {
     make: { type: String },
     model: { type: String },
-    plateNumber: { type: String, unique: true },
+    plateNumber: { type: String },
     type: { type: String },
     color: { type: String }
   },
@@ -1846,7 +1846,7 @@ router.post('/driver/signup', async (req, res) => {
   const { username, phoneNumber, email, password, nationalId, driverLicenseNumber } = req.body;
   console.log(req.body);
 
-  if (!username || !phoneNumber || !password || !nationalId || !driverLicenseNumber) {
+  if (!username || !phoneNumber || !email || !password || !nationalId || !driverLicenseNumber) {
     return res.status(400).json({ message: 'Missing required fields' });
   }
 
@@ -1855,6 +1855,7 @@ router.post('/driver/signup', async (req, res) => {
       $or: [
         { username },
         { phoneNumber },
+        { email },
         { nationalId },
         { driverLicenseNumber }
       ]
@@ -1878,7 +1879,7 @@ router.post('/driver/signup', async (req, res) => {
     await newDriver.save();
 
     // Create JWT token
-    const token = jwt.sign({ id: newDriver._id }, process.env.JWT_SECRET, { expiresIn: '7d' });
+    const token = jwt.sign({ id: newDriver._id }, JWT_SECRET, { expiresIn: '7d' });
 
     res.status(201).json({
       token,
@@ -1919,6 +1920,11 @@ router.post('/driver/login', async (req, res) => {
     const isMatch = await bcrypt.compare(password, driver.password);
     if (!isMatch) {
       return res.status(400).json({ message: 'Invalid password' });
+    }
+
+    // Block suspended drivers
+    if (driver.verificationStatus === 'Rejected') {
+      return res.status(403).json({ message: 'Your account has been suspended. Please contact support.' });
     }
 
     // Mark driver online/available on successful login
@@ -1971,6 +1977,9 @@ router.post('/driver/online', authenticateToken, async (req, res) => {
   try {
     const driver = await Driver.findById(req.user.driverId || req.user.id || req.user._id);
     if (!driver) return res.status(404).json({ message: 'Driver not found' });
+    if (driver.verificationStatus === 'Rejected') {
+      return res.status(403).json({ message: 'Account suspended' });
+    }
     driver.status = 'Available';
     driver.lastActiveAt = new Date();
     await driver.save();
@@ -2988,11 +2997,16 @@ router.patch('/admin/drivers/:driverId/disable', authenticateAdminToken, async (
       return res.status(404).json({ message: 'Driver not found' });
     }
 
-    // Toggle driver status
-    driver.status = driver.status === 'active' ? 'inactive' : 'active';
+    // Toggle suspension via verificationStatus
+    if (driver.verificationStatus === 'Rejected') {
+      driver.verificationStatus = 'Verified';
+    } else {
+      driver.verificationStatus = 'Rejected';
+      driver.status = 'Offline'; // ensure not available
+    }
     await driver.save();
 
-    res.json({ message: `Driver ${driver.status}`, driver: { _id: driver._id, status: driver.status } });
+    res.json({ message: `Driver ${driver.verificationStatus === 'Rejected' ? 'suspended' : 'reinstated'}`, driver: { _id: driver._id, verificationStatus: driver.verificationStatus, status: driver.status } });
   } catch (error) {
     console.error('Error updating driver status:', error);
     res.status(500).json({ message: 'Failed to update driver status', error: error.message });
