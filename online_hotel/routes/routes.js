@@ -21,7 +21,7 @@ const axios = require('axios');
 const { type } = require("os");
 require('dotenv').config();
 const nodemailer = require('nodemailer');
-const { notifyPartner, notifyDriver } = require('../socketServer');
+const { notifyPartner, notifyDriver, suspendDriver } = require('../socketServer');
 const geolib = require('geolib');
 const fetch = require('node-fetch');
 const crypto = require('crypto');
@@ -108,6 +108,7 @@ const partnerSchema = new mongoose.Schema({
   businessPermit: { type: String, required: false },
   description: { type: String, default: '' },
   role: { type: String, enum: ['admin', 'partner'], default: 'partner' },
+  suspended: { type: Boolean, default: false },
   ratings: {
     average: { type: Number, default: 0 },
     reviews: [
@@ -530,6 +531,7 @@ const userSchema = new mongoose.Schema({
   password: { type: String, required: true },
   resetToken: { type: String },
   resetTokenExpiry: { type: Number },
+  suspended: { type: Boolean, default: false },
 });
 
 const User = mongoose.model('User', userSchema);
@@ -667,6 +669,14 @@ router.post('/login', async (req, res) => {
     if (!account) {
       console.error('Account not found for identifier:', identifier);
       return res.status(404).json({ message: 'Account not found' });
+    }
+
+    // Suspended checks
+    if (role === 'user' && account.suspended) {
+      return res.status(403).json({ message: 'Your account has been suspended. Please contact support.' });
+    }
+    if (role === 'partner' && account.suspended) {
+      return res.status(403).json({ message: 'Your vendor account has been suspended. Please contact support.' });
     }
 
     // Compare passwords
@@ -3056,6 +3066,36 @@ router.get('/admin/users', authenticateAdminToken, async (req, res) => {
   }
 });
 
+// Toggle user suspension
+router.patch('/admin/users/:userId/disable', authenticateAdminToken, async (req, res) => {
+  try {
+    const { userId } = req.params;
+    const user = await User.findById(userId);
+    if (!user) return res.status(404).json({ message: 'User not found' });
+    user.suspended = !user.suspended;
+    await user.save();
+    res.json({ message: user.suspended ? 'User suspended' : 'User reinstated', user: { _id: user._id, suspended: user.suspended } });
+  } catch (error) {
+    console.error('Error updating user status:', error);
+    res.status(500).json({ message: 'Failed to update user status', error: error.message });
+  }
+});
+
+// Toggle partner suspension
+router.patch('/admin/partners/:partnerId/disable', authenticateAdminToken, async (req, res) => {
+  try {
+    const { partnerId } = req.params;
+    const partner = await Partner.findById(partnerId);
+    if (!partner) return res.status(404).json({ message: 'Partner not found' });
+    partner.suspended = !partner.suspended;
+    await partner.save();
+    res.json({ message: partner.suspended ? 'Vendor suspended' : 'Vendor reinstated', partner: { _id: partner._id, suspended: partner.suspended } });
+  } catch (error) {
+    console.error('Error updating partner status:', error);
+    res.status(500).json({ message: 'Failed to update partner status', error: error.message });
+  }
+});
+
 // Admin endpoint to get all drivers (addition only)
 router.get('/admin/drivers', authenticateAdminToken, async (req, res) => {
   try {
@@ -3133,6 +3173,9 @@ router.patch('/admin/drivers/:driverId/disable', authenticateAdminToken, async (
     } else {
       driver.verificationStatus = 'Rejected';
       driver.status = 'Offline'; // ensure not available
+    try {
+      suspendDriver(String(driver._id), { reason: 'suspended' });
+    } catch (e) {}
     }
     await driver.save();
 

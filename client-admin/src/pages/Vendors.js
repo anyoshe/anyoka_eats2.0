@@ -42,7 +42,10 @@ export default function Vendors(){
       || (v.location || '').toLowerCase().includes(query.toLowerCase())
       || (v.id || v._id || '').includes(query)
     );
-    const matchesStatus = statusFilter === 'all' || (v.status || 'active') === statusFilter;
+    const suspended = !!v.suspended || (v.status === 'suspended');
+    const matchesStatus = statusFilter === 'all' 
+      || (statusFilter === 'active' && !suspended)
+      || (statusFilter === 'suspended' && suspended);
     const matchesKyc = kycFilter === 'all' || (v.kyc || 'verified') === kycFilter;
     return matchesQuery && matchesStatus && matchesKyc;
   });
@@ -206,10 +209,13 @@ export default function Vendors(){
             <DataTable
               columns={columns}
               rows={pageRows}
+            getRowStyle={(row)=> (row.suspended || row.status === 'suspended') ? { background: 'rgba(176,0,32,0.08)' } : undefined}
               renderActions={row => (
                 <div className="cluster">
                   <button className="btn" onClick={()=>setSelected(row)} style={{ background: 'var(--color-gray-100)' }}>View</button>
-                  <button className="btn btn--emphasis">{row.kyc === 'verified' ? 'Feature' : 'Verify KYC'}</button>
+                  <button className="btn btn--emphasis" onClick={async ()=>{ await apiService.disablePartner(row.id || row._id); await refetch(); }}>
+                    {((row.suspended) || (row.status === 'suspended')) ? 'Reactivate' : 'Suspend'}
+                  </button>
                 </div>
               )}
             />

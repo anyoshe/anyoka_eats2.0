@@ -15,6 +15,7 @@ export default function Drivers(){
   const [query, setQuery] = useState('');
   const [onlineFilter, setOnlineFilter] = useState('all');
   const [selected, setSelected] = useState(null);
+  const [actionDriverId, setActionDriverId] = useState(null);
   const [page, setPage] = useState(1);
   const pageSize = 8;
   const { user } = useAuth();
@@ -36,14 +37,33 @@ export default function Drivers(){
                         (d.email || '').toLowerCase().includes(query.toLowerCase()) ||
                         (d.phoneNumber || '').includes(query);
     const isOnline = (d.status === 'Available') || d.online === true;
+    const isSuspended = (d.verificationStatus === 'Rejected');
     const matchesOnline = onlineFilter === 'all' || 
                          (onlineFilter === 'online' && isOnline) || 
-                         (onlineFilter === 'offline' && !isOnline);
+                         (onlineFilter === 'offline' && !isOnline && !isSuspended) ||
+                         (onlineFilter === 'suspended' && isSuspended);
     return matchesQuery && matchesOnline;
   });
 
   const pageCount = Math.ceil(filtered.length / pageSize);
   const pageRows = filtered.slice((page-1)*pageSize, page*pageSize);
+
+  async function handleToggleDriver(driver) {
+    try {
+      const driverId = driver.id || driver._id;
+      if (!driverId) return;
+      setActionDriverId(driverId);
+      await apiService.disableDriver(driverId);
+      await refetch();
+      // refresh selected data if slide-over is open
+      if (selected) {
+        const updated = (driversData?.drivers || driversData || []).find(d => (d.id || d._id) === driverId);
+        if (updated) setSelected(updated);
+      }
+    } finally {
+      setActionDriverId(null);
+    }
+  }
 
   const columns = [
     { key: 'id', label: 'Driver ID', render: (v, row) => row.id || row._id || 'N/A' },
@@ -115,6 +135,7 @@ export default function Drivers(){
           <option value="all">All Status</option>
           <option value="online">Online</option>
           <option value="offline">Offline</option>
+          <option value="suspended">Suspended</option>
         </select>
         
         {/* Status chips - desktop only */}
@@ -122,6 +143,7 @@ export default function Drivers(){
           <Chip active={onlineFilter === 'all'} onClick={() => setOnlineFilter('all')}>All</Chip>
           <Chip active={onlineFilter === 'online'} onClick={() => setOnlineFilter('online')}>Online</Chip>
           <Chip active={onlineFilter === 'offline'} onClick={() => setOnlineFilter('offline')}>Offline</Chip>
+          <Chip active={onlineFilter === 'suspended'} onClick={() => setOnlineFilter('suspended')}>Suspended</Chip>
         </div>
         
         {/* Action buttons */}
@@ -167,10 +189,17 @@ export default function Drivers(){
             <DataTable
               columns={columns}
               rows={pageRows}
+            getRowStyle={(row)=> (row.verificationStatus === 'Rejected') ? { background: 'rgba(176,0,32,0.08)' } : undefined}
               renderActions={row => (
                 <div className="cluster">
                   <button className="btn" onClick={()=>setSelected(row)} style={{ background: 'var(--color-gray-100)' }}>View</button>
-                  <button className="btn btn--emphasis">Disable</button>
+                <button 
+                  className="btn btn--emphasis"
+                  onClick={() => handleToggleDriver(row)}
+                  disabled={actionDriverId === (row.id || row._id)}
+                >
+                  {row.verificationStatus === 'Rejected' ? 'Reinstate' : 'Suspend'}
+                </button>
                 </div>
               )}
             />

@@ -34,7 +34,10 @@ export default function Users(){
     const matchesQuery = (u.name || u.username || '').toLowerCase().includes(query.toLowerCase()) || 
                         (u.id || u._id || '').includes(query) ||
                         (u.email || '').toLowerCase().includes(query.toLowerCase());
-    const matchesStatus = statusFilter === 'all' || (u.status || 'active') === statusFilter;
+    const suspended = !!u.suspended || (u.status === 'suspended');
+    const matchesStatus = statusFilter === 'all' 
+      || (statusFilter === 'active' && !suspended)
+      || (statusFilter === 'suspended' && suspended);
     return matchesQuery && matchesStatus;
   });
 
@@ -162,10 +165,13 @@ export default function Users(){
             <DataTable
               columns={columns}
               rows={pageRows}
+            getRowStyle={(row)=> (row.suspended || row.status === 'suspended') ? { background: 'rgba(176,0,32,0.08)' } : undefined}
               renderActions={row => (
                 <div className="cluster">
                   <button className="btn" onClick={()=>setSelected(row)} style={{ background: 'var(--color-gray-100)' }}>View</button>
-                  <button className="btn btn--emphasis">{row.status === 'active' ? 'Suspend' : 'Reactivate'}</button>
+                  <button className="btn btn--emphasis" onClick={async ()=>{ await apiService.suspendUser(row.id || row._id); await refetch(); }}>
+                    {((row.suspended) || (row.status === 'suspended')) ? 'Reactivate' : 'Suspend'}
+                  </button>
                 </div>
               )}
             />

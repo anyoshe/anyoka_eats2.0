@@ -53,14 +53,8 @@ export default function Login() {
             color: 'var(--color-text)', 
             margin: 0 
           }}>
-            Anyoka Eats Admin
+            
           </h1>
-          <p style={{ 
-            color: 'var(--color-text-muted)', 
-            margin: 'var(--space-2) 0 0 0' 
-          }}>
-            Sign in to access the admin dashboard
-          </p>
         </div>
 
         <form onSubmit={handleSubmit}>

@@ -11,7 +11,7 @@ const config = {
     
     // Admin Users endpoint (NEW - real data)
     adminUsers: '/api/admin/users',
-    suspendUser: (userId) => `/api/admin/users/${userId}/suspend`,
+    suspendUser: (userId) => `/api/admin/users/${userId}/disable`,
     
     // Admin Drivers endpoint (NEW - real data)  
     adminDrivers: '/api/admin/drivers',
@@ -19,6 +19,7 @@ const config = {
     
     // Partners/Vendors
     partners: '/api/partners',
+    disablePartner: (partnerId) => `/api/admin/partners/${partnerId}/disable`,
     partnerById: (id) => `/api/partners/${id}`,
     partnerOrders: (partnerId) => `/api/partners/${partnerId}/orders`,
     

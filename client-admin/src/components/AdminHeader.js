@@ -38,7 +38,7 @@ export default function AdminHeader() {
         {/* Logo Section */}
         <div className={styles.logoSection}>
           <div className={styles.logoIcon}>AE</div>
-          <span className={styles.logoText}>Anyoka Eats Admin</span>
+          <span className={styles.logoText}></span>
         </div>
 
         {/* Desktop Navigation */}
