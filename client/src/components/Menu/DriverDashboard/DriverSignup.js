@@ -182,14 +182,15 @@ const DriverSignup = () => {
             <div key={field} className={styles.formGroup}>
               <label>
                 {field.replace(/([A-Z])/g, ' $1').toUpperCase()}
-                {field !== 'email' && <span style={{ color: 'red', marginLeft: '4px' }}>*</span>}
+                {<span style={{ color: 'red', marginLeft: '4px' }}>*</span>}
               </label>
               <input
                 type={field.includes('password') ? 'password' : field === 'email' ? 'email' : 'text'}
                 name={field}
                 value={formData[field]}
                 onChange={handleChange}
-                required={field !== 'email'} // email is optional
+                // required={field !== 'email'}
+                required
                 placeholder={`Enter ${field.replace(/([A-Z])/g, ' $1').toLowerCase()}`}
               />
             </div>
