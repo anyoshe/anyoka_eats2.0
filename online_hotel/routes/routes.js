@@ -1374,12 +1374,14 @@ const SubOrderSchema = new mongoose.Schema({
       'PickedUp',
       'OutForDelivery',
       'Delivered',
+      'Confirmed Delivered', 
     ],
     default: 'Pending'
   },
   assignedDriver: { type: mongoose.Schema.Types.ObjectId, ref: 'Driver', default: null },
   deliveredBy: { type: String },
   deliveredByPhone: { type: String },
+  deliveredAt: { type: Date },
   createdAt: { type: Date, default: Date.now }
 });
 
@@ -1606,10 +1608,120 @@ router.get('/suborders/:id', async (req, res) => {
 
 
 
+// router.put('/suborders/:id/status', async (req, res) => {
+//   try {
+//     const { id } = req.params;
+//     const { status, driverId } = req.body;
+
+//     const validStatuses = [
+//       'Pending',
+//       'OrderReceived',
+//       'Preparing',
+//       'ReadyForPickup',
+//       'PickedUp',
+//       'OutForDelivery',
+//       'Delivered',
+//     ];
+
+//     if (!validStatuses.includes(status)) {
+//       return res.status(400).json({ error: 'Invalid status' });
+//     }
+
+//     // Update the suborder status
+//     const subOrder = await SubOrder.findByIdAndUpdate(
+//       id,
+//       { status },
+//       { new: true }
+//     ).populate('shop parentOrder');
+
+//     if (!subOrder) {
+//       return res.status(404).json({ error: 'SubOrder not found' });
+//     }
+
+//     // Assign the driver to the parent order if not already assigned
+//     if (status === 'PickedUp' && !subOrder.parentOrder.assignedDriver) {
+//       await Order.findByIdAndUpdate(subOrder.parentOrder._id, { assignedDriver: driverId });
+//     }
+
+//     // Check if all sibling suborders of the parent order are in ReadyForPickup status
+//     const parentOrder = await Order.findById(subOrder.parentOrder._id).populate({
+//       path: 'subOrders',
+//       populate: {
+//         path: 'shop', // Populate the shop field in each suborder
+//         select: 'businessName location', // Only fetch the required fields
+//       },
+//       select: 'status shop', // Fetch the status and shop fields for suborders
+//     });
+
+//     const allReady = parentOrder.subOrders.every((so) => so.status === 'ReadyForPickup');
+//     // After updating suborder status and fetching parentOrder work for own delivery
+//     const allOutForDelivery = parentOrder.subOrders.every((so) => so.status === 'OutForDelivery');
+  
+//     if (
+//       allOutForDelivery &&
+//       parentOrder.delivery.option === 'own' &&
+//       parentOrder.status !== 'Delivered'
+//     ) {
+//       parentOrder.status = 'Delivered';
+//       await parentOrder.save();
+//     }
+
+//     // Notify drivers if all suborders are ready for pickup for platform delivery
+//     if (allReady) {
+//       const shop = await Partner.findById(subOrder.shop._id);
+//       if (!shop || !shop.location) {
+//         return res.status(400).json({ error: 'Shop location is missing' });
+//       }
+
+//       const shopCoords = await parsePlusCodeToLatLng(shop.location); // Ensure this helper works
+//       const drivers = await Driver.find({ status: 'Available', currentLocation: { $exists: true } });
+
+//       for (const driver of drivers) {
+//         const driverCoords = await parsePlusCodeToLatLng(driver.currentLocation?.location);
+//         if (!driverCoords) {
+//           console.error(`Invalid driver location for driver ID: ${driver._id}`);
+//           continue;
+//         }
+
+//         const distance = geolib.getDistance(shopCoords, driverCoords); // in meters
+//         if (distance <= 5000) { // 5km radius
+//           // Notify the driver
+//           notifyDriver(driver._id.toString(), {
+//             type: 'AllSubOrdersReady',
+//             message: 'All suborders for an order are ready for pickup',
+//             orderId: parentOrder.orderId,
+//             shops: parentOrder.subOrders.map((so) => ({
+//               shopName: so.shop.businessName,
+//               location: so.shop.location,
+//             })),
+//           });
+
+//           // Save notification for the parent order in the database
+//           try {
+//             await DriverNotification.create({
+//               driver: driver._id,
+//               orderId: parentOrder._id,
+//               message: 'All suborders for an order are ready for pickup',
+//               status: 'ReadyForPickup',
+//             });
+//           } catch (err) {
+//             console.error('Failed to create driver notification:', err.message);
+//           }
+//         }
+//       }
+//     }
+
+//     res.json(subOrder);
+//   } catch (error) {
+//     console.error('Error updating suborder status:', error);
+//     res.status(500).json({ error: 'Server error' });
+//   }
+// });
+
 router.put('/suborders/:id/status', async (req, res) => {
   try {
     const { id } = req.params;
-    const { status, driverId } = req.body;
+    let { status, driverId } = req.body; // 'let' because we might override status
 
     const validStatuses = [
       'Pending',
@@ -1619,71 +1731,89 @@ router.put('/suborders/:id/status', async (req, res) => {
       'PickedUp',
       'OutForDelivery',
       'Delivered',
+      'Confirmed Delivered',
     ];
 
     if (!validStatuses.includes(status)) {
       return res.status(400).json({ error: 'Invalid status' });
     }
 
-    // Update the suborder status
-    const subOrder = await SubOrder.findByIdAndUpdate(
-      id,
-      { status },
-      { new: true }
-    ).populate('shop parentOrder');
-
+    // 🔹 Fetch the suborder with parent
+    const subOrder = await SubOrder.findById(id).populate('shop parentOrder');
     if (!subOrder) {
       return res.status(404).json({ error: 'SubOrder not found' });
     }
 
-    // Assign the driver to the parent order if not already assigned
-    if (status === 'PickedUp' && !subOrder.parentOrder.assignedDriver) {
-      await Order.findByIdAndUpdate(subOrder.parentOrder._id, { assignedDriver: driverId });
+    // 🔹 Fetch parent order (for delivery logic)
+    let parentOrder = await Order.findById(subOrder.parentOrder._id).populate('subOrders');
+
+    // ✅ If vendor uses own delivery and marking PickedUp, instantly confirm delivered
+    if (parentOrder.delivery.option === 'own' && status === 'PickedUp') {
+      status = 'Confirmed Delivered';
     }
 
-    // Check if all sibling suborders of the parent order are in ReadyForPickup status
-    const parentOrder = await Order.findById(subOrder.parentOrder._id).populate({
-      path: 'subOrders',
-      populate: {
-        path: 'shop', // Populate the shop field in each suborder
-        select: 'businessName location', // Only fetch the required fields
-      },
-      select: 'status shop', // Fetch the status and shop fields for suborders
-    });
+    // 🔹 Update suborder status
+    subOrder.status = status;
+    if (status === 'Confirmed Delivered' || status === 'Delivered') {
+  subOrder.deliveredAt = new Date();
+}
+    await subOrder.save();
 
-    const allReady = parentOrder.subOrders.every((so) => so.status === 'ReadyForPickup');
-    // After updating suborder status and fetching parentOrder work for own delivery
-    const allOutForDelivery = parentOrder.subOrders.every((so) => so.status === 'OutForDelivery');
-  
-    if (
-      allOutForDelivery &&
-      parentOrder.delivery.option === 'own' &&
-      parentOrder.status !== 'Delivered'
-    ) {
-      parentOrder.status = 'Delivered';
+    // ✅ If the suborder is confirmed delivered, check if all siblings are also confirmed delivered
+    const allConfirmed = parentOrder.subOrders.every(
+      (so) =>
+        so._id.equals(subOrder._id)
+          ? status === 'Confirmed Delivered'
+          : so.status === 'Confirmed Delivered'
+    );
+
+    if (allConfirmed) {
+      parentOrder.status = 'Confirmed Delivered';
       await parentOrder.save();
     }
 
-    // Notify drivers if all suborders are ready for pickup for platform delivery
+    // 🔹 Assign driver for platform delivery (not own delivery)
+    if (
+      status === 'PickedUp' &&
+      parentOrder.delivery.option !== 'own' &&
+      !subOrder.parentOrder.assignedDriver
+    ) {
+      await Order.findByIdAndUpdate(subOrder.parentOrder._id, { assignedDriver: driverId });
+    }
+
+    // 🔹 Re-fetch parent order with suborders for platform logic
+    parentOrder = await Order.findById(subOrder.parentOrder._id).populate({
+      path: 'subOrders',
+      populate: {
+        path: 'shop',
+        select: 'businessName location',
+      },
+      select: 'status shop',
+    });
+
+    // 🔹 Check collective statuses
+    const allReady = parentOrder.subOrders.every((so) => so.status === 'ReadyForPickup');
+
+    // 🔹 Platform delivery: notify drivers if all suborders ready for pickup
     if (allReady) {
       const shop = await Partner.findById(subOrder.shop._id);
       if (!shop || !shop.location) {
         return res.status(400).json({ error: 'Shop location is missing' });
       }
 
-      const shopCoords = await parsePlusCodeToLatLng(shop.location); // Ensure this helper works
-      const drivers = await Driver.find({ status: 'Available', currentLocation: { $exists: true } });
+      const shopCoords = await parsePlusCodeToLatLng(shop.location);
+      const drivers = await Driver.find({
+        status: 'Available',
+        currentLocation: { $exists: true },
+      });
 
       for (const driver of drivers) {
         const driverCoords = await parsePlusCodeToLatLng(driver.currentLocation?.location);
-        if (!driverCoords) {
-          console.error(`Invalid driver location for driver ID: ${driver._id}`);
-          continue;
-        }
+        if (!driverCoords) continue;
 
         const distance = geolib.getDistance(shopCoords, driverCoords); // in meters
-        if (distance <= 5000) { // 5km radius
-          // Notify the driver
+        if (distance <= 5000) {
+          // Notify nearby driver
           notifyDriver(driver._id.toString(), {
             type: 'AllSubOrdersReady',
             message: 'All suborders for an order are ready for pickup',
@@ -1694,7 +1824,6 @@ router.put('/suborders/:id/status', async (req, res) => {
             })),
           });
 
-          // Save notification for the parent order in the database
           try {
             await DriverNotification.create({
               driver: driver._id,
@@ -1711,11 +1840,12 @@ router.put('/suborders/:id/status', async (req, res) => {
 
     res.json(subOrder);
   } catch (error) {
-    console.error('Error updating suborder status:', error);
+    // console.error('Error updating suborder status:', error);
+    console.error('Error updating suborder status:', error.message, error.stack);
+
     res.status(500).json({ error: 'Server error' });
   }
 });
-
 
 
 const PartnerNotificationSchema = new mongoose.Schema({

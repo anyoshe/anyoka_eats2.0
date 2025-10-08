@@ -63,9 +63,16 @@ const Sales = () => {
       driver: order.parentOrder?.delivery?.option === 'own'
         ? 'Own'
         : order.parentOrder?.deliveredBy || 'N/A',
+      // deliveredAt: order.parentOrder?.deliveredAt
+      //   ? new Date(order.parentOrder.deliveredAt).toLocaleDateString()
+      //   : 'N/A' // Include delivered date in CSV
       deliveredAt: order.parentOrder?.deliveredAt
         ? new Date(order.parentOrder.deliveredAt).toLocaleDateString()
-        : 'N/A' // Include delivered date in CSV
+        : order.deliveredAt
+          ? new Date(order.deliveredAt).toLocaleDateString()
+          : order.parentOrder?.createdAt
+            ? new Date(order.parentOrder.createdAt).toLocaleDateString()
+            : 'N/A'
     }));
 
     const headers = Object.keys(csvData[0]).join(',');
@@ -137,9 +144,16 @@ const Sales = () => {
                       : order.parentOrder?.deliveredBy || 'N/A'}
                   </td>
                   <td>
+                    {/* {order.parentOrder?.deliveredAt
+                      ? new Date(order.parentOrder.deliveredAt).toLocaleDateString()
+                      : 'N/A'} */}
                     {order.parentOrder?.deliveredAt
                       ? new Date(order.parentOrder.deliveredAt).toLocaleDateString()
-                      : 'N/A'}
+                      : order.deliveredAt
+                        ? new Date(order.deliveredAt).toLocaleDateString()
+                        : order.parentOrder?.createdAt
+                          ? new Date(order.parentOrder.createdAt).toLocaleDateString()
+                          : 'N/A'}
                   </td>
                   <td>
                     <button onClick={() => handleViewOrder(order)} className={styles.suborderBtn}>View Suborder</button>
@@ -165,8 +179,27 @@ const Sales = () => {
             <p><strong>Order ID:</strong> {selectedOrder.parentOrder?.orderId || 'N/A'}</p>
             <p><strong>Customer Name:</strong> {selectedOrder.parentOrder?.user?.names || 'N/A'}</p>
             <p><strong>Total:</strong> KES {selectedOrder.total}</p>
-            <p><strong>Delivered By:</strong> {selectedOrder.parentOrder?.deliveredBy || 'N/A'}</p>
-            <p><strong>Delivered At:</strong> {new Date(selectedOrder.parentOrder?.deliveredAt).toLocaleString()}</p>
+            {/* <p><strong>Delivered By:</strong> {selectedOrder.parentOrder?.deliveredBy || 'N/A'}</p>
+            <p><strong>Delivered At:</strong> {new Date(selectedOrder.parentOrder?.deliveredAt).toLocaleString()}</p> */}
+            <p>
+              <strong>Delivered By:</strong>{' '}
+              {selectedOrder.parentOrder?.delivery?.option === 'own'
+                ? 'Own'
+                : selectedOrder.parentOrder?.delivery?.option === 'platform'
+                  ? (selectedOrder.parentOrder?.deliveredBy || 'Platform')
+                  : 'None'}
+            </p>
+
+            <p>
+              <strong>Delivered At:</strong>{' '}
+              {selectedOrder.parentOrder?.deliveredAt
+                ? new Date(selectedOrder.parentOrder.deliveredAt).toLocaleDateString()
+                : selectedOrder.deliveredAt
+                  ? new Date(selectedOrder.deliveredAt).toLocaleDateString()
+                  : selectedOrder.parentOrder?.createdAt
+                    ? new Date(selectedOrder.parentOrder.createdAt).toLocaleDateString()
+                    : 'N/A'}
+            </p>
 
             <h4>Items</h4>
             <ul>
