@@ -535,6 +535,93 @@ const userSchema = new mongoose.Schema({
 });
 
 const User = mongoose.model('User', userSchema);
+// Ads Schema (supports text/image/video entries)
+const adsSchema = new mongoose.Schema({
+  items: [{
+    type: { type: String, enum: ['text', 'image', 'video'], default: 'text' },
+    content: { type: String }, // for text
+    mediaUrl: { type: String }, // for image/video
+    link: { type: String },
+    placement: { 
+      type: String, 
+      enum: ['hero_top_marquee','hero_left','hero_right'], 
+      default: 'hero_top_marquee' 
+    },
+    active: { type: Boolean, default: true },
+    startsAt: { type: Date },
+    endsAt: { type: Date },
+  }],
+}, { timestamps: true });
+const Ads = mongoose.models.Ads || mongoose.model('Ads', adsSchema);
+
+// Public: get ads messages for client top bar
+router.get('/ads', async (req, res) => {
+  try {
+    let ads = await Ads.findOne();
+    if (!ads) {
+      ads = await Ads.create({ items: [
+        { type: 'text', content: "Today's picks are hot — grab your favorites!", placement: 'hero_top_marquee' },
+        { type: 'text', content: 'Limited-time deals across top categories', placement: 'hero_top_marquee' },
+        { type: 'text', content: 'Fast delivery on featured items near you', placement: 'hero_top_marquee' },
+      ]});
+    }
+    // filter active and within schedule if provided
+    const now = new Date();
+    let items = (ads.items || []).filter(it => it.active !== false && (!it.startsAt || it.startsAt <= now) && (!it.endsAt || it.endsAt >= now));
+    if (req.query.placement) {
+      items = items.filter(it => it.placement === req.query.placement);
+    }
+    res.json({ items });
+  } catch (error) {
+    res.status(500).json({ message: 'Failed to load ads', error: error.message });
+  }
+});
+
+// Admin: get current ads
+router.get('/admin/ads', authenticateAdminToken, async (req, res) => {
+  try {
+    let ads = await Ads.findOne();
+    if (!ads) {
+      ads = await Ads.create({ items: [] });
+    }
+    res.json({ items: ads.items || [] });
+  } catch (error) {
+    res.status(500).json({ message: 'Failed to fetch ads', error: error.message });
+  }
+});
+
+// Admin: update ads messages
+router.put('/admin/ads', authenticateAdminToken, async (req, res) => {
+  try {
+    const { items } = req.body;
+    if (!Array.isArray(items)) {
+      return res.status(400).json({ message: 'items must be an array' });
+    }
+    // sanitize
+    const allowed = ['text','image','video'];
+    const allowedPlacements = ['hero_top_marquee','hero_left','hero_right'];
+    const clean = items.map(raw => ({
+      type: ['text','image','video'].includes(raw.type) ? raw.type : 'text',
+      content: raw.content ? String(raw.content) : undefined,
+      mediaUrl: raw.mediaUrl ? String(raw.mediaUrl) : undefined,
+      link: raw.link ? String(raw.link) : undefined,
+      placement: allowedPlacements.includes(raw.placement) ? raw.placement : 'top_marquee',
+      active: raw.active !== false,
+      startsAt: raw.startsAt ? new Date(raw.startsAt) : undefined,
+      endsAt: raw.endsAt ? new Date(raw.endsAt) : undefined,
+    }));
+    let ads = await Ads.findOne();
+    if (!ads) {
+      ads = new Ads({ items: [] });
+    }
+    ads.items = clean;
+    await ads.save();
+    res.json({ items: ads.items });
+  } catch (error) {
+    res.status(500).json({ message: 'Failed to update ads', error: error.message });
+  }
+});
+
 
 
 

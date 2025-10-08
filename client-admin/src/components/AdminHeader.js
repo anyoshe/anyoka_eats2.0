@@ -91,6 +91,14 @@ export default function AdminHeader() {
           >
             System
           </NavLink>
+          <NavLink 
+            to="/ads" 
+            className={({ isActive }) => 
+              isActive ? `${styles.navLink} ${styles.active}` : styles.navLink
+            }
+          >
+            Ads
+          </NavLink>
         </nav>
 
         {/* User Section */}
@@ -169,6 +177,15 @@ export default function AdminHeader() {
           onClick={closeMobileMenu}
         >
           System
+        </NavLink>
+        <NavLink 
+          to="/ads" 
+          className={({ isActive }) => 
+            isActive ? `${styles.mobileNavLink} ${styles.active}` : styles.mobileNavLink
+          }
+          onClick={closeMobileMenu}
+        >
+          Ads
         </NavLink>
         <div className={styles.mobileUserSection}>
           <button 

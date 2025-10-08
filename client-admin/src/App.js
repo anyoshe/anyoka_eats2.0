@@ -10,6 +10,7 @@ import Users from './pages/Users';
 import Vendors from './pages/Vendors';
 import Drivers from './pages/Drivers';
 import System from './pages/System';
+import Ads from './pages/Ads';
 import AdminHeader from './components/AdminHeader';
 
 function App() {
@@ -75,6 +76,16 @@ function App() {
               <AdminHeader />
               <main className="container stack" style={{ padding: 'var(--space-6) 0' }}>
                 <System />
+              </main>
+            </div>
+          </ProtectedRoute>
+        } />
+        <Route path="/ads" element={
+          <ProtectedRoute>
+            <div>
+              <AdminHeader />
+              <main className="container stack" style={{ padding: 'var(--space-6) 0' }}>
+                <Ads />
               </main>
             </div>
           </ProtectedRoute>
