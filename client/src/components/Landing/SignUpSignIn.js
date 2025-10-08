@@ -59,17 +59,7 @@ const StoreSignUpForm = () => {
       setFormData({ ...formData, [name]: files[0] });
     } else {
       setFormData({ ...formData, [name]: value });
-      // Update map center dynamically based on town
-      if (name === 'town') {
-        const geocoder = new window.google.maps.Geocoder();
-        geocoder.geocode({ address: value }, (results, status) => {
-          if (status === 'OK' && results[0]?.geometry?.location) {
-            const { lat, lng } = results[0].geometry.location;
-            setMapCenter({ lat: lat(), lng: lng() });
-            setShowMap(true);
-          }
-        });
-      }
+      // Town remains a simple text field; no auto geocoding or map open here
     }
   };
 
@@ -259,6 +249,7 @@ const StoreSignUpForm = () => {
                 className={styles.formSighUpInputs}
                 placeholder="Click pin or enter town to drop pin"
                 required
+                onClick={() => setShowMap(true)}
               />
               <FaMapMarkerAlt
                 className={styles.locationIcon}
