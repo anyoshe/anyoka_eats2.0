@@ -3,6 +3,7 @@ import styles from './AccountPage.module.css';
 import { PartnerContext } from '../../contexts/PartnerContext';
 import Profile from './Profile';
 import ShopSection from "./ShopSection";
+import VendorShare from './VendorShare';
 import NotificationComponent from './NotificationComponent';
 import LogoutComponent from './LogoutComponent';
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -68,6 +69,8 @@ const AccountPage = () => {
         return <Orders />;
       case "sales":
         return <Sales />;
+      case "share":
+        return <VendorShare />;
       default:
         return null;
     }
@@ -164,6 +167,12 @@ const AccountPage = () => {
             onClick={() => setActiveTab("sales")}
           >
             Sales
+          </div>
+          <div
+            className={`${styles.tab} ${activeTab === "share" ? styles.active : ""}`}
+            onClick={() => setActiveTab("share")}
+          >
+            Share
           </div>
 
           <div className={styles.headerNavIcons}>

@@ -56,7 +56,7 @@ const HeroHeader = () => {
             <nav className={styles.landingNav}>
                 <a href="/" className={styles.homeLogoPic}>
                     <img src={logoImg} alt="Anyoka Eats" className={styles.logoImg} />
-                    <span className={styles.brandText}>Anyoka Eats</span>
+                    
                 </a>
 
                 {/* Center Ad Slot */}

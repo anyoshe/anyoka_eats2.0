@@ -38,7 +38,7 @@ export default function AdminHeader() {
         {/* Logo Section */}
         <div className={styles.logoSection}>
           <div className={styles.logoIcon}>AE</div>
-          <span className={styles.logoText}>Anyoka Eats Admin</span>
+          <span className={styles.logoText}></span>
         </div>
 
         {/* Desktop Navigation */}
@@ -90,6 +90,14 @@ export default function AdminHeader() {
             }
           >
             System
+          </NavLink>
+          <NavLink 
+            to="/ads" 
+            className={({ isActive }) => 
+              isActive ? `${styles.navLink} ${styles.active}` : styles.navLink
+            }
+          >
+            Ads
           </NavLink>
         </nav>
 
@@ -169,6 +177,15 @@ export default function AdminHeader() {
           onClick={closeMobileMenu}
         >
           System
+        </NavLink>
+        <NavLink 
+          to="/ads" 
+          className={({ isActive }) => 
+            isActive ? `${styles.mobileNavLink} ${styles.active}` : styles.mobileNavLink
+          }
+          onClick={closeMobileMenu}
+        >
+          Ads
         </NavLink>
         <div className={styles.mobileUserSection}>
           <button 

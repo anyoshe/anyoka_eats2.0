@@ -21,7 +21,7 @@ const axios = require('axios');
 const { type } = require("os");
 require('dotenv').config();
 const nodemailer = require('nodemailer');
-const { notifyPartner, notifyDriver } = require('../socketServer');
+const { notifyPartner, notifyDriver, suspendDriver } = require('../socketServer');
 const geolib = require('geolib');
 const fetch = require('node-fetch');
 const crypto = require('crypto');
@@ -108,6 +108,8 @@ const partnerSchema = new mongoose.Schema({
   businessPermit: { type: String, required: false },
   description: { type: String, default: '' },
   role: { type: String, enum: ['admin', 'partner'], default: 'partner' },
+  suspended: { type: Boolean, default: false },
+  slug: { type: String, unique: true, index: true },
   ratings: {
     average: { type: Number, default: 0 },
     reviews: [
@@ -123,12 +125,39 @@ const partnerSchema = new mongoose.Schema({
 
 const Partner = mongoose.model('Partner', partnerSchema);
 
+function slugify(name) {
+  if (!name) return null;
+  return name.toString().toLowerCase().trim()
+    .replace(/[^a-z0-9\s-]/g, '')
+    .replace(/\s+/g, '-')
+    .replace(/-+/g, '-');
+}
+
+async function ensureUniquePartnerSlug(base) {
+  let candidate = base;
+  let counter = 1;
+  // loop until unique
+  // eslint-disable-next-line no-constant-condition
+  while (true) {
+    const exists = await Partner.findOne({ slug: candidate });
+    if (!exists) return candidate;
+    counter += 1;
+    candidate = `${base}-${counter}`;
+  }
+}
+
 // Find the partner before adding one
 router.get('/partner', authenticateToken, async (req, res) => {
   try {
     console.log('User ID:', req.user._id);
     const partner = await Partner.findById(req.user._id);
     if (!partner) return res.status(404).send('Partner not found.');
+    // backfill slug if missing
+    if (!partner.slug && partner.businessName) {
+      const base = slugify(partner.businessName);
+      partner.slug = await ensureUniquePartnerSlug(base || `store-${Date.now()}`);
+      await partner.save();
+    }
     res.json(partner);
   } catch (error) {
     res.status(500).send(error.message);
@@ -183,6 +212,12 @@ router.post('/signup', uploadSignupFiles, processSignupFiles, async (req, res) =
     }
     if (req.files && req.files.profileImage) {
       newPartnerData.profileImage = `/uploads/profile-images/${req.files.profileImage[0].filename}`;
+    }
+
+    // generate slug
+    if (!newPartnerData.slug) {
+      const base = slugify(businessName);
+      newPartnerData.slug = await ensureUniquePartnerSlug(base || `store-${Date.now()}`);
     }
 
     const newPartner = new Partner(newPartnerData);
@@ -410,6 +445,17 @@ router.get('/partners', async (req, res) => {
   }
 });
 
+// Lookup partner by slug
+router.get('/partners/slug/:slug', async (req, res) => {
+  try {
+    const partner = await Partner.findOne({ slug: req.params.slug });
+    if (!partner) return res.status(404).json({ message: 'Partner not found' });
+    res.json(partner);
+  } catch (error) {
+    res.status(500).json({ message: 'Failed to fetch partner', error: error.message });
+  }
+});
+
 //RATING SHOPS
 // GET /api/partners/:id/reviews
 router.get('/partners/:id/reviews', async (req, res) => {
@@ -530,9 +576,97 @@ const userSchema = new mongoose.Schema({
   password: { type: String, required: true },
   resetToken: { type: String },
   resetTokenExpiry: { type: Number },
+  suspended: { type: Boolean, default: false },
 });
 
 const User = mongoose.model('User', userSchema);
+// Ads Schema (supports text/image/video entries)
+const adsSchema = new mongoose.Schema({
+  items: [{
+    type: { type: String, enum: ['text', 'image', 'video'], default: 'text' },
+    content: { type: String }, // for text
+    mediaUrl: { type: String }, // for image/video
+    link: { type: String },
+    placement: { 
+      type: String, 
+      enum: ['hero_top_marquee','hero_left','hero_right'], 
+      default: 'hero_top_marquee' 
+    },
+    active: { type: Boolean, default: true },
+    startsAt: { type: Date },
+    endsAt: { type: Date },
+  }],
+}, { timestamps: true });
+const Ads = mongoose.models.Ads || mongoose.model('Ads', adsSchema);
+
+// Public: get ads messages for client top bar
+router.get('/ads', async (req, res) => {
+  try {
+    let ads = await Ads.findOne();
+    if (!ads) {
+      ads = await Ads.create({ items: [
+        { type: 'text', content: "Today's picks are hot — grab your favorites!", placement: 'hero_top_marquee' },
+        { type: 'text', content: 'Limited-time deals across top categories', placement: 'hero_top_marquee' },
+        { type: 'text', content: 'Fast delivery on featured items near you', placement: 'hero_top_marquee' },
+      ]});
+    }
+    // filter active and within schedule if provided
+    const now = new Date();
+    let items = (ads.items || []).filter(it => it.active !== false && (!it.startsAt || it.startsAt <= now) && (!it.endsAt || it.endsAt >= now));
+    if (req.query.placement) {
+      items = items.filter(it => it.placement === req.query.placement);
+    }
+    res.json({ items });
+  } catch (error) {
+    res.status(500).json({ message: 'Failed to load ads', error: error.message });
+  }
+});
+
+// Admin: get current ads
+router.get('/admin/ads', authenticateAdminToken, async (req, res) => {
+  try {
+    let ads = await Ads.findOne();
+    if (!ads) {
+      ads = await Ads.create({ items: [] });
+    }
+    res.json({ items: ads.items || [] });
+  } catch (error) {
+    res.status(500).json({ message: 'Failed to fetch ads', error: error.message });
+  }
+});
+
+// Admin: update ads messages
+router.put('/admin/ads', authenticateAdminToken, async (req, res) => {
+  try {
+    const { items } = req.body;
+    if (!Array.isArray(items)) {
+      return res.status(400).json({ message: 'items must be an array' });
+    }
+    // sanitize
+    const allowed = ['text','image','video'];
+    const allowedPlacements = ['hero_top_marquee','hero_left','hero_right'];
+    const clean = items.map(raw => ({
+      type: ['text','image','video'].includes(raw.type) ? raw.type : 'text',
+      content: raw.content ? String(raw.content) : undefined,
+      mediaUrl: raw.mediaUrl ? String(raw.mediaUrl) : undefined,
+      link: raw.link ? String(raw.link) : undefined,
+      placement: allowedPlacements.includes(raw.placement) ? raw.placement : 'top_marquee',
+      active: raw.active !== false,
+      startsAt: raw.startsAt ? new Date(raw.startsAt) : undefined,
+      endsAt: raw.endsAt ? new Date(raw.endsAt) : undefined,
+    }));
+    let ads = await Ads.findOne();
+    if (!ads) {
+      ads = new Ads({ items: [] });
+    }
+    ads.items = clean;
+    await ads.save();
+    res.json({ items: ads.items });
+  } catch (error) {
+    res.status(500).json({ message: 'Failed to update ads', error: error.message });
+  }
+});
+
 
 
 
@@ -667,6 +801,14 @@ router.post('/login', async (req, res) => {
     if (!account) {
       console.error('Account not found for identifier:', identifier);
       return res.status(404).json({ message: 'Account not found' });
+    }
+
+    // Suspended checks
+    if (role === 'user' && account.suspended) {
+      return res.status(403).json({ message: 'Your account has been suspended. Please contact support.' });
+    }
+    if (role === 'partner' && account.suspended) {
+      return res.status(403).json({ message: 'Your vendor account has been suspended. Please contact support.' });
     }
 
     // Compare passwords
@@ -1808,7 +1950,7 @@ const DriverSchema = new mongoose.Schema({
   vehicleDetails: {
     make: { type: String },
     model: { type: String },
-    plateNumber: { type: String, unique: true },
+    plateNumber: { type: String },
     type: { type: String },
     color: { type: String }
   },
@@ -1863,7 +2005,7 @@ router.post('/driver/signup', async (req, res) => {
   const { username, phoneNumber, email, password, nationalId, driverLicenseNumber } = req.body;
   console.log(req.body);
 
-  if (!username || !phoneNumber || !password || !nationalId || !driverLicenseNumber) {
+  if (!username || !phoneNumber || !email || !password || !nationalId || !driverLicenseNumber) {
     return res.status(400).json({ message: 'Missing required fields' });
   }
 
@@ -1872,6 +2014,7 @@ router.post('/driver/signup', async (req, res) => {
       $or: [
         { username },
         { phoneNumber },
+        { email },
         { nationalId },
         { driverLicenseNumber }
       ]
@@ -1895,7 +2038,7 @@ router.post('/driver/signup', async (req, res) => {
     await newDriver.save();
 
     // Create JWT token
-    const token = jwt.sign({ id: newDriver._id }, process.env.JWT_SECRET, { expiresIn: '7d' });
+    const token = jwt.sign({ id: newDriver._id }, JWT_SECRET, { expiresIn: '7d' });
 
     res.status(201).json({
       token,
@@ -1936,6 +2079,11 @@ router.post('/driver/login', async (req, res) => {
     const isMatch = await bcrypt.compare(password, driver.password);
     if (!isMatch) {
       return res.status(400).json({ message: 'Invalid password' });
+    }
+
+    // Block suspended drivers
+    if (driver.verificationStatus === 'Rejected') {
+      return res.status(403).json({ message: 'Your account has been suspended. Please contact support.' });
     }
 
     // Mark driver online/available on successful login
@@ -1988,6 +2136,9 @@ router.post('/driver/online', authenticateToken, async (req, res) => {
   try {
     const driver = await Driver.findById(req.user.driverId || req.user.id || req.user._id);
     if (!driver) return res.status(404).json({ message: 'Driver not found' });
+    if (driver.verificationStatus === 'Rejected') {
+      return res.status(403).json({ message: 'Account suspended' });
+    }
     driver.status = 'Available';
     driver.lastActiveAt = new Date();
     await driver.save();
@@ -2934,6 +3085,36 @@ router.get('/admin/users', authenticateAdminToken, async (req, res) => {
   }
 });
 
+// Toggle user suspension
+router.patch('/admin/users/:userId/disable', authenticateAdminToken, async (req, res) => {
+  try {
+    const { userId } = req.params;
+    const user = await User.findById(userId);
+    if (!user) return res.status(404).json({ message: 'User not found' });
+    user.suspended = !user.suspended;
+    await user.save();
+    res.json({ message: user.suspended ? 'User suspended' : 'User reinstated', user: { _id: user._id, suspended: user.suspended } });
+  } catch (error) {
+    console.error('Error updating user status:', error);
+    res.status(500).json({ message: 'Failed to update user status', error: error.message });
+  }
+});
+
+// Toggle partner suspension
+router.patch('/admin/partners/:partnerId/disable', authenticateAdminToken, async (req, res) => {
+  try {
+    const { partnerId } = req.params;
+    const partner = await Partner.findById(partnerId);
+    if (!partner) return res.status(404).json({ message: 'Partner not found' });
+    partner.suspended = !partner.suspended;
+    await partner.save();
+    res.json({ message: partner.suspended ? 'Vendor suspended' : 'Vendor reinstated', partner: { _id: partner._id, suspended: partner.suspended } });
+  } catch (error) {
+    console.error('Error updating partner status:', error);
+    res.status(500).json({ message: 'Failed to update partner status', error: error.message });
+  }
+});
+
 // Admin endpoint to get all drivers (addition only)
 router.get('/admin/drivers', authenticateAdminToken, async (req, res) => {
   try {
@@ -3005,11 +3186,19 @@ router.patch('/admin/drivers/:driverId/disable', authenticateAdminToken, async (
       return res.status(404).json({ message: 'Driver not found' });
     }
 
-    // Toggle driver status
-    driver.status = driver.status === 'active' ? 'inactive' : 'active';
+    // Toggle suspension via verificationStatus
+    if (driver.verificationStatus === 'Rejected') {
+      driver.verificationStatus = 'Verified';
+    } else {
+      driver.verificationStatus = 'Rejected';
+      driver.status = 'Offline'; // ensure not available
+    try {
+      suspendDriver(String(driver._id), { reason: 'suspended' });
+    } catch (e) {}
+    }
     await driver.save();
 
-    res.json({ message: `Driver ${driver.status}`, driver: { _id: driver._id, status: driver.status } });
+    res.json({ message: `Driver ${driver.verificationStatus === 'Rejected' ? 'suspended' : 'reinstated'}`, driver: { _id: driver._id, verificationStatus: driver.verificationStatus, status: driver.status } });
   } catch (error) {
     console.error('Error updating driver status:', error);
     res.status(500).json({ message: 'Failed to update driver status', error: error.message });

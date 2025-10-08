@@ -40,4 +40,11 @@ function notifyDriver(driverId, data) {
 }
 
 
-module.exports = { initSocket, notifyPartner, notifyDriver };
+function suspendDriver(driverId, payload) {
+  if (io) {
+    io.to(driverId).emit('driverSuspended', payload || { message: 'Your account has been suspended. Please contact support.' });
+  }
+}
+
+
+module.exports = { initSocket, notifyPartner, notifyDriver, suspendDriver };

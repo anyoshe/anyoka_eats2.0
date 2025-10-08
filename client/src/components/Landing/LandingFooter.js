@@ -101,16 +101,15 @@ const handleSubmit = async (event) => {
                 <i className="fab fa-facebook-f facebook-bg" id="social_list"></i>
               </a>
 
-              <a class="twitter-timeline social_link" href="https://twitter.com/AnyokaEats?ref_src=twsrc%5Etfw">
-              <i className="fab fa-twitter twitter-bg" id="social_list"></i></a> 
-
-              <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
+              <a href="https://twitter.com/AnyokaEats" target="_blank" className="social_link">
+                <i className="fab fa-twitter twitter-bg" id="social_list"></i>
+              </a>
 
               <a href="https://www.instagram.com/anyokaeats254" target="_blank" className="social_link">
                 <i className="fab fa-instagram instagram-bg" id="social_list"></i>
               </a>
 
-              <a href="https://wa.me/254706251573" target="_blank" class="whatsapp-link social_link">
+              <a href="https://wa.me/254706251573" target="_blank" className="whatsapp-link social_link">
                 <i className="fab fa-whatsapp whatsapp-bg" id="social_list"></i>
               </a>
             </div>
@@ -146,6 +145,64 @@ const handleSubmit = async (event) => {
             </form>
           </div>
         </div>
+
+        {/* Helpful links */}
+        {/* <div className="row links_row">
+          <div className="column_footer">
+            <h4 className="links_header">Discover</h4>
+            <ul className="footer_links">
+              <li><a href="/menu?category=Food">Popular Categories</a></li>
+              <li><a href="/featured">Top Vendors</a></li>
+              <li><a href="/offers">Deals & Offers</a></li>
+              <li><a href="mailto:anyokaeats@gmail.com?subject=Advertise%20with%20Anyoka%20Eats">Advertise with Us</a></li>
+            </ul>
+          </div>
+          <div className="column_footer">
+            <h4 className="links_header">Help & Support</h4>
+            <ul className="footer_links">
+              <li><a href="/help">Help Center / FAQs</a></li>
+              <li><a href="mailto:anyokaeats@gmail.com">Contact Support (Email)</a></li>
+              <li><a href="tel:+254706251573">Contact Support (Phone)</a></li>
+              <li><a href="https://wa.me/254706251573" target="_blank" rel="noreferrer">Contact on WhatsApp</a></li>
+              <li><a href="/customer-dashboard">Track My Order</a></li>
+              <li><a href="/support/report">Report an Issue</a></li>
+            </ul>
+          </div>
+          <div className="column_footer">
+            <h4 className="links_header">For Vendors</h4>
+            <ul className="footer_links">
+              <li><a href="/sign-up-sign-in">Become a Vendor (Sign up)</a></li>
+              <li><a href="/sign-in">Vendor Login</a></li>
+              <li><a href="/vendor/guidelines">Vendor Guidelines / Fees</a></li>
+              <li><a href="/account-type-selection">Share Your Store (how‑to)</a></li>
+            </ul>
+          </div>
+          <div className="column_footer">
+            <h4 className="links_header">For Drivers</h4>
+            <ul className="footer_links">
+              <li><a href="/driver-signup">Become a Driver (Sign up)</a></li>
+              <li><a href="/driver-login">Driver Login</a></li>
+              <li><a href="/driver/requirements">Driver Requirements</a></li>
+              <li><a href="/driver/safety">Safety Guidelines</a></li>
+            </ul>
+          </div>
+          <div className="column_footer">
+            <h4 className="links_header">Legal</h4>
+            <ul className="footer_links">
+              <li><a href="/legal/terms">Terms of Service</a></li>
+              <li><a href="/legal/privacy">Privacy Policy</a></li>
+              <li><a href="/legal/cookies">Cookie Policy</a></li>
+              <li><a href="/legal/refunds">Refund & Cancellation Policy</a></li>
+            </ul>
+          </div>
+          <div className="column_footer">
+            <h4 className="links_header">Company</h4>
+            <ul className="footer_links">
+              <li><a href="/about">About Us</a></li>
+              <li><a href="/blog">Blog/News</a></li>
+            </ul>
+          </div>
+        </div> */}
       </div>
 
       <span className="bike"></span>

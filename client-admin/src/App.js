@@ -3,7 +3,6 @@ import { Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider } from './contexts/AuthContext';
 import ProtectedRoute from './components/ProtectedRoute';
 import ErrorBoundary from './components/ErrorBoundary';
-import DebugInfo from './components/DebugInfo';
 import Login from './pages/Login';
 import Dashboard from './pages/Dashboard';
 import Orders from './pages/Orders';
@@ -11,13 +10,13 @@ import Users from './pages/Users';
 import Vendors from './pages/Vendors';
 import Drivers from './pages/Drivers';
 import System from './pages/System';
+import Ads from './pages/Ads';
 import AdminHeader from './components/AdminHeader';
 
 function App() {
   return (
     <ErrorBoundary>
       <AuthProvider>
-        <DebugInfo />
         <Routes>
         <Route path="/login" element={<Login />} />
         <Route path="/" element={<Navigate to="/dashboard" replace />} />
@@ -77,6 +76,16 @@ function App() {
               <AdminHeader />
               <main className="container stack" style={{ padding: 'var(--space-6) 0' }}>
                 <System />
+              </main>
+            </div>
+          </ProtectedRoute>
+        } />
+        <Route path="/ads" element={
+          <ProtectedRoute>
+            <div>
+              <AdminHeader />
+              <main className="container stack" style={{ padding: 'var(--space-6) 0' }}>
+                <Ads />
               </main>
             </div>
           </ProtectedRoute>

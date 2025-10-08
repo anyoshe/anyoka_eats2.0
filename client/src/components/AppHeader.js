@@ -12,7 +12,6 @@ const AppHeader = () => {
       <div className={styles.container}>
         <button className={styles.logoButton} onClick={() => navigate('/')} aria-label="Go to home">
           <span className={styles.logoDot} />
-          <span className={styles.logoText}>Anyoka Eats</span>
         </button>
 
         <nav className={styles.nav} aria-label="Primary">

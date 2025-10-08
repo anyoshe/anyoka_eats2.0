@@ -31,11 +31,13 @@ export default function Users(){
   const allUsers = usersData?.users || usersData || mockUsers;
 
   const filtered = allUsers.filter(u => {
-    const matchesQuery = (u.names || u.name || u.username || '').toLowerCase().includes(query.toLowerCase()) || 
+    const matchesQuery = (u.name || u.username || '').toLowerCase().includes(query.toLowerCase()) || 
                         (u.id || u._id || '').includes(query) ||
-                        (u.email || '').toLowerCase().includes(query.toLowerCase()) ||
-                        (u.phoneNumber || '').includes(query);
-    const matchesStatus = statusFilter === 'all' || (u.status || 'active') === statusFilter;
+                        (u.email || '').toLowerCase().includes(query.toLowerCase());
+    const suspended = !!u.suspended || (u.status === 'suspended');
+    const matchesStatus = statusFilter === 'all' 
+      || (statusFilter === 'active' && !suspended)
+      || (statusFilter === 'suspended' && suspended);
     return matchesQuery && matchesStatus;
   });
 
@@ -44,8 +46,8 @@ export default function Users(){
 
   const columns = [
     { key: 'id', label: 'User ID', render: (v, row) => row.id || row._id || 'N/A' },
-    { key: 'name', label: 'Name', render: (v, row) => row.names || row.name || row.username || 'N/A' },
-    { key: 'contact', label: 'Contact', render: (v, row) => row.email || row.phoneNumber || row.contact || 'N/A' },
+    { key: 'name', label: 'Name', render: (v, row) => row.name || row.username || 'N/A' },
+    { key: 'contact', label: 'Contact', render: (v, row) => row.email || row.contact || 'N/A' },
     { key: 'orders', label: 'Orders', render: (v, row) => row.ordersCount || row.orders || 0 },
     { key: 'lastOrder', label: 'Last Order', render: (v, row) => row.lastOrder || row.lastOrderDate || 'N/A' },
     { key: 'status', label: 'Status', render: (v, row) => {
@@ -163,10 +165,13 @@ export default function Users(){
             <DataTable
               columns={columns}
               rows={pageRows}
+            getRowStyle={(row)=> (row.suspended || row.status === 'suspended') ? { background: 'rgba(176,0,32,0.08)' } : undefined}
               renderActions={row => (
                 <div className="cluster">
                   <button className="btn" onClick={()=>setSelected(row)} style={{ background: 'var(--color-gray-100)' }}>View</button>
-                  <button className="btn btn--emphasis">{row.status === 'active' ? 'Suspend' : 'Reactivate'}</button>
+                  <button className="btn btn--emphasis" onClick={async ()=>{ await apiService.suspendUser(row.id || row._id); await refetch(); }}>
+                    {((row.suspended) || (row.status === 'suspended')) ? 'Reactivate' : 'Suspend'}
+                  </button>
                 </div>
               )}
             />
@@ -178,7 +183,7 @@ export default function Users(){
               items={pageRows}
               renderCard={(row)=>(
                 <div className="card-row">
-                  <div><strong>{row.names || row.name || row.username || 'N/A'}</strong><div className="muted">{row.id || row._id || 'N/A'}</div></div>
+                  <div><strong>{row.name || row.username || 'N/A'}</strong><div className="muted">{row.id || row._id || 'N/A'}</div></div>
                   <div style={{ justifySelf: 'end' }}>
                     <span style={{ 
                       background: (row.status || 'active') === 'active' ? 'rgba(30,165,9,0.12)' : 'rgba(176,0,32,0.12)', 
@@ -189,7 +194,7 @@ export default function Users(){
                       fontWeight: 600 
                     }}>{row.status || 'active'}</span>
                   </div>
-                  <div><small className="muted">Contact</small><div>{row.email || row.phoneNumber || row.contact || 'N/A'}</div></div>
+                  <div><small className="muted">Contact</small><div>{row.email || row.contact || 'N/A'}</div></div>
                   <div><small className="muted">Orders</small><div>{row.ordersCount || row.orders || 0}</div></div>
                   <div><small className="muted">Last order</small><div>{row.lastOrder || row.lastOrderDate || 'N/A'}</div></div>
                   <div><button className="btn" onClick={()=>setSelected(row)} style={{ background: 'var(--color-gray-100)' }}>View</button></div>

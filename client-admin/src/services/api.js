@@ -121,6 +121,15 @@ class ApiService {
     return this.request(config.api.partnerById(id));
   }
 
+  async disablePartner(partnerId) {
+    return this.request(config.api.disablePartner(partnerId), {
+      method: 'PATCH',
+      headers: {
+        ...(this.adminToken ? { 'Authorization': `Bearer ${this.adminToken}` } : {}),
+      },
+    });
+  }
+
   // Drivers (using new admin endpoints)
   async getDrivers(params = {}) {
     return this.request(config.api.adminDrivers, {
