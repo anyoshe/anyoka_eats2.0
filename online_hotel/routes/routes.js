@@ -2002,7 +2002,7 @@ const Driver = mongoose.models.Driver || mongoose.model('Driver', DriverSchema);
 
 
 router.post('/driver/signup', async (req, res) => {
-  const { username, phoneNumber, email, password, nationalId, driverLicenseNumber } = req.body;
+  const { username, phoneNumber, email, password, nationalId, driverLicenseNumber, plateNumber } = req.body;
   console.log(req.body);
 
   if (!username || !phoneNumber || !email || !password || !nationalId || !driverLicenseNumber) {
@@ -2033,6 +2033,9 @@ router.post('/driver/signup', async (req, res) => {
       password: hashedPassword,
       nationalId,
       driverLicenseNumber,
+      vehicleDetails: {
+        plateNumber: plateNumber || undefined,
+      },
     });
 
     await newDriver.save();

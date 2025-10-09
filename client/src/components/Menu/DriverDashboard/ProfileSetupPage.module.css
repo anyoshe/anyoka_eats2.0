@@ -1,32 +1,36 @@
-:root {
-  --green: #1ea509;
-  --orange: #ffa500;
-  --white: #ffffff;
-}
-
 .profileSetupContainer {
   max-width: 60rem;
-  margin: 2rem auto;
-  padding: 2rem;
-  background: var(--white);
-  border-radius: 1rem;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  margin: var(--space-6) auto;
+  padding: var(--space-6);
+  background: var(--color-white);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-lg);
 }
 
 h2 {
   text-align: center;
-  color: var(--green);
-  margin-bottom: 1.5rem;
+  color: var(--color-green);
+  margin-bottom: var(--space-6);
 }
 
 h3 {
-  margin: 1.5rem 0 1rem;
-  color: var(--orange);
+  margin: var(--space-4) 0 var(--space-3);
+  color: var(--color-green);
+}
+
+/* Section wrapper for consistent spacing and borders */
+.sectionCard {
+  background: var(--color-white);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  padding: var(--space-5);
+  box-shadow: var(--shadow-sm);
+  margin-bottom: var(--space-6);
 }
 
 .photoSection {
   text-align: center;
-  margin-bottom: 2rem;
+  margin-bottom: var(--space-6);
 }
 
 .photoPreview,
@@ -37,7 +41,7 @@ h3 {
   object-fit: cover;
   display: block;
   margin: 0 auto 1rem;
-  border: 2px solid var(--orange);
+  border: 2px solid var(--color-orange);
 }
 
 .photoPlaceholder {
@@ -51,21 +55,34 @@ h3 {
 .gridTwo {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 1rem;
+  gap: var(--space-4);
+}
+
+label {
+  display: block;
+  font-weight: 600;
+  color: var(--color-gray-700);
+  margin-bottom: var(--space-2);
 }
 
 input {
   padding: 0.8rem 1rem;
-  border: 1px solid #ccc;
-  border-radius: 0.5rem;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
   font-size: 1rem;
-  transition: border 0.3s ease;
+  transition: border var(--duration-fast) var(--ease-out), box-shadow var(--duration-fast) var(--ease-out);
   width: 100%;
+  background: var(--color-white);
 }
 
 input:focus {
-  border: 1px solid var(--orange);
+  border: 1px solid var(--color-orange);
   outline: none;
+  box-shadow: 0 0 0 3px rgba(255,165,0,0.2);
+}
+
+.readOnlyInput {
+  cursor: pointer;
 }
 
 .selectedLocation {
@@ -85,7 +102,7 @@ input:focus {
   display: flex;
   align-items: center;
   justify-content: center;
-  z-index: 9999;
+  z-index: var(--z-modal);
 }
 
 .mapModal {
@@ -93,8 +110,8 @@ input:focus {
   width: 90%;
   max-width: 50rem;
   height: 70vh;
-  background: var(--white);
-  border-radius: 1rem;
+  background: var(--color-white);
+  border-radius: var(--radius-lg);
   overflow: hidden;
 }
 
@@ -102,12 +119,12 @@ input:focus {
   position: absolute;
   top: 0.5rem;
   right: 0.5rem;
-  background: var(--orange);
+  background: var(--color-orange);
   border: none;
   border-radius: 50%;
   width: 2rem;
   height: 2rem;
-  color: var(--white);
+  color: var(--color-white);
   font-size: 1.2rem;
   cursor: pointer;
   z-index: 10;
@@ -116,37 +133,39 @@ input:focus {
 .buttonRow {
   display: flex;
   justify-content: space-between;
-  margin-top: 2rem;
-  gap: 1rem;
+  margin-top: var(--space-6);
+  gap: var(--space-3);
 }
 
 .backButton,
 .submitButton {
   flex: 1;
-  padding: 0.8rem;
+  padding: var(--space-3);
   border: none;
-  border-radius: 2rem;
+  border-radius: var(--radius-pill);
   font-size: 1rem;
   cursor: pointer;
-  transition: 0.3s;
+  transition: background var(--duration-fast) var(--ease-out), color var(--duration-fast) var(--ease-out), transform var(--duration-fast) var(--ease-out);
 }
 
 .backButton {
-  background: #eee;
-  color: #333;
+  background: var(--color-white);
+  color: var(--color-orange);
+  border: 1px solid var(--color-orange);
 }
 
 .backButton:hover {
-  background: #ddd;
+  background: var(--color-orange);
+  color: var(--color-white);
 }
 
 .submitButton {
-  background: var(--green);
-  color: var(--white);
+  background: var(--color-green);
+  color: var(--color-white);
 }
 
 .submitButton:hover {
-  background: var(--orange);
+  background: var(--color-orange);
 }
 
 /* Media Queries - 2560px to 320px */
@@ -167,7 +186,7 @@ input:focus {
 }
 
 @media (max-width: 768px) {
-  .profileSetupContainer { padding: 1.5rem; }
+  .profileSetupContainer { padding: var(--space-5); }
   .buttonRow { flex-direction: column; }
 }
 
@@ -176,7 +195,7 @@ input:focus {
 }
 
 @media (max-width: 320px) {
-  .profileSetupContainer { padding: 1rem; }
+  .profileSetupContainer { padding: var(--space-4); }
   input { font-size: 0.9rem; }
   h2 { font-size: 1.2rem; }
 }
