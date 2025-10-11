@@ -136,6 +136,7 @@ const AccountPage = () => {
             <div className={styles.mobileTab} onClick={() => handleTabChange("orders")}>Orders</div>
             <div className={styles.mobileTab} onClick={() => handleTabChange("sales")}>Sales</div>
             <div className={styles.mobileTab} onClick={() => handleTabChange("shop")}>Shop</div>
+            <div className={styles.mobileTab} onClick={() => handleTabChange("share")}>Share</div>
             <div className={styles.mobileDivider}></div>
             <div className={styles.mobileDanger} onClick={() => logoutAndClose()}>Logout</div>
           </div>
