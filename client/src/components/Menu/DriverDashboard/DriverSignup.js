@@ -18,7 +18,7 @@ const DriverSignup = () => {
     password: '',
     nationalId: '',
     driverLicenseNumber: '',
-    plateNumber: '',
+    
   });
 
   const [loginData, setLoginData] = useState({
@@ -43,7 +43,7 @@ const DriverSignup = () => {
   };
 
   const validateForm = () => {
-    const requiredFields = ['username', 'phoneNumber', 'password', 'nationalId', 'driverLicenseNumber', 'plateNumber'];
+    const requiredFields = ['username', 'phoneNumber', 'password', 'nationalId', 'driverLicenseNumber'];
     const missingFields = [];
     
     for (const field of requiredFields) {
@@ -178,7 +178,7 @@ const DriverSignup = () => {
     </p>
           </>
         ) : (
-          ['username', 'phoneNumber', 'email', 'password', 'nationalId', 'driverLicenseNumber', 'plateNumber'].map(field => (
+          ['username', 'phoneNumber', 'email', 'password', 'nationalId', 'driverLicenseNumber'].map(field => (
             loading ? <div key={field} className={styles.skeletonField} /> : (
             <div key={field} className={styles.formGroup}>
               <label>

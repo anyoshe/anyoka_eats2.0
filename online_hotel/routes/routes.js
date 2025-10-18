@@ -587,10 +587,10 @@ const adsSchema = new mongoose.Schema({
     content: { type: String }, // for text
     mediaUrl: { type: String }, // for image/video
     link: { type: String },
-    placement: { 
-      type: String, 
-      enum: ['hero_top_marquee','hero_left','hero_right'], 
-      default: 'hero_top_marquee' 
+    placement: {
+      type: String,
+      enum: ['hero_top_marquee', 'hero_left', 'hero_right'],
+      default: 'hero_top_marquee'
     },
     active: { type: Boolean, default: true },
     startsAt: { type: Date },
@@ -604,11 +604,13 @@ router.get('/ads', async (req, res) => {
   try {
     let ads = await Ads.findOne();
     if (!ads) {
-      ads = await Ads.create({ items: [
-        { type: 'text', content: "Today's picks are hot — grab your favorites!", placement: 'hero_top_marquee' },
-        { type: 'text', content: 'Limited-time deals across top categories', placement: 'hero_top_marquee' },
-        { type: 'text', content: 'Fast delivery on featured items near you', placement: 'hero_top_marquee' },
-      ]});
+      ads = await Ads.create({
+        items: [
+          { type: 'text', content: "Today's picks are hot — grab your favorites!", placement: 'hero_top_marquee' },
+          { type: 'text', content: 'Limited-time deals across top categories', placement: 'hero_top_marquee' },
+          { type: 'text', content: 'Fast delivery on featured items near you', placement: 'hero_top_marquee' },
+        ]
+      });
     }
     // filter active and within schedule if provided
     const now = new Date();
@@ -643,10 +645,10 @@ router.put('/admin/ads', authenticateAdminToken, async (req, res) => {
       return res.status(400).json({ message: 'items must be an array' });
     }
     // sanitize
-    const allowed = ['text','image','video'];
-    const allowedPlacements = ['hero_top_marquee','hero_left','hero_right'];
+    const allowed = ['text', 'image', 'video'];
+    const allowedPlacements = ['hero_top_marquee', 'hero_left', 'hero_right'];
     const clean = items.map(raw => ({
-      type: ['text','image','video'].includes(raw.type) ? raw.type : 'text',
+      type: ['text', 'image', 'video'].includes(raw.type) ? raw.type : 'text',
       content: raw.content ? String(raw.content) : undefined,
       mediaUrl: raw.mediaUrl ? String(raw.mediaUrl) : undefined,
       link: raw.link ? String(raw.link) : undefined,
@@ -1160,15 +1162,15 @@ router.put('/products/:id', uploadProductImages, processProductImages, async (re
     product.tags = req.body.tags ? req.body.tags.split(',').map((tag) => tag.trim()) : product.tags;
     product.price = req.body.price || product.price;
 
-  if (
-  req.body.discountedPrice === '' ||
-  req.body.discountedPrice === '0' ||
-  Number(req.body.discountedPrice) === 0
-) {
-  product.discountedPrice = null;
-} else if (req.body.discountedPrice !== undefined) {
-  product.discountedPrice = req.body.discountedPrice;
-}
+    if (
+      req.body.discountedPrice === '' ||
+      req.body.discountedPrice === '0' ||
+      Number(req.body.discountedPrice) === 0
+    ) {
+      product.discountedPrice = null;
+    } else if (req.body.discountedPrice !== undefined) {
+      product.discountedPrice = req.body.discountedPrice;
+    }
     product.quantity = req.body.quantity || product.quantity;
     product.unit = req.body.unit || product.unit;
     product.inventory = req.body.inventory || product.inventory;
@@ -1463,7 +1465,9 @@ const OrderSchema = new mongoose.Schema({
   },
   total: { type: Number, default: 0 },
   paymentMethod: { type: String, enum: ['COD', 'Mpesa', 'PayPal', 'Card'], required: true },
-  paymentStatus: { type: String, enum: ['Pending', 'Paid'], default: 'Pending' },
+  paymentStatus: { type: String, enum: ['Pending', 'Paid', 'DepositPaid'], default: 'Pending' },
+  paymentType: { type: String, enum: ['full', 'deposit'], default: 'full' },
+  balanceDue: { type: Number, default: 0 },
   createdAt: { type: Date, default: Date.now },
   assignedDriver: { type: mongoose.Schema.Types.ObjectId, ref: 'Driver', default: null },
   deliveredAt: { type: Date },
@@ -1516,7 +1520,7 @@ const SubOrderSchema = new mongoose.Schema({
       'PickedUp',
       'OutForDelivery',
       'Delivered',
-      'Confirmed Delivered', 
+      'Confirmed Delivered',
     ],
     default: 'Pending'
   },
@@ -1566,12 +1570,32 @@ router.post('/orders/place', async (req, res) => {
   try {
     // 1. Create main order
     const total = items.reduce((sum, i) => sum + i.price * i.quantity, 0);
+    // const order = await Order.create([{
+    //   user: userId,
+    //   items,
+    //   delivery,
+    //   paymentMethod,
+    //   total // <- Add this
+    // }], { session });
+    const {
+      paymentStatus = 'Pending',
+      paymentType = 'full',
+    } = req.body;
+
+    let balanceDue = 0;
+    if (paymentType === 'deposit') {
+      balanceDue = Math.round(total + delivery.fee - (total + delivery.fee) * 0.3);
+    }
+
     const order = await Order.create([{
       user: userId,
       items,
       delivery,
       paymentMethod,
-      total // <- Add this
+      total,
+      paymentStatus,
+      paymentType,
+      balanceDue
     }], { session });
 
 
@@ -2002,7 +2026,7 @@ const Driver = mongoose.models.Driver || mongoose.model('Driver', DriverSchema);
 
 
 router.post('/driver/signup', async (req, res) => {
-  const { username, phoneNumber, email, password, nationalId, driverLicenseNumber, plateNumber } = req.body;
+  const { username, phoneNumber, email, password, nationalId, driverLicenseNumber } = req.body;
   console.log(req.body);
 
   if (!username || !phoneNumber || !email || !password || !nationalId || !driverLicenseNumber) {
@@ -2033,9 +2057,7 @@ router.post('/driver/signup', async (req, res) => {
       password: hashedPassword,
       nationalId,
       driverLicenseNumber,
-      vehicleDetails: {
-        plateNumber: plateNumber || undefined,
-      },
+
     });
 
     await newDriver.save();
@@ -2396,32 +2418,72 @@ router.get('/driver-active-orders/:driverId', authenticateToken, async (req, res
   }
 });
 
+// router.put('/orders/:orderId/mark-delivered', authenticateToken, async (req, res) => {
+//   const { orderId } = req.params;
+//   const { driverName, driverPhone } = req.body;
+
+//   try {
+//     const order = await Order.findByIdAndUpdate(
+//       orderId,
+//       {
+//         status: 'Delivered',
+//         deliveredAt: new Date(),
+//         deliveredBy: driverName,
+//         deliveredByPhone: driverPhone,
+//       },
+//       { new: true }
+//     );
+
+//     if (!order) {
+//       return res.status(404).json({ error: 'Order not found' });
+//     }
+
+//     res.json({ message: 'Order marked as delivered', order });
+//   } catch (error) {
+//     console.error('Error marking order as delivered:', error.message);
+//     res.status(500).json({ error: 'Server error' });
+//   }
+// });
+
 router.put('/orders/:orderId/mark-delivered', authenticateToken, async (req, res) => {
   const { orderId } = req.params;
-  const { driverName, driverPhone } = req.body;
+  const { driverName, driverPhone, finalPaymentReceived = false } = req.body;
 
   try {
-    const order = await Order.findByIdAndUpdate(
-      orderId,
-      {
-        status: 'Delivered',
-        deliveredAt: new Date(),
-        deliveredBy: driverName,
-        deliveredByPhone: driverPhone,
-      },
-      { new: true }
-    );
-
+    const order = await Order.findById(orderId);
     if (!order) {
       return res.status(404).json({ error: 'Order not found' });
     }
 
-    res.json({ message: 'Order marked as delivered', order });
+    // 🧮 CASE 1: Deposit order - check payment completion
+    if (order.paymentType === 'deposit' && order.balanceDue > 0) {
+      if (!finalPaymentReceived) {
+        return res.status(400).json({
+          error: `Cannot mark as fully delivered. Customer still owes KSH ${order.balanceDue}.`,
+          requiresFinalPayment: true,
+        });
+      }
+
+      // ✅ Final payment confirmed by driver
+      order.paymentStatus = 'Paid';
+      order.balanceDue = 0;
+    }
+
+    // 🧮 CASE 2: Normal order (full payment or COD)
+    order.status = 'Delivered';
+    order.deliveredAt = new Date();
+    order.deliveredBy = driverName;
+    order.deliveredByPhone = driverPhone;
+
+    await order.save();
+
+    res.json({ message: 'Order marked as delivered successfully', order });
   } catch (error) {
     console.error('Error marking order as delivered:', error.message);
     res.status(500).json({ error: 'Server error' });
   }
 });
+
 
 router.put('/orders/:orderId/confirm-delivery', authenticateToken, async (req, res) => {
   const { orderId } = req.params;
@@ -2551,7 +2613,7 @@ router.get('/search', async (req, res) => {
     category: { $regex: q, $options: 'i' }
   });
 
-   // Search subcategories
+  // Search subcategories
   const subcategories = await Product.distinct('subCategory', {
     subCategory: { $regex: q, $options: 'i' }
   });
@@ -2604,7 +2666,159 @@ router.get('/products/by-shop/:shopId', async (req, res) => {
 
 
 
-// PAYMENTS CONTROLS ROUTES
+// // PAYMENTS CONTROLS ROUTES
+// const consumerKey = process.env.CONSUMER_KEY;
+// const consumerSecret = process.env.CONSUMER_SECRET;
+// const shortcode = process.env.SHORTCODE;
+// const passkey = process.env.PASSKEY;
+// const ngrokUrl = process.env.NODE_ENV === 'production'
+//   ? process.env.NGROK_URL
+//   : process.env.NGROK_URL_LOCAL;
+// router.post('/mpesa/callback', (req, res) => {
+//   const callbackData = req.body;
+//   console.log('M-Pesa Callback Received:', callbackData);
+
+//   // Your logic to handle the callback data goes here...
+//   // Extract relevant information from the callback data
+//   const { Body, ResultCode, ResultDesc } = callbackData;
+
+//   // Log the callback data for debugging or auditing
+//   console.log('Callback Body:', Body);
+//   console.log('Result Code:', ResultCode);
+//   console.log('Result Description:', ResultDesc);
+
+//   // Example: Process the callback based on ResultCode
+//   if (ResultCode === 0) {
+//     // Successful transaction
+//     // Update your database, notify user, etc.
+//     console.log('Payment successful. Update database...');
+//   } else {
+//     // Failed transaction
+//     // Handle failure scenario
+//     console.log('Payment failed:', ResultDesc);
+//   }
+//   // Respond with a success status to acknowledge receipt
+//   res.sendStatus(200);
+// });
+
+
+
+// // Route to handle M-Pesa payment
+// const generateTimestamp = () => {
+//   const date = new Date();
+
+//   const year = date.getFullYear();
+//   const month = String(date.getMonth() + 1).padStart(2, '0');
+//   const day = String(date.getDate()).padStart(2, '0');
+//   const hours = String(date.getHours()).padStart(2, '0');
+//   const minutes = String(date.getMinutes()).padStart(2, '0');
+//   const seconds = String(date.getSeconds()).padStart(2, '0');
+
+//   return `${year}${month}${day}${hours}${minutes}${seconds}`;
+// };
+
+
+
+// router.post('/mpesa/pay', async (req, res) => {
+//   const { phoneNumber, amount } = req.body;
+//   console.log('Received payment request:', { phoneNumber, amount });
+
+//   try {
+//     const timestamp = generateTimestamp();
+//     console.log('Generated timestamp:', timestamp);
+
+//     // Fetch access token 
+//     const authResponse = await axios.get('https://api.safaricom.co.ke/oauth/v1/generate?grant_type=client_credentials', {
+//       headers: {
+//         'Authorization': `Basic ${Buffer.from(`${consumerKey}:${consumerSecret}`).toString('base64')}`
+//       }
+//     });
+
+//     const { access_token } = authResponse.data;
+//     if (!access_token) {
+//       throw new Error('Failed to fetch access token');
+//     }
+
+//     console.log('Access Token:', access_token);
+
+//     // Generate password and payment data
+//     const password = Buffer.from(`${shortcode}${passkey}${timestamp}`).toString('base64');
+//     const paymentData = {
+//       BusinessShortCode: shortcode,
+//       Password: password,
+//       Timestamp: timestamp,
+//       TransactionType: 'CustomerPayBillOnline',
+//       Amount: amount,
+//       PartyA: phoneNumber,
+//       PartyB: shortcode,
+//       PhoneNumber: phoneNumber,
+//       CallBackURL: `${ngrokUrl}/mpesa/callback`,
+//       AccountReference: 4148059,
+//       TransactionDesc: 'Order Payment'
+//     };
+
+//     console.log('Payment Data:', paymentData);
+
+//     // Initiate payment 
+//     const paymentResponse = await axios.post('https://api.safaricom.co.ke/mpesa/stkpush/v1/processrequest', paymentData, {
+//       headers: {
+//         'Authorization': `Bearer ${access_token}`,
+//         'Content-Type': 'application/json'
+//       }
+//     });
+
+//     console.log('Payment Response:', paymentResponse.data);
+//     res.json(paymentResponse.data);
+//   } catch (error) {
+//     console.error('Error initiating M-Pesa payment:', error.response ? error.response.data : error.message);
+//     res.status(500).json({ error: 'Failed to initiate payment', details: error.message });
+//   }
+// });
+
+// router.post('/mpesa/status', async (req, res) => {
+//   const { CheckoutRequestID } = req.body; // The ID from the payment initiation response
+//   console.log('Checking payment status for:', CheckoutRequestID);
+
+//   try {
+//     // Fetch access token
+//     const authResponse = await axios.get('https://api.safaricom.co.ke/oauth/v1/generate?grant_type=client_credentials', {
+//       headers: {
+//         'Authorization': `Basic ${Buffer.from(`${consumerKey}:${consumerSecret}`).toString('base64')}`
+//       }
+//     });
+
+//     const { access_token } = authResponse.data;
+//     if (!access_token) {
+//       throw new Error('Failed to fetch access token');
+//     }
+
+//     console.log('Access Token:', access_token);
+
+//     // Payment status request data
+//     const statusRequestData = {
+//       BusinessShortCode: shortcode,
+//       Password: Buffer.from(`${shortcode}${passkey}${generateTimestamp()}`).toString('base64'),
+//       Timestamp: generateTimestamp(),
+//       CheckoutRequestID: CheckoutRequestID
+//     };
+
+//     // Query payment status
+//     const statusResponse = await axios.post('https://api.safaricom.co.ke/mpesa/stkpushquery/v1/query', statusRequestData, {
+//       headers: {
+//         'Authorization': `Bearer ${access_token}`,
+//         'Content-Type': 'application/json'
+//       }
+//     });
+
+//     console.log('Payment Status Response:', statusResponse.data);
+//     res.json(statusResponse.data);
+//   } catch (error) {
+//     console.error('Error checking payment status:', error.response ? error.response.data : error.message);
+//     res.status(500).json({ error: 'Failed to check payment status', details: error.message });
+//   }
+// });
+// --- M-PESA ROUTES (Extended) ---
+
 const consumerKey = process.env.CONSUMER_KEY;
 const consumerSecret = process.env.CONSUMER_SECRET;
 const shortcode = process.env.SHORTCODE;
@@ -2612,75 +2826,32 @@ const passkey = process.env.PASSKEY;
 const ngrokUrl = process.env.NODE_ENV === 'production'
   ? process.env.NGROK_URL
   : process.env.NGROK_URL_LOCAL;
-router.post('/mpesa/callback', (req, res) => {
-  const callbackData = req.body;
-  console.log('M-Pesa Callback Received:', callbackData);
 
-  // Your logic to handle the callback data goes here...
-  // Extract relevant information from the callback data
-  const { Body, ResultCode, ResultDesc } = callbackData;
-
-  // Log the callback data for debugging or auditing
-  console.log('Callback Body:', Body);
-  console.log('Result Code:', ResultCode);
-  console.log('Result Description:', ResultDesc);
-
-  // Example: Process the callback based on ResultCode
-  if (ResultCode === 0) {
-    // Successful transaction
-    // Update your database, notify user, etc.
-    console.log('Payment successful. Update database...');
-  } else {
-    // Failed transaction
-    // Handle failure scenario
-    console.log('Payment failed:', ResultDesc);
-  }
-  // Respond with a success status to acknowledge receipt
-  res.sendStatus(200);
-});
-
-
-
-// Route to handle M-Pesa payment
 const generateTimestamp = () => {
   const date = new Date();
-
-  const year = date.getFullYear();
-  const month = String(date.getMonth() + 1).padStart(2, '0');
-  const day = String(date.getDate()).padStart(2, '0');
-  const hours = String(date.getHours()).padStart(2, '0');
-  const minutes = String(date.getMinutes()).padStart(2, '0');
-  const seconds = String(date.getSeconds()).padStart(2, '0');
-
-  return `${year}${month}${day}${hours}${minutes}${seconds}`;
+  return date.toISOString().replace(/[-T:.Z]/g, '').slice(0, 14);
 };
 
+// 🔹 Utility: Get Safaricom Access Token
+const getAccessToken = async () => {
+  const response = await axios.get('https://api.safaricom.co.ke/oauth/v1/generate?grant_type=client_credentials', {
+    headers: {
+      Authorization: `Basic ${Buffer.from(`${consumerKey}:${consumerSecret}`).toString('base64')}`,
+    },
+  });
+  return response.data.access_token;
+};
 
-
+// 🔹 Initiate M-Pesa Payment (Deposit or Balance)
 router.post('/mpesa/pay', async (req, res) => {
-  const { phoneNumber, amount } = req.body;
-  console.log('Received payment request:', { phoneNumber, amount });
+  const { phoneNumber, amount, orderId, paymentType = 'Full' } = req.body; 
+  console.log('Received payment request:', { phoneNumber, amount, orderId, paymentType });
 
   try {
     const timestamp = generateTimestamp();
-    console.log('Generated timestamp:', timestamp);
-
-    // Fetch access token 
-    const authResponse = await axios.get('https://api.safaricom.co.ke/oauth/v1/generate?grant_type=client_credentials', {
-      headers: {
-        'Authorization': `Basic ${Buffer.from(`${consumerKey}:${consumerSecret}`).toString('base64')}`
-      }
-    });
-
-    const { access_token } = authResponse.data;
-    if (!access_token) {
-      throw new Error('Failed to fetch access token');
-    }
-
-    console.log('Access Token:', access_token);
-
-    // Generate password and payment data
+    const accessToken = await getAccessToken();
     const password = Buffer.from(`${shortcode}${passkey}${timestamp}`).toString('base64');
+
     const paymentData = {
       BusinessShortCode: shortcode,
       Password: password,
@@ -2690,22 +2861,31 @@ router.post('/mpesa/pay', async (req, res) => {
       PartyA: phoneNumber,
       PartyB: shortcode,
       PhoneNumber: phoneNumber,
-      CallBackURL: `${ngrokUrl}/mpesa/callback`,
-      AccountReference: 4148059,
-      TransactionDesc: 'Order Payment'
+      CallBackURL: `${ngrokUrl}/api/mpesa/callback`,
+      AccountReference: orderId || 'ANYEAT-ORDER',
+      TransactionDesc: paymentType === 'Deposit' ? 'Deposit Payment' : 'Balance Payment',
     };
 
-    console.log('Payment Data:', paymentData);
-
-    // Initiate payment 
-    const paymentResponse = await axios.post('https://api.safaricom.co.ke/mpesa/stkpush/v1/processrequest', paymentData, {
-      headers: {
-        'Authorization': `Bearer ${access_token}`,
-        'Content-Type': 'application/json'
+    const paymentResponse = await axios.post(
+      'https://api.safaricom.co.ke/mpesa/stkpush/v1/processrequest',
+      paymentData,
+      {
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+          'Content-Type': 'application/json',
+        },
       }
-    });
+    );
 
-    console.log('Payment Response:', paymentResponse.data);
+    // Save pending transaction to order for tracking
+    if (orderId) {
+      await Order.findByIdAndUpdate(orderId, {
+        lastPaymentRequestId: paymentResponse.data.CheckoutRequestID,
+        lastPaymentAmount: amount,
+        paymentInitiatedAt: new Date(),
+      });
+    }
+
     res.json(paymentResponse.data);
   } catch (error) {
     console.error('Error initiating M-Pesa payment:', error.response ? error.response.data : error.message);
@@ -2713,43 +2893,91 @@ router.post('/mpesa/pay', async (req, res) => {
   }
 });
 
+// 🔹 Handle M-Pesa Callback
+router.post('/mpesa/callback', async (req, res) => {
+  try {
+    const callbackData = req.body;
+    console.log('M-Pesa Callback Received:', JSON.stringify(callbackData, null, 2));
+
+    const result = callbackData.Body.stkCallback;
+    const checkoutId = result.CheckoutRequestID;
+    const resultCode = result.ResultCode;
+    const resultDesc = result.ResultDesc;
+
+    if (resultCode !== 0) {
+      console.warn('M-Pesa Payment Failed:', resultDesc);
+      return res.sendStatus(200);
+    }
+
+    const metadata = result.CallbackMetadata?.Item || [];
+    const amount = metadata.find(i => i.Name === 'Amount')?.Value || 0;
+    const mpesaNumber = metadata.find(i => i.Name === 'PhoneNumber')?.Value || 'Unknown';
+    const transactionId = metadata.find(i => i.Name === 'MpesaReceiptNumber')?.Value;
+
+    console.log('✅ Payment Success:', { transactionId, mpesaNumber, amount });
+
+    // --- Update corresponding order if found ---
+    const order = await Order.findOne({ lastPaymentRequestId: checkoutId });
+    if (!order) {
+      console.warn('No order found for CheckoutRequestID:', checkoutId);
+      return res.sendStatus(200);
+    }
+
+    let newPaymentStatus = order.paymentStatus;
+    let newAmountPaid = (order.amountPaid || 0) + amount;
+    let newBalance = Math.max((order.total + (order.delivery?.fee || 0)) - newAmountPaid, 0);
+
+    if (newBalance <= 0) {
+      newPaymentStatus = 'Paid';
+    } else if (newAmountPaid > 0) {
+      newPaymentStatus = 'PartiallyPaid';
+    }
+
+    await Order.findByIdAndUpdate(order._id, {
+      paymentStatus: newPaymentStatus,
+      amountPaid: newAmountPaid,
+      balanceDue: newBalance,
+      lastTransactionId: transactionId,
+      lastPaidBy: mpesaNumber,
+    });
+
+    console.log(`✅ Order ${order._id} updated: ${newPaymentStatus}`);
+
+    res.sendStatus(200);
+  } catch (error) {
+    console.error('Error in M-Pesa callback:', error.message);
+    res.sendStatus(500);
+  }
+});
+
+// 🔹 Check Payment Status
 router.post('/mpesa/status', async (req, res) => {
-  const { CheckoutRequestID } = req.body; // The ID from the payment initiation response
+  const { CheckoutRequestID } = req.body;
   console.log('Checking payment status for:', CheckoutRequestID);
 
   try {
-    // Fetch access token
-    const authResponse = await axios.get('https://api.safaricom.co.ke/oauth/v1/generate?grant_type=client_credentials', {
-      headers: {
-        'Authorization': `Basic ${Buffer.from(`${consumerKey}:${consumerSecret}`).toString('base64')}`
-      }
-    });
+    const accessToken = await getAccessToken();
+    const timestamp = generateTimestamp();
 
-    const { access_token } = authResponse.data;
-    if (!access_token) {
-      throw new Error('Failed to fetch access token');
-    }
-
-    console.log('Access Token:', access_token);
-
-    // Payment status request data
     const statusRequestData = {
       BusinessShortCode: shortcode,
-      Password: Buffer.from(`${shortcode}${passkey}${generateTimestamp()}`).toString('base64'),
-      Timestamp: generateTimestamp(),
-      CheckoutRequestID: CheckoutRequestID
+      Password: Buffer.from(`${shortcode}${passkey}${timestamp}`).toString('base64'),
+      Timestamp: timestamp,
+      CheckoutRequestID,
     };
 
-    // Query payment status
-    const statusResponse = await axios.post('https://api.safaricom.co.ke/mpesa/stkpushquery/v1/query', statusRequestData, {
-      headers: {
-        'Authorization': `Bearer ${access_token}`,
-        'Content-Type': 'application/json'
+    const response = await axios.post(
+      'https://api.safaricom.co.ke/mpesa/stkpushquery/v1/query',
+      statusRequestData,
+      {
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+          'Content-Type': 'application/json',
+        },
       }
-    });
+    );
 
-    console.log('Payment Status Response:', statusResponse.data);
-    res.json(statusResponse.data);
+    res.json(response.data);
   } catch (error) {
     console.error('Error checking payment status:', error.response ? error.response.data : error.message);
     res.status(500).json({ error: 'Failed to check payment status', details: error.message });
@@ -3017,7 +3245,7 @@ function authenticateAdminToken(req, res, next) {
   if (!token) return res.status(401).json({ message: 'Access Denied - No token provided' });
 
   let verified;
-  
+
   try {
     // First try with the main JWT_SECRET (for real production tokens)
     verified = jwt.verify(token, JWT_SECRET);
@@ -3038,12 +3266,12 @@ function authenticateAdminToken(req, res, next) {
       }
     }
   }
-  
+
   // Check if user has admin role
   if (verified.role !== 'admin' && verified.role !== 'partner') {
     return res.status(403).json({ message: 'Admin access required' });
   }
-  
+
   req.user = verified;
   console.log('Admin token verified:', verified);
   next();
@@ -3055,20 +3283,20 @@ function decodeBrowserJWT(token) {
   if (parts.length !== 3) {
     throw new Error('Invalid token format');
   }
-  
+
   try {
     // Decode the payload (middle part)
     const payload = JSON.parse(Buffer.from(parts[1], 'base64').toString());
-    
+
     // Basic validation
     if (!payload.exp || payload.exp < Math.floor(Date.now() / 1000)) {
       throw new Error('Token expired');
     }
-    
+
     if (!payload.role) {
       throw new Error('Missing role in token');
     }
-    
+
     return payload;
   } catch (error) {
     throw new Error('Failed to decode browser JWT: ' + error.message);
@@ -3163,7 +3391,7 @@ router.patch('/admin/users/:userId/suspend', authenticateAdminToken, async (req,
   try {
     const { userId } = req.params;
     const user = await User.findById(userId);
-    
+
     if (!user) {
       return res.status(404).json({ message: 'User not found' });
     }
@@ -3184,7 +3412,7 @@ router.patch('/admin/drivers/:driverId/disable', authenticateAdminToken, async (
   try {
     const { driverId } = req.params;
     const driver = await Driver.findById(driverId);
-    
+
     if (!driver) {
       return res.status(404).json({ message: 'Driver not found' });
     }
@@ -3195,9 +3423,9 @@ router.patch('/admin/drivers/:driverId/disable', authenticateAdminToken, async (
     } else {
       driver.verificationStatus = 'Rejected';
       driver.status = 'Offline'; // ensure not available
-    try {
-      suspendDriver(String(driver._id), { reason: 'suspended' });
-    } catch (e) {}
+      try {
+        suspendDriver(String(driver._id), { reason: 'suspended' });
+      } catch (e) { }
     }
     await driver.save();
 

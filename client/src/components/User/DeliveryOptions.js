@@ -53,109 +53,194 @@ const DeliveryOptions = ({ cart, userLocation, deliveryTown, onDeliveryOptionSel
 };
 
 
-  const calculateDeliveryFee = async () => {
-    if (!userLocation || cart.length === 0) return;
+  // const calculateDeliveryFee = async () => {
+  //   if (!userLocation || cart.length === 0) return;
   
-    const currentRequestId = requestId + 1;
-    setRequestId(currentRequestId);
-    latestRequestRef.current = currentRequestId;
+  //   const currentRequestId = requestId + 1;
+  //   setRequestId(currentRequestId);
+  //   latestRequestRef.current = currentRequestId;
    
-    setCalculating(true); // START calculating
+  //   setCalculating(true); // START calculating
+  // onDeliveryOptionSelected(null, 'platform', true);
+
+  //   const shopAddresses = cart.map(item => item.shop.location);
+  //   const uniqueShops = [...new Set(shopAddresses)];
+  
+  //   try {
+  //     const shopCoordsList = await Promise.all(uniqueShops.map(addr => geocodeAddress(addr)));
+  //     const userGeo = await geocodeAddress(userLocation);
+  //     const userCoords = userGeo.coords;
+  //     const deliveryTownDetected = userGeo.town?.toLowerCase();
+  
+  //     const origins = shopCoordsList.map(c => c.coords).join('|');
+  //     const response = await fetch(`${config.backendUrl}/api/distance?origins=${origins}&destinations=${userCoords}`);
+  //     const data = await response.json();
+  
+  //     if (currentRequestId !== latestRequestRef.current) {
+  //       return;
+  //     }
+  
+  //     if (data.status !== 'OK') throw new Error('Failed to fetch distance');
+  
+  //     const elements = data.rows.map(row => row.elements[0]);
+  
+  //     let maxDistanceInKm = null;
+  //     elements.forEach((el, idx) => {
+  //       if (el.status === 'OK' && el.distance?.value != null) {
+  //         const distanceInKm = el.distance.value / 1000;
+  //         if (maxDistanceInKm === null || distanceInKm > maxDistanceInKm) {
+  //           maxDistanceInKm = distanceInKm;
+  //         }
+  //       } else {
+  //       }
+  //     });
+  
+  //     if (maxDistanceInKm === null) throw new Error('Could not determine any valid shop-to-user distances.');
+  
+  //     const extraKm = Math.max(0, maxDistanceInKm - DELIVERY_CONFIG.freeLimitKm);
+  //     const baseDeliveryFee = DELIVERY_CONFIG.baseFee + (extraKm * DELIVERY_CONFIG.perKmFee);
+  //     let totalFee = baseDeliveryFee;
+  
+  //     if (uniqueShops.length > 1) {
+  //       totalFee += (uniqueShops.length - 1) * DELIVERY_CONFIG.extraShopHandlingFee;
+  //     }
+  
+  //     const shopTowns = await Promise.all(uniqueShops.map(async (addr) => {
+  //       const result = await geocodeAddress(addr);
+  //       return result.town?.toLowerCase();
+  //     }));
+  
+  //     const anyDifferentTown = shopTowns.some(town =>
+  //       town && deliveryTownDetected && town !== deliveryTownDetected
+  //     );
+  
+  //     if (anyDifferentTown) {
+  //       totalFee += DELIVERY_CONFIG.interTownFee;
+  //     }
+  
+  //     const details = elements.map((el, idx) => {
+  //       if (el.status === 'OK' && el.distance?.value != null) {
+  //         const distanceInKm = el.distance.value / 1000;
+  //         return {
+  //           shop: uniqueShops[idx],
+  //           distance: distanceInKm.toFixed(2),
+  //           fee: idx === 0
+  //             ? baseDeliveryFee.toFixed(2)
+  //             : `Handled (KSH ${DELIVERY_CONFIG.extraShopHandlingFee})`,
+  //         };
+  //       } else {
+  //         return {
+  //           shop: uniqueShops[idx],
+  //           distance: 'N/A',
+  //           fee: 'Unavailable',
+  //         };
+  //       }
+  //     });
+  
+  //     // Final safety check before updating state
+  //     if (currentRequestId === latestRequestRef.current) {
+  //       setDistanceInfo(details);
+  //       const finalCost = Math.ceil(totalFee);
+  //       setDeliveryFee(finalCost);
+  //       onDeliveryOptionSelected(finalCost, 'platform', false);
+  //     }
+  
+  //   } catch (error) {
+  //     if (currentRequestId === latestRequestRef.current) {
+  //       alert('Could not calculate delivery cost. Try again.');
+  //       onDeliveryOptionSelected(null, 'platform', false);
+  //     }
+  //   } finally {
+  //     if (currentRequestId === latestRequestRef.current) {
+  //       setCalculating(false); // FINISHED
+  //     }
+  //   }
+  // };
+
+  const calculateDeliveryFee = async () => {
+  if (!userLocation || cart.length === 0) return;
+
+  const currentRequestId = requestId + 1;
+  setRequestId(currentRequestId);
+  latestRequestRef.current = currentRequestId;
+
+  setCalculating(true);
   onDeliveryOptionSelected(null, 'platform', true);
 
-    const shopAddresses = cart.map(item => item.shop.location);
-    const uniqueShops = [...new Set(shopAddresses)];
-  
-    try {
-      const shopCoordsList = await Promise.all(uniqueShops.map(addr => geocodeAddress(addr)));
-      const userGeo = await geocodeAddress(userLocation);
-      const userCoords = userGeo.coords;
-      const deliveryTownDetected = userGeo.town?.toLowerCase();
-  
-      const origins = shopCoordsList.map(c => c.coords).join('|');
-      const response = await fetch(`${config.backendUrl}/api/distance?origins=${origins}&destinations=${userCoords}`);
-      const data = await response.json();
-  
-      if (currentRequestId !== latestRequestRef.current) {
-        return;
-      }
-  
-      if (data.status !== 'OK') throw new Error('Failed to fetch distance');
-  
-      const elements = data.rows.map(row => row.elements[0]);
-  
-      let maxDistanceInKm = null;
-      elements.forEach((el, idx) => {
-        if (el.status === 'OK' && el.distance?.value != null) {
-          const distanceInKm = el.distance.value / 1000;
-          if (maxDistanceInKm === null || distanceInKm > maxDistanceInKm) {
-            maxDistanceInKm = distanceInKm;
-          }
-        } else {
+  const shopAddresses = cart.map(item => item.shop.location);
+  const uniqueShops = [...new Set(shopAddresses)];
+
+  try {
+    const shopCoordsList = await Promise.all(uniqueShops.map(addr => geocodeAddress(addr)));
+    const userGeo = await geocodeAddress(userLocation);
+    const userCoords = userGeo.coords;
+    const deliveryTownDetected = userGeo.town?.toLowerCase();
+
+    const origins = shopCoordsList.map(c => c.coords).join('|');
+    const response = await fetch(`${config.backendUrl}/api/distance?origins=${origins}&destinations=${userCoords}`);
+    const data = await response.json();
+
+    if (currentRequestId !== latestRequestRef.current) return;
+    if (data.status !== 'OK') throw new Error('Failed to fetch distance');
+
+    const elements = data.rows.map(row => row.elements[0]);
+    let maxDistanceInKm = null;
+
+    elements.forEach((el, idx) => {
+      if (el.status === 'OK' && el.distance?.value != null) {
+        const distanceInKm = el.distance.value / 1000;
+        if (maxDistanceInKm === null || distanceInKm > maxDistanceInKm) {
+          maxDistanceInKm = distanceInKm;
         }
-      });
-  
-      if (maxDistanceInKm === null) throw new Error('Could not determine any valid shop-to-user distances.');
-  
-      const extraKm = Math.max(0, maxDistanceInKm - DELIVERY_CONFIG.freeLimitKm);
-      const baseDeliveryFee = DELIVERY_CONFIG.baseFee + (extraKm * DELIVERY_CONFIG.perKmFee);
-      let totalFee = baseDeliveryFee;
-  
-      if (uniqueShops.length > 1) {
-        totalFee += (uniqueShops.length - 1) * DELIVERY_CONFIG.extraShopHandlingFee;
       }
-  
-      const shopTowns = await Promise.all(uniqueShops.map(async (addr) => {
-        const result = await geocodeAddress(addr);
-        return result.town?.toLowerCase();
-      }));
-  
-      const anyDifferentTown = shopTowns.some(town =>
-        town && deliveryTownDetected && town !== deliveryTownDetected
-      );
-  
-      if (anyDifferentTown) {
-        totalFee += DELIVERY_CONFIG.interTownFee;
-      }
-  
-      const details = elements.map((el, idx) => {
-        if (el.status === 'OK' && el.distance?.value != null) {
-          const distanceInKm = el.distance.value / 1000;
-          return {
-            shop: uniqueShops[idx],
-            distance: distanceInKm.toFixed(2),
-            fee: idx === 0
-              ? baseDeliveryFee.toFixed(2)
-              : `Handled (KSH ${DELIVERY_CONFIG.extraShopHandlingFee})`,
-          };
-        } else {
-          return {
-            shop: uniqueShops[idx],
-            distance: 'N/A',
-            fee: 'Unavailable',
-          };
-        }
-      });
-  
-      // Final safety check before updating state
-      if (currentRequestId === latestRequestRef.current) {
-        setDistanceInfo(details);
-        const finalCost = Math.ceil(totalFee);
-        setDeliveryFee(finalCost);
-        onDeliveryOptionSelected(finalCost, 'platform', false);
-      }
-  
-    } catch (error) {
-      if (currentRequestId === latestRequestRef.current) {
-        alert('Could not calculate delivery cost. Try again.');
-        onDeliveryOptionSelected(null, 'platform', false);
-      }
-    } finally {
-      if (currentRequestId === latestRequestRef.current) {
-        setCalculating(false); // FINISHED
-      }
+    });
+
+    if (maxDistanceInKm === null) throw new Error('No valid distances found.');
+    // Save distance globally for PaymentMethods to access
+    window.localStorage.setItem('latestDistanceKm', maxDistanceInKm);
+
+
+    // ✅ Apply tiered pricing
+    let totalFee;
+    if (maxDistanceInKm <= 5) totalFee = 100;
+    else if (maxDistanceInKm <= 50) totalFee = 100 + (10 * maxDistanceInKm);
+    else if (maxDistanceInKm <= 150) totalFee = 500;
+    else if (maxDistanceInKm <= 500) totalFee = 800;
+    else totalFee = 1000;
+
+    // Add handling for multiple shops
+    if (uniqueShops.length > 1) {
+      totalFee += (uniqueShops.length - 1) * DELIVERY_CONFIG.extraShopHandlingFee;
     }
-  };
+
+    const details = elements.map((el, idx) => ({
+      shop: uniqueShops[idx],
+      distance:
+        el.status === 'OK' && el.distance?.value != null
+          ? (el.distance.value / 1000).toFixed(2)
+          : 'N/A',
+      fee: idx === 0
+        ? Math.ceil(totalFee)
+        : `Handled (KSH ${DELIVERY_CONFIG.extraShopHandlingFee})`,
+    }));
+
+    if (currentRequestId === latestRequestRef.current) {
+      setDistanceInfo(details);
+      setDeliveryFee(Math.ceil(totalFee));
+      onDeliveryOptionSelected(Math.ceil(totalFee), 'platform', false);
+    }
+  } catch (error) {
+    if (currentRequestId === latestRequestRef.current) {
+      alert('Could not calculate delivery cost. Try again.');
+      onDeliveryOptionSelected(null, 'platform', false);
+    }
+  } finally {
+    if (currentRequestId === latestRequestRef.current) {
+      setCalculating(false);
+    }
+  }
+};
+
 
   useEffect(() => {
     if (option === 'platform') {
