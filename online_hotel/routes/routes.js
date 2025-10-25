@@ -307,64 +307,135 @@ router.post('/signup', uploadSignupFiles, processSignupFiles, async (req, res) =
     res.status(201).json({
       message: 'Sign-up successful! Please check your email to verify your account before logging in.',
     });
+
   } catch (error) {
     console.error('Sign-up error:', error);
-    res.status(500).json({ message: 'Server error during sign-up.', error: error.message });
+
+    // 🧠 Handle duplicate key errors from MongoDB
+    if (error.code === 11000) {
+      const field = Object.keys(error.keyPattern || {})[0];
+      const value = error.keyValue ? error.keyValue[field] : '';
+      return res.status(400).json({
+        message: `A partner with this ${field} (${value}) already exists. Please use a different one.`,
+      });
+    }
+
+    // 🧠 Handle Mongoose validation errors (e.g., missing required fields)
+    if (error.name === 'ValidationError') {
+      const messages = Object.values(error.errors).map((err) => err.message);
+      return res.status(400).json({ message: messages.join(' ') });
+    }
+
+    // 🧠 Handle any other server errors
+    res.status(500).json({
+      message: 'An unexpected error occurred during registration. Please try again later.',
+    });
   }
 });
 
 
+
+// router.get('/verify/:token', async (req, res) => {
+//   try {
+//     const partner = await Partner.findOne({ verificationToken: req.params.token });
+
+//     if (!partner) {
+//       return res.status(400).json({ message: 'Invalid or expired verification token.' });
+//     }
+
+//     partner.isVerified = true;
+//     partner.verificationToken = undefined; // clear token after verification
+//     await partner.save();
+
+//     res.status(200).json({ message: 'Account verified successfully! You can now log in.' });
+//   } catch (error) {
+//     res.status(500).json({ message: 'Verification failed.' });
+//   }
+// });
 
 router.get('/verify/:token', async (req, res) => {
   try {
     const partner = await Partner.findOne({ verificationToken: req.params.token });
 
+    // ✅ Case 1: Invalid or expired token
     if (!partner) {
+      // Maybe user already verified earlier — let's check
+      const alreadyVerified = await Partner.findOne({ isVerified: true, verificationToken: undefined });
+      if (alreadyVerified) {
+        return res.status(200).json({
+          message: 'Your account is already verified. You can log in.',
+          alreadyVerified: true,
+        });
+      }
+
       return res.status(400).json({ message: 'Invalid or expired verification token.' });
     }
 
-    partner.isVerified = true;
-    partner.verificationToken = undefined; // clear token after verification
-    await partner.save();
+    // ✅ Case 2: Mark verified (only once)
+    if (!partner.isVerified) {
+      partner.isVerified = true;
+      partner.verificationToken = undefined;
+      await partner.save();
+    }
 
-    res.status(200).json({ message: 'Account verified successfully! You can now log in.' });
+    return res.status(200).json({ message: 'Account verified successfully! You can now log in.' });
   } catch (error) {
-    res.status(500).json({ message: 'Verification failed.' });
+    console.error('Verification error:', error);
+    res.status(500).json({ message: 'Verification failed due to a server error.' });
   }
 });
+
 
 /* =======================
    PARTNER LOGIN ROUTE
 ======================= */
+
 router.post('/partner/login', async (req, res) => {
   const { identifier, password } = req.body;
   console.log('Partner login attempt:', req.body);
 
   if (!identifier || !password) {
-    return res.status(400).json({ message: 'Business name/phone and password are required' });
+    return res.status(400).json({ message: 'Business name/phone and password are required.' });
   }
 
   try {
-    // 🔍 Find partner by business name or contact number (not user!)
+    // 🔍 Find partner by business name or contact number
     const partner = await Partner.findOne({
       $or: [{ businessName: identifier }, { contactNumber: identifier }],
     });
 
     if (!partner) {
       console.error('Partner not found:', identifier);
-      return res.status(404).json({ message: 'Partner not found' });
+      return res.status(404).json({ message: 'Partner not found.' });
     }
 
+    // 🚫 Check if suspended
     if (partner.suspended) {
-      return res.status(403).json({ message: 'Your vendor account has been suspended. Please contact support.' });
+      return res.status(403).json({
+        message: 'Your vendor account has been suspended. Please contact support.',
+      });
     }
 
+    // 🚫 Check if NOT verified
+    if (!partner.isVerified) {
+      return res.status(401).json({
+        message:
+          'Your account has not been verified yet. Please check your email for a verification link or contact support.',
+      });
+    }
+
+    // 🔑 Validate password
     const isMatch = await bcrypt.compare(password, partner.password);
     if (!isMatch) {
-      return res.status(401).json({ message: 'Invalid credentials' });
+      return res.status(401).json({ message: 'Invalid credentials.' });
     }
 
-    const token = jwt.sign({ _id: partner._id, role: 'partner' }, process.env.JWT_SECRET, { expiresIn: '7d' });
+    // ✅ Create JWT token
+    const token = jwt.sign(
+      { _id: partner._id, role: 'partner' },
+      process.env.JWT_SECRET,
+      { expiresIn: '7d' }
+    );
 
     res.status(200).json({
       message: 'Partner login successful',
@@ -377,6 +448,7 @@ router.post('/partner/login', async (req, res) => {
     res.status(500).json({ message: 'Login error', error: error.message });
   }
 });
+
 
 // Retrieve Partner Route
 router.get('/partners/:partnerId', async (req, res) => {
