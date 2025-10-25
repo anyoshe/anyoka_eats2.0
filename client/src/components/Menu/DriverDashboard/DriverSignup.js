@@ -18,7 +18,7 @@ const DriverSignup = () => {
     password: '',
     nationalId: '',
     driverLicenseNumber: '',
-    
+
   });
 
   const [loginData, setLoginData] = useState({
@@ -28,8 +28,8 @@ const DriverSignup = () => {
 
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
-  const [isLogin, setIsLogin] = useState(false); 
-  const [showModal, setShowModal] = useState(false); 
+  const [isLogin, setIsLogin] = useState(false);
+  const [showModal, setShowModal] = useState(false);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -45,34 +45,34 @@ const DriverSignup = () => {
   const validateForm = () => {
     const requiredFields = ['username', 'phoneNumber', 'password', 'nationalId', 'driverLicenseNumber'];
     const missingFields = [];
-    
+
     for (const field of requiredFields) {
       if (!formData[field] || formData[field].trim() === '') {
         missingFields.push(field.replace(/([A-Z])/g, ' $1').toLowerCase());
       }
     }
-    
+
     if (missingFields.length > 0) {
       setError(`Please fill in all required fields: ${missingFields.join(', ')}`);
       return false;
     }
-    
+
     // Additional validation
     if (formData.password.length < 6) {
       setError('Password must be at least 6 characters long');
       return false;
     }
-    
+
     if (formData.phoneNumber && !/^[\d\s\-\+\(\)]+$/.test(formData.phoneNumber)) {
       setError('Please enter a valid phone number');
       return false;
     }
-    
+
     if (formData.email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
       setError('Please enter a valid email address');
       return false;
     }
-    
+
     return true;
   };
 
@@ -86,7 +86,7 @@ const DriverSignup = () => {
         setError('Please fill in username and password');
         return;
       }
-      
+
       const result = await loginDriver(loginData);
       if (result.success) {
         setSuccess('Logged in successfully!');
@@ -98,11 +98,16 @@ const DriverSignup = () => {
       if (!validateForm()) {
         return;
       }
-      
+
       const result = await signupDriver(formData);
+
       if (result.success) {
-        setSuccess('Driver signed up successfully!');
-        // Clear form after successful signup
+        setSuccess('✅ Sign-up successful! Please check your email to verify your account before logging in.');
+        setError('');
+
+        // Optionally auto-switch to login form after a short delay
+        setTimeout(() => setIsLogin(true), 3000);
+
         setFormData({
           username: '',
           phoneNumber: '',
@@ -114,6 +119,7 @@ const DriverSignup = () => {
       } else {
         setError(result.message || 'Signup failed');
       }
+
     }
   };
 
@@ -150,58 +156,58 @@ const DriverSignup = () => {
         {isLogin ? (
           <>
             {loading ? <div className={styles.skeletonField} /> : (
-            <div className={styles.formGroup}>
-              <label>Username / Phone Number</label>
-              <input
-                type="text"
-                name="username"
-                value={loginData.username}
-                onChange={(e) => handleChange(e, true)}
-                required
-              />
-            </div>)}
+              <div className={styles.formGroup}>
+                <label>Username / Phone Number</label>
+                <input
+                  type="text"
+                  name="username"
+                  value={loginData.username}
+                  onChange={(e) => handleChange(e, true)}
+                  required
+                />
+              </div>)}
 
             {loading ? <div className={styles.skeletonField} /> : (
-            <div className={styles.formGroup}>
-              <label>Password</label>
-              <input
-                type="password"
-                name="password"
-                value={loginData.password}
-                onChange={(e) => handleChange(e, true)}
-                required
-              />
-            </div>)}
-             {/* 👇 Place the forgot password link here */}
-    <p className={styles.forgotPassword}>
-      Forgot your password? <a href="/driver/reset-password">Reset it here</a>
-    </p>
+              <div className={styles.formGroup}>
+                <label>Password</label>
+                <input
+                  type="password"
+                  name="password"
+                  value={loginData.password}
+                  onChange={(e) => handleChange(e, true)}
+                  required
+                />
+              </div>)}
+            {/* 👇 Place the forgot password link here */}
+            <p className={styles.forgotPassword}>
+              Forgot your password? <a href="/driver/reset-password">Reset it here</a>
+            </p>
           </>
         ) : (
           ['username', 'phoneNumber', 'email', 'password', 'nationalId', 'driverLicenseNumber'].map(field => (
             loading ? <div key={field} className={styles.skeletonField} /> : (
-            <div key={field} className={styles.formGroup}>
-              <label>
-                {field.replace(/([A-Z])/g, ' $1').toUpperCase()}
-                {<span style={{ color: 'red', marginLeft: '4px' }}>*</span>}
-              </label>
-              <input
-                type={field.includes('password') ? 'password' : field === 'email' ? 'email' : 'text'}
-                name={field}
-                value={formData[field]}
-                onChange={handleChange}
-                // required={field !== 'email'}
-                required
-                placeholder={`Enter ${field.replace(/([A-Z])/g, ' $1').toLowerCase()}`}
-              />
-            </div>
-          )))
+              <div key={field} className={styles.formGroup}>
+                <label>
+                  {field.replace(/([A-Z])/g, ' $1').toUpperCase()}
+                  {<span style={{ color: 'red', marginLeft: '4px' }}>*</span>}
+                </label>
+                <input
+                  type={field.includes('password') ? 'password' : field === 'email' ? 'email' : 'text'}
+                  name={field}
+                  value={formData[field]}
+                  onChange={handleChange}
+                  // required={field !== 'email'}
+                  required
+                  placeholder={`Enter ${field.replace(/([A-Z])/g, ' $1').toLowerCase()}`}
+                />
+              </div>
+            )))
         )}
 
         {loading ? <div className={styles.skeletonButton} /> : (
-        <button type="submit" className={styles.submitButton}>
-          {isLogin ? 'Login' : 'Sign Up'}
-        </button>
+          <button type="submit" className={styles.submitButton}>
+            {isLogin ? 'Login' : 'Sign Up'}
+          </button>
         )}
 
         {error && <div className={styles.errorMessage}>{error}</div>}
@@ -241,7 +247,7 @@ const DriverSignup = () => {
               <div className={styles.formGroup}>
 
                 <label>Username / Phone Number</label>
-            
+
                 <input
                   type="text"
                   name="username"
@@ -266,7 +272,7 @@ const DriverSignup = () => {
               <button type="submit" className={styles.submitButton}>
                 Login
               </button>
-            
+
               {error && <div className={styles.errorMessage}>{error}</div>}
               {success && <div className={styles.successMessage}>{success}</div>}
             </form>

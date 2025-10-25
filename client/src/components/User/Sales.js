@@ -144,9 +144,6 @@ const Sales = () => {
                       : order.parentOrder?.deliveredBy || 'N/A'}
                   </td>
                   <td>
-                    {/* {order.parentOrder?.deliveredAt
-                      ? new Date(order.parentOrder.deliveredAt).toLocaleDateString()
-                      : 'N/A'} */}
                     {order.parentOrder?.deliveredAt
                       ? new Date(order.parentOrder.deliveredAt).toLocaleDateString()
                       : order.deliveredAt

@@ -1,11 +1,10 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faUser, faStore, faTruck, faCaretDown } from '@fortawesome/free-solid-svg-icons';
 import styles from './AccountTypeSelection.module.css';
 
 const AccountTypeSelection = () => {
-  const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {}, []);

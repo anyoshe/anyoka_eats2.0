@@ -97,6 +97,53 @@ const ProfileSetupPage = () => {
     return true;
   };
 
+  const handleAutoDetectLocation = () => {
+    if (!navigator.geolocation) {
+      setError('Geolocation is not supported by your browser.');
+      return;
+    }
+
+    setError(''); // clear any previous errors
+    navigator.geolocation.getCurrentPosition(
+      async (position) => {
+        const { latitude, longitude } = position.coords;
+
+        const geocoder = new window.google.maps.Geocoder();
+        const latLng = { lat: latitude, lng: longitude };
+
+        geocoder.geocode({ location: latLng }, (results, status) => {
+          if (status === 'OK' && results[0]) {
+            const address = results[0].formatted_address;
+
+            // Try to extract town/city name from the results
+            let townName = '';
+            const components = results[0].address_components;
+            for (const comp of components) {
+              if (comp.types.includes('locality') || comp.types.includes('administrative_area_level_2')) {
+                townName = comp.long_name;
+                break;
+              }
+            }
+
+            setCurrentLocation({
+              town: townName || currentLocation.town,
+              location: address,
+            });
+            setMarkerPosition(latLng);
+            setMapCenter(latLng);
+          } else {
+            setError('Unable to detect location. Try manual pinning.');
+          }
+        });
+      },
+      (error) => {
+        console.error('Geolocation error:', error);
+        setError('Location detection failed. Please enable GPS or use manual pinning.');
+      }
+    );
+  };
+
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
@@ -276,6 +323,43 @@ const ProfileSetupPage = () => {
             }
           }}
         />
+        <div className={styles.locationOptions}>
+          <button
+            type="button"
+            className={styles.locationButton}
+            onClick={handleAutoDetectLocation}
+          >
+            📍 Auto-Detect My Location
+          </button>
+
+          <button
+            type="button"
+            className={styles.locationButton}
+            onClick={() => {
+              if (currentLocation.town.trim()) {
+                // Same geocode logic as before
+                const geocoder = new window.google.maps.Geocoder();
+                geocoder.geocode(
+                  { address: currentLocation.town },
+                  (results, status) => {
+                    if (status === 'OK' && results[0]) {
+                      setMapCenter(results[0].geometry.location.toJSON());
+                    } else {
+                      setMapCenter({ lat: -1.2921, lng: 36.8219 });
+                    }
+                    setMapVisible(true);
+                  }
+                );
+              } else {
+                setMapCenter({ lat: -1.2921, lng: 36.8219 });
+                setMapVisible(true);
+              }
+            }}
+          >
+            🗺️ Pin Location Manually
+          </button>
+        </div>
+
 
         {/* Map Modal */}
         {mapVisible && (

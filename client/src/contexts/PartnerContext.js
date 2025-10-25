@@ -15,21 +15,6 @@ export const PartnerProvider = ({ children }) => {
   const notifiedIds = useRef(new Set());
   const audioEnabledRef = useRef(false); 
 
-  // useEffect(() => {
-  //   const enableAudioPlayback = () => {
-  //     audioEnabledRef.current = true; // Mark audio as enabled
-  //     document.removeEventListener('click', enableAudioPlayback); // Remove listener after interaction
-  //   };
-
-  //   document.addEventListener('click', enableAudioPlayback); // Listen for user interaction
-    
-  //   const storedPartner = JSON.parse(localStorage.getItem('partnerDetails'));
-  //   const storedToken = localStorage.getItem('partnerToken');
-  //   if (storedPartner && storedToken) {
-  //     setPartner(storedPartner);
-  //     setToken(storedToken);
-  //   }
-  // }, []);
 
   useEffect(() => {
   const enableAudioPlayback = () => {

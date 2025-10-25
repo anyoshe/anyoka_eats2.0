@@ -12,9 +12,6 @@ const LandingPage = () => {
             <HeroHeader />
             <LandingBodyContainer />
             <PartnershipSection />
-            
-
-            {/* <OrderTrackingModal isOpen={isModalOpen} onClose={closeModal} /> */}
         </div>
     );
 };

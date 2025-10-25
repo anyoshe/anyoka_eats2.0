@@ -4,6 +4,8 @@ import { AuthContext } from '../../contexts/AuthContext';
 import MapSelector from './MapSelector';
 import styles from './SignupPage.module.css';
 import config from '../../config';
+import Swal from 'sweetalert2';
+
 
 const SignupPage = () => {
   const [formData, setFormData] = useState({
@@ -45,39 +47,62 @@ const SignupPage = () => {
     setFormData({ ...formData, location });
   };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    setIsSubmitting(true);
+const handleSubmit = async (e) => {
+  e.preventDefault();
+  setIsSubmitting(true);
 
-    try {
-      const response = await fetch(`${config.backendUrl}/api/auth/userSignup`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(formData),
+  try {
+    const response = await fetch(`${config.backendUrl}/api/auth/userSignup`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(formData),
+    });
+
+    const data = await response.json();
+
+    if (response.ok) {
+      // ✅ Store user info
+      setUser(data.user);
+      setIsLoggedIn(true);
+      localStorage.setItem('userToken', data.token);
+      localStorage.setItem('user', JSON.stringify(data.user));
+
+      // 🎉 Warm welcome modal
+      await Swal.fire({
+        title: `Welcome, ${data.user.names.split(' ')[0]}! 🎉`,
+        html: `
+          <p>Your account has been created successfully.</p>
+          <p>We've sent you a warm welcome email with helpful info and a link to our <a href="${config.frontendUrl}/data-protection-policy" target="_blank" style="color:#ff6b00;">Data Protection Policy</a>.</p>
+          <p>We're so glad to have you join <strong>Anyoka Eats</strong>!</p>
+        `,
+        icon: 'success',
+        confirmButtonColor: '#ff6b00',
+        confirmButtonText: 'Let’s Go 🍽️',
       });
 
-      const data = await response.json();
-
-      if (response.ok) {
-        setUser(data.user);
-        setIsLoggedIn(true);
-        localStorage.setItem('userToken', data.token);
-        localStorage.setItem('user', JSON.stringify(data.user));
-        alert('Signup successful!');
-        // navigate(redirectPath || '/');
-        // setRedirectPath('/');
-        const targetPath = redirectPath || '/';
-        setRedirectPath('/');
-        navigate(targetPath);
-      } else {
-        alert(`Signup failed: ${data.message}`);
-      }
-    } catch (error) {
-      alert('An error occurred. Please try again.');
-    } finally {
-      setIsSubmitting(false);
+      // ✅ Redirect after modal
+      const targetPath = redirectPath || '/';
+      setRedirectPath('/');
+      navigate(targetPath);
+    } else {
+      Swal.fire({
+        title: 'Signup Failed',
+        text: data.message,
+        icon: 'error',
+        confirmButtonColor: '#ff6b00',
+      });
     }
-  };
+  } catch (error) {
+    Swal.fire({
+      title: 'Oops!',
+      text: 'An unexpected error occurred. Please try again.',
+      icon: 'error',
+      confirmButtonColor: '#ff6b00',
+    });
+  } finally {
+    setIsSubmitting(false);
+  }
+};
 
   return (
     <div className={styles['signup-page']}>

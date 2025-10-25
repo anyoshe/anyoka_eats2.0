@@ -1,4 +1,3 @@
-
 const express = require("express");
 const router = express.Router();
 const mongoose = require('mongoose');
@@ -333,25 +332,6 @@ router.post('/signup', uploadSignupFiles, processSignupFiles, async (req, res) =
   }
 });
 
-
-
-// router.get('/verify/:token', async (req, res) => {
-//   try {
-//     const partner = await Partner.findOne({ verificationToken: req.params.token });
-
-//     if (!partner) {
-//       return res.status(400).json({ message: 'Invalid or expired verification token.' });
-//     }
-
-//     partner.isVerified = true;
-//     partner.verificationToken = undefined; // clear token after verification
-//     await partner.save();
-
-//     res.status(200).json({ message: 'Account verified successfully! You can now log in.' });
-//   } catch (error) {
-//     res.status(500).json({ message: 'Verification failed.' });
-//   }
-// });
 
 router.get('/verify/:token', async (req, res) => {
   try {
@@ -900,28 +880,27 @@ router.put('/admin/ads', authenticateAdminToken, async (req, res) => {
 });
 
 
+// // Route to handle user signup
 
-
-// Route to handle user signup
 router.post('/auth/userSignup', async (req, res) => {
-  const { username, names, email, phoneNumber, town, location, password } = req.body;
-
   try {
-    // Validate required fields
+    const { username, names, email, phoneNumber, town, location, password } = req.body;
+
+    // ✅ 1. Validate fields
     if (!username || !names || !phoneNumber || !town || !location || !password) {
       return res.status(400).json({ success: false, message: 'All fields are required' });
     }
 
-    // Check if the user already exists
+    // ✅ 2. Check if user already exists
     const existingUser = await User.findOne({ $or: [{ username }, { email }, { phoneNumber }] });
     if (existingUser) {
       return res.status(400).json({ success: false, message: 'User already exists' });
     }
 
-    // Hash the password
+    // ✅ 3. Hash password
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    // Create a new user
+    // ✅ 4. Create new user
     const newUser = new User({
       username,
       names,
@@ -932,19 +911,53 @@ router.post('/auth/userSignup', async (req, res) => {
       password: hashedPassword,
     });
 
-    // Save the user to the database
     await newUser.save();
 
-    // Generate a JWT token
+    // ✅ 5. Generate JWT for immediate login
     const token = jwt.sign({ id: newUser._id }, JWT_SECRET, { expiresIn: '7d' });
 
-    // Return the token and user details
+    // ✅ 6. Build Data Protection Policy link
+    const policyUrl = `${process.env.FRONTEND_URL}/data-protection-policy`;
+
+    // ✅ 7. Send Welcome Email
+    await transporter.sendMail({
+      from: `"Anyoka Eats" <${process.env.GMAIL_USER}>`,
+      to: email,
+      subject: '🎉 Welcome to Anyoka Eats!',
+      html: `
+        <div style="font-family: 'Segoe UI', sans-serif; background-color: #f9fafc; padding: 30px;">
+          <div style="max-width: 600px; margin: auto; background: white; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 8px rgba(0,0,0,0.1);">
+            <div style="background-color: #ff6b00; color: white; text-align: center; padding: 20px 0;">
+              <h2>Welcome to Anyoka Eats, ${names.split(' ')[0]}! 🍽️</h2>
+            </div>
+            <div style="padding: 20px 30px; color: #333;">
+              <p>Hi <strong>${names}</strong>,</p>
+              <p>We’re absolutely thrilled to have you join the Anyoka Eats family! Your account has been successfully created, and you can now explore all our services with your registered credentials.</p>
+
+              <p>At <strong>Anyoka Eats</strong>, your privacy and trust are incredibly important to us. By signing up, you have willingly shared your information with us for the purpose of providing better services.</p>
+
+              <p>We handle your personal data with utmost care, in accordance with our <a href="${policyUrl}" style="color: #ff6b00; text-decoration: none;">Data Protection Policy</a>.</p>
+
+              <p style="margin-top: 20px;">If you have any concerns about how your information is used, please don’t hesitate to reach out to us via <a href="mailto:support@anyokaeats.com" style="color:#ff6b00;">support@anyokaeats.com</a>.</p>
+
+              <p style="margin-top: 20px;">Once again, welcome aboard — we’re glad to have you with us! 🎉</p>
+
+              <p style="color: #777; font-size: 0.9em;">Warm regards,<br><strong>The Anyoka Eats Team</strong></p>
+            </div>
+            <div style="background: #f3f4f6; text-align: center; padding: 15px; font-size: 0.85em; color: #777;">
+              © ${new Date().getFullYear()} Anyoka Eats. All rights reserved.
+            </div>
+          </div>
+        </div>
+      `,
+    });
+
+    // ✅ 8. Respond to client
     res.status(201).json({
       success: true,
-      message: 'User registered successfully',
+      message: 'Welcome aboard! A warm welcome email has been sent to your inbox.',
       token,
       user: {
-        // id: newUser._id,
         _id: newUser._id,
         username: newUser.username,
         names: newUser.names,
@@ -954,12 +967,30 @@ router.post('/auth/userSignup', async (req, res) => {
         location: newUser.location,
       },
     });
-  } catch (error) {
-    console.error('Error during signup:', error.message);
-    res.status(500).json({ success: false, message: 'Server error' });
+   } catch (error) {
+    console.error('Sign-up error:', error);
+
+    // 🧠 Handle duplicate key errors from MongoDB
+    if (error.code === 11000) {
+      const field = Object.keys(error.keyPattern || {})[0];
+      const value = error.keyValue ? error.keyValue[field] : '';
+      return res.status(400).json({
+        message: `A partner with this ${field} (${value}) already exists. Please use a different one.`,
+      });
+    }
+
+    // 🧠 Handle Mongoose validation errors (e.g., missing required fields)
+    if (error.name === 'ValidationError') {
+      const messages = Object.values(error.errors).map((err) => err.message);
+      return res.status(400).json({ message: messages.join(' ') });
+    }
+
+    // 🧠 Handle any other server errors
+    res.status(500).json({
+      message: 'An unexpected error occurred during registration. Please try again later.',
+    });
   }
 });
-
 
 router.get('/auth/current', async (req, res) => {
   const token = req.headers.authorization?.split(' ')[1];
@@ -2261,6 +2292,8 @@ const DriverSchema = new mongoose.Schema({
   nationalId: { type: String, required: true, unique: true },
   driverLicenseNumber: { type: String, required: true, unique: true },
   profilePhotoUrl: { type: String },
+  isVerified: { type: Boolean, default: false },
+  verificationToken: { type: String },
 
   vehicleDetails: {
     make: { type: String },
@@ -2317,30 +2350,36 @@ const Driver = mongoose.models.Driver || mongoose.model('Driver', DriverSchema);
 
 
 router.post('/driver/signup', async (req, res) => {
-  const { username, phoneNumber, email, password, nationalId, driverLicenseNumber } = req.body;
-  console.log(req.body);
-
-  if (!username || !phoneNumber || !email || !password || !nationalId || !driverLicenseNumber) {
-    return res.status(400).json({ message: 'Missing required fields' });
-  }
-
   try {
+    const { username, phoneNumber, email, password, nationalId, driverLicenseNumber } = req.body;
+
+    if (!username || !phoneNumber || !email || !password || !nationalId || !driverLicenseNumber) {
+      return res.status(400).json({ message: 'Missing required fields' });
+    }
+
+    // 🔹 1. Check if driver already exists
     const existingDriver = await Driver.findOne({
       $or: [
         { username },
         { phoneNumber },
         { email },
         { nationalId },
-        { driverLicenseNumber }
-      ]
+        { driverLicenseNumber },
+      ],
     });
-
     if (existingDriver) {
-      return res.status(400).json({ message: 'Driver already exists with provided details' });
+      return res.status(400).json({
+        message: 'Driver already exists with provided details.',
+      });
     }
 
+    // 🔹 2. Hash password
     const hashedPassword = await bcrypt.hash(password, 10);
 
+    // 🔹 3. Create verification token
+    const verificationToken = crypto.randomBytes(32).toString('hex');
+
+    // 🔹 4. Create driver record
     const newDriver = new Driver({
       username,
       phoneNumber,
@@ -2348,86 +2387,200 @@ router.post('/driver/signup', async (req, res) => {
       password: hashedPassword,
       nationalId,
       driverLicenseNumber,
-
+      isVerified: false,
+      verificationToken,
     });
 
     await newDriver.save();
 
-    // Create JWT token
-    const token = jwt.sign({ id: newDriver._id }, JWT_SECRET, { expiresIn: '7d' });
+    // 🔹 5. Send verification email
+    const verificationUrl = `${process.env.FRONTEND_URL}/driver-verify/${verificationToken}`;
+
+    await transporter.sendMail({
+      from: `"Anyoka Eats" <${process.env.GMAIL_USER}>`,
+      to: email,
+      subject: 'Verify your Anyoka Eats Driver Account',
+      html: `
+        <h2>Welcome to Anyoka Eats, ${username}!</h2>
+        <p>Before you can start delivering, please verify your email address:</p>
+        <a href="${verificationUrl}" style="
+          display:inline-block;
+          background:#ff6b00;
+          color:white;
+          padding:10px 20px;
+          border-radius:5px;
+          text-decoration:none;
+        ">Verify My Account</a>
+        <p>If the button doesn’t work, click this link:</p>
+        <p>${verificationUrl}</p>
+      `,
+    });
 
     res.status(201).json({
-      token,
-      driver: {
-        id: newDriver._id,
-        username: newDriver.username,
-        phoneNumber: newDriver.phoneNumber,
-        email: newDriver.email,
-        status: newDriver.status,
+      message: 'Sign-up successful! Please check your email to verify your account before logging in.',
+    });
+
+  } catch (error) {
+    console.error('Driver sign-up error:', error);
+
+    if (error.code === 11000) {
+      const field = Object.keys(error.keyPattern || {})[0];
+      const value = error.keyValue ? error.keyValue[field] : '';
+      return res.status(400).json({
+        message: `A driver with this ${field} (${value}) already exists. Please use a different one.`,
+      });
+    }
+
+    res.status(500).json({
+      message: 'An unexpected error occurred during driver registration.',
+    });
+  }
+});
+
+router.get('/driver/verify/:token', async (req, res) => {
+  try {
+    const driver = await Driver.findOne({ verificationToken: req.params.token });
+
+    // ✅ Case 1: Invalid or expired token
+    if (!driver) {
+      // Maybe already verified earlier — handle gracefully
+      const alreadyVerified = await Driver.findOne({ isVerified: true, verificationToken: undefined });
+      if (alreadyVerified) {
+        return res.status(200).json({
+          message: 'Your account is already verified. You can log in.',
+          alreadyVerified: true,
+        });
       }
+
+      return res.status(400).json({ message: 'Invalid or expired verification token.' });
+    }
+
+    // ✅ Case 2: Mark verified (only once)
+    if (!driver.isVerified) {
+      driver.isVerified = true;
+      driver.verificationToken = undefined;
+      await driver.save();
+    }
+
+    return res.status(200).json({
+      message: 'Driver account verified successfully! You can now log in.',
     });
   } catch (error) {
-    console.error(error);
-    res.status(500).json({ message: 'Server error during signup' });
+    console.error('Driver verification error:', error);
+    res.status(500).json({ message: 'Verification failed due to a server error.' });
   }
 });
 
 
+
 router.post('/driver/login', async (req, res) => {
   const { username, password } = req.body;
-
+ console.log('Driver login attempt:', { username, password });
   try {
-    // Check if username is provided
+    // ✅ Validate inputs
     if (!username || !password) {
       return res.status(400).json({ message: 'Username and password are required' });
     }
 
-    // Find the driver by username or phone number
+    // ✅ Find driver by username or phone number
     const driver = await Driver.findOne({
-      $or: [{ username }, { phoneNumber: username }],
+      $or: [{ username }, { phoneNumber: username }, { email: username }]
     });
 
     if (!driver) {
       return res.status(404).json({ message: 'Driver not found' });
     }
 
-    // Check if the password matches
+    // ✅ Ensure driver is verified before allowing login
+    if (!driver.isVerified) {
+      return res.status(403).json({
+        message: 'Your account is not verified yet. Please check your email and verify your account before logging in.'
+      });
+    }
+
+    // ✅ Check password
     const isMatch = await bcrypt.compare(password, driver.password);
     if (!isMatch) {
       return res.status(400).json({ message: 'Invalid password' });
     }
 
-    // Block suspended drivers
+    // ✅ Prevent suspended or rejected accounts from logging in
     if (driver.verificationStatus === 'Rejected') {
       return res.status(403).json({ message: 'Your account has been suspended. Please contact support.' });
     }
 
-    // Mark driver online/available on successful login
+    // ✅ Update driver’s availability and last active timestamp
     driver.status = 'Available';
     driver.lastActiveAt = new Date();
     await driver.save();
 
-    // Create JWT token
+    // ✅ Create JWT token
     const token = jwt.sign(
       { driverId: driver._id },
       process.env.JWT_SECRET,
-      { expiresIn: '1d' }
+      { expiresIn: '7d' }
     );
 
-    // Respond with driver data and token
-    res.json({
+    // ✅ Respond cleanly
+    return res.status(200).json({
+      message: 'Login successful',
       driver: {
         _id: driver._id,
         username: driver.username,
         phoneNumber: driver.phoneNumber,
+        email: driver.email,
         profileCompleted: driver.profileCompleted,
+        isVerified: driver.isVerified,
         status: driver.status,
       },
-      token,
+      token
     });
+
   } catch (error) {
-    console.error('Login Error:', error);
-    res.status(500).json({ message: 'Server error, please try again later' });
+    console.error('Driver Login Error:', error);
+    return res.status(500).json({ message: 'Server error, please try again later' });
+  }
+});
+
+
+// Profile completion after signup
+
+router.put('/driver/update-profile', authenticateToken, uploadProfileImage, processProfileImage, async (req, res) => {
+  try {
+    const driverId = req.user.driverId;
+    const driver = await Driver.findById(driverId);
+    console.log('Updating driver profile for:', driverId);
+    if (!driver) {
+      return res.status(404).json({ error: 'Driver not found' });
+    }
+
+    // Parse JSON fields
+    if (req.body.vehicleDetails) {
+      driver.vehicleDetails = JSON.parse(req.body.vehicleDetails);
+    }
+    if (req.body.emergencyContact) {
+      driver.emergencyContact = JSON.parse(req.body.emergencyContact);
+    }
+    if (req.body.currentLocation) {
+      driver.currentLocation = JSON.parse(req.body.currentLocation);
+    }
+    if (req.body.profileCompleted !== undefined) {
+      driver.profileCompleted = req.body.profileCompleted === 'true'; // because formData sends strings
+    }
+
+    // Handle profile image upload
+    if (req.file) {
+      // Optionally delete old profile image if needed
+      driver.profilePhotoUrl = `/uploads/drivers/${req.file.filename}`;
+    }
+
+    // Save the updated driver
+    await driver.save();
+
+    res.json(driver);
+  } catch (err) {
+    console.error('Error updating driver profile:', err);
+    res.status(500).json({ error: 'Server error while updating profile' });
   }
 });
 
@@ -2686,46 +2839,6 @@ router.put('/driver/updates-profile', authenticateToken, uploadProfileImage, pro
   } catch (error) {
     console.error('Error updating profile:', error);
     res.status(500).json({ message: 'An error occurred while updating the profile' });
-  }
-});
-
-
-router.put('/driver/update-profile', authenticateToken, uploadProfileImage, processProfileImage, async (req, res) => {
-  try {
-    const driverId = req.user.id; // Assuming your authenticate middleware attaches driver id
-    const driver = await Driver.findById(driverId);
-
-    if (!driver) {
-      return res.status(404).json({ error: 'Driver not found' });
-    }
-
-    // Parse JSON fields
-    if (req.body.vehicleDetails) {
-      driver.vehicleDetails = JSON.parse(req.body.vehicleDetails);
-    }
-    if (req.body.emergencyContact) {
-      driver.emergencyContact = JSON.parse(req.body.emergencyContact);
-    }
-    if (req.body.currentLocation) {
-      driver.currentLocation = JSON.parse(req.body.currentLocation);
-    }
-    if (req.body.profileCompleted !== undefined) {
-      driver.profileCompleted = req.body.profileCompleted === 'true'; // because formData sends strings
-    }
-
-    // Handle profile image upload
-    if (req.file) {
-      // Optionally delete old profile image if needed
-      driver.profilePhotoUrl = `/uploads/drivers/${req.file.filename}`;
-    }
-
-    // Save the updated driver
-    await driver.save();
-
-    res.json(driver);
-  } catch (err) {
-    console.error('Error updating driver profile:', err);
-    res.status(500).json({ error: 'Server error while updating profile' });
   }
 });
 

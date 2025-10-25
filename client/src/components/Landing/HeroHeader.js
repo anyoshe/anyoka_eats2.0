@@ -2,7 +2,6 @@ import React, { useContext, useState, useRef, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { User } from 'lucide-react';
 import logoImg from '../../assets/images/logo_on_white orange.png';
-// import ADS from '../../assets/images/Ecommerce_ADs.png';
 import leftAd from '../../assets/Ecommerce_ADs.png';
 import rightAd from '../../assets/Ecommerce_ADs 2.png';
 import styles from './HeroHeader.module.css';
@@ -88,17 +87,6 @@ const HeroHeader = () => {
                                     <User className={styles.userIcon} />
                                 </button>
                             </Link>
-
-                            {/* {dropdownOpen && (
-                                <div className={styles.dropdownMenu}>
-                                    <button
-                                        className={styles.dropdownItem}
-                                        onClick={handleLogout}
-                                    >
-                                        Log out
-                                    </button>
-                                </div>
-                            )} */}
                         </div>
                     )}
                 </div>

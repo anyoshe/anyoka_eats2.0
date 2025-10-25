@@ -103,34 +103,20 @@ const ProductCard = ({ product }) => {
           ) : (
             <p className={styles.productPrice}>Price: Ksh {product.price.toFixed(2)}</p>
           )}
-          {/* <p className={styles.productBrand}>Brand : {product.brand}</p> */}
-          {/* <p className={styles.productCategory}>Category : {product.category}</p> */}
+
           <p className={styles.productInventory}>Seller : {product.shop.shopName}</p>
           <p className={styles.productInventory}>Town : {product.shop.town}</p>
           <p className={styles.productInventory}>Available : {product.inventory}</p>
 
-          {/* <div className={styles.rating}>
-            {[...Array(5)].map((_, index) => {
-              const star = index + 1;
-              return (
-                <span
-                  key={star}
-                  className={star <= product.ratings?.average ? 'star filled' : 'star'}
-                >
-                  &#9733;
-                </span>
-              );
-            })}
-          </div> */}
           <div className={styles.rating}>
-  {[1, 2, 3, 4, 5].map((star) => (
-    <FontAwesomeIcon
-      key={star}
-      icon={star <= (product.ratings?.average || 0) ? solidStar : regularStar}
-      className={`${styles.starIcon} ${star <= (product.ratings?.average || 0) ? styles.filled : ''}`}
-    />
-  ))}
-</div>
+            {[1, 2, 3, 4, 5].map((star) => (
+              <FontAwesomeIcon
+                key={star}
+                icon={star <= (product.ratings?.average || 0) ? solidStar : regularStar}
+                className={`${styles.starIcon} ${star <= (product.ratings?.average || 0) ? styles.filled : ''}`}
+              />
+            ))}
+          </div>
 
 
           <p className={styles.average}>
@@ -138,12 +124,7 @@ const ProductCard = ({ product }) => {
             <br />
             ({product.ratings?.reviews?.length || 0} reviews)
           </p>
-          {/* <button
-            onClick={() => setShowReviews(!showReviews)}
-            className={styles.toggleReviewsButton}
-          >
-            {showReviews ? 'Hide Reviews' : 'Show Reviews'}
-          </button> */}
+
         </div>
       </div>
 

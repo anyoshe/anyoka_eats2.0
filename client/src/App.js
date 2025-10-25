@@ -6,10 +6,8 @@ import { CartProvider } from './contexts/CartContext';
 import SignUpSignIn from './components/Landing/SignUpSignIn';
 import AccountPage from './components/User/AccountPage';
 import { PartnerProvider } from './contexts/PartnerContext';
-import InstallPrompt from './components/Header/InstallPrompt';
 import SignupPage from './components/User/SignupPage';
 import ProductCard from './components/User/ProductCard';
-import Logout from './components/User/UserLogout';
 import OrderSummaryPage from './components/User/OrderSummaryPage';
 import StoreMenuPage from './components/Menu/StoreMenuPage';
 import DriverSignup from './components/Menu/DriverDashboard/DriverSignup';
@@ -18,17 +16,15 @@ import { DriverProvider } from './contexts/DriverContext';
 import ProfileSetupPage from './components/Menu/DriverDashboard/ProfileSetupPage';
 import DriverDashboard from './components/Menu/DriverDashboard/DriverDashboard';
 import AccountTypeSelection from './components/Landing/AccountTypeSelection';
-import CustomerProfileDisplay from './components/Customer/CustomerProfileDisplay';
 import CustomerDashboard from './components/Customer/CustomerDashboard';
 import AppFooter from './components/AppFooter';
-import AppHeader from './components/AppHeader';
 import DriverPasswordReset from './components/Menu/DriverDashboard/DriverPasswordReset';
 import VerifyEmail from './components/Landing/VerifyEmail';
 import PartnerLogin from './components/User/PartnerLogin';
 import UserLogin from './components/User/UserLogin';
 import UserPasswordReset from './components/User/UserPasswordReset';
 import PartnerPasswordReset from './components/User/PartnerPasswordReset';
-
+import DriverVerifyEmail from './components/Menu/DriverDashboard/DriverVerifyEmail';
 
 
 function App() {
@@ -63,6 +59,8 @@ function App() {
                         <Route path="/user/reset-password" element={<UserPasswordReset />} />
                         <Route path="/partner/reset-password" element={<PartnerPasswordReset />} />
                         <Route path="/driver/reset-password" element={<DriverPasswordReset />} />
+                        <Route path="/driver-verify/:token" element={<DriverVerifyEmail />} />
+
                         
                         <Route path="/menu" element={
                             <CartProvider>
