@@ -39,6 +39,25 @@ export default function VendorShare(){
               <a className={styles.actionBtn} href={shareLink} target="_blank" rel="noreferrer">Preview link</a>
             </div>
             <small className={styles.note}>This link cannot be edited. Contact support for changes.</small>
+
+            <button
+              className={styles.shareBtn}
+              onClick={() => {
+              if (navigator.share) {
+                navigator.share({
+                  title: 'Check out my store!',
+                  text: 'Here’s my store link:',
+                  url: shareLink,
+                })
+                .catch(err => console.log('Share failed:', err));
+              } else {
+                alert('Sharing not supported on this browser. Copy the link manually.');
+              }
+              }}
+              >
+                Share store
+            </button>
+
           </div>
         </div>
       </div>

@@ -96,7 +96,7 @@ const Login = () => {
           <div className={styles.skeletonField} />
         ) : (
           <div className={styles.field}>
-            <label>Username / Phone / Business Name:</label>
+            <label>Username / Phone:</label>
             <input
               type="text"
               value={identifier}

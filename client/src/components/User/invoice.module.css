@@ -1,0 +1,122 @@
+.wrapper {
+  background: white;
+  max-width: 800px;
+  margin: 2rem auto;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+  font-family: "Poppins", sans-serif;
+}
+
+.header {
+  background: linear-gradient(135deg, #ffa726, #ffcc80);
+  color: white;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  padding: 1.5rem 2rem;
+  position: relative;
+}
+
+.title {
+  font-size: 2.5rem;
+  font-weight: 700;
+  margin: 0;
+  color: white;
+}
+
+.date {
+  font-size: 0.9rem;
+  opacity: 0.9;
+}
+
+.invoiceNumber {
+  font-size: 0.95rem;
+  font-weight: 600;
+  opacity: 0.9;
+}
+
+.descriptionBox {
+  background: #f6f6f6;
+  padding: 1.2rem 2rem;
+  color: #333;
+  border-bottom: 1px solid #e5e5e5;
+  font-size: 0.95rem;
+  line-height: 1.5;
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.table th {
+  background: #1aa334;
+  color: white;
+  text-align: left;
+  padding: 0.8rem 1rem;
+}
+
+.table td {
+  padding: 0.8rem 1rem;
+  border-bottom: 1px solid #e5e5e5;
+}
+
+.table tbody tr:nth-child(even) {
+  background: #f3fef4;
+}
+
+.summary {
+  background: #eafbea;
+  padding: 1rem 2rem;
+  display: flex;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  font-weight: 600;
+  color: #222;
+}
+
+.footer {
+  background: #ffa726;
+  color: white;
+  text-align: center;
+  padding: 1rem;
+  font-size: 0.9rem;
+}
+
+.printBtnContainer {
+  text-align: center;
+  padding: 1rem;
+  background: #fff;
+}
+
+.printBtn {
+  background: #1aa334;
+  color: white;
+  border: none;
+  padding: 0.8rem 1.5rem;
+  border-radius: 6px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.3s;
+}
+
+.printBtn:hover {
+  background: #158a2c;
+}
+@media (max-width: 600px) {
+  .header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5rem;
+  }
+  
+  .title {
+    font-size: 2rem;
+  }
+  
+  .summary {
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+}
