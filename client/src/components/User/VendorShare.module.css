@@ -11,8 +11,9 @@
 .linkInput { width: 100%; border: 1px solid var(--color-border); border-radius: var(--radius); padding: 0.6rem 0.8rem; }
 .copyBtn { background: var(--color-gray-100); border: none; padding: 0.6rem 0.9rem; border-radius: var(--radius); cursor: pointer; }
 .actions { display: flex; gap: var(--space-2); }
-.actionBtn { background: var(--color-primary-500); color: white; text-decoration: none; padding: 0.6rem 1rem; border-radius: var(--radius); }
+.actionBtn { background: var(--color-primary-500);text-decoration: none; padding: 0.6rem 1rem; border-radius: var(--radius); }
 .note { color: var(--color-text-muted); }
+.shareBtn{ background: var(--color-green); border: none; padding: 0.6rem 1rem; border-radius: var(--radius); cursor: pointer; color : var(--color-white); }
 
 @media (max-width: 800px) {
   .body { grid-template-columns: 1fr; }
