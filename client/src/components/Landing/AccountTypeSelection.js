@@ -13,7 +13,7 @@ const AccountTypeSelection = () => {
   const handleAccountTypeSelect = (accountType) => {
     switch (accountType) {
       case 'customer':
-        navigate('/sign-in');
+        navigate('/user/sign-in');
         break;
       case 'vendor':
         navigate('/sign-in');

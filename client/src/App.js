@@ -10,7 +10,6 @@ import InstallPrompt from './components/Header/InstallPrompt';
 import SignupPage from './components/User/SignupPage';
 import ProductCard from './components/User/ProductCard';
 import Logout from './components/User/UserLogout';
-import Login from './components/User/Login';
 import OrderSummaryPage from './components/User/OrderSummaryPage';
 import StoreMenuPage from './components/Menu/StoreMenuPage';
 import DriverSignup from './components/Menu/DriverDashboard/DriverSignup';
@@ -25,6 +24,12 @@ import AppFooter from './components/AppFooter';
 import AppHeader from './components/AppHeader';
 import PasswordReset from './components/User/PasswordReset';
 import DriverPasswordReset from './components/Menu/DriverDashboard/DriverPasswordReset';
+import VerifyEmail from './components/Landing/VerifyEmail';
+import PartnerLogin from './components/User/PartnerLogin';
+import UserLogin from './components/User/UserLogin';
+import UserPasswordReset from './components/User/UserPasswordReset';
+import PartnerPasswordReset from './components/User/PartnerPasswordReset';
+
 
 
 function App() {
@@ -42,11 +47,12 @@ function App() {
     
                     {/* Shared header on all routes except Landing */}
                     <Routes>
-
+                        <Route path="/verify-email/:token" element={<VerifyEmail />} />
                         <Route path="/" element={<LandingPage />} />
                         <Route path="/account-type-selection" element={<AccountTypeSelection />} />
                         <Route path="/sign-up-sign-in" element={<SignUpSignIn />} />
-                        <Route path="/sign-in" element={<Login />} />
+                        <Route path="/sign-in" element={<PartnerLogin />} />
+                        <Route path="/user/sign-in" element={<UserLogin />} />
                         <Route path="/product/:id" element={<ProductCard />} />
                         <Route path="/signup" element={<SignupPage />} />
                         <Route path="/driver-signup" element={<DriverSignup />} />
@@ -55,7 +61,8 @@ function App() {
                         <Route path="/driver/dashboard" element={<DriverDashboard />} />
                         <Route path="/dashboard" element={<AccountPage />} />
                         <Route path="/customer-dashboard" element={<CustomerDashboard />} />
-                        <Route path="/password-reset" element={<PasswordReset />} />
+                        <Route path="/user/reset-password" element={<UserPasswordReset />} />
+                        <Route path="/partner/reset-password" element={<PartnerPasswordReset />} />
                         <Route path="/driver/reset-password" element={<DriverPasswordReset />} />
                         
                         <Route path="/menu" element={

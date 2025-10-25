@@ -32,6 +32,52 @@ const JWT_SECRET = process.env.JWT_SECRET;
 const RESET_PASSWORD_SECRET = process.env.RESET_PASSWORD_SECRET;
 const RESET_PASSWORD_EXPIRY = process.env.RESET_PASSWORD_EXPIRY;
 
+// Configure nodemailer
+const transporter = nodemailer.createTransport({
+  service: 'gmail',
+  auth: {
+    user: process.env.GMAIL_USER,
+    pass: process.env.GMAIL_APP_PASSWORD,
+  },
+});
+
+// Verify transporter configuration
+transporter.verify((error, success) => {
+  if (error) {
+    console.error('Nodemailer verification error:', error);
+  } else {
+    console.log('Nodemailer is ready to send emails');
+  }
+});
+
+
+/* -------------------------------
+   ✅ Contact form route (frontend contact page)
+--------------------------------- */
+router.post('/send-email', async (req, res) => {
+  const { email, message } = req.body;
+
+  if (!email || !message) {
+    return res.status(400).json({ message: 'Email and message are required.' });
+  }
+
+  const mailOptions = {
+    from: `"Customer Inquiry" <${process.env.GMAIL_USER}>`,
+    replyTo: email,
+    to: 'anyokaeats@gmail.com',
+    subject: 'New Contact Form Submission',
+    text: `📩 Message from: ${email}\n\n${message}`,
+  };
+
+  try {
+    await transporter.sendMail(mailOptions);
+    console.log('✅ Contact form email sent from:', email);
+    res.status(200).json({ message: 'Email sent successfully.' });
+  } catch (error) {
+    console.error('❌ Error sending contact email:', error);
+    res.status(500).json({ message: 'Failed to send email.' });
+  }
+});
 // Admin endpoint to get all orders
 router.get('/admin/orders', authenticateAdminToken, async (req, res) => {
   try {
@@ -110,6 +156,8 @@ const partnerSchema = new mongoose.Schema({
   role: { type: String, enum: ['admin', 'partner'], default: 'partner' },
   suspended: { type: Boolean, default: false },
   slug: { type: String, unique: true, index: true },
+  isVerified: { type: Boolean, default: false }, // ✅ new field
+  verificationToken: { type: String }, // ✅ new field
   ratings: {
     average: { type: Number, default: 0 },
     reviews: [
@@ -165,8 +213,7 @@ router.get('/partner', authenticateToken, async (req, res) => {
 });
 
 
-
-// Partner Sign up route
+// Partner Sign-Up Route with Email Verification + File Handling + Slug + JWT
 router.post('/signup', uploadSignupFiles, processSignupFiles, async (req, res) => {
   try {
     const {
@@ -181,19 +228,25 @@ router.post('/signup', uploadSignupFiles, processSignupFiles, async (req, res) =
       role,
     } = req.body;
 
-    console.log('Received:', req.body, 'Files:', req.files);
+    console.log('Received signup data:', req.body, 'Files:', req.files);
 
+    // 🔹 1. Check for existing partner (email, name, or phone)
     const existingPartner = await Partner.findOne({
-      $or: [{ businessName }, { contactNumber }],
+      $or: [{ businessName }, { contactNumber }, { email }],
     });
-
     if (existingPartner) {
-      return res.status(400).json({ message: 'Business name or contact number already exists.' });
+      return res.status(400).json({
+        message: 'Business name, email, or contact number already exists.',
+      });
     }
 
+    // 🔹 2. Hash password
     const hashedPassword = await bcrypt.hash(password, 10);
+
+    // 🔹 3. Determine role
     const effectiveRole = email === 'anyokaeats@gmail.com' ? 'admin' : role || 'partner';
 
+    // 🔹 4. Build partner object
     const newPartnerData = {
       businessName,
       businessType,
@@ -204,9 +257,11 @@ router.post('/signup', uploadSignupFiles, processSignupFiles, async (req, res) =
       location,
       password: hashedPassword,
       role: effectiveRole,
+      isVerified: false,
+      verificationToken: crypto.randomBytes(32).toString('hex'),
     };
 
-    // Add file paths if uploaded
+    // 🔹 5. Attach file paths (if any)
     if (req.files && req.files.businessPermit) {
       newPartnerData.businessPermit = `/uploads/business-permits/${req.files.businessPermit[0].filename}`;
     }
@@ -214,33 +269,114 @@ router.post('/signup', uploadSignupFiles, processSignupFiles, async (req, res) =
       newPartnerData.profileImage = `/uploads/profile-images/${req.files.profileImage[0].filename}`;
     }
 
-    // generate slug
+    // 🔹 6. Generate unique slug
     if (!newPartnerData.slug) {
       const base = slugify(businessName);
       newPartnerData.slug = await ensureUniquePartnerSlug(base || `store-${Date.now()}`);
     }
 
+    // 🔹 7. Save new partner
     const newPartner = new Partner(newPartnerData);
     await newPartner.save();
 
-    // Generate JWT token
-    const token = jwt.sign(
-      { _id: newPartner._id, role: newPartner.role },
-      process.env.JWT_SECRET,
-      { expiresIn: '7d' }
-    );
+    // 🔹 8. Build verification link
+    const verificationUrl = `${process.env.FRONTEND_URL}/verify-email/${newPartner.verificationToken}`;
 
+    // 🔹 9. Send verification email
+    await transporter.sendMail({
+      from: `"Anyoka Eats" <${process.env.GMAIL_USER}>`,
+      to: email,
+      subject: 'Verify your Anyoka Eats Partner Account',
+      html: `
+        <h2>Welcome to Anyoka Eats, ${businessName}!</h2>
+        <p>Please verify your email to activate your partner account.</p>
+        <a href="${verificationUrl}" style="
+          display:inline-block;
+          background:#ff6b00;
+          color:white;
+          padding:10px 20px;
+          border-radius:5px;
+          text-decoration:none;
+        ">Verify My Account</a>
+        <p>If that button doesn't work, click this link instead:</p>
+        <p>${verificationUrl}</p>
+      `,
+    });
+
+    // 🔹 10. Respond (no JWT yet — only after verification/login)
     res.status(201).json({
-      message: 'Sign-up successful',
-      token,
-      partner: newPartner,
+      message: 'Sign-up successful! Please check your email to verify your account before logging in.',
     });
   } catch (error) {
-    console.error('Sign-up failed:', error);
-    res.status(500).json({ message: error.message || 'Server error during sign-up.' });
+    console.error('Sign-up error:', error);
+    res.status(500).json({ message: 'Server error during sign-up.', error: error.message });
   }
 });
 
+
+
+router.get('/verify/:token', async (req, res) => {
+  try {
+    const partner = await Partner.findOne({ verificationToken: req.params.token });
+
+    if (!partner) {
+      return res.status(400).json({ message: 'Invalid or expired verification token.' });
+    }
+
+    partner.isVerified = true;
+    partner.verificationToken = undefined; // clear token after verification
+    await partner.save();
+
+    res.status(200).json({ message: 'Account verified successfully! You can now log in.' });
+  } catch (error) {
+    res.status(500).json({ message: 'Verification failed.' });
+  }
+});
+
+/* =======================
+   PARTNER LOGIN ROUTE
+======================= */
+router.post('/partner/login', async (req, res) => {
+  const { identifier, password } = req.body;
+  console.log('Partner login attempt:', req.body);
+
+  if (!identifier || !password) {
+    return res.status(400).json({ message: 'Business name/phone and password are required' });
+  }
+
+  try {
+    // 🔍 Find partner by business name or contact number (not user!)
+    const partner = await Partner.findOne({
+      $or: [{ businessName: identifier }, { contactNumber: identifier }],
+    });
+
+    if (!partner) {
+      console.error('Partner not found:', identifier);
+      return res.status(404).json({ message: 'Partner not found' });
+    }
+
+    if (partner.suspended) {
+      return res.status(403).json({ message: 'Your vendor account has been suspended. Please contact support.' });
+    }
+
+    const isMatch = await bcrypt.compare(password, partner.password);
+    if (!isMatch) {
+      return res.status(401).json({ message: 'Invalid credentials' });
+    }
+
+    const token = jwt.sign({ _id: partner._id, role: 'partner' }, process.env.JWT_SECRET, { expiresIn: '7d' });
+
+    res.status(200).json({
+      message: 'Partner login successful',
+      token,
+      role: 'partner',
+      redirectTo: partner.role === 'admin' ? '/superuserdashboard' : '/dashboard',
+    });
+  } catch (error) {
+    console.error('Error during partner login:', error);
+    res.status(500).json({ message: 'Login error', error: error.message });
+  }
+});
 
 // Retrieve Partner Route
 router.get('/partners/:partnerId', async (req, res) => {
@@ -304,36 +440,7 @@ router.put('/partners/:id', async (req, res) => {
 });
 
 // Update /Add Partner profile Image
-// router.post('/upload-profile-image', (req, res) => {
-//   uploadProfileImage, processProfileImage(req, res, async (err) => {
-//     if (err) {
-//       return res.status(400).json({ message: err.message });
-//     }
 
-//     const imagePath = req.file.path;
-
-//     try {
-//       const { partnerId } = req.body;
-//       const updatedPartner = await Partner.findByIdAndUpdate(
-//         partnerId,
-//         { profileImage: `/uploads/profile-images/${req.file.filename}` },
-//         { new: true }
-//       );
-
-//       if (!updatedPartner) {
-//         return res.status(404).json({ message: 'Partner not found' });
-//       }
-
-//       res.status(200).json({
-//         message: 'Image uploaded and profile updated successfully',
-//         profileImage: `/uploads/profile-images/${req.file.filename}`,
-//       });
-//     } catch (error) {
-//       console.error('Error updating partner profile image:', error);
-//       res.status(500).json({ message: 'Server error' });
-//     }
-//   });
-// });
 router.post(
   '/upload-profile-image',
   uploadProfileImage,       // Multer middleware
@@ -368,39 +475,6 @@ router.post(
 
 
 // Update/Add Business permit
-// router.post('/upload-business-permit', (req, res) => {
-//   uploadBusinessPermit, processBusinessPermit(req, res, async (err) => {
-//     if (err) {
-//       return res.status(400).json({ message: err.message });
-//     }
-
-//     try {
-//       const { partnerId } = req.body;
-//       if (!partnerId || !req.file) {
-//         return res.status(400).json({ message: 'Partner ID and file are required' });
-//       }
-
-//       const updatedPartner = await Partner.findByIdAndUpdate(
-//         partnerId,
-//         { businessPermit: `/uploads/business-permits/${req.file.filename}` },
-//         { new: true }
-//       );
-
-//       if (!updatedPartner) {
-//         return res.status(404).json({ message: 'Partner not found' });
-//       }
-
-//       res.status(200).json({
-//         message: 'Business permit uploaded and profile updated successfully',
-//         businessPermit: `/uploads/business-permits/${req.file.filename}`,
-//       });
-//     } catch (error) {
-//       console.error('Error uploading business permit:', error);
-//       res.status(500).json({ message: 'Server error', error: error.message });
-//     }
-//   });
-// });
-
 router.post(
   '/upload-business-permit',
   uploadBusinessPermit,        // Multer middleware
@@ -432,6 +506,90 @@ router.post(
     }
   }
 );
+
+// ============================
+// PARTNER PASSWORD RESET ROUTES
+// ============================
+router.post('/partner/request-reset', async (req, res) => {
+  const { email } = req.body;
+  try {
+    const partner = await Partner.findOne({ email });
+    if (!partner) return res.status(404).json({ message: 'No partner account found with that email.' });
+
+    const resetToken = crypto.randomBytes(32).toString('hex');
+    partner.resetToken = resetToken;
+    partner.resetTokenExpiry = Date.now() + 3600000; // 1 hour
+    await partner.save({ validateBeforeSave: false });
+
+    const resetUrl = `${process.env.FRONTEND_URL}/partner/reset-password?token=${resetToken}&email=${email}`;
+
+    const emailHtml = `
+      <div style="font-family: Arial, sans-serif; background-color:#f8f9fa; padding:20px;">
+        <div style="max-width:600px;margin:auto;background:#ffffff;padding:30px;border-radius:10px;box-shadow:0 2px 5px rgba(0,0,0,0.1);">
+          <h2 style="color:#333;">Partner Password Reset</h2>
+          <p>Hi ${partner.businessName || 'Partner'},</p>
+          <p>You requested to reset your password for your <strong>Anyoka Eats</strong> partner account.</p>
+          <p>Please click the button below to set a new password:</p>
+          <div style="text-align:center;margin:25px 0;">
+            <a href="${resetUrl}" 
+              style="background-color:#1d3557;color:white;text-decoration:none;padding:12px 25px;border-radius:5px;font-weight:bold;">
+              Reset Partner Password
+            </a>
+          </div>
+          <p>If you prefer to enter the token manually, copy it below:</p>
+          <p style="font-weight:bold;background:#f1f1f1;padding:10px;border-radius:5px;text-align:center;">${resetToken}</p>
+          <p>This link and token expire in <strong>1 hour</strong>.</p>
+          <p>If you didn’t request this, you can safely ignore this email.</p>
+          <hr />
+          <small style="color:#999;">© ${new Date().getFullYear()} Anyoka Eats. All rights reserved.</small>
+        </div>
+      </div>
+    `;
+
+    await transporter.sendMail({
+      from: `"Anyoka Eats Support" <${process.env.GMAIL_USER}>`,
+      to: email,
+      subject: 'Partner Password Reset Request',
+      html: emailHtml,
+    });
+
+    res.json({ message: 'Partner password reset link sent to your email.' });
+  } catch (err) {
+    console.error('Partner password reset error:', err);
+    res.status(500).json({ message: 'Error sending reset email.' });
+  }
+});
+
+// Complete password reset (PARTNER)
+router.post('/partner/reset-password', async (req, res) => {
+  const { token, email, newPassword } = req.body;
+
+  try {
+    if (!token || !email || !newPassword) {
+      return res.status(400).json({ message: 'Token, email, and new password are required.' });
+    }
+
+    const partner = await Partner.findOne({
+      email,
+      resetToken: token,
+      resetTokenExpiry: { $gt: Date.now() },
+    });
+
+    if (!partner) {
+      return res.status(400).json({ message: 'Invalid or expired reset token.' });
+    }
+
+    partner.password = await bcrypt.hash(newPassword, 10);
+    partner.resetToken = undefined;
+    partner.resetTokenExpiry = undefined;
+    await partner.save({ validateBeforeSave: false });
+
+    res.status(200).json({ message: 'Partner password reset successfully. You can now log in.' });
+  } catch (error) {
+    console.error('Error during partner password reset:', error.message);
+    res.status(500).json({ message: 'Server error', error: error.message });
+  }
+});
 
 
 // Route to fetch all partners
@@ -769,76 +927,137 @@ router.get('/user/me', authenticateToken, async (req, res) => {
 });
 
 
-router.post('/login', async (req, res) => {
+
+/* =======================
+   USER LOGIN ROUTE
+======================= */
+router.post('/user/login', async (req, res) => {
   const { identifier, password } = req.body;
-  console.log('Login attempt:', req.body);
+  console.log('User login attempt:', req.body);
 
   if (!identifier || !password) {
-    return res.status(400).json({ message: 'Identifier and password are required' });
+    return res.status(400).json({ message: 'Username/phone and password are required' });
   }
 
   try {
-    // Attempt to find user by username or phone number
-    let account = await User.findOne({
-      $or: [
-        { username: identifier },
-        { phoneNumber: identifier }
-      ]
+    // 🔍 Find user by username or phone
+    const user = await User.findOne({
+      $or: [{ username: identifier }, { phoneNumber: identifier }],
     });
 
-    let role = 'user';
-
-    // If not found, attempt to find partner by business name or contact number
-    if (!account) {
-      account = await Partner.findOne({
-        $or: [
-          { businessName: identifier },
-          { contactNumber: identifier }
-        ]
-      });
-      role = 'partner';
+    if (!user) {
+      console.error('User not found:', identifier);
+      return res.status(404).json({ message: 'User not found' });
     }
 
-    // If account is still not found
-    if (!account) {
-      console.error('Account not found for identifier:', identifier);
-      return res.status(404).json({ message: 'Account not found' });
-    }
-
-    // Suspended checks
-    if (role === 'user' && account.suspended) {
+    if (user.suspended) {
       return res.status(403).json({ message: 'Your account has been suspended. Please contact support.' });
     }
-    if (role === 'partner' && account.suspended) {
-      return res.status(403).json({ message: 'Your vendor account has been suspended. Please contact support.' });
-    }
 
-    // Compare passwords
-    const isMatch = await bcrypt.compare(password, account.password);
+    const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) {
-      console.error('Invalid credentials for identifier:', identifier);
       return res.status(401).json({ message: 'Invalid credentials' });
     }
 
-    // Generate JWT token
-    const token = jwt.sign(
-      { _id: account._id, role },
-      process.env.JWT_SECRET,
-    );
+    const token = jwt.sign({ _id: user._id, role: 'user' }, process.env.JWT_SECRET, { expiresIn: '7d' });
 
-    // Respond with token and role
     res.status(200).json({
-      message: 'Login successful',
+      message: 'User login successful',
       token,
-      role,
-      redirectTo: role === 'partner' ? '/shop' : 'back'
+      role: 'user',
+      redirectTo: '/',
     });
-
   } catch (error) {
-    console.error('Error during login:', error);
+    console.error('Error during user login:', error);
     res.status(500).json({ message: 'Login error', error: error.message });
   }
 });
+
+
+// ==========================
+// USER PASSWORD RESET ROUTES
+// ==========================
+router.post('/user/request-reset', async (req, res) => {
+  const { email } = req.body;
+  try {
+    const user = await User.findOne({ email });
+    if (!user) return res.status(404).json({ message: 'No account found with that email.' });
+
+    const resetToken = crypto.randomBytes(32).toString('hex');
+    user.resetToken = resetToken;
+    user.resetTokenExpiry = Date.now() + 3600000; // 1 hour
+    await user.save({ validateBeforeSave: false });
+
+    const resetUrl = `${process.env.FRONTEND_URL}/user/reset-password?token=${resetToken}&email=${email}`;
+
+    const emailHtml = `
+      <div style="font-family: Arial, sans-serif; background-color:#f8f9fa; padding:20px;">
+        <div style="max-width:600px;margin:auto;background:#ffffff;padding:30px;border-radius:10px;box-shadow:0 2px 5px rgba(0,0,0,0.1);">
+          <h2 style="color:#333;">Password Reset Request</h2>
+          <p>Hi ${user.username || 'there'},</p>
+          <p>You requested to reset your password for your <strong>Anyoka Eats</strong> user account.</p>
+          <p>Please click the button below to reset your password:</p>
+          <div style="text-align:center;margin:25px 0;">
+            <a href="${resetUrl}" 
+              style="background-color:#e63946;color:white;text-decoration:none;padding:12px 25px;border-radius:5px;font-weight:bold;">
+              Reset Password
+            </a>
+          </div>
+          <p>If you prefer to enter the token manually, copy it below:</p>
+          <p style="font-weight:bold;background:#f1f1f1;padding:10px;border-radius:5px;text-align:center;">${resetToken}</p>
+          <p>This link and token expire in <strong>1 hour</strong>.</p>
+          <p>If you didn’t request this, you can safely ignore this email.</p>
+          <hr />
+          <small style="color:#999;">© ${new Date().getFullYear()} Anyoka Eats. All rights reserved.</small>
+        </div>
+      </div>
+    `;
+
+    await transporter.sendMail({
+      from: `"Anyoka Eats Support" <${process.env.GMAIL_USER}>`,
+      to: email,
+      subject: 'Reset Your Password',
+      html: emailHtml,
+    });
+
+    res.json({ message: 'Password reset link sent to your email.' });
+  } catch (err) {
+    console.error('User password reset error:', err);
+    res.status(500).json({ message: 'Error sending password reset email.' });
+  }
+});
+
+// Complete password reset (USER)
+router.post('/user/reset-password', async (req, res) => {
+  const { token, email, newPassword } = req.body;
+
+  try {
+    if (!token || !email || !newPassword) {
+      return res.status(400).json({ message: 'Token, email, and new password are required.' });
+    }
+
+    const user = await User.findOne({
+      email,
+      resetToken: token,
+      resetTokenExpiry: { $gt: Date.now() },
+    });
+
+    if (!user) {
+      return res.status(400).json({ message: 'Invalid or expired reset token.' });
+    }
+
+    user.password = await bcrypt.hash(newPassword, 10);
+    user.resetToken = undefined;
+    user.resetTokenExpiry = undefined;
+    await user.save({ validateBeforeSave: false });
+
+    res.status(200).json({ message: 'Password reset successfully. You can now log in.' });
+  } catch (error) {
+    console.error('Error during user password reset:', error.message);
+    res.status(500).json({ message: 'Server error', error: error.message });
+  }
+});
+
 
 // Admin login route
 router.post('/admin/login', async (req, res) => {
@@ -2140,6 +2359,107 @@ router.post('/driver/login', async (req, res) => {
   }
 });
 
+// ============================
+// DRIVER PASSWORD RESET ROUTES
+// ============================
+
+router.post('/driver/request-reset', async (req, res) => {
+  const { email } = req.body;
+
+  try {
+    if (!email) {
+      return res.status(400).json({ message: 'Email is required.' });
+    }
+
+    const driver = await Driver.findOne({ email });
+    if (!driver) {
+      return res.status(404).json({ message: 'No driver found with this email.' });
+    }
+
+    const resetToken = crypto.randomBytes(32).toString('hex');
+    const resetTokenExpiry = Date.now() + 3600000; // 1 hour
+
+    driver.resetToken = resetToken;
+    driver.resetTokenExpiry = resetTokenExpiry;
+    await driver.save({ validateBeforeSave: false });
+
+    const resetUrl = `${process.env.FRONTEND_URL}/driver/reset-password?token=${resetToken}&email=${email}`;
+
+    // ✨ Styled email with both clickable button and copyable token
+    const emailHtml = `
+      <div style="font-family: Arial, sans-serif; background-color:#f8f9fa; padding:20px;">
+        <div style="max-width:600px;margin:auto;background:#ffffff;padding:30px;border-radius:10px;box-shadow:0 2px 5px rgba(0,0,0,0.1);">
+          <h2 style="color:#333;">Driver Password Reset</h2>
+          <p>Hi ${driver.fullName || 'Driver'},</p>
+          <p>You requested to reset your password for your <strong>Anyoka Eats</strong> driver account.</p>
+          <p>Please click the button below to set a new password:</p>
+          <div style="text-align:center;margin:25px 0;">
+            <a href="${resetUrl}" 
+              style="background-color:#457b9d;color:white;text-decoration:none;padding:12px 25px;border-radius:5px;font-weight:bold;">
+              Reset Password
+            </a>
+          </div>
+          <p>If you prefer to enter the token manually, copy it below:</p>
+          <p style="font-weight:bold;background:#f1f1f1;padding:10px;border-radius:5px;text-align:center;">${resetToken}</p>
+          <p>This link and token will expire in <strong>1 hour</strong>.</p>
+          <p>If you didn’t request this, you can safely ignore this email.</p>
+          <hr />
+          <small style="color:#999;">© ${new Date().getFullYear()} Anyoka Eats. All rights reserved.</small>
+        </div>
+      </div>
+    `;
+
+    await transporter.sendMail({
+      from: `"Anyoka Eats Support" <${process.env.GMAIL_USER}>`,
+      to: email,
+      subject: 'Driver Password Reset Request',
+      html: emailHtml,
+    });
+
+    console.log('✅ Sent reset email to driver:', email);
+    res.status(200).json({ message: 'Password reset link sent to your email.' });
+  } catch (error) {
+    console.error('❌ Driver reset email error:', error);
+    res.status(500).json({ message: 'Server error while sending reset email.', error: error.message });
+  }
+});
+
+
+// ===============================
+// COMPLETE DRIVER PASSWORD RESET
+// ===============================
+router.post('/driver/reset-password', async (req, res) => {
+  const { token, email, newPassword } = req.body;
+
+  try {
+    if (!token || !email || !newPassword) {
+      return res.status(400).json({ message: 'Token, email, and new password are required.' });
+    }
+
+    const driver = await Driver.findOne({
+      email,
+      resetToken: token,
+      resetTokenExpiry: { $gt: Date.now() },
+    });
+
+    if (!driver) {
+      return res.status(400).json({ message: 'Invalid or expired reset token, or email does not match.' });
+    }
+
+    const hashedPassword = await bcrypt.hash(newPassword, 10);
+    driver.password = hashedPassword;
+    driver.resetToken = undefined;
+    driver.resetTokenExpiry = undefined;
+    await driver.save({ validateBeforeSave: false });
+
+    res.status(200).json({ message: 'Password reset successfully. You can now log in.' });
+  } catch (error) {
+    console.error('❌ Driver password reset error:', error.message, error.stack);
+    res.status(500).json({ message: 'Server error during password reset.', error: error.message });
+  }
+});
+
+
 // Driver logout: mark offline
 router.post('/driver/logout', authenticateToken, async (req, res) => {
   try {
@@ -2982,223 +3302,6 @@ router.post('/mpesa/status', async (req, res) => {
     console.error('Error checking payment status:', error.response ? error.response.data : error.message);
     res.status(500).json({ error: 'Failed to check payment status', details: error.message });
   }
-});
-
-
-
-// Configure nodemailer
-const transporter = nodemailer.createTransport({
-  service: 'gmail',
-  auth: {
-    user: process.env.GMAIL_USER,
-    pass: process.env.GMAIL_APP_PASSWORD,
-  },
-});
-
-// Verify transporter configuration
-transporter.verify((error, success) => {
-  if (error) {
-    console.error('Nodemailer verification error:', error);
-  } else {
-    console.log('Nodemailer is ready to send emails');
-  }
-});
-
-// Request password reset (send email with reset link)
-router.post('/auth/request-reset', async (req, res) => {
-  const { email, accountType } = req.body;
-
-  try {
-    if (!email) {
-      return res.status(400).json({ message: 'Email is required' });
-    }
-    let account;
-    let role = accountType || 'user';
-
-    if (role === 'partner') {
-      account = await Partner.findOne({ email });
-    } else {
-      account = await User.findOne({ email });
-    }
-
-    if (!account) {
-      return res.status(404).json({ message: 'No account found with this email.' });
-    }
-
-    const resetToken = crypto.randomBytes(32).toString('hex');
-    const resetTokenExpiry = Date.now() + 3600000;
-
-    account.resetToken = resetToken;
-    account.resetTokenExpiry = resetTokenExpiry;
-    await account.save({ validateBeforeSave: false });
-
-    const resetUrl = `${process.env.FRONTEND_URL}/password-reset?token=${resetToken}&email=${email}&accountType=${role}`;
-    const mailOptions = {
-      from: 'anyokaeats@gmail.com',
-      to: email,
-      subject: 'Password Reset Request',
-      html: `
-        <p>You requested a password reset.</p>
-        <p>Click this <a href="${resetUrl}">link</a> to reset your password.</p>
-        <p>This link will expire in 1 hour.</p>
-      `,
-    };
-
-    console.log('Sending email to:', email);
-    await transporter.sendMail(mailOptions);
-    res.status(200).json({ message: 'Password reset link sent to your email.' });
-  } catch (error) {
-    console.error('Error during password reset request:', error.message, error.stack);
-    res.status(500).json({ message: 'Server error', error: error.message });
-  }
-});
-
-// Reset password (email-based)
-router.post('/auth/reset-password', async (req, res) => {
-  const { token, email, newPassword, accountType } = req.body;
-
-  try {
-    if (!token || !email || !newPassword) {
-      return res.status(400).json({ message: 'Token, email, and new password are required.' });
-    }
-
-    let account;
-    let role = accountType || 'user';
-
-    if (role === 'partner') {
-      account = await Partner.findOne({
-        email,
-        resetToken: token,
-        resetTokenExpiry: { $gt: Date.now() },
-      });
-    } else {
-      account = await User.findOne({
-        email,
-        resetToken: token,
-        resetTokenExpiry: { $gt: Date.now() },
-      });
-    }
-
-    if (!account) {
-      return res.status(400).json({ message: 'Invalid or expired reset token, or email does not match.' });
-    }
-
-    const hashedPassword = await bcrypt.hash(newPassword, 10);
-    account.password = hashedPassword;
-    account.resetToken = undefined;
-    account.resetTokenExpiry = undefined;
-    await account.save({ validateBeforeSave: false });
-
-    res.status(200).json({ message: 'Password reset successfully.' });
-  } catch (error) {
-    console.error('Error during password reset:', error.message, error.stack);
-    res.status(500).json({ message: 'Server error', error: error.message });
-  }
-});
-
-
-
-
-// Request driver password reset (send email with reset link)
-router.post('/driver/request-reset', async (req, res) => {
-  const { email } = req.body;
-
-  try {
-    if (!email) {
-      return res.status(400).json({ message: 'Email is required' });
-    }
-
-    const driver = await Driver.findOne({ email });
-    if (!driver) {
-      return res.status(404).json({ message: 'No driver found with this email.' });
-    }
-
-    const resetToken = crypto.randomBytes(32).toString('hex');
-    const resetTokenExpiry = Date.now() + 3600000; // 1 hour
-
-    driver.resetToken = resetToken;
-    driver.resetTokenExpiry = resetTokenExpiry;
-    await driver.save({ validateBeforeSave: false });
-
-    // frontend reset page with query params for auto-fill
-    const resetUrl = `${process.env.FRONTEND_URL}/driver/reset-password?token=${resetToken}&email=${email}`;
-    const mailOptions = {
-      from: 'anyokaeats@gmail.com',
-      to: email,
-      subject: 'Driver Password Reset Request',
-      html: `
-        <p>You requested a password reset.</p>
-        <p>Click this <a href="${resetUrl}">link</a> to reset your password.</p>
-        <p>This link will expire in 1 hour.</p>
-      `,
-    };
-
-    console.log('Sending reset email to driver:', email);
-    await transporter.sendMail(mailOptions);
-
-    res.status(200).json({ message: 'Password reset link sent to your email.' });
-  } catch (error) {
-    console.error('Error during driver password reset request:', error.message, error.stack);
-    res.status(500).json({ message: 'Server error', error: error.message });
-  }
-});
-
-// Reset password (email-based)
-router.post('/driver/reset-password', async (req, res) => {
-  const { token, email, newPassword } = req.body;
-
-  try {
-    if (!token || !email || !newPassword) {
-      return res.status(400).json({ message: 'Token, email, and new password are required.' });
-    }
-
-    const driver = await Driver.findOne({
-      email,
-      resetToken: token,
-      resetTokenExpiry: { $gt: Date.now() },
-    });
-
-    if (!driver) {
-      return res.status(400).json({ message: 'Invalid or expired reset token, or email does not match.' });
-    }
-
-    const hashedPassword = await bcrypt.hash(newPassword, 10);
-    driver.password = hashedPassword;
-    driver.resetToken = undefined;
-    driver.resetTokenExpiry = undefined;
-    await driver.save({ validateBeforeSave: false });
-
-    res.status(200).json({ message: 'Password reset successfully.' });
-  } catch (error) {
-    console.error('Error during driver password reset:', error.message, error.stack);
-    res.status(500).json({ message: 'Server error', error: error.message });
-  }
-});
-
-//MAILS POST
-
-// Route to handle form submission
-router.post('/send-email', (req, res) => {
-  const { email, message } = req.body;
-  // console.log(req.body);
-
-  const mailOptions = {
-    from: email,
-    to: 'anyokaeats@gmail.com', // replace with your email
-    subject: 'New Contact Form Submission',
-    text: `Message from ${email}: ${message}`,
-  };
-
-  transporter.sendMail(mailOptions, (error, info) => {
-    if (error) {
-      console.error('Error sending email:', error); // Log the error details
-      return res.status(500).send(error.toString());
-    } else {
-      // console.log('SMTP Server is ready to take our messages');
-    }
-    // console.log('Email sent: ' + info.response); // Log success message
-    res.status(200).send('Email sent successfully');
-  });
 });
 
 
