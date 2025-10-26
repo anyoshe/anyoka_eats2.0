@@ -4,6 +4,7 @@ import styles from './DriverSignup.module.css';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCartShopping, faCaretDown } from '@fortawesome/free-solid-svg-icons';
 import { useNavigate } from 'react-router-dom';
+import Swal from 'sweetalert2';
 
 
 const DriverSignup = () => {
@@ -77,37 +78,62 @@ const DriverSignup = () => {
   };
 
   const handleSubmit = async (e) => {
-    e.preventDefault();
-    setError('');
-    setSuccess('');
+  e.preventDefault();
+  setError('');
+  setSuccess('');
 
-    if (isLogin) {
-      if (!loginData.username || !loginData.password) {
-        setError('Please fill in username and password');
-        return;
-      }
+  if (isLogin) {
+    // 🔹 Driver Login Flow
+    if (!loginData.username || !loginData.password) {
+      Swal.fire({
+        title: 'Missing Fields',
+        text: 'Please fill in both your username and password.',
+        icon: 'warning',
+        confirmButtonColor: '#ff6b00',
+      });
+      return;
+    }
 
-      const result = await loginDriver(loginData);
-      if (result.success) {
+    const result = await loginDriver(loginData);
+    if (result.success) {
+      Swal.fire({
+        title: 'Welcome Back! 🚗',
+        text: 'Login successful. Redirecting to your dashboard...',
+        icon: 'success',
+        confirmButtonColor: '#ff6b00',
+      });
+      setTimeout(() => {
         setSuccess('Logged in successfully!');
-      } else {
-        setError(result.message || 'Login failed');
-      }
+      }, 1500);
     } else {
-      // Validate signup form
-      if (!validateForm()) {
-        return;
-      }
+      Swal.fire({
+        title: 'Login Failed',
+        text: result.message || 'Invalid credentials. Please try again.',
+        icon: 'error',
+        confirmButtonColor: '#ff6b00',
+      });
+    }
+  } else {
+    // 🔹 Driver Signup Flow
+    if (!validateForm()) return;
 
+    try {
       const result = await signupDriver(formData);
 
       if (result.success) {
-        setSuccess('✅ Sign-up successful! Please check your email to verify your account before logging in.');
-        setError('');
+        await Swal.fire({
+          title: 'Welcome to Anyoka Drivers! 🧡',
+          html: `
+            <p>Thank you for signing up, <strong>${formData.username}</strong>!</p>
+            <p>We’ve sent a verification link to your email <strong>${formData.email}</strong>.</p>
+            <p>Please verify your email to activate your driver account and start delivering orders. 🚗💨</p>
+          `,
+          icon: 'success',
+          confirmButtonColor: '#ff6b00',
+          confirmButtonText: 'Okay, Got It!',
+        });
 
-        // Optionally auto-switch to login form after a short delay
-        setTimeout(() => setIsLogin(true), 3000);
-
+        // Reset form + switch to login
         setFormData({
           username: '',
           phoneNumber: '',
@@ -116,12 +142,26 @@ const DriverSignup = () => {
           nationalId: '',
           driverLicenseNumber: '',
         });
+        setTimeout(() => setIsLogin(true), 500);
       } else {
-        setError(result.message || 'Signup failed');
+        Swal.fire({
+          title: 'Sign-up Failed',
+          text: result.message || 'Something went wrong. Please try again.',
+          icon: 'error',
+          confirmButtonColor: '#ff6b00',
+        });
       }
-
+    } catch (err) {
+      Swal.fire({
+        title: 'Sign-up Failed',
+        text: err.response?.data?.message || 'Something went wrong. Please try again.',
+        icon: 'error',
+        confirmButtonColor: '#ff6b00',
+      });
     }
-  };
+  }
+};
+
 
   const toggleForm = () => {
     setIsLogin(!isLogin);  // Toggle between login and signup form

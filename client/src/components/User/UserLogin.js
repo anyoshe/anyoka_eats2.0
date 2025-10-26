@@ -6,6 +6,7 @@ import config from '../../config';
 import styles from './Login.module.css';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCaretDown } from '@fortawesome/free-solid-svg-icons';
+import Swal from 'sweetalert2';
 
 const UserLogin = () => {
   const [identifier, setIdentifier] = useState('');
@@ -21,41 +22,63 @@ const UserLogin = () => {
     return () => clearTimeout(t);
   }, []);
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    setError('');
 
-    try {
-      const res = await axios.post(`${config.backendUrl}/api/user/login`, { identifier, password });
-      const { token, role } = res.data;
+const handleSubmit = async (e) => {
+  e.preventDefault();
+  setError('');
 
-      if (role !== 'user') {
-        setError('Invalid credentials for user account.');
-        return;
-      }
+  try {
+    const res = await axios.post(`${config.backendUrl}/api/user/login`, { identifier, password });
+    const { token, role } = res.data;
 
-      // ✅ Store user token separately
-      localStorage.setItem('userToken', token);
-      setToken(token);
-
-      // Fetch user details
-      const userRes = await axios.get(`${config.backendUrl}/api/user/me`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      const userData = userRes.data;
-
-      localStorage.setItem('user', JSON.stringify(userData));
-      setUser(userData);
-      setIsLoggedIn(true);
-
-      const targetPath = redirectPath || '/';
-      setRedirectPath('/');
-      navigate(targetPath);
-
-    } catch (err) {
-      setError(err.response?.data?.message || 'Login failed. Please try again.');
+    if (role !== 'user') {
+      setError('Invalid credentials for user account.');
+      return;
     }
-  };
+
+    // ✅ Store token
+    localStorage.setItem('userToken', token);
+    setToken(token);
+
+    // ✅ Fetch user details
+    const userRes = await axios.get(`${config.backendUrl}/api/user/me`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    const userData = userRes.data;
+
+    // ✅ Save user info locally
+    localStorage.setItem('user', JSON.stringify(userData));
+    setUser(userData);
+    setIsLoggedIn(true);
+
+    // 🎉 Friendly welcome modal
+    await Swal.fire({
+      title: `Welcome back, ${userData.names.split(' ')[0]}! 👋`,
+      html: `
+        <p>Great to have you back with <strong>Anyoka</strong>.</p>
+        <p>Start exploring the latest products, deals, and offers tailored just for you.</p>
+        <p>Let’s make your shopping experience smoother and more exciting!</p>
+      `,
+      icon: 'success',
+      confirmButtonColor: '#ff6b00',
+      confirmButtonText: 'Continue Shopping 🛍️',
+    });
+
+    // ✅ Redirect after welcome
+    const targetPath = redirectPath || '/';
+    setRedirectPath('/');
+    navigate(targetPath);
+
+  } catch (err) {
+    Swal.fire({
+      title: 'Login Failed',
+      text: err.response?.data?.message || 'Please check your credentials and try again.',
+      icon: 'error',
+      confirmButtonColor: '#ff6b00',
+    });
+  }
+};
+
 
   return (
     <div className={styles.loginBackDiv}>

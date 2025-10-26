@@ -4,6 +4,7 @@ import styles from './DriverSignup.module.css';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCaretDown } from '@fortawesome/free-solid-svg-icons';
 import { useNavigate } from 'react-router-dom';
+import Swal from 'sweetalert2';
 
 const DriverLogin = () => {
   const navigate = useNavigate();
@@ -21,17 +22,52 @@ const DriverLogin = () => {
     setLoginData(prev => ({ ...prev, [e.target.name]: e.target.value }));
   };
 
-  const handleSubmit = async (e) => {
+ const handleSubmit = async (e) => {
     e.preventDefault();
-    setError('');
-    setSuccess('');
 
-    const result = await loginDriver(loginData);
-    if (result.success) {
-      setSuccess('Logged in successfully!');
-      // Navigation will be handled by the DriverContext
-    } else {
-      setError(result.message || 'Login failed');
+    if (!loginData.username.trim() || !loginData.password.trim()) {
+      Swal.fire({
+        title: 'Missing Information',
+        text: 'Please enter both your username (or phone number) and password.',
+        icon: 'warning',
+        confirmButtonColor: '#ff6b00',
+      });
+      return;
+    }
+
+    try {
+      const result = await loginDriver(loginData);
+
+      if (result.success) {
+        await Swal.fire({
+          title: 'Welcome Back! 🚗',
+          html: `
+            <p>Hi <strong>${result.driver?.username || 'Driver'}</strong>, we're happy to see you again!</p>
+            <p>Redirecting you to your dashboard...</p>
+          `,
+          icon: 'success',
+          confirmButtonColor: '#ff6b00',
+          confirmButtonText: 'Let’s Go!',
+          timer: 2500,
+          timerProgressBar: true,
+        });
+
+        // Navigation handled inside DriverContext after login
+      } else {
+        Swal.fire({
+          title: 'Login Failed',
+          text: result.message || 'Invalid credentials. Please try again.',
+          icon: 'error',
+          confirmButtonColor: '#ff6b00',
+        });
+      }
+    } catch (error) {
+      Swal.fire({
+        title: 'Login Error',
+        text: error.response?.data?.message || 'Something went wrong. Please try again.',
+        icon: 'error',
+        confirmButtonColor: '#ff6b00',
+      });
     }
   };
 

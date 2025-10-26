@@ -8,6 +8,7 @@ import styles from './SignUpSignIn.module.css';
 import { FaMapMarkerAlt, FaEye, FaEyeSlash } from 'react-icons/fa';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCaretDown } from '@fortawesome/free-solid-svg-icons';
+import Swal from 'sweetalert2';
 
 const StoreSignUpForm = () => {
   const [formData, setFormData] = useState({
@@ -70,12 +71,12 @@ const StoreSignUpForm = () => {
       axios.get(`${config.backendUrl}/api/partner`, {
         headers: { Authorization: `Bearer ${token}` },
       })
-      .then((response) => {
-        const partnerData = response.data;
-        setPartner(partnerData);
-        navigate(partnerData.role === 'admin' ? '/superuserdashboard' : '/dashboard');
-      })
-      .catch(() => {});
+        .then((response) => {
+          const partnerData = response.data;
+          setPartner(partnerData);
+          navigate(partnerData.role === 'admin' ? '/superuserdashboard' : '/dashboard');
+        })
+        .catch(() => { });
     }
   }, [navigate, setPartner]);
 
@@ -95,33 +96,69 @@ const StoreSignUpForm = () => {
   // 🔹 Auto detect location using browser geolocation
   const handleAutoLocate = () => {
     if (!navigator.geolocation) {
-      alert('Geolocation not supported on this device.');
+      Swal.fire({
+        title: 'Location Error',
+        text: 'Geolocation is not supported on this device.',
+        icon: 'error',
+        confirmButtonColor: '#ff6b00',
+      });
       return;
     }
+
     navigator.geolocation.getCurrentPosition(
       async (pos) => {
         const lat = pos.coords.latitude;
         const lng = pos.coords.longitude;
         setMapCenter({ lat, lng });
 
-        // Reverse geocode to get human-readable address
         if (window.google?.maps) {
           const geocoder = new window.google.maps.Geocoder();
           const latlng = { lat, lng };
           geocoder.geocode({ location: latlng }, (results, status) => {
             if (status === 'OK' && results[0]) {
               const address = results[0].formatted_address;
-              handleLocationSelect(address);
+              const components = results[0].address_components;
+
+              // 🏙️ Extract the town or locality from the components
+              let detectedTown = '';
+              for (const comp of components) {
+                if (comp.types.includes('locality') || comp.types.includes('administrative_area_level_2')) {
+                  detectedTown = comp.long_name;
+                  break;
+                }
+              }
+
+              // ✅ Update both town and location automatically
+              setFormData((prev) => ({
+                ...prev,
+                town: detectedTown || prev.town, // fallback to previous if none found
+                location: address,
+              }));
             } else {
-              handleLocationSelect(`${lat}, ${lng}`);
+              // fallback if geocoding fails
+              setFormData((prev) => ({
+                ...prev,
+                location: `${lat}, ${lng}`,
+              }));
             }
           });
         } else {
-          handleLocationSelect(`${lat}, ${lng}`);
+          setFormData((prev) => ({
+            ...prev,
+            location: `${lat}, ${lng}`,
+          }));
         }
+
         setShowLocationChoice(false);
       },
-      () => alert('Unable to retrieve your location.')
+      () => {
+        Swal.fire({
+          title: 'Unable to Detect',
+          text: 'Could not retrieve your location. Please enable GPS and try again.',
+          icon: 'warning',
+          confirmButtonColor: '#ff6b00',
+        });
+      }
     );
   };
 
@@ -138,14 +175,21 @@ const StoreSignUpForm = () => {
     setShowMap(true);
   };
 
+
   const handleSubmitSignUp = async (event) => {
     event.preventDefault();
 
-    // Manual validation
-  if (!formData.location || formData.location.trim() === '') {
-    alert('Please drop a pin or select a location before submitting.');
-    return; // stop submission
-  }
+    // ✅ Only check location when actually submitting
+    if (!formData.location || formData.location.trim() === '') {
+      Swal.fire({
+        title: 'Location Required',
+        text: 'Please drop a pin or select your store location before submitting your registration.',
+        icon: 'warning',
+        confirmButtonColor: '#ff6b00',
+      });
+      return;
+    }
+
     try {
       const role = formData.email === 'anyokaeats@gmail.com' ? 'admin' : 'partner';
 
@@ -161,15 +205,29 @@ const StoreSignUpForm = () => {
       localStorage.setItem('partnerToken', token);
       localStorage.setItem('partnerDetails', JSON.stringify(partner));
 
-      // alert('Sign up successful! Welcome!');
-      // navigate(partner.role === 'admin' ? '/superuserdashboard' : '/dashboard');
-      alert('Sign up successful! Please check your email to verify your account before logging in.');
-      navigate('/sign-in');
+      await Swal.fire({
+        title: 'Welcome to Anyoka Business! 🧡',
+        html: `
+        <p>Thank you for registering your business <strong>${partner.businessName}</strong>.</p>
+        <p>We've sent a verification link to your email <strong>${partner.email}</strong>.</p>
+        <p>Please verify your email to activate your account and start selling!</p>
+      `,
+        icon: 'success',
+        confirmButtonColor: '#ff6b00',
+        confirmButtonText: 'Okay, Got It!',
+      });
 
+      navigate('/sign-in');
     } catch (error) {
-      alert(error.response?.data?.message || 'Sign up failed. Try again.');
+      Swal.fire({
+        title: 'Sign-up Failed',
+        text: error.response?.data?.message || 'Something went wrong. Please try again.',
+        icon: 'error',
+        confirmButtonColor: '#ff6b00',
+      });
     }
   };
+
 
   return (
     <section className={styles.signUpContainer}>
@@ -290,18 +348,27 @@ const StoreSignUpForm = () => {
             <div className={styles.modalOverlay}>
               <div className={styles.modalContent}>
                 <h3>Select how to set your location</h3>
-                <button onClick={handleAutoLocate} className={styles.choiceBtn}>
+
+                {/* ✅ type="button" prevents form submission */}
+                <button type="button" onClick={handleAutoLocate} className={styles.choiceBtn}>
                   📍 Auto-detect my location
                 </button>
-                <button onClick={handleManualPin} className={styles.choiceBtn}>
+
+                <button type="button" onClick={handleManualPin} className={styles.choiceBtn}>
                   🗺️ Manually pin location
                 </button>
-                <button onClick={() => setShowLocationChoice(false)} className={styles.closeModal}>
-                  x 
+
+                <button
+                  type="button"
+                  onClick={() => setShowLocationChoice(false)}
+                  className={styles.closeModal}
+                >
+                  x
                 </button>
               </div>
             </div>
           )}
+
 
           {/* 🔹 Map Modal */}
           {showMap && (

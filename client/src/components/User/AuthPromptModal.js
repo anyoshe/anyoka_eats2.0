@@ -10,7 +10,7 @@ const AuthPromptModal = ({ isOpen, onRequestClose }) => {
 
   const handleLogin = () => {
     onRequestClose();
-    navigate('/sign-in');
+    navigate('/user/sign-in');
   };
 
   const handleSignup = () => {

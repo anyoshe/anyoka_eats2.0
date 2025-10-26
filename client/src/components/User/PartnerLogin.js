@@ -7,6 +7,7 @@ import config from '../../config';
 import styles from './Login.module.css';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCaretDown } from '@fortawesome/free-solid-svg-icons';
+import Swal from 'sweetalert2';
 
 const PartnerLogin = () => {
   const [identifier, setIdentifier] = useState('');
@@ -23,38 +24,60 @@ const PartnerLogin = () => {
     return () => clearTimeout(t);
   }, []);
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    setError('');
 
-    try {
-      const res = await axios.post(`${config.backendUrl}/api/partner/login`, { identifier, password });
-      const { token, role } = res.data;
+const handleSubmit = async (e) => {
+  e.preventDefault();
+  setError('');
 
-      if (role !== 'partner') {
-        setError('Invalid credentials for partner account.');
-        return;
-      }
+  try {
+    const res = await axios.post(`${config.backendUrl}/api/partner/login`, { identifier, password });
+    const { token, role } = res.data;
 
-      // ✅ Store partner token separately
-      localStorage.setItem('partnerToken', token);
-      setToken(token);
-
-      // Fetch partner details
-      const partnerRes = await axios.get(`${config.backendUrl}/api/partner`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      const partnerData = partnerRes.data;
-
-      localStorage.setItem('partnerDetails', JSON.stringify(partnerData));
-      setPartner(partnerData);
-      updatePartnerDetails(partnerData);
-
-      navigate(partnerData.role === 'admin' ? '/superuserdashboard' : '/dashboard');
-    } catch (err) {
-      setError(err.response?.data?.message || 'Login failed. Please try again.');
+    if (role !== 'partner') {
+      setError('Invalid credentials for partner account.');
+      return;
     }
-  };
+
+    // ✅ Store token securely
+    localStorage.setItem('partnerToken', token);
+    setToken(token);
+
+    // ✅ Fetch partner details
+    const partnerRes = await axios.get(`${config.backendUrl}/api/partner`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    const partnerData = partnerRes.data;
+
+    localStorage.setItem('partnerDetails', JSON.stringify(partnerData));
+    setPartner(partnerData);
+    updatePartnerDetails(partnerData);
+
+    // 🎉 Warm business welcome
+    await Swal.fire({
+      title: `Welcome back, ${partnerData.businessName}! 🧡`,
+      html: `
+        <p>We're glad to have your business back on <strong>Anyoka</strong>.</p>
+        <p>Check your dashboard for the latest orders, insights, and updates.</p>
+        <p>Let’s grow together and keep customers happy!</p>
+      `,
+      icon: 'success',
+      confirmButtonColor: '#ff6b00',
+      confirmButtonText: 'Go to Dashboard 🚀',
+    });
+
+    // ✅ Navigate to dashboard or admin panel
+    navigate(partnerData.role === 'admin' ? '/superuserdashboard' : '/dashboard');
+
+  } catch (err) {
+    Swal.fire({
+      title: 'Login Failed',
+      text: err.response?.data?.message || 'Please check your credentials and try again.',
+      icon: 'error',
+      confirmButtonColor: '#ff6b00',
+    });
+  }
+};
+
 
   return (
     <div className={styles.loginBackDiv}>

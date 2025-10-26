@@ -305,6 +305,10 @@ router.post('/signup', uploadSignupFiles, processSignupFiles, async (req, res) =
     // 🔹 10. Respond (no JWT yet — only after verification/login)
     res.status(201).json({
       message: 'Sign-up successful! Please check your email to verify your account before logging in.',
+      partner: {
+        businessName: newPartner.businessName,
+        email: newPartner.email,
+      },
     });
 
   } catch (error) {
@@ -967,7 +971,7 @@ router.post('/auth/userSignup', async (req, res) => {
         location: newUser.location,
       },
     });
-   } catch (error) {
+  } catch (error) {
     console.error('Sign-up error:', error);
 
     // 🧠 Handle duplicate key errors from MongoDB
@@ -2475,7 +2479,7 @@ router.get('/driver/verify/:token', async (req, res) => {
 
 router.post('/driver/login', async (req, res) => {
   const { username, password } = req.body;
- console.log('Driver login attempt:', { username, password });
+  console.log('Driver login attempt:', { username, password });
   try {
     // ✅ Validate inputs
     if (!username || !password) {
@@ -3349,7 +3353,7 @@ const getAccessToken = async () => {
 
 // 🔹 Initiate M-Pesa Payment (Deposit or Balance)
 router.post('/mpesa/pay', async (req, res) => {
-  const { phoneNumber, amount, orderId, paymentType = 'Full' } = req.body; 
+  const { phoneNumber, amount, orderId, paymentType = 'Full' } = req.body;
   console.log('Received payment request:', { phoneNumber, amount, orderId, paymentType });
 
   try {
