@@ -24,19 +24,21 @@ const PaymentMethods = ({
   const { user } = useContext(AuthContext);
   const navigate = useNavigate();
 
-  // Autofill user phone number if available
+  // Auto-fill M-Pesa number
   useEffect(() => {
-    if (user?.phoneNumber) setMpesaNumber(user.phoneNumber);
+    if (user?.phoneNumber) {
+      setMpesaNumber(user.phoneNumber);
+    }
   }, [user]);
 
-  // Automatically switch to M-Pesa if platform delivery
+  // Switch automatically to M-Pesa for platform delivery
   useEffect(() => {
     if (deliveryOption === 'platform' && method === 'COD') {
       setMethod('Mpesa');
     }
   }, [deliveryOption, method]);
 
-  // Build base order payload
+  // Build base payload
   const buildOrderPayload = (extraFields = {}) => ({
     userId: user._id,
     items: cart.map(({ _id, quantity, price, shop }) => ({
@@ -55,7 +57,7 @@ const PaymentMethods = ({
     ...extraFields
   });
 
-  // === HANDLE ORDER PLACEMENT ===
+  // === Handle Order Placement ===
   const handlePlaceOrder = async () => {
     if (loading) return;
 
@@ -72,11 +74,11 @@ const PaymentMethods = ({
     setLoading(true);
 
     try {
-      // CASE 1: CASH ON DELIVERY (OWN DELIVERY ONLY)
+      // CASE 1: Cash on Delivery
       if (method === 'COD') {
         const payload = buildOrderPayload({
           paymentStatus: 'Pending',
-          paymentType: 'collectLater'
+          paymentType: 'full'
         });
 
         const res = await fetch(`${config.backendUrl}/api/orders/place`, {
@@ -96,63 +98,27 @@ const PaymentMethods = ({
         return navigate(`/orders/${data.orderId}`);
       }
 
-      // CASE 2: M-PESA PAYMENT (PLATFORM OR OWN DELIVERY)
+      // CASE 2: M-Pesa Payment
       if (method === 'Mpesa') {
         let formattedNumber = mpesaNumber.startsWith('254')
           ? mpesaNumber
           : mpesaNumber.replace(/^0/, '254');
 
         const amount = total + (deliveryFee || 0);
-
-        // STEP 1️⃣: Create a pending order before payment
-        const pendingOrderPayload = buildOrderPayload({
-          paymentStatus: 'Pending',
-          paymentType: 'full'
-        });
-
-        const orderRes = await fetch(`${config.backendUrl}/api/orders/place`, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            Authorization: `Bearer ${user.token}`
-          },
-          body: JSON.stringify(pendingOrderPayload)
-        });
-
-        const orderData = await orderRes.json();
-        if (!orderRes.ok) throw new Error(orderData.error || 'Failed to create order');
-
-        const { orderId } = orderData;
-        if (!orderId) throw new Error('Order ID not returned from backend');
-
-        // STEP 2️⃣: Initiate M-Pesa payment using the new orderId
         setShowMpesaModal(true);
-        console.log('🚀 Initiating M-Pesa Payment:', {
-          phoneNumber: formattedNumber,
-          amount,
-          orderId,
-          deliveryOption
-        });
 
-        const paymentInit = await fetch(`${config.backendUrl}/api/mpesa/pay`, {
+        const res = await fetch(`${config.backendUrl}/api/mpesa/pay`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            phoneNumber: formattedNumber,
-            amount,
-            orderId, // ✅ include the orderId now
-            paymentType: 'full',
-            callback: `${config.backendUrl}/api/mpesa/callback`
-          })
+          body: JSON.stringify({ phoneNumber: formattedNumber, amount })
         });
 
-        const paymentData = await paymentInit.json();
-        if (!paymentInit.ok)
-          throw new Error(paymentData.error || 'Failed to initiate M-Pesa payment');
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error || 'M-Pesa payment failed');
 
-        const { CheckoutRequestID } = paymentData;
+        const { CheckoutRequestID } = data;
 
-        // STEP 3️⃣: Poll for payment confirmation
+        // Poll for confirmation
         let paymentConfirmed = false;
         for (let i = 0; i < 8; i++) {
           await new Promise(r => setTimeout(r, 5000));
@@ -171,29 +137,29 @@ const PaymentMethods = ({
 
         setShowMpesaModal(false);
 
-        if (!paymentConfirmed)
-          throw new Error('Payment not confirmed. Please try again.');
+        if (!paymentConfirmed) throw new Error('Payment not confirmed. Try again.');
 
-        // STEP 4️⃣: Update order payment status → Paid
-        const confirmRes = await fetch(`${config.backendUrl}/api/orders/${orderId}/confirm-payment`, {
-          method: 'PUT',
+        // Confirmed payment → Place order
+        const orderPayload = buildOrderPayload({
+          paymentStatus: 'Paid',
+          paymentType: 'full'
+        });
+
+        const orderRes = await fetch(`${config.backendUrl}/api/orders/place`, {
+          method: 'POST',
           headers: {
             'Content-Type': 'application/json',
             Authorization: `Bearer ${user.token}`
           },
-          body: JSON.stringify({
-            paymentStatus: 'Paid',
-            paymentType: 'full'
-          })
+          body: JSON.stringify(orderPayload)
         });
 
-        const confirmData = await confirmRes.json();
-        if (!confirmRes.ok)
-          throw new Error(confirmData.error || 'Failed to confirm payment');
+        const orderData = await orderRes.json();
+        if (!orderRes.ok) throw new Error(orderData.error || 'Order placement failed');
 
         clearCart();
         onSuccess?.();
-        navigate(`/orders/${orderId}`);
+        navigate(`/orders/${orderData.orderId}`);
       }
     } catch (err) {
       console.error('Order Error:', err);
@@ -223,7 +189,7 @@ const PaymentMethods = ({
           </label>
         )}
 
-        {/* M-Pesa always visible */}
+        {/* Mpesa always visible */}
         <label>
           <input
             type="radio"
