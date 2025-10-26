@@ -485,3 +485,21 @@
     opacity: 1;
   }
 }
+
+
+.paymentSelection {
+  margin-bottom: 1rem;
+}
+
+.paymentTypeDropdown {
+  width: 100%;
+  padding: 0.5rem;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+  margin-top: 0.5rem;
+}
+
+.paymentSummary {
+  margin-bottom: 1rem;
+  font-size: 1.1rem;
+}

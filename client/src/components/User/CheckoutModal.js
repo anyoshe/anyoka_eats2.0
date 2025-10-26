@@ -29,6 +29,14 @@ const CheckoutModal = ({ isOpen, onClose, cart, total }) => {
   const [mapCenter, setMapCenter] = useState({ lat: -3.2192, lng: 40.1169 });
   const [isEditingLocation, setIsEditingLocation] = useState(false);
   const [showAuthPrompt, setShowAuthPrompt] = useState(!user);
+  const [paymentType, setPaymentType] = useState('full');
+
+  const amountToPay = React.useMemo(() => {
+    if (paymentType === 'delivery') return deliveryFee || 0;
+    if (paymentType === 'goods') return total;
+    return (total + (deliveryFee || 0));
+  }, [paymentType, total, deliveryFee]);
+
 
   const handleDeliveryChange = (fee, option, calculating) => {
     setDeliveryFee(fee);
@@ -287,37 +295,85 @@ const CheckoutModal = ({ isOpen, onClose, cart, total }) => {
             </div>
           </div>
 
+
+
           {/* Step 3: Payment Method */}
-          <div className={`${styles.stepContent} ${currentStep === 3 ? styles.active : ''}`}>
-            {/* Keep step title; inner heading in PaymentMethods will be hidden via CSS */}
-            <div className={styles.paymentOptions}>
-              <PaymentMethods
-                cart={cart}
-                total={total}
-                deliveryFee={deliveryFee}
-                deliveryOption={deliveryOption}
-                deliveryTown={formState.town}
-                isDeliveryFeeReady={isDeliveryFeeReady}
-                deliveryLocation={formState.selectedLocation}
-                clearCart={() => { /* clear context cart */ }}
-                onSuccess={() => alert('Order placed!')}
-                onError={(msg) => alert(`Order error: ${msg}`)}
-              />
+          {deliveryOption !== 'none' && (
+            <div className={`${styles.stepContent} ${currentStep === 3 ? styles.active : ''}`}>
+              <h3 className={styles.stepTitle}>Payment Method</h3>
+
+              {/* Only show payment type selector if NOT 'own' */}
+              {deliveryOption !== 'own' ? (
+                <div className={styles.paymentSelection}>
+                  <label htmlFor="paymentType"><strong>Choose Amount To Pay:</strong></label>
+                  <select
+                    id="paymentType"
+                    value={paymentType}
+                    onChange={(e) => setPaymentType(e.target.value)}
+                    className={styles.paymentTypeDropdown}
+                  >
+                    <option value="full">Pay Full Amount</option>
+                    <option value="delivery">Pay Delivery Fee Only</option>
+                    <option value="goods">Pay for Goods Only</option>
+                  </select>
+                </div>
+              ) : (
+                // 👇 Automatically set payment type to "full" for own delivery
+                <div className={styles.paymentSelection}>
+                  <p><strong>Payment Type:</strong> Full Payment</p>
+                </div>
+              )}
+
+              <div className={styles.paymentSummary}>
+                <p>
+                  <strong>Amount to Pay: </strong>
+                  KSH {amountToPay.toFixed(2)}
+                </p>
+
+                {deliveryOption !== 'own' && paymentType !== 'full' && (
+                  <p className={styles.balanceInfo}>
+                    💬 Balance payable upon delivery:&nbsp;
+                    <strong>
+                      KSH {(() => {
+                        if (paymentType === 'delivery') return total.toFixed(2);
+                        if (paymentType === 'goods') return (deliveryFee || 0).toFixed(2);
+                        return '0.00';
+                      })()}
+                    </strong>
+                  </p>
+                )}
+              </div>
+
+              <div className={styles.paymentOptions}>
+                <PaymentMethods
+                  cart={cart}
+                  total={amountToPay}
+                  deliveryFee={deliveryFee}
+                  deliveryOption={deliveryOption}
+                  deliveryTown={formState.town}
+                  isDeliveryFeeReady={isDeliveryFeeReady}
+                  deliveryLocation={formState.selectedLocation}
+                  clearCart={() => { /* clear context cart */ }}
+                  onSuccess={() => alert('Order placed!')}
+                  onError={(msg) => alert(`Order error: ${msg}`)}
+                />
+              </div>
             </div>
-          </div>
+          )}
+
 
           {/* Navigation buttons */}
           <div className={styles.stepNavigation}>
-            <button 
-              className={styles.stepButton} 
+            <button
+              className={styles.stepButton}
               onClick={prevStep}
               disabled={currentStep === 1}
             >
               Previous
             </button>
             <span className={styles.stepCounter}>Step {currentStep} of 3</span>
-            <button 
-              className={`${styles.stepButton} ${styles.primary}`} 
+            <button
+              className={`${styles.stepButton} ${styles.primary}`}
               onClick={nextStep}
               disabled={currentStep === 3}
             >

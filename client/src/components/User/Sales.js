@@ -13,26 +13,36 @@ const Sales = () => {
   const [selectedDate, setSelectedDate] = useState('');
   const [selectedOrder, setSelectedOrder] = useState(null);
   const [showModal, setShowModal] = useState(false);
+
   useEffect(() => {
-    if (!partner?._id) return;
+  if (!partner?._id) return;
 
-    const fetchSales = async () => {
-      try {
-        const response = await axios.get(`${config.backendUrl}/api/partners/${partner._id}/orders`);
-        // Filter orders with parentOrder status === 'Confirmed Delivered'
-        const completed = response.data.filter(
-          (order) => order.parentOrder?.status === 'Confirmed Delivered'
-        );
-        setSales(completed);
-        setFilteredSales(completed); // Initially, show all sales
-      } catch (error) {
-      } finally {
-        setLoading(false);
-      }
-    };
+  const fetchSales = async () => {
+    try {
+      const response = await axios.get(`${config.backendUrl}/api/partners/${partner._id}/orders`);
 
-    fetchSales();
-  }, [partner]);
+      const completed = response.data.filter((order) => {
+        const parentDelivered = order.parentOrder?.status === 'Confirmed Delivered';
+        const ownDeliveryPaid =
+          order.parentOrder?.delivery?.option === 'own' &&
+          order.status === 'Confirmed Delivered' &&
+          order.paymentStatus === 'Paid';
+
+        return parentDelivered || ownDeliveryPaid;
+      });
+
+      setSales(completed);
+      setFilteredSales(completed);
+    } catch (error) {
+      console.error('Error fetching sales:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  fetchSales();
+}, [partner]);
+
 
   const handleDateFilter = (event) => {
     const date = event.target.value;
