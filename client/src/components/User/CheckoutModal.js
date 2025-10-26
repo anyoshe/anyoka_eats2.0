@@ -356,6 +356,7 @@ const CheckoutModal = ({ isOpen, onClose, cart, total }) => {
                   clearCart={() => { /* clear context cart */ }}
                   onSuccess={() => alert('Order placed!')}
                   onError={(msg) => alert(`Order error: ${msg}`)}
+                  selectedPaymentType={paymentType}
                 />
               </div>
             </div>
