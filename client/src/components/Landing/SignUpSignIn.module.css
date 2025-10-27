@@ -52,6 +52,7 @@
   width: 60rem;  
   border-radius: 0.5rem;
   margin: 0rem auto;
+  margin-bottom: 1rem;
 }
 
 .signUpWrapperH2 {
@@ -95,7 +96,7 @@
 }
 
 .formSighUpInputs {
-  padding: 0.75rem 1rem;
+  padding: 0.7rem 1rem;
   font-size: 1rem;
   border: 1px solid #ddd;
   border-radius: 0.4rem;
@@ -119,43 +120,106 @@
   padding-right: 2.5rem;
 }
 
+/* Modal Overlay */
 .modalOverlay {
   position: fixed;
   top: 0;
   left: 0;
-  width: 100%;
-  height: 100%;
-  background-color: rgba(0, 0, 0, 0.5); 
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.7);
   display: flex;
   justify-content: center;
   align-items: center;
   z-index: 1000;
+  backdrop-filter: blur(4px);
 }
 
+/* Modal Content */
 .modalContent {
-  background: var(--white);
-  padding: 1rem;
-  border-radius: 0.5rem;
+  background-color: white;
+  padding: 2rem;
+  border-radius: 12px;
   width: 90%;
-  max-width: 900px;
-  max-height: 90vh;
-  overflow-y: auto;
+  max-width: 400px;
   position: relative;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+  animation: slideIn 0.3s ease-out;
 }
 
+/* Modal Title */
+.modalContent h3 {
+  color: #333;
+  margin-bottom: 1.5rem;
+  font-size: 1.25rem;
+  text-align: center;
+  font-weight: 600;
+}
+
+/* Choice Buttons */
+.choiceBtn {
+  width: 100%;
+  padding: 1rem;
+  margin: 0.75rem 0;
+  border: 2px solid var(--orange);
+  background-color: white;
+  color: var(--orange);
+  border-radius: 8px;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+}
+
+.choiceBtn:hover {
+  background-color: #ff6b00;
+  color: white;
+  transform: translateY(-2px);
+}
+
+.choiceBtn:active {
+  transform: translateY(0);
+}
+
+/* Close Button */
 .closeModal {
   position: absolute;
-  top: -0.1rem;
-  right: 0.2rem;
+  top: 0.75rem;
+  right: 0.75rem;
   background: none;
   border: none;
   font-size: 1.5rem;
-  font-weight: bold;
-  color: var(--green);
+  color: #666;
   cursor: pointer;
-  z-index: 100;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
 }
 
+
+.closeModal:hover {
+  background-color: #f0f0f0;
+  color: #333;
+}
+
+/* Animation */
+@keyframes slideIn {
+  from {
+    transform: translateY(-20px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
 
 .locationIcon, .eyeIcon {
   position: absolute;

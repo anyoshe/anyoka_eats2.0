@@ -104,19 +104,183 @@
 .printBtn:hover {
   background: #158a2c;
 }
-@media (max-width: 600px) {
-  .header {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 0.5rem;
+
+/* 4K and Ultra Wide Screens (2560px and above) */
+@media screen and (min-width: 2560px) {
+  .wrapper {
+    max-width: 1200px;
+    margin: 3rem auto;
   }
-  
+
+  .header {
+    padding: 2.5rem 3rem;
+  }
+
+  .title {
+    font-size: 3.5rem;
+  }
+
+  .date, .invoiceNumber {
+    font-size: 1.2rem;
+  }
+
+  .table th, .table td {
+    padding: 1.2rem 1.5rem;
+    font-size: 1.1rem;
+  }
+
+  .printBtn {
+    padding: 1rem 2rem;
+    font-size: 1.1rem;
+  }
+}
+
+/* Large Desktop Screens (1920px to 2559px) */
+@media screen and (min-width: 1920px) and (max-width: 2559px) {
+  .wrapper {
+    max-width: 1000px;
+  }
+
+  .title {
+    font-size: 3rem;
+  }
+
+  .date, .invoiceNumber {
+    font-size: 1.1rem;
+  }
+}
+
+/* Desktop Screens (1440px to 1919px) */
+@media screen and (min-width: 1440px) and (max-width: 1919px) {
+  .wrapper {
+    max-width: 900px;
+  }
+
+  .title {
+    font-size: 2.5rem;
+  }
+}
+
+/* Small Desktop/Laptop (1024px to 1439px) */
+@media screen and (min-width: 1024px) and (max-width: 1439px) {
+  .wrapper {
+    max-width: 800px;
+    margin: 1.5rem auto;
+  }
+
+  .header {
+    padding: 1.25rem 2rem;
+  }
+
+  .title {
+    font-size: 2.25rem;
+  }
+}
+
+/* Tablets (768px to 1023px) */
+@media screen and (min-width: 768px) and (max-width: 1023px) {
+  .wrapper {
+    max-width: 90%;
+    margin: 1rem auto;
+  }
+
+  .header {
+    padding: 1.2rem 1.5rem;
+  }
+
   .title {
     font-size: 2rem;
   }
-  
-  .summary {
+
+  .table th, .table td {
+    padding: 0.7rem 0.9rem;
+  }
+}
+
+/* Large Mobile (480px to 767px) */
+@media screen and (min-width: 480px) and (max-width: 767px) {
+  .wrapper {
+    max-width: 95%;
+    margin: 0.8rem auto;
+    border-radius: 8px;
+  }
+
+  .header {
+    padding: 1rem;
     flex-direction: column;
     gap: 0.5rem;
+  }
+
+  .title {
+    font-size: 1.75rem;
+  }
+
+  .descriptionBox {
+    padding: 1rem;
+  }
+
+  .table {
+    font-size: 0.9rem;
+  }
+
+  .table th, .table td {
+    padding: 0.6rem 0.8rem;
+  }
+
+  .summary {
+    padding: 1rem;
+    flex-direction: column;
+    gap: 0.8rem;
+  }
+}
+
+/* Small Mobile (320px to 479px) */
+@media screen and (min-width: 320px) and (max-width: 479px) {
+  .wrapper {
+    max-width: 100%;
+    margin: 0.5rem auto;
+    border-radius: 6px;
+  }
+
+  .header {
+    padding: 0.8rem;
+    flex-direction: column;
+    gap: 0.4rem;
+  }
+
+  .title {
+    font-size: 1.5rem;
+  }
+
+  .date, .invoiceNumber {
+    font-size: 0.8rem;
+  }
+
+  .descriptionBox {
+    padding: 0.8rem;
+    font-size: 0.85rem;
+  }
+
+  .table {
+    font-size: 0.8rem;
+  }
+
+  .table th, .table td {
+    padding: 0.5rem 0.6rem;
+  }
+
+  .summary {
+    padding: 0.8rem;
+    font-size: 0.85rem;
+  }
+
+  .printBtn {
+    padding: 0.6rem 1rem;
+    font-size: 0.85rem;
+  }
+
+  .footer {
+    padding: 0.8rem;
+    font-size: 0.8rem;
   }
 }
