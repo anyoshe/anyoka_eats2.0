@@ -1761,14 +1761,14 @@ router.get('/products-by-partner/:partnerId', async (req, res) => {
 
 
 // --- ORDERS SCHEMAS & MODELS ---
+// --- COUNTER ---
 const CounterSchema = new mongoose.Schema({
   date: { type: String, required: true, unique: true }, // Format: '20250421'
   seq: { type: Number, default: 0 },
 });
-
 const Counter = mongoose.models.Counter || mongoose.model('Counter', CounterSchema);
 
-
+// --- ORDER ITEM ---
 const OrderItemSchema = new mongoose.Schema({
   product: { type: mongoose.Schema.Types.ObjectId, ref: 'Product', required: true },
   quantity: { type: Number, required: true },
@@ -1779,6 +1779,7 @@ const OrderItemSchema = new mongoose.Schema({
   }
 });
 
+// --- ORDER ---
 const OrderSchema = new mongoose.Schema({
   orderId: { type: String, unique: true },
   user: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
@@ -1794,8 +1795,13 @@ const OrderSchema = new mongoose.Schema({
   paymentMethod: { type: String, enum: ['COD', 'Mpesa', 'PayPal', 'Card'], required: true },
   paymentStatus: { type: String, enum: ['Pending', 'Paid', 'DepositPaid'], default: 'Pending' },
   paid: { type: Number, default: 0 },
-  paidAt: { type: Date },
-  paymentType: { type: String, enum: ['full', 'goods', 'delivery', 'deposit'], default: 'full' },
+  lastPaymentRequestId: {
+    type: String,
+    index: { sparse: true, background: true }
+  },
+  paymentInitiatedAt: Date,
+  paidAt: Date,
+  paymentType: { type: String, enum: ['full', 'goods', 'delivery'], default: 'full' },
   balanceDue: { type: Number, default: 0 },
   createdAt: { type: Date, default: Date.now },
   assignedDriver: { type: mongoose.Schema.Types.ObjectId, ref: 'Driver', default: null },
@@ -1804,32 +1810,40 @@ const OrderSchema = new mongoose.Schema({
   deliveredByPhone: { type: String },
   status: { type: String, enum: ['Pending', 'Delivered', 'Confirmed Delivered'], default: 'Pending' },
 });
-// Hook must be BEFORE model is compiled
+
+// ──────────────────────────────────────────────────────────────
+//  PRE-SAVE: Generate orderId + Auto-calculate balanceDue
+// ──────────────────────────────────────────────────────────────
 OrderSchema.pre('save', async function (next) {
-  if (this.orderId) return next();
-
-  const today = new Date();
-  const dateStr = today.toISOString().split('T')[0].replace(/-/g, '');
-
   try {
-    const counter = await Counter.findOneAndUpdate(
-      { date: dateStr },
-      { $inc: { seq: 1 } },
-      { new: true, upsert: true }
-    );
+    // 1. Generate orderId if missing
+    if (!this.orderId) {
+      const today = new Date();
+      const dateStr = today.toISOString().split('T')[0].replace(/-/g, '');
 
-    const paddedSeq = String(counter.seq).padStart(6, '0');
-    this.orderId = `ANYEAT-${dateStr}-${paddedSeq}`;
+      const counter = await Counter.findOneAndUpdate(
+        { date: dateStr },
+        { $inc: { seq: 1 } },
+        { new: true, upsert: true }
+      );
+
+      const paddedSeq = String(counter.seq).padStart(6, '0');
+      this.orderId = `ANYEAT-${dateStr}-${paddedSeq}`;
+    }
+
+    // 2. Always keep balanceDue in sync
+    this.balanceDue = Math.max((this.total || 0) - (this.paid || 0), 0);
+
     next();
   } catch (err) {
     next(err);
   }
 });
 
-// Compile model AFTER hook
-// Prevent OverwriteModelError
+// Compile model
 const Order = mongoose.models.Order || mongoose.model('Order', OrderSchema);
 
+// --- SUBORDER ---
 const SubOrderSchema = new mongoose.Schema({
   parentOrder: { type: mongoose.Schema.Types.ObjectId, ref: 'Order', required: true },
   shop: { type: mongoose.Schema.Types.ObjectId, ref: 'Partner', required: true },
@@ -1858,10 +1872,7 @@ const SubOrderSchema = new mongoose.Schema({
     enum: ['Pending', 'Paid'],
     default: 'Pending',
   },
-  paidAt: {
-    type: Date,
-  },
-
+  paidAt: { type: Date },
   assignedDriver: { type: mongoose.Schema.Types.ObjectId, ref: 'Driver', default: null },
   deliveredBy: { type: String },
   deliveredByPhone: { type: String },
@@ -1870,6 +1881,7 @@ const SubOrderSchema = new mongoose.Schema({
 });
 
 const SubOrder = mongoose.models.SubOrder || mongoose.model('SubOrder', SubOrderSchema);
+
 
 
 // --- ROUTES ---
@@ -1907,21 +1919,21 @@ router.post('/orders/place', async (req, res) => {
     }
 
     // 🟢 PLATFORM DELIVERY
-else if (delivery.option === 'platform' && paymentMethod === 'Mpesa') {
-  switch (finalPaymentType) {
-    case 'full':
-    case 'goods':
-    case 'delivery':
-      paid = 0; // always start as unpaid until callback
-      balanceDue = total;
-      finalPaymentStatus = 'Pending';
-      break;
-    default:
-      paid = 0;
-      balanceDue = total;
-      finalPaymentStatus = 'Pending';
-  }
-}
+    else if (delivery.option === 'platform' && paymentMethod === 'Mpesa') {
+      switch (finalPaymentType) {
+        case 'full':
+        case 'goods':
+        case 'delivery':
+          paid = 0; // always start as unpaid until callback
+          balanceDue = total;
+          finalPaymentStatus = 'Pending';
+          break;
+        default:
+          paid = 0;
+          balanceDue = total;
+          finalPaymentStatus = 'Pending';
+      }
+    }
 
 
     const order = await Order.create([{
@@ -1992,33 +2004,39 @@ else if (delivery.option === 'platform' && paymentMethod === 'Mpesa') {
 });
 
 
-// GET order by ID
-
+// ---------------------------------------------------------------
+// GET /api/orders/:orderId   (User can view only their own order)
+// ---------------------------------------------------------------
 router.get('/orders/:orderId', authenticateToken, async (req, res) => {
   const { orderId } = req.params;
+
   try {
-    // ✅ Populate correct user fields
+    // Populate everything the frontend needs
     const order = await Order.findById(orderId)
       .populate('user', 'names phoneNumber email town location')
-      .populate('items.product', 'name price');
+      .populate('items.product', 'name price image')
+      .populate('items.shop.shopId', 'shopName') // if shop is nested
+      .select('+paymentStatus +paid +balanceDue +paidAt +lastPaymentRequestId'); // include hidden fields
 
     if (!order) {
       return res.status(404).json({ error: 'Order not found' });
     }
 
-    if (!order.user) {
-      return res.status(500).json({ error: 'Order user is missing' });
-    }
-
-    if (!req.user) {
-      return res.status(403).json({ error: 'User not authenticated' });
-    }
-
+    // Security: only owner can view
     const orderUserId = order.user?._id?.toString();
     const requestUserId = req.user?._id?.toString() || req.user?.id?.toString();
 
+    if (!orderUserId || !requestUserId) {
+      return res.status(403).json({ error: 'Invalid user data' });
+    }
+
     if (orderUserId !== requestUserId) {
       return res.status(403).json({ error: 'Unauthorized access to order' });
+    }
+
+    // Optional: Compute balanceDue if not stored (fallback)
+    if (typeof order.balanceDue === 'undefined') {
+      order.balanceDue = Math.max(order.total - (order.paid || 0), 0);
     }
 
     res.json(order);
@@ -2027,7 +2045,6 @@ router.get('/orders/:orderId', authenticateToken, async (req, res) => {
     res.status(500).json({ error: 'Server error fetching order' });
   }
 });
-
 
 
 router.get('/driver-orders/:orderId', authenticateToken, async (req, res) => {
@@ -3200,259 +3217,71 @@ router.get('/products/by-shop/:shopId', async (req, res) => {
   }
 });
 
+// --------------------------------------------------------------------
+// M-Pesa Payment Integration
+// --------------------------------------------------------------------
 
-
-
-
-
-
-
-
-// PAYMENTS CONTROLS ROUTES
-
-// const consumerKey = process.env.CONSUMER_KEY;
-// const consumerSecret = process.env.CONSUMER_SECRET;
-// const shortcode = process.env.SHORTCODE;
-// const passkey = process.env.PASSKEY;
-// const ngrokUrl = process.env.NODE_ENV === 'production'
-//   ? process.env.NGROK_URL
-//   : process.env.NGROK_URL_LOCAL;
-
-// const generateTimestamp = () => {
-//   const date = new Date();
-//   return date.toISOString().replace(/[-T:.Z]/g, '').slice(0, 14);
-// };
-// console.log('🔍 M-PESA CONFIG:', {
-//   consumerKey: consumerKey ? '✅ Loaded' : '❌ Missing',
-//   consumerSecret: consumerSecret ? '✅ Loaded' : '❌ Missing',
-//   shortcode,
-//   passkey: passkey ? '✅ Loaded' : '❌ Missing',
-//   ngrokUrl
-// });
-
-// // 🔹 Utility: Get Safaricom Access Token
-// const getAccessToken = async () => {
-//   console.log('🔑 Requesting M-Pesa Access Token...');
-//   const response = await axios.get('https://api.safaricom.co.ke/oauth/v1/generate?grant_type=client_credentials', {
-//     headers: {
-//       Authorization: `Basic ${Buffer.from(`${consumerKey}:${consumerSecret}`).toString('base64')}`,
-//     },
-//   });
-//    console.log('✅ Access Token Received');
-//   return response.data.access_token;
-// };
-
-// // 🔹 Initiate M-Pesa Payment (Deposit or Balance)
-// router.post('/mpesa/pay', async (req, res) => {
-//   const { phoneNumber, amount, orderId, paymentType = 'Full' } = req.body;
-//   console.log('Received payment request:', { phoneNumber, amount, orderId, paymentType });
-//   console.log('🚀 Initiating M-Pesa Payment with data:', {
-//   phoneNumber,
-//   amount,
-//   orderId,
-//   paymentType,
-//   callback: `${ngrokUrl}/api/mpesa/callback`
-// });
-
-
-//   try {
-//     const timestamp = generateTimestamp();
-//     const accessToken = await getAccessToken();
-//     const password = Buffer.from(`${shortcode}${passkey}${timestamp}`).toString('base64');
-
-//     const paymentData = {
-//       BusinessShortCode: shortcode,
-//       Password: password,
-//       Timestamp: timestamp,
-//       TransactionType: 'CustomerPayBillOnline',
-//       Amount: amount,
-//       PartyA: phoneNumber,
-//       PartyB: shortcode,
-//       PhoneNumber: phoneNumber,
-//       CallBackURL: `${ngrokUrl}/api/mpesa/callback`,
-//       AccountReference: orderId || 'ANYEAT-ORDER',
-//       TransactionDesc: paymentType === 'Deposit' ? 'Deposit Payment' : 'Balance Payment',
-//     };
-
-//     const paymentResponse = await axios.post(
-//       'https://api.safaricom.co.ke/mpesa/stkpush/v1/processrequest',
-//       paymentData,
-//       {
-//         headers: {
-//           Authorization: `Bearer ${accessToken}`,
-//           'Content-Type': 'application/json',
-//         },
-//       }
-//     );
-//     console.log('✅ M-Pesa API Response:', paymentResponse.data);
-
-
-//     // Save pending transaction to order for tracking
-//     if (orderId) {
-//       await Order.findByIdAndUpdate(orderId, {
-//         lastPaymentRequestId: paymentResponse.data.CheckoutRequestID,
-//         lastPaymentAmount: amount,
-//         paymentInitiatedAt: new Date(),
-//       });
-//     }
-
-//     res.json(paymentResponse.data);
-// } catch (error) {
-//   console.error('❌ Error initiating M-Pesa payment:', error.response ? error.response.data : error.message);
-//   if (error.response) {
-//     console.error('🔸 Full M-Pesa Error Response:', JSON.stringify(error.response.data, null, 2));
-//   }
-//   res.status(500).json({ error: 'Failed to initiate payment', details: error.message });
-// }
-
-// });
-
-// // 🔹 Handle M-Pesa Callback
-// router.post('/mpesa/callback', async (req, res) => {
-//   console.log('📩 M-Pesa Callback Received:', JSON.stringify(req.body, null, 2));
-
-//   try {
-//     const callbackData = req.body;
-//     console.log('M-Pesa Callback Received:', JSON.stringify(callbackData, null, 2));
-
-//     const result = callbackData.Body.stkCallback;
-//     const checkoutId = result.CheckoutRequestID;
-//     const resultCode = result.ResultCode;
-//     const resultDesc = result.ResultDesc;
-
-//     if (resultCode !== 0) {
-//       console.warn('M-Pesa Payment Failed:', resultDesc);
-//       return res.sendStatus(200);
-//     }
-
-//     const metadata = result.CallbackMetadata?.Item || [];
-//     const amount = metadata.find(i => i.Name === 'Amount')?.Value || 0;
-//     const mpesaNumber = metadata.find(i => i.Name === 'PhoneNumber')?.Value || 'Unknown';
-//     const transactionId = metadata.find(i => i.Name === 'MpesaReceiptNumber')?.Value;
-
-//     console.log('✅ Payment Success:', { transactionId, mpesaNumber, amount });
-//     console.log('💰 Payment Successful:', {
-//   checkoutId,
-//   transactionId,
-//   mpesaNumber,
-//   amount
-// });
-
-
-//     // --- Update corresponding order if found ---
-//    let order = await Order.findOne({ lastPaymentRequestId: checkoutId });
-// if (!order && result.AccountReference) {
-//   order = await Order.findOne({ orderId: result.AccountReference });
-// }
-
-// // Determine payment type from order
-// const paymentType = order.paymentType?.toLowerCase();
-
-// // Compute new totals
-// let newAmountPaid = (order.paid || 0) + amount;
-// let newBalance = Math.max(order.total - newAmountPaid, 0);
-// let newPaymentStatus = order.paymentStatus;
-
-// // Determine new payment status
-// if (newBalance <= 0) {
-//   newPaymentStatus = 'Paid';
-// } else if (paymentType === 'goods' || paymentType === 'delivery') {
-//   newPaymentStatus = 'DepositPaid';
-// } else if (newAmountPaid > 0) {
-//   newPaymentStatus = 'PartiallyPaid';
-// }
-    
-
-//       await Order.findByIdAndUpdate(order._id, {
-//   paymentStatus: newPaymentStatus,
-//   paid: newAmountPaid, // ensure field consistency
-//   balanceDue: newBalance,
-//   lastTransactionId: transactionId,
-//   lastPaidBy: mpesaNumber,
-//   paidAt: new Date(),
-// });
-
-//         console.log(`✅ Order ${order._id} updated: ${newPaymentStatus}`);
-
-//     res.sendStatus(200);
-//   } catch (error) {
-//     console.error('Error in M-Pesa callback:', error.message);
-//     res.sendStatus(500);
-//   }
-// });
-
-// // 🔹 Check Payment Status
-// router.post('/mpesa/status', async (req, res) => {
-//   const { CheckoutRequestID } = req.body;
-//   console.log('Checking payment status for:', CheckoutRequestID);
-
-//   try {
-//     const accessToken = await getAccessToken();
-//     const timestamp = generateTimestamp();
-
-//     const statusRequestData = {
-//       BusinessShortCode: shortcode,
-//       Password: Buffer.from(`${shortcode}${passkey}${timestamp}`).toString('base64'),
-//       Timestamp: timestamp,
-//       CheckoutRequestID,
-//     };
-
-//     const response = await axios.post(
-//       'https://api.safaricom.co.ke/mpesa/stkpushquery/v1/query',
-//       statusRequestData,
-//       {
-//         headers: {
-//           Authorization: `Bearer ${accessToken}`,
-//           'Content-Type': 'application/json',
-//         },
-//       }
-//     );
-
-//     res.json(response.data);
-//   } catch (error) {
-//     console.error('Error checking payment status:', error.response ? error.response.data : error.message);
-//     res.status(500).json({ error: 'Failed to check payment status', details: error.message });
-//   }
-// });
-
+// 🔹 Environment Variables
 const consumerKey = process.env.CONSUMER_KEY;
 const consumerSecret = process.env.CONSUMER_SECRET;
 const shortcode = process.env.SHORTCODE;
 const passkey = process.env.PASSKEY;
+
 const ngrokUrl =
   process.env.NODE_ENV === 'production'
     ? process.env.NGROK_URL
     : process.env.NGROK_URL_LOCAL;
 
-// Utility: Timestamp for password
+// ✅ Auto-select M-Pesa base URL (live ↔ sandbox)
+const baseMpesaUrl =
+  process.env.NODE_ENV === 'production'
+    ? 'https://api.safaricom.co.ke'
+    : 'https://sandbox.safaricom.co.ke';
+
+// --------------------------------------------------------------------
+// 🕓 Utility: Generate M-Pesa timestamp
 const generateTimestamp = () => {
   const date = new Date();
   return date.toISOString().replace(/[-T:.Z]/g, '').slice(0, 14);
 };
 
-// Utility: Fetch M-Pesa access token
+// --------------------------------------------------------------------
+// 🔐 Utility: Fetch M-Pesa access token
 const getAccessToken = async () => {
-  const response = await axios.get(
-    'https://api.safaricom.co.ke/oauth/v1/generate?grant_type=client_credentials',
-    {
-      headers: {
-        Authorization: `Basic ${Buffer.from(
-          `${consumerKey}:${consumerSecret}`
-        ).toString('base64')}`,
-      },
+  try {
+    const auth = Buffer.from(`${consumerKey}:${consumerSecret}`).toString('base64');
+    const response = await axios.get(
+      `${baseMpesaUrl}/oauth/v1/generate?grant_type=client_credentials`,
+      { headers: { Authorization: `Basic ${auth}` } }
+    );
+
+    if (!response.data?.access_token) {
+      throw new Error('No access token returned. Check live credentials or IP restrictions.');
     }
-  );
-  return response.data.access_token;
+
+    return response.data.access_token;
+  } catch (error) {
+    console.error('❌ Failed to get M-Pesa access token:', error.response?.status, error.response?.data || error.message);
+    throw error;
+  }
 };
 
-// 🔹 Initiate M-Pesa Payment
+// ============================================================
+// 💰 Initiate M-Pesa STK Push Payment
+// ============================================================
 router.post('/mpesa/pay', async (req, res) => {
-  const { phoneNumber, amount, orderId, paymentType = 'Full' } = req.body;
+  const { phoneNumber, amount, orderId, paymentType = 'full' } = req.body;
+  console.log('Initiating M-Pesa payment:', { phoneNumber, amount, orderId, paymentType });
 
   try {
     const timestamp = generateTimestamp();
     const accessToken = await getAccessToken();
     const password = Buffer.from(`${shortcode}${passkey}${timestamp}`).toString('base64');
+    const callbackURL = `${ngrokUrl}/api/mpesa/callback`;
+
+    let description = 'Full Payment';
+    if (paymentType === 'goods') description = 'Goods Payment';
+    else if (paymentType === 'delivery') description = 'Delivery Fee Payment';
 
     const paymentData = {
       BusinessShortCode: shortcode,
@@ -3463,101 +3292,124 @@ router.post('/mpesa/pay', async (req, res) => {
       PartyA: phoneNumber,
       PartyB: shortcode,
       PhoneNumber: phoneNumber,
-      CallBackURL: `${ngrokUrl}/api/mpesa/callback`,
+      CallBackURL: callbackURL,
       AccountReference: orderId || 'ANYEAT-ORDER',
-      TransactionDesc:
-        paymentType === 'Deposit' ? 'Deposit Payment' : 'Full Payment',
+      TransactionDesc: description,
     };
 
-    const paymentResponse = await axios.post(
-      'https://api.safaricom.co.ke/mpesa/stkpush/v1/processrequest',
+    console.log('M-Pesa Request:', JSON.stringify(paymentData, null, 2));
+
+    const { data } = await axios.post(
+      `${baseMpesaUrl}/mpesa/stkpush/v1/processrequest`,
       paymentData,
       {
         headers: {
           Authorization: `Bearer ${accessToken}`,
           'Content-Type': 'application/json',
+          Accept: 'application/json',
         },
       }
     );
 
-    // Track transaction on the order
-    if (orderId) {
-      await Order.findByIdAndUpdate(orderId, {
-        lastPaymentRequestId: paymentResponse.data.CheckoutRequestID,
-        lastPaymentAmount: amount,
-        paymentInitiatedAt: new Date(),
-      });
+    // Link CheckoutRequestID to Order
+    if (orderId && data.CheckoutRequestID) {
+      const checkoutId = data.CheckoutRequestID.trim();
+      try {
+        const updated = await Order.findByIdAndUpdate(
+          orderId,
+          {
+            lastPaymentRequestId: checkoutId,
+            paymentInitiatedAt: new Date(),
+          },
+          { new: true, runValidators: true }
+        );
+
+        if (updated) {
+          console.log('Linked order', orderId, 'to', checkoutId);
+        } else {
+          console.warn('Order not found when linking CheckoutRequestID:', orderId);
+        }
+      } catch (err) {
+        console.error('Failed to link CheckoutRequestID:', err.message);
+        // Don't fail payment
+      }
     }
 
-    res.json(paymentResponse.data);
+    console.log('STK Push initiated:', data);
+    res.json(data);
   } catch (error) {
-    const msg = error.response?.data || error.message;
-    console.error('❌ M-Pesa Pay Error:', msg);
-    res.status(500).json({ error: 'Failed to initiate payment', details: msg });
+    console.error('STK Push Error:', error.response?.data || error.message);
+    res.status(500).json({ error: 'Failed to initiate payment', details: error.message });
   }
 });
 
-// 🔹 Handle M-Pesa Callback
+
+// ============================================================
+// Handle M-Pesa Callback (CRASH-PROOF + ASYNC)
+// ============================================================
 router.post('/mpesa/callback', async (req, res) => {
-  try {
-    const callbackData = req.body?.Body?.stkCallback;
-    if (!callbackData) return res.sendStatus(400);
+  // Always respond 200 immediately
+  res.status(200).json({ message: 'OK' });
 
-    const { CheckoutRequestID, ResultCode, ResultDesc } = callbackData;
-
-    if (ResultCode !== 0) {
-      console.warn(`⚠️ Payment failed: ${ResultDesc}`);
-      return res.sendStatus(200);
-    }
-
-    const metadata = callbackData.CallbackMetadata?.Item || [];
-    const amount = metadata.find((i) => i.Name === 'Amount')?.Value || 0;
-    const mpesaNumber = metadata.find((i) => i.Name === 'PhoneNumber')?.Value || 'Unknown';
-    const transactionId = metadata.find((i) => i.Name === 'MpesaReceiptNumber')?.Value;
-
-    // Find matching order
-    let order = await Order.findOne({ lastPaymentRequestId: CheckoutRequestID });
-    if (!order && callbackData.AccountReference) {
-      order = await Order.findOne({ orderId: callbackData.AccountReference });
-    }
-
-    if (!order) {
-      console.warn('⚠️ No order found for payment callback.');
-      return res.sendStatus(200);
-    }
-
-    // Determine payment logic
-    const paymentType = order.paymentType?.toLowerCase();
-    const newPaid = (order.paid || 0) + amount;
-    const newBalance = Math.max(order.total - newPaid, 0);
-
-    let paymentStatus = order.paymentStatus;
-    if (newBalance <= 0) paymentStatus = 'Paid';
-    else if (['goods', 'delivery'].includes(paymentType))
-      paymentStatus = 'DepositPaid';
-    else if (newPaid > 0) paymentStatus = 'PartiallyPaid';
-
-    // Update order
-    await Order.findByIdAndUpdate(order._id, {
-      paymentStatus,
-      paid: newPaid,
-      balanceDue: newBalance,
-      lastTransactionId: transactionId,
-      lastPaidBy: mpesaNumber,
-      paidAt: new Date(),
-    });
-
-    console.log(`✅ Order ${order.orderId} updated → ${paymentStatus}`);
-    res.sendStatus(200);
-  } catch (error) {
-    console.error('❌ M-Pesa Callback Error:', error.message);
-    res.sendStatus(500);
+  const stkCallback = req.body?.Body?.stkCallback;
+  if (!stkCallback) {
+    console.log('Invalid callback: missing stkCallback');
+    return;
   }
+
+  const { CheckoutRequestID, ResultCode, ResultDesc, CallbackMetadata } = stkCallback;
+  console.log('Callback received:', { CheckoutRequestID, ResultCode });
+
+  // Process in background
+  setImmediate(async () => {
+    try {
+      if (ResultCode !== 0 && ResultCode !== '0') {
+        console.log('Payment failed:', ResultDesc);
+        return;
+      }
+
+      const amount = CallbackMetadata?.Item?.find(i => i.Name === 'Amount')?.Value || 0;
+      const checkoutId = (CheckoutRequestID || '').trim();
+      if (!checkoutId) {
+        console.log('Missing CheckoutRequestID');
+        return;
+      }
+
+      const order = await Order.findOne({ lastPaymentRequestId: checkoutId });
+      if (!order) {
+        console.log('Order not found for:', checkoutId);
+        return;
+      }
+
+      // Determine new status
+      let newStatus = 'Pending';
+      if (order.paymentType === 'full') newStatus = 'Paid';
+      else if (['goods', 'delivery'].includes(order.paymentType)) newStatus = 'DepositPaid';
+
+      order.paymentStatus = newStatus;
+      order.paid = (order.paid || 0) + Number(amount);
+      order.balanceDue = Math.max(order.total - order.paid, 0);
+      order.paidAt = new Date();
+
+      await order.save();
+
+      console.log(`Payment SUCCESS: Order ${order._id} | ${amount} KES | ${newStatus}`);
+    } catch (err) {
+      console.error('Callback processing failed:', err.stack);
+    }
+  });
 });
 
-// 🔹 Check Payment Status
+
+// ============================================================
+// Check Payment Status (Polling)
+// ============================================================
 router.post('/mpesa/status', async (req, res) => {
   const { CheckoutRequestID } = req.body;
+  if (!CheckoutRequestID) {
+    return res.status(400).json({ error: 'CheckoutRequestID required' });
+  }
+
   try {
     const accessToken = await getAccessToken();
     const timestamp = generateTimestamp();
@@ -3569,8 +3421,8 @@ router.post('/mpesa/status', async (req, res) => {
       CheckoutRequestID,
     };
 
-    const response = await axios.post(
-      'https://api.safaricom.co.ke/mpesa/stkpushquery/v1/query',
+    const { data } = await axios.post(
+      `${baseMpesaUrl}/mpesa/stkpushquery/v1/query`,
       query,
       {
         headers: {
@@ -3580,15 +3432,13 @@ router.post('/mpesa/status', async (req, res) => {
       }
     );
 
-    res.json(response.data);
+    console.log('Status check:', data);
+    res.json(data);
   } catch (error) {
-    const msg = error.response?.data || error.message;
-    console.error('❌ M-Pesa Status Check Error:', msg);
-    res.status(500).json({ error: 'Failed to check payment status', details: msg });
+    console.error('Status check error:', error.response?.data || error.message);
+    res.status(500).json({ error: 'Status check failed' });
   }
 });
-
-
 
 
 // ORDER CONFIRMATION FOR ORDERS

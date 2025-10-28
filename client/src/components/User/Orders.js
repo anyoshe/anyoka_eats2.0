@@ -364,6 +364,7 @@ const Orders = () => {
               <h3>Order ID: {order.parentOrder?.orderId || 'N/A'}</h3>
               <p>Status: <strong>{order.status}</strong></p>
               <p>Total: <strong>KES {order.total}</strong></p>
+               <p>Payment Status: <strong>{order.paymentStatus}</strong></p>
               <p>Created At: {new Date(order.createdAt).toLocaleString()}</p>
 
               <h4>Delivery Info</h4>
