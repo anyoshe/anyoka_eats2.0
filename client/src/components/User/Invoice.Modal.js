@@ -123,7 +123,7 @@ export default function Invoice({
 
       {/* SUMMARY — EXACT DB VALUES */}
       <div className={styles.summary}>
-        <div>VAT (16%): <strong>{vat.toLocaleString()}</strong></div>
+        <div>VAT: <strong>{vat.toLocaleString()}</strong></div>
         <div>Subtotal: <strong>{subtotal.toLocaleString()}</strong></div>
         <div>Total: <strong>{total.toLocaleString()}</strong></div>
         <div>Paid: <strong>{paid.toLocaleString()}</strong></div>
@@ -141,7 +141,7 @@ export default function Invoice({
       {/* ACTIONS */}
       <div className={styles.printBtnContainer}>
         <button onClick={handleDownloadPDF} className={styles.printBtn}>
-          Download / Print
+          Download
         </button>
         <button onClick={handleShare} className={styles.printBtn}>
           Share

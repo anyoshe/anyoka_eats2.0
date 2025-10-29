@@ -99,6 +99,7 @@
   font-weight: 600;
   cursor: pointer;
   transition: background 0.3s;
+  margin-right: 0.5rem;
 }
 
 .printBtn:hover {
@@ -133,6 +134,14 @@
     padding: 1rem 2rem;
     font-size: 1.1rem;
   }
+
+  .footer {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 0.2rem;
+  }
+
 }
 
 /* Large Desktop Screens (1920px to 2559px) */
@@ -148,6 +157,13 @@
   .date, .invoiceNumber {
     font-size: 1.1rem;
   }
+
+    .footer {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 0.2rem;
+  }
 }
 
 /* Desktop Screens (1440px to 1919px) */
@@ -158,6 +174,13 @@
 
   .title {
     font-size: 2.5rem;
+  }
+
+    .footer {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 0.2rem;
   }
 }
 
@@ -174,6 +197,13 @@
 
   .title {
     font-size: 2.25rem;
+  }
+
+    .footer {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 0.2rem;
   }
 }
 
@@ -194,6 +224,13 @@
 
   .table th, .table td {
     padding: 0.7rem 0.9rem;
+  }
+
+    .footer {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 0.2rem;
   }
 }
 

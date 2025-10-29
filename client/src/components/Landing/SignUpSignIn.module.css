@@ -138,10 +138,11 @@
 /* Modal Content */
 .modalContent {
   background-color: white;
-  padding: 2rem;
+  /* padding: 2rem; */
+   padding: 1rem;
   border-radius: 12px;
   width: 90%;
-  max-width: 400px;
+  /* max-width: 400px; */
   position: relative;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
   animation: slideIn 0.3s ease-out;
@@ -187,12 +188,13 @@
 /* Close Button */
 .closeModal {
   position: absolute;
-  top: 0.75rem;
-  right: 0.75rem;
+  top: 0.1rem;
+  right: 0.1rem;
   background: none;
   border: none;
   font-size: 1.5rem;
-  color: #666;
+  color: var(--green);
+  font-weight: bold;
   cursor: pointer;
   width: 32px;
   height: 32px;
@@ -201,6 +203,7 @@
   align-items: center;
   justify-content: center;
   transition: all 0.2s ease;
+  z-index: 200;
 }
 
 
