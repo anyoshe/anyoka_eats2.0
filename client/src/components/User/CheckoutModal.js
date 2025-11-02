@@ -7,9 +7,11 @@ import MapSelector from './MapSelector';
 import config from '../../config';
 import DeliveryOptions from './DeliveryOptions';
 import PaymentMethods from './PaymentMethods';
+import { CartContext } from '../../contexts/CartContext';
 
 const CheckoutModal = ({ isOpen, onClose, cart, total }) => {
   const { user, setRedirectPath } = useContext(AuthContext);
+  const { clearCart } = useContext(CartContext);
   const [savedLocations, setSavedLocations] = useState([]);
   const [isAddingNewLocation, setIsAddingNewLocation] = useState(false);
   const [deliveryOption, setDeliveryOption] = useState('platform');
@@ -353,7 +355,7 @@ const CheckoutModal = ({ isOpen, onClose, cart, total }) => {
                   deliveryTown={formState.town}
                   isDeliveryFeeReady={isDeliveryFeeReady}
                   deliveryLocation={formState.selectedLocation}
-                  clearCart={() => { /* clear context cart */ }}
+                  clearCart={clearCart} 
                   onSuccess={() => alert('Order placed!')}
                   onError={(msg) => alert(`Order error: ${msg}`)}
                   selectedPaymentType={paymentType}
@@ -502,7 +504,7 @@ const CheckoutModal = ({ isOpen, onClose, cart, total }) => {
               deliveryTown={formState.town}
               isDeliveryFeeReady={isDeliveryFeeReady}
               deliveryLocation={formState.selectedLocation}
-              clearCart={() => { /* clear context cart */ }}
+              clearCart={clearCart} 
               onSuccess={() => alert('Order placed!')}
               onError={(msg) => alert(`Order error: ${msg}`)}
             />

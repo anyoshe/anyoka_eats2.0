@@ -232,10 +232,20 @@ const PaymentMethods = ({
     } catch (err) {
       console.error('Order Error:', err);
       onError?.(err.message);
+
+      // === Prevent cart from clearing if payment failed ===
+      if (method !== 'COD') {
+        // For M-Pesa: keep items in cart so user can retry payment
+        console.warn('M-Pesa payment failed — cart retained for retry.');
+      } else {
+        // COD logic: optional — you can keep or clear based on your UX choice
+        console.warn('COD order failed — user may retry manually.');
+      }
     } finally {
       setLoading(false);
       setShowMpesaModal(false);
     }
+
   };
 
   // -----------------------------------------------------------------
@@ -319,8 +329,8 @@ const PaymentMethods = ({
             ? 'Waiting for Payment...'
             : 'Processing...'
           : method === 'COD'
-          ? 'Place Order'
-          : 'Pay Now'}
+            ? 'Place Order'
+            : 'Pay Now'}
       </button>
 
       {showMpesaModal && (

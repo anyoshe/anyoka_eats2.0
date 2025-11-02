@@ -1759,9 +1759,11 @@ router.get('/products-by-partner/:partnerId', async (req, res) => {
   }
 });
 
+//----------------------------------------------------------------
+// COUNTER SCHEMA for generating unique order IDs
+//OrderSchema and SubOrderSchema will use this
+//----------------------------------------------------------------
 
-// --- ORDERS SCHEMAS & MODELS ---
-// --- COUNTER ---
 const CounterSchema = new mongoose.Schema({
   date: { type: String, required: true, unique: true }, // Format: '20250421'
   seq: { type: Number, default: 0 },
@@ -1793,7 +1795,7 @@ const OrderSchema = new mongoose.Schema({
   },
   total: { type: Number, default: 0 },
   paymentMethod: { type: String, enum: ['COD', 'Mpesa', 'PayPal', 'Card'], required: true },
-  paymentStatus: { type: String, enum: ['Pending', 'Paid', 'DepositPaid'], default: 'Pending' },
+  paymentStatus: { type: String, enum: ['Pending', 'Paid', 'DepositPaid', 'Partial'], default: 'Pending' },
   paid: { type: Number, default: 0 },
   lastPaymentRequestId: {
     type: String,
@@ -1801,9 +1803,12 @@ const OrderSchema = new mongoose.Schema({
   },
   paymentInitiatedAt: Date,
   paidAt: Date,
-  paymentType: { type: String, enum: ['full', 'goods', 'delivery'], default: 'full' },
+  paymentType: { type: String, enum: ['full', 'goods', 'delivery', 'balance'], default: 'full' },
   balanceDue: { type: Number, default: 0 },
   createdAt: { type: Date, default: Date.now },
+  driverNotified: { type: Boolean, default: false },
+  driverNotificationSentAt: { type: Date },
+  lastDriverCheckAt: { type: Date },
   assignedDriver: { type: mongoose.Schema.Types.ObjectId, ref: 'Driver', default: null },
   deliveredAt: { type: Date },
   deliveredBy: { type: String },
@@ -1883,15 +1888,24 @@ const SubOrderSchema = new mongoose.Schema({
 const SubOrder = mongoose.models.SubOrder || mongoose.model('SubOrder', SubOrderSchema);
 
 
-
-// --- ROUTES ---
+// ---------------------------------------------------------------
+// POST /api/orders/place   (User places an order)
+// ---------------------------------------------------------------
 
 router.post('/orders/place', async (req, res) => {
-  const { userId, items, delivery, paymentMethod, paymentType = 'full', paymentStatus = 'Pending' } = req.body;
+  const {
+    userId,
+    items,
+    delivery,
+    paymentMethod,
+    paymentType = 'full',
+    paymentStatus = 'Pending',
+  } = req.body;
 
   if (!delivery || !delivery.option)
     return res.status(400).json({ error: 'Incomplete delivery information.' });
-  if (!items?.length) return res.status(400).json({ error: 'No items in order.' });
+  if (!items?.length)
+    return res.status(400).json({ error: 'No items in order.' });
 
   const session = await mongoose.startSession();
   session.startTransaction();
@@ -1903,28 +1917,30 @@ router.post('/orders/place', async (req, res) => {
     let paid = 0;
     let balanceDue = total;
     let finalPaymentStatus = 'Pending';
-    let finalPaymentType = paymentType.toLowerCase();
+    const finalPaymentType = paymentType.toLowerCase();
 
-    // 🟢 OWN DELIVERY
+    // === OWN DELIVERY ===
     if (delivery.option === 'own') {
       if (paymentMethod === 'COD') {
+        // COD: Pay on pickup → notify vendors immediately
         paid = 0;
         balanceDue = total;
         finalPaymentStatus = 'Pending';
-      } else if (paymentMethod === 'Mpesa' && paymentType === 'full') {
-        paid = 0; // updated after M-Pesa confirmation
+      } else if (paymentMethod === 'Mpesa') {
+        // Prepaid via M-Pesa → no vendor notification until payment confirmed
+        paid = 0;
         balanceDue = total;
         finalPaymentStatus = 'Pending';
       }
     }
 
-    // 🟢 PLATFORM DELIVERY
+    // === PLATFORM DELIVERY ===
     else if (delivery.option === 'platform' && paymentMethod === 'Mpesa') {
       switch (finalPaymentType) {
         case 'full':
         case 'goods':
         case 'delivery':
-          paid = 0; // always start as unpaid until callback
+          paid = 0;
           balanceDue = total;
           finalPaymentStatus = 'Pending';
           break;
@@ -1935,20 +1951,25 @@ router.post('/orders/place', async (req, res) => {
       }
     }
 
+    // === CREATE ORDER ===
+    const order = await Order.create(
+      [
+        {
+          user: userId,
+          items,
+          delivery,
+          paymentMethod,
+          paymentType: finalPaymentType,
+          paymentStatus: finalPaymentStatus,
+          total,
+          paid,
+          balanceDue,
+        },
+      ],
+      { session }
+    );
 
-    const order = await Order.create([{
-      user: userId,
-      items,
-      delivery,
-      paymentMethod,
-      paymentType: finalPaymentType,
-      paymentStatus: finalPaymentStatus,
-      total,
-      paid,
-      balanceDue
-    }], { session });
-
-    // 🔹 Create suborders
+    // === GROUP ITEMS BY SHOP ===
     const byShop = items.reduce((acc, i) => {
       const sid = i.shop.shopId.toString();
       if (!acc[sid]) acc[sid] = [];
@@ -1957,35 +1978,48 @@ router.post('/orders/place', async (req, res) => {
     }, {});
 
     const subOrderIds = [];
+
     for (const shopId in byShop) {
       const shopItems = byShop[shopId];
       const shopTotal = shopItems.reduce((sum, i) => sum + i.price * i.quantity, 0);
-      const subOrder = await SubOrder.create([{
-        parentOrder: order[0]._id,
-        shop: shopId,
-        items: shopItems.map(i => ({
-          product: i.product,
-          quantity: i.quantity,
-          price: i.price
-        })),
-        total: shopTotal
-      }], { session });
+
+      const subOrder = await SubOrder.create(
+        [
+          {
+            parentOrder: order[0]._id,
+            shop: shopId,
+            items: shopItems.map((i) => ({
+              product: i.product,
+              quantity: i.quantity,
+              price: i.price,
+            })),
+            total: shopTotal,
+            paymentStatus: 'Pending',
+          },
+        ],
+        { session }
+      );
 
       subOrderIds.push(subOrder[0]._id);
 
-      // Notify vendors
-      notifyPartner(shopId, {
-        message: "New order received!",
-        subOrderId: subOrder[0]._id,
-        orderId: order[0]._id,
-        total: shopTotal,
-        timestamp: new Date()
-      });
-      await partnerNotify(shopId, {
-        message: "New order received!",
-        subOrderId: subOrder[0]._id,
-        orderId: order[0]._id
-      });
+      // === Vendor notification conditions ===
+      const isCOD = delivery.option === 'own' && paymentMethod === 'COD';
+      const notifyNow = isCOD;
+
+      if (notifyNow) {
+        notifyPartner(shopId, {
+          message: 'New order received!',
+          subOrderId: subOrder[0]._id,
+          orderId: order[0]._id,
+          total: shopTotal,
+          timestamp: new Date(),
+        });
+        await partnerNotify(shopId, {
+          message: 'New order received!',
+          subOrderId: subOrder[0]._id,
+          orderId: order[0]._id,
+        });
+      }
     }
 
     order[0].subOrders = subOrderIds;
@@ -2002,7 +2036,6 @@ router.post('/orders/place', async (req, res) => {
     res.status(500).json({ error: 'Failed to place order.' });
   }
 });
-
 
 // ---------------------------------------------------------------
 // GET /api/orders/:orderId   (User can view only their own order)
@@ -2038,6 +2071,8 @@ router.get('/orders/:orderId', authenticateToken, async (req, res) => {
     if (typeof order.balanceDue === 'undefined') {
       order.balanceDue = Math.max(order.total - (order.paid || 0), 0);
     }
+    // FORCE IT TO BE A NUMBER (this is the key)
+    order.balanceDue = Number(order.balanceDue) || 0;
 
     res.json(order);
   } catch (err) {
@@ -2046,6 +2081,11 @@ router.get('/orders/:orderId', authenticateToken, async (req, res) => {
   }
 });
 
+
+// ---------------------------------------------------------------
+// GET /api/driver-orders/:orderId
+// Fetch a specific order for a driver (includes suborders)
+// ---------------------------------------------------------------
 
 router.get('/driver-orders/:orderId', authenticateToken, async (req, res) => {
   const { orderId } = req.params;
@@ -2054,16 +2094,20 @@ router.get('/driver-orders/:orderId', authenticateToken, async (req, res) => {
       .populate({
         path: 'subOrders',
         populate: {
-          path: 'shop', // Populate the shop field in each suborder
-          select: 'businessName location', // Only fetch the required fields
+          path: 'shop',
+          select: 'businessName location',
         },
-        select: 'status shop', // Fetch the status and shop fields for suborders
+        select: 'status shop',
       })
-      .populate('user', 'username phoneNumber'); // Populate user details (username, phoneNumber)
+      .populate('user', 'username phoneNumber')
+      .lean(); // ← Use .lean() for safe mutation
 
     if (!order) {
       return res.status(404).json({ error: 'Order not found' });
     }
+
+    // === SAFELY NORMALIZE balanceDue AS NUMBER ===
+    order.balanceDue = Number(order.balanceDue) || 0;
 
     res.json(order);
   } catch (err) {
@@ -2072,27 +2116,48 @@ router.get('/driver-orders/:orderId', authenticateToken, async (req, res) => {
   }
 });
 
-
-
+// ---------------------------------------------------------------
+// GET /api/partners/:partnerId/orders
+// Fetch all suborders for a specific partner (shop)
+// ---------------------------------------------------------------
 router.get('/partners/:partnerId/orders', async (req, res) => {
   try {
     const { partnerId } = req.params;
 
-    // Validate partnerId
     if (!mongoose.Types.ObjectId.isValid(partnerId)) {
       return res.status(400).json({ error: 'Invalid partner ID' });
     }
 
-    // Fetch suborders for the partner with nested population
     const subOrders = await SubOrder.find({ shop: partnerId })
       .populate({
         path: 'parentOrder',
-        populate: { path: 'user', select: 'names' } // Populate the 'user' field within 'parentOrder'
+        populate: { path: 'user', select: 'names' },
+        select: '+balanceDue +paid +total' // force hidden fields
       })
-      .populate('items.product') // Populate product details
-      .sort({ createdAt: -1 }); // Sort by most recent
+      .populate('items.product')
+      .sort({ createdAt: -1 })
+      .lean(); // ← Important: allows mutation
 
-    res.json(subOrders);
+    // === NORMALIZE balanceDue ON EVERY ORDER ===
+    const normalized = subOrders.map(subOrder => {
+      const parent = subOrder.parentOrder;
+
+      if (parent) {
+        // Fallback if missing
+        if (typeof parent.balanceDue === 'undefined' || parent.balanceDue === null) {
+          parent.balanceDue = Math.max(parent.total - (parent.paid || 0), 0);
+        }
+
+        // FORCE NUMBER
+        parent.balanceDue = Number(parent.balanceDue) || 0;
+        parent.total = Number(parent.total) || 0;
+        parent.paid = Number(parent.paid) || 0;
+      }
+
+      return subOrder;
+    });
+
+    res.json(normalized);
 
   } catch (error) {
     console.error('Error fetching suborders:', error);
@@ -2115,11 +2180,14 @@ router.get('/suborders/:id', async (req, res) => {
   }
 });
 
-
+// ---------------------------------------------------------------
+// Route to update suborder status
+// This route allows updating the status of a suborder and handles various business logic around payment and delivery.
+// ---------------------------------------------------------------
 router.put('/suborders/:id/status', async (req, res) => {
   try {
     const { id } = req.params;
-    let { status, driverId } = req.body; // 'let' because we might override status
+    let { status, driverId } = req.body;
 
     const validStatuses = [
       'Pending',
@@ -2136,51 +2204,66 @@ router.put('/suborders/:id/status', async (req, res) => {
       return res.status(400).json({ error: 'Invalid status' });
     }
 
-    // 🔹 Fetch suborder with parent
+    // Fetch suborder + parent
     const subOrder = await SubOrder.findById(id).populate('shop parentOrder');
     if (!subOrder) return res.status(404).json({ error: 'SubOrder not found' });
 
-    // 🔹 Fetch parent order
-    let parentOrder = await Order.findById(subOrder.parentOrder._id).populate('subOrders');
+    const parentOrder = await Order.findById(subOrder.parentOrder._id).populate('subOrders');
     if (!parentOrder) return res.status(404).json({ error: 'Parent order not found' });
 
-    // ✅ If own delivery: PickedUp → instantly confirm delivered & mark payment as Paid
+    // --------------------------------------------------------------
+    // BLOCK DELIVERED IF PLATFORM DELIVERY AND BALANCE DUE > 0
+    // --------------------------------------------------------------
+    if (
+      status === 'Delivered' &&
+      parentOrder.delivery?.option === 'platform' &&
+      parentOrder.balanceDue > 0
+    ) {
+      return res.status(403).json({
+        error: 'Cannot mark as Delivered: customer still owes a balance.',
+      });
+    }
+    // PRESERVE PREPAID STATUS
+    const isPrepaidOwnMpesa = (
+      parentOrder.delivery.option === 'own' &&
+      parentOrder.paymentMethod === 'Mpesa' &&
+      parentOrder.paymentType === 'full' &&
+      subOrder.paymentStatus === 'Paid'
+    );
+
+    // AUTO-CONFIRM FOR OWN DELIVERY (ONLY IF NOT ALREADY PAID)
     if (parentOrder.delivery.option === 'own' && status === 'PickedUp') {
       status = 'Confirmed Delivered';
-      subOrder.paymentStatus = 'Paid'; // 🟢 vendor has been paid immediately
-      subOrder.paidAt = new Date();
+      if (subOrder.paymentStatus === 'Pending') {
+        subOrder.paymentStatus = 'Paid';
+        subOrder.paidAt = new Date();
+      }
     }
 
-    // 🔹 Update suborder status
+    // UPDATE STATUS
     subOrder.status = status;
     if (['Confirmed Delivered', 'Delivered'].includes(status)) {
       subOrder.deliveredAt = new Date();
     }
-    await subOrder.save();
-    // 🔹 Update parent order payment progress dynamically
-    const parent = await Order.findById(subOrder.parentOrder._id).populate('subOrders');
 
-    // If this suborder was just marked paid, adjust parent order amounts
-    if (subOrder.paymentStatus === 'Paid') {
-      // 🧮 Recalculate total paid from all suborders
+    // PRESERVE PREPAID: Do NOT allow status change to undo Paid
+    if (isPrepaidOwnMpesa && subOrder.paymentStatus === 'Paid') {
+      // Keep it Paid — do nothing
+    }
+
+    await subOrder.save();
+
+    // === UPDATE PARENT PAYMENT PROGRESS (ONLY FOR OWN DELIVERY) ===
+    const parent = await Order.findById(parentOrder._id).populate('subOrders');
+    if (parent.delivery.option === 'own') {
       const totalPaidFromSubs = parent.subOrders.reduce((sum, so) => {
-        // include this one’s total if paid
-        if (so._id.equals(subOrder._id)) {
-          return sum + (subOrder.paymentStatus === 'Paid' ? subOrder.total : 0);
-        }
         return sum + (so.paymentStatus === 'Paid' ? so.total : 0);
       }, 0);
 
       parent.paid = totalPaidFromSubs;
       parent.balanceDue = Math.max(parent.total - totalPaidFromSubs, 0);
 
-      // 🟢 Determine payment status
-      const allPaid = parent.subOrders.every(
-        so => so._id.equals(subOrder._id)
-          ? subOrder.paymentStatus === 'Paid'
-          : so.paymentStatus === 'Paid'
-      );
-
+      const allPaid = parent.subOrders.every(so => so.paymentStatus === 'Paid');
       if (allPaid) {
         parent.paymentStatus = 'Paid';
         parent.paidAt = new Date();
@@ -2193,27 +2276,25 @@ router.put('/suborders/:id/status', async (req, res) => {
       await parent.save();
     }
 
-
-    // ✅ If all suborders are confirmed delivered → mark parent as confirmed
-    const allConfirmed = parentOrder.subOrders.every((so) =>
+    // CONFIRM ALL SUBORDERS DELIVERED
+    const allConfirmed = parentOrder.subOrders.every(so =>
       so._id.equals(subOrder._id)
         ? status === 'Confirmed Delivered'
         : so.status === 'Confirmed Delivered'
     );
+
     if (allConfirmed) {
       parentOrder.status = 'Confirmed Delivered';
       await parentOrder.save();
     }
 
-    // 🟢 NEW LOGIC: For own delivery, if all suborders are delivered *and paid*, mark parent as Paid
+    // OWN DELIVERY: FULLY PAID & DELIVERED
     if (parentOrder.delivery.option === 'own') {
       const updatedParent = await Order.findById(parentOrder._id).populate('subOrders');
-
-      const allDeliveredAndPaid = updatedParent.subOrders.every(
-        (so) =>
-        (so._id.equals(subOrder._id)
-          ? status === 'Confirmed Delivered' && subOrder.paymentStatus === 'Paid'
-          : so.status === 'Confirmed Delivered' && so.paymentStatus === 'Paid')
+      const allDeliveredAndPaid = updatedParent.subOrders.every(so =>
+      (so._id.equals(subOrder._id)
+        ? status === 'Confirmed Delivered' && so.paymentStatus === 'Paid'
+        : so.status === 'Confirmed Delivered' && so.paymentStatus === 'Paid')
       );
 
       if (allDeliveredAndPaid) {
@@ -2221,86 +2302,185 @@ router.put('/suborders/:id/status', async (req, res) => {
         updatedParent.paymentStatus = 'Paid';
         updatedParent.paidAt = new Date();
         await updatedParent.save();
-
-        console.log(`✅ Parent order ${updatedParent._id} marked as fully delivered and paid (own delivery).`);
+        console.log(`Parent ${updatedParent._id} fully delivered & paid (own)`);
       }
     }
 
-    // 🔹 Assign driver for platform delivery (not own)
+    // PLATFORM: ASSIGN DRIVER ON PICKUP
     if (
       status === 'PickedUp' &&
-      parentOrder.delivery.option !== 'own' &&
-      !subOrder.parentOrder.assignedDriver
+      parentOrder.delivery.option === 'platform' &&
+      !parentOrder.assignedDriver
     ) {
-      await Order.findByIdAndUpdate(subOrder.parentOrder._id, {
-        assignedDriver: driverId,
-      });
+      await Order.findByIdAndUpdate(parentOrder._id, { assignedDriver: driverId });
     }
 
-    // 🔹 Re-fetch populated order for later checks
-    parentOrder = await Order.findById(subOrder.parentOrder._id).populate({
+    // NOTIFY DRIVERS (PLATFORM ONLY)
+    const refreshedParent = await Order.findById(parentOrder._id).populate({
       path: 'subOrders',
       populate: { path: 'shop', select: 'businessName location' },
       select: 'status shop',
     });
 
-    // 🔹 Check if all suborders are ReadyForPickup
-    const allReady = parentOrder.subOrders.every(
-      (so) => so.status === 'ReadyForPickup'
-    );
+    const allReady = refreshedParent.subOrders.every(so => so.status === 'ReadyForPickup');
 
-    // ✅ ONLY notify drivers for platform delivery orders
-    if (allReady && parentOrder.delivery.option === 'platform') {
-      const shop = await Partner.findById(subOrder.shop._id);
-      if (!shop || !shop.location) {
-        return res.status(400).json({ error: 'Shop location is missing' });
-      }
+    if (allReady && refreshedParent.delivery.option === 'platform') {
+      if (refreshedParent.driverNotified) {
+        // Already notified → SKIP
+      } else {
+        const shopLocations = refreshedParent.subOrders.map(so => ({
+          name: so.shop.businessName,
+          location: so.shop.location,
+        }));
 
-      const shopCoords = await parsePlusCodeToLatLng(shop.location);
-      const drivers = await Driver.find({
-        status: 'Available',
-        currentLocation: { $exists: true },
-      });
+        let notified = false;
 
-      for (const driver of drivers) {
-        const driverCoords = await parsePlusCodeToLatLng(
-          driver.currentLocation?.location
-        );
-        if (!driverCoords) continue;
+        for (const subOrder of refreshedParent.subOrders) {
+          const shop = subOrder.shop;
+          if (!shop?.location) continue;
 
-        const distance = geolib.getDistance(shopCoords, driverCoords); // meters
-        if (distance <= 5000) {
-          // 🔔 Notify nearby driver
-          notifyDriver(driver._id.toString(), {
-            type: 'AllSubOrdersReady',
-            message: 'All suborders for an order are ready for pickup',
-            orderId: parentOrder._id, // ✅ Use MongoDB _id, not orderId string
-            shops: parentOrder.subOrders.map((so) => ({
-              shopName: so.shop.businessName,
-              location: so.shop.location,
-            })),
+          const shopCoords = await parsePlusCodeToLatLng(shop.location);
+          if (!shopCoords) continue;
+
+          const drivers = await Driver.find({
+            status: 'Available',
+            'currentLocation.location': { $exists: true }
           });
 
-          try {
+          for (const driver of drivers) {
+            const driverCoords = await parsePlusCodeToLatLng(driver.currentLocation.location);
+            if (!driverCoords) continue;
+
+            const distance = geolib.getDistance(shopCoords, driverCoords);
+            if (distance > 5000) continue;
+
+            notifyDriver(driver._id.toString(), {
+              type: 'AllSubOrdersReady',
+              message: 'All suborders ready for pickup',
+              orderId: refreshedParent._id,
+              shops: shopLocations,
+            });
+
             await DriverNotification.create({
               driver: driver._id,
-              orderId: parentOrder._id,
-              message: 'All suborders for an order are ready for pickup',
+              orderId: refreshedParent._id,
+              message: 'All suborders ready',
               status: 'ReadyForPickup',
-            });
-          } catch (err) {
-            console.error('Failed to create driver notification:', err.message);
+            }).catch(err => console.error('Notification error:', err));
+
+            notified = true;
           }
+        }
+
+        await Order.findByIdAndUpdate(refreshedParent._id, {
+          driverNotified: true,
+          driverNotificationSentAt: new Date(),
+        });
+
+        if (notified) {
+          console.log(`REAL-TIME: Notified drivers for order ${refreshedParent._id}`);
         }
       }
     }
 
+    // FINAL RESPONSE
     res.json(subOrder);
   } catch (error) {
-    console.error('Error updating suborder status:', error.message, error.stack);
+    console.error('Status update error:', error.message, error.stack);
     res.status(500).json({ error: 'Server error' });
   }
 });
+// ---------------------------------------------------------------
+// Route to pay and deliver a suborder
+// This route handles the payment and delivery confirmation for a suborder.
+// It updates the suborder status, calculates the parent order's payment status, and notifies partners.
+// ---------------------------------------------------------------
+router.post('/suborders/:id/pay-and-deliver', async (req, res) => {
+  const { id } = req.params;
+  const { paymentMethod, balancePaid } = req.body;   // <-- added balancePaid
+
+  try {
+    // 1. Fetch suborder with parent
+    const subOrder = await SubOrder.findById(id).populate('parentOrder');
+    if (!subOrder) return res.status(404).json({ error: 'SubOrder not found' });
+
+    const parentId = subOrder.parentOrder._id || subOrder.parentOrder;
+    if (!parentId) return res.status(400).json({ error: 'Parent order missing' });
+
+    // -----------------------------------------------------------------
+    // NEW: PLATFORM BALANCE PAYMENT (M-Pesa only)
+    // -----------------------------------------------------------------
+    if (paymentMethod === 'Mpesa' && balancePaid) {
+      // driver just collected the remaining balance
+      const parent = await Order.findById(parentId).populate('subOrders');
+      if (!parent) return res.status(404).json({ error: 'Parent not found' });
+
+      parent.paid = parent.total;
+      parent.balanceDue = 0;
+      parent.paymentStatus = 'Paid';
+      parent.paidAt = new Date();
+      parent.status = 'Confirmed Delivered';   // optional – UI will also set it
+      await parent.save();
+
+      // mark **every** sub-order as Paid + Confirmed Delivered
+      await SubOrder.updateMany(
+        { parentOrder: parent._id },
+        {
+          $set: {
+            paymentStatus: 'Paid',
+            paidAt: new Date(),
+            status: 'Confirmed Delivered',
+            deliveredAt: new Date(),
+          },
+        }
+      );
+
+      return res.json({ message: 'Balance paid – order fully confirmed', parent });
+    }
+    // -----------------------------------------------------------------
+
+    // 2. (Original flow) Mark **this** sub-order as Paid & Delivered
+    subOrder.paymentStatus = 'Paid';
+    subOrder.paidAt = new Date();
+    subOrder.status = 'Confirmed Delivered';
+    subOrder.deliveredAt = new Date();
+    await subOrder.save();
+
+    // 3. Fetch parent with FULLY POPULATED subOrders
+    const parent = await Order.findById(parentId).populate({
+      path: 'subOrders',
+      select: 'total paymentStatus',
+    });
+
+    if (!parent) return res.status(404).json({ error: 'Parent not found' });
+
+    // 4. Calculate total paid (original logic – runs for COD / own-delivery)
+    const totalPaid = parent.subOrders
+      .filter(so => so.paymentStatus === 'Paid')
+      .reduce((sum, so) => sum + (so.total || 0), 0);
+
+    parent.paid = totalPaid;
+    parent.balanceDue = Math.max(parent.total - totalPaid, 0);
+
+    // 5. Update parent status
+    const allPaid = parent.subOrders.every(so => so.paymentStatus === 'Paid');
+    if (allPaid) {
+      parent.paymentStatus = 'Paid';
+      parent.paidAt = new Date();
+      parent.status = 'Confirmed Delivered';
+    } else if (totalPaid > 0) {
+      parent.paymentStatus = 'Partial';
+    }
+
+    await parent.save();
+
+    res.json({ message: 'Paid & Delivered', subOrder });
+  } catch (err) {
+    console.error('Pay-and-deliver error:', err.message, err.stack);
+    res.status(500).json({ error: 'Server error' });
+  }
+});
+
 
 
 const PartnerNotificationSchema = new mongoose.Schema({
@@ -2594,13 +2774,13 @@ router.post('/driver/login', async (req, res) => {
     driver.lastActiveAt = new Date();
     await driver.save();
 
+
     // ✅ Create JWT token
     const token = jwt.sign(
-      { driverId: driver._id },
+      { _id: driver._id.toString(), role: 'driver' },
       process.env.JWT_SECRET,
       { expiresIn: '7d' }
     );
-
     // ✅ Respond cleanly
     return res.status(200).json({
       message: 'Login successful',
@@ -2982,67 +3162,107 @@ router.put('/orders/:orderId/assign-driver', authenticateToken, async (req, res)
   }
 });
 
+// routes/driver.js or orders.js
 router.get('/driver-active-orders/:driverId', authenticateToken, async (req, res) => {
   const { driverId } = req.params;
+  console.log('Fetching active orders for driver:', driverId);
+  console.log('Auth payload:', req.user, 'Param driverId:', driverId);
+
+  // SECURITY: Compare as strings
+  if (req.user.role !== 'driver' || req.user._id !== driverId) {
+    console.log('403 Debug:', {
+      tokenUserId: req.user._id,
+      paramDriverId: driverId,
+      role: req.user.role
+    });
+    return res.status(403).json({ error: 'Unauthorized' });
+  }
   try {
-    const orders = await Order.find({ assignedDriver: driverId })
+    // Find orders where driver is assigned AND not fully delivered
+    const orders = await Order.find({
+      assignedDriver: driverId,
+      status: { $nin: ['Confirmed Delivered', 'Cancelled', 'Failed'] }
+    })
       .populate({
         path: 'subOrders',
-        populate: {
-          path: 'shop',
-          select: 'businessName location',
-        },
-        select: 'status shop',
+        populate: { path: 'shop', select: 'businessName location' },
+        select: 'status shop'
       })
-      .populate('user', 'username phoneNumber'); // Populate user details (username, phoneNumber)
+      .populate('user', 'username phoneNumber')
+      .populate('delivery', 'location instructions fee option')
+      .lean();
 
-    res.json(orders);
+    // === NORMALIZE NUMBERS ===
+    orders.forEach(order => {
+      order.balanceDue = Number(order.balanceDue) || 0;
+      order.total = Number(order.total) || 0;
+      order.paid = Number(order.paid) || 0;
+    });
+
+    // === FILTER: Only show if at least one sub-order is ReadyForPickup or OutForDelivery ===
+    const activeOrders = orders.filter(order => {
+      return order.subOrders.some(so =>
+        ['ReadyForPickup', 'OutForDelivery', 'Delivered'].includes(so.status)
+      );
+    });
+
+    res.json(activeOrders);
   } catch (err) {
     console.error('Error fetching active driver orders:', err.message);
-    res.status(500).json({ error: 'Server error fetching active orders' });
+    res.status(500).json({ error: 'Server error' });
   }
 });
 
 
+// routes/orders.js
 router.put('/orders/:orderId/mark-delivered', authenticateToken, async (req, res) => {
   const { orderId } = req.params;
-  const { driverName, driverPhone, finalPaymentReceived = false } = req.body;
+  const { driverName, driverPhone } = req.body;
 
   try {
-    const order = await Order.findById(orderId);
-    if (!order) {
-      return res.status(404).json({ error: 'Order not found' });
+    const order = await Order.findById(orderId).populate('subOrders');
+    if (!order) return res.status(404).json({ error: 'Order not found' });
+
+    // === FINALIZE PAYMENT IF BALANCE WAS DUE ===
+    if (order.balanceDue > 0) {
+      return res.status(400).json({
+        error: `Customer still owes KES ${order.balanceDue}. Collect payment first.`,
+      });
     }
 
-    // 🧮 CASE 1: Deposit order - check payment completion
-    if (order.paymentType === 'deposit' && order.balanceDue > 0) {
-      if (!finalPaymentReceived) {
-        return res.status(400).json({
-          error: `Cannot mark as fully delivered. Customer still owes KSH ${order.balanceDue}.`,
-          requiresFinalPayment: true,
-        });
-      }
-
-      // ✅ Final payment confirmed by driver
-      order.paymentStatus = 'Paid';
-      order.balanceDue = 0;
-    }
-
-    // 🧮 CASE 2: Normal order (full payment or COD)
-    order.status = 'Delivered';
+    // === MARK PARENT AS PAID & CONFIRMED DELIVERED ===
+    order.paymentStatus = 'Paid';
+    order.balanceDue = 0;
+    order.paid = order.total;
+    order.paidAt = new Date();
+    order.status = 'Confirmed Delivered';
     order.deliveredAt = new Date();
     order.deliveredBy = driverName;
     order.deliveredByPhone = driverPhone;
 
     await order.save();
 
-    res.json({ message: 'Order marked as delivered successfully', order });
+    // === SYNC ALL SUB-ORDERS ===
+    await SubOrder.updateMany(
+      { parentOrder: order._id },
+      {
+        $set: {
+          paymentStatus: 'Paid',
+          paidAt: new Date(),
+          status: 'Confirmed Delivered',
+          deliveredAt: new Date(),
+        },
+      }
+    );
+
+    console.log(`Order ${order._id} fully delivered & paid. Sub-orders synced.`);
+
+    res.json({ message: 'Order confirmed delivered & paid', order });
   } catch (error) {
-    console.error('Error marking order as delivered:', error.message);
+    console.error('Error marking order as delivered:', error);
     res.status(500).json({ error: 'Server error' });
   }
 });
-
 
 router.put('/orders/:orderId/confirm-delivery', authenticateToken, async (req, res) => {
   const { orderId } = req.params;
@@ -3266,8 +3486,13 @@ const getAccessToken = async () => {
   }
 };
 
+
+
 // ============================================================
-// 💰 Initiate M-Pesa STK Push Payment
+// Initiate M-Pesa STK Push Payment
+// ============================================================
+// ============================================================
+// 1. /mpesa/pay – initiate STK Push
 // ============================================================
 router.post('/mpesa/pay', async (req, res) => {
   const { phoneNumber, amount, orderId, paymentType = 'full' } = req.body;
@@ -3282,6 +3507,7 @@ router.post('/mpesa/pay', async (req, res) => {
     let description = 'Full Payment';
     if (paymentType === 'goods') description = 'Goods Payment';
     else if (paymentType === 'delivery') description = 'Delivery Fee Payment';
+    else if (paymentType === 'balance') description = 'Balance Payment';
 
     const paymentData = {
       BusinessShortCode: shortcode,
@@ -3311,31 +3537,17 @@ router.post('/mpesa/pay', async (req, res) => {
       }
     );
 
-    // Link CheckoutRequestID to Order
+    // === Link CheckoutRequestID to order ===
     if (orderId && data.CheckoutRequestID) {
       const checkoutId = data.CheckoutRequestID.trim();
-      try {
-        const updated = await Order.findByIdAndUpdate(
-          orderId,
-          {
-            lastPaymentRequestId: checkoutId,
-            paymentInitiatedAt: new Date(),
-          },
-          { new: true, runValidators: true }
-        );
-
-        if (updated) {
-          console.log('Linked order', orderId, 'to', checkoutId);
-        } else {
-          console.warn('Order not found when linking CheckoutRequestID:', orderId);
-        }
-      } catch (err) {
-        console.error('Failed to link CheckoutRequestID:', err.message);
-        // Don't fail payment
-      }
+      await Order.findByIdAndUpdate(orderId, {
+        lastPaymentRequestId: checkoutId,
+        paymentInitiatedAt: new Date(),
+        paymentType,
+      });
+      console.log(`Linked order ${orderId} → ${checkoutId} (${paymentType})`);
     }
 
-    console.log('STK Push initiated:', data);
     res.json(data);
   } catch (error) {
     console.error('STK Push Error:', error.response?.data || error.message);
@@ -3345,61 +3557,155 @@ router.post('/mpesa/pay', async (req, res) => {
 
 
 // ============================================================
-// Handle M-Pesa Callback (CRASH-PROOF + ASYNC)
+// 2. /mpesa/callback – handles Safaricom response
 // ============================================================
 router.post('/mpesa/callback', async (req, res) => {
-  // Always respond 200 immediately
-  res.status(200).json({ message: 'OK' });
+  res.status(200).json({ message: 'OK' }); // immediate Safaricom response
 
-  const stkCallback = req.body?.Body?.stkCallback;
-  if (!stkCallback) {
-    console.log('Invalid callback: missing stkCallback');
-    return;
-  }
+  try {
+    const stkCallback = req.body?.Body?.stkCallback;
+    if (!stkCallback) return console.log('Invalid callback: missing stkCallback');
 
-  const { CheckoutRequestID, ResultCode, ResultDesc, CallbackMetadata } = stkCallback;
-  console.log('Callback received:', { CheckoutRequestID, ResultCode });
+    const { CheckoutRequestID, ResultCode, ResultDesc, CallbackMetadata } = stkCallback;
+    const checkoutId = (CheckoutRequestID || '').trim();
+    console.log('Callback received:', { CheckoutRequestID, ResultCode });
 
-  // Process in background
-  setImmediate(async () => {
-    try {
-      if (ResultCode !== 0 && ResultCode !== '0') {
-        console.log('Payment failed:', ResultDesc);
-        return;
+    if (!checkoutId) return console.log('Missing CheckoutRequestID');
+
+    // === Payment failed → delete unpaid platform/own orders ===
+    if (ResultCode !== 0 && ResultCode !== '0') {
+      console.log('Payment failed:', ResultDesc);
+
+      const order = await Order.findOne({
+        lastPaymentRequestId: { $regex: new RegExp(`^${checkoutId}$`, 'i') },
+      });
+
+      if (order && order.paymentMethod === 'Mpesa' && order.paymentStatus === 'Pending') {
+        // Only clean up if no payment was made
+        if (order.delivery.option === 'platform' || order.delivery.option === 'own') {
+          await SubOrder.deleteMany({ parentOrder: order._id });
+          await Order.deleteOne({ _id: order._id });
+          console.log(`Deleted unpaid order ${order._id}`);
+        }
       }
-
-      const amount = CallbackMetadata?.Item?.find(i => i.Name === 'Amount')?.Value || 0;
-      const checkoutId = (CheckoutRequestID || '').trim();
-      if (!checkoutId) {
-        console.log('Missing CheckoutRequestID');
-        return;
-      }
-
-      const order = await Order.findOne({ lastPaymentRequestId: checkoutId });
-      if (!order) {
-        console.log('Order not found for:', checkoutId);
-        return;
-      }
-
-      // Determine new status
-      let newStatus = 'Pending';
-      if (order.paymentType === 'full') newStatus = 'Paid';
-      else if (['goods', 'delivery'].includes(order.paymentType)) newStatus = 'DepositPaid';
-
-      order.paymentStatus = newStatus;
-      order.paid = (order.paid || 0) + Number(amount);
-      order.balanceDue = Math.max(order.total - order.paid, 0);
-      order.paidAt = new Date();
-
-      await order.save();
-
-      console.log(`Payment SUCCESS: Order ${order._id} | ${amount} KES | ${newStatus}`);
-    } catch (err) {
-      console.error('Callback processing failed:', err.stack);
+      return;
     }
-  });
-});
 
+    // === Payment success ===
+    const amount = Number(CallbackMetadata?.Item?.find(i => i.Name === 'Amount')?.Value || 0);
+
+    // Try suborder payment first
+    let subOrder = await SubOrder.findOne({
+      lastPaymentRequestId: { $regex: new RegExp(`^${checkoutId}$`, 'i') },
+    });
+
+    if (subOrder) {
+      subOrder.paymentStatus = 'Paid';
+      subOrder.paidAt = new Date();
+      await subOrder.save();
+
+      const parent = await Order.findById(subOrder.parentOrder).populate('subOrders', 'total paymentStatus');
+      if (parent) {
+        const totalPaid = parent.subOrders
+          .filter((so) => so.paymentStatus === 'Paid')
+          .reduce((sum, so) => sum + so.total, 0);
+
+        parent.paid = totalPaid;
+        parent.balanceDue = Math.max(parent.total - totalPaid, 0);
+        parent.paymentStatus =
+          totalPaid === parent.total
+            ? 'Paid'
+            : totalPaid > 0
+            ? 'Partial'
+            : 'Pending';
+
+        if (totalPaid === parent.total) parent.paidAt = new Date();
+        await parent.save();
+      }
+
+      console.log(`SubOrder ${subOrder._id} paid → Parent updated`);
+      return;
+    }
+
+    // === Otherwise find parent order ===
+    const order = await Order.findOne({
+      lastPaymentRequestId: { $regex: new RegExp(`^${checkoutId}$`, 'i') },
+    });
+    if (!order) return console.log('Order not found for:', checkoutId);
+
+    const newPaid = (order.paid || 0) + amount;
+    const isFullyPaid = newPaid >= order.total;
+
+    order.paid = newPaid;
+    order.balanceDue = Math.max(order.total - newPaid, 0);
+    order.paymentStatus = isFullyPaid ? 'Paid' : 'Partial';
+    if (isFullyPaid) order.paidAt = new Date();
+    await order.save();
+
+    // === Handle OWN delivery prepaid ===
+    if (order.delivery.option === 'own' && order.paymentMethod === 'Mpesa') {
+      await SubOrder.updateMany(
+        { parentOrder: order._id },
+        { $set: { paymentStatus: 'Paid', paidAt: new Date() } }
+      );
+
+      const subOrders = await SubOrder.find({ parentOrder: order._id });
+      for (const so of subOrders) {
+        notifyPartner(so.shop, {
+          message: 'New prepaid order received!',
+          subOrderId: so._id,
+          orderId: order._id,
+          total: so.total,
+          timestamp: new Date(),
+        });
+        await partnerNotify(so.shop, {
+          message: 'New prepaid order received!',
+          subOrderId: so._id,
+          orderId: order._id,
+        });
+      }
+
+      console.log(`Vendors notified for prepaid own order ${order._id}`);
+    }
+
+    // === Handle PLATFORM delivery ===
+    if (order.delivery.option === 'platform' && order.paymentMethod === 'Mpesa') {
+      if (order.paymentStatus === 'Paid' || order.paymentStatus === 'Partial') {
+        await SubOrder.updateMany(
+          { parentOrder: order._id },
+          { $set: { paymentStatus: 'Paid', paidAt: new Date() } }
+        );
+
+        const subOrders = await SubOrder.find({ parentOrder: order._id });
+        for (const so of subOrders) {
+          notifyPartner(so.shop, {
+            message:
+              order.paymentStatus === 'Paid'
+                ? 'New fully paid order received!'
+                : 'New partially paid order received!',
+            subOrderId: so._id,
+            orderId: order._id,
+            total: so.total,
+            timestamp: new Date(),
+          });
+          await partnerNotify(so.shop, {
+            message:
+              order.paymentStatus === 'Paid'
+                ? 'New fully paid order received!'
+                : 'New partially paid order received!',
+            subOrderId: so._id,
+            orderId: order._id,
+          });
+        }
+        console.log(`Platform vendors notified for ${order._id}`);
+      }
+    }
+
+    console.log(`Payment SUCCESS: ${order._id} +${amount} KES | ${order.paymentStatus}`);
+  } catch (err) {
+    console.error('Callback processing failed:', err.stack);
+  }
+});
 
 // ============================================================
 // Check Payment Status (Polling)
@@ -3439,7 +3745,6 @@ router.post('/mpesa/status', async (req, res) => {
     res.status(500).json({ error: 'Status check failed' });
   }
 });
-
 
 // ORDER CONFIRMATION FOR ORDERS
 
@@ -3679,4 +3984,5 @@ router.patch('/admin/drivers/:driverId/disable', authenticateAdminToken, async (
 // =====================================================
 
 
-module.exports = router;
+// module.exports = router;
+module.exports = { router, Order, SubOrder };

@@ -7,7 +7,7 @@ const DELIVERY_CONFIG = {
   baseFee: 100,
   perKmFee: 25,
   freeLimitKm: 4,
-  extraShopHandlingFee: 30,
+  extraShopHandlingFee: 0,
   interTownFee: 200,
 };
 
@@ -97,7 +97,7 @@ const DeliveryOptions = ({ cart, userLocation, deliveryTown, onDeliveryOptionSel
 
     // ✅ Apply tiered pricing
     let totalFee;
-    if (maxDistanceInKm <= 5) totalFee = 100;
+    if (maxDistanceInKm <= 5) totalFee = 10;
     else if (maxDistanceInKm <= 50) totalFee = 100 + (10 * maxDistanceInKm);
     else if (maxDistanceInKm <= 150) totalFee = 500;
     else if (maxDistanceInKm <= 500) totalFee = 800;

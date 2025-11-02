@@ -21,98 +21,205 @@ const OrderStatusUpdater = ({
   onStatusChange,
   deliveredBy,
   deliveryOption,
+  subOrderTotal,
 }) => {
   const [loading, setLoading] = useState(false);
+  const [showPaymentPrompt, setShowPaymentPrompt] = useState(false);
+  const [paymentMethod, setPaymentMethod] = useState('COD');
+  const [mpesaNumber, setMpesaNumber] = useState('');
+  const [polling, setPolling] = useState(false);
   const intervalRef = useRef(null);
   const statusRef = useRef(currentStatus);
 
-  // Disable after PickedUp for own delivery, after ReadyForPickup for platform
-  const disablePartner =
-    loading ||
-    (deliveryOption === 'own'
-      ? statusFlow.indexOf(currentStatus) > statusFlow.indexOf('PickedUp') // allow up to PickedUp
-      : statusFlow.indexOf(currentStatus) >= statusFlow.indexOf('ReadyForPickup'));
   useEffect(() => {
     statusRef.current = currentStatus;
   }, [currentStatus]);
 
-  const updateSubOrderStatus = async (newStatus) => {
-    try {
-      const response = await axios.put(
-        `${config.backendUrl}/api/suborders/${subOrderId}/status`,
-        { status: newStatus }
-      );
-      onStatusChange(response.data.status);
-    } catch (error) {
-    }
-  };
-
-  const fetchAndSyncWithParent = async () => {
-    try {
-      const res = await axios.get(`${config.backendUrl}/api/order/${parentOrderId}/status`);
-      const parentStatus = res.data.status;
-      const current = statusRef.current;
-
-      if (parentStatus === 'Delivered' && current === 'OutForDelivery') {
-        await updateSubOrderStatus('Delivered');
-      } else if (parentStatus === 'Confirmed Delivered' && current !== 'Confirmed Delivered') {
-        await updateSubOrderStatus('Confirmed Delivered');
-      }
-    } catch (error) {
-    }
-  };
-
-  useEffect(() => {
-    if (deliveredBy && currentStatus === 'OutForDelivery') {
-      intervalRef.current = setInterval(fetchAndSyncWithParent, 8000);
-    }
-
-    return () => {
-      clearInterval(intervalRef.current);
-    };
-  }, [deliveredBy, currentStatus, parentOrderId]);
+  const disablePartner =
+    loading ||
+    (deliveryOption === 'own'
+      ? statusFlow.indexOf(currentStatus) > statusFlow.indexOf('PickedUp')
+      : statusFlow.indexOf(currentStatus) >= statusFlow.indexOf('ReadyForPickup'));
 
   const getNextStatus = () => {
-    const currentIndex = statusFlow.indexOf(currentStatus);
-    return currentIndex < statusFlow.length - 1 ? statusFlow[currentIndex + 1] : null;
+    const idx = statusFlow.indexOf(currentStatus);
+    return idx < statusFlow.length - 1 ? statusFlow[idx + 1] : null;
   };
 
   const handleStatusUpdate = async () => {
-    const nextStatus = getNextStatus();
-    if (!nextStatus) return;
+    const next = getNextStatus();
+    if (!next || next !== 'PickedUp') {
+      await updateStatus(next);
+      return;
+    }
 
+    if (deliveryOption !== 'own') {
+      await updateStatus('PickedUp');
+      return;
+    }
+
+    try {
+      const res = await axios.get(`${config.backendUrl}/api/suborders/${subOrderId}`);
+      if (res.data.paymentStatus === 'Paid') {
+        await updateStatus('Confirmed Delivered');
+      } else {
+        setShowPaymentPrompt(true);
+      }
+    } catch (err) {
+      alert('Failed to check payment status');
+    }
+  };
+
+  const updateStatus = async (status) => {
     setLoading(true);
     try {
-      const response = await axios.put(
+      const res = await axios.put(
         `${config.backendUrl}/api/suborders/${subOrderId}/status`,
-        { status: nextStatus }
+        { status }
       );
-      onStatusChange(response.data.status);
-    } catch (error) {
+      onStatusChange(res.data.status);
+    } catch (err) {
+      alert(err.response?.data?.error || 'Update failed');
     } finally {
       setLoading(false);
     }
   };
 
-  const nextStatus = getNextStatus();
+  const handlePayment = async () => {
+    if (paymentMethod === 'COD') {
+      if (!window.confirm(`Customer paid KES ${subOrderTotal} in cash?`)) return;
+      await markAsPaidAndDelivered();
+    } else {
+      if (!mpesaNumber.match(/^254[0-9]{9}$/)) {
+        alert('Enter valid M-Pesa number (2547...)');
+        return;
+      }
+      setPolling(true);
+      await initiateMpesaPayment();
+    }
+  };
 
+  const initiateMpesaPayment = async () => {
+    try {
+      const res = await axios.post(`${config.backendUrl}/api/mpesa/pay`, {
+        phoneNumber: mpesaNumber,
+        amount: subOrderTotal,
+        orderId: parentOrderId,
+        paymentType: 'goods',
+        subOrderId,
+      });
+
+      const { CheckoutRequestID } = res.data;
+      let attempts = 0;
+      const poll = async () => {
+        if (attempts++ > 15) {
+          setPolling(false);
+          alert('Payment timeout');
+          return;
+        }
+        const statusRes = await axios.post(`${config.backendUrl}/api/mpesa/status`, { CheckoutRequestID });
+        if (statusRes.data.ResultCode === '0') {
+          await markAsPaidAndDelivered();
+          setPolling(false);
+        } else if (statusRes.data.ResultCode === '1032') {
+          setPolling(false);
+          alert('Payment cancelled');
+        } else {
+          setTimeout(poll, 5000);
+        }
+      };
+      poll();
+    } catch (err) {
+      setPolling(false);
+      alert('M-Pesa failed');
+    }
+  };
+
+  const markAsPaidAndDelivered = async () => {
+    try {
+      const response = await axios.post(
+        `${config.backendUrl}/api/suborders/${subOrderId}/pay-and-deliver`,
+        { paymentMethod: paymentMethod === 'COD' ? 'COD' : 'Mpesa' }
+      );
+      setShowPaymentPrompt(false);
+      onStatusChange('Confirmed Delivered');
+      alert('Suborder marked as Paid & Confirmed Delivered');
+      console.log('Success:', response.data);
+    } catch (err) {
+      console.error('Pay & Deliver failed:', err.response?.data || err.message);
+      alert('Failed to finalize: ' + (err.response?.data?.error || 'Server error'));
+    }
+  };
+
+  const nextStatus = getNextStatus();
   if (currentStatus === 'Confirmed Delivered') return null;
 
   return (
     <div>
       <p><strong>Status:</strong> {currentStatus}</p>
-      {nextStatus && (
+
+      {nextStatus && !showPaymentPrompt && (
         <button
           onClick={handleStatusUpdate}
-          disabled={disablePartner}
+          disabled={disablePartner || loading}
           className={styles.statusButtonOrder}
         >
-          {loading
-            ? 'Updating...'
-            : currentStatus === 'OutForDelivery' && deliveredBy
-              ? 'Syncing with parent...'
-              : `Mark as ${nextStatus}`}
+          {loading ? 'Updating...' : `Mark as ${nextStatus}`}
         </button>
+      )}
+
+      {/* ✨ MODAL SECTION ✨ */}
+      {showPaymentPrompt && (
+        <div className={styles.modalOverlay}>
+          <div className={styles.modal}>
+            <h3>Confirm Payment</h3>
+            <p><strong>Amount Due:</strong> KES {subOrderTotal}</p>
+
+            <div className={styles.paymentOptions}>
+              <label>
+                <input
+                  type="radio"
+                  checked={paymentMethod === 'COD'}
+                  onChange={() => setPaymentMethod('COD')}
+                /> Cash (COD)
+              </label>
+              <label>
+                <input
+                  type="radio"
+                  checked={paymentMethod === 'Mpesa'}
+                  onChange={() => setPaymentMethod('Mpesa')}
+                /> M-Pesa
+              </label>
+            </div>
+
+            {paymentMethod === 'Mpesa' && (
+              <input
+                type="tel"
+                placeholder="2547xxxxxxxx"
+                value={mpesaNumber}
+                onChange={(e) => setMpesaNumber(e.target.value)}
+                className={styles.input}
+              />
+            )}
+
+            <div className={styles.modalActions}>
+              <button
+                onClick={handlePayment}
+                disabled={polling}
+                className={styles.confirmBtn}
+              >
+                {polling ? 'Waiting for PIN...' : 'Confirm Payment'}
+              </button>
+              <button
+                onClick={() => setShowPaymentPrompt(false)}
+                className={styles.cancelBtn}
+              >
+                Cancel
+              </button>
+            </div>
+
+          </div>
+        </div>
       )}
     </div>
   );

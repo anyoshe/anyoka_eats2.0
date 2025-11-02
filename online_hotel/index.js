@@ -9,7 +9,8 @@ const session = require('express-session');
 const path = require('path');
 const LocalStrategy = require('passport-local').Strategy;
 const jwt = require('jsonwebtoken');
-const routes = require('./routes/routes.js'); 
+// const routes = require('./routes/routes.js');
+const { router, Order, SubOrder } = require('./routes/routes.js'); 
 const bodyParser = require('body-parser');
 
 const app = express();
@@ -59,7 +60,7 @@ app.use(passport.initialize());
 app.use(passport.session());
 
 // Routes
-app.use('/api', routes);
+app.use('/api', router);
 
 // File Uploads
 // app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
@@ -96,6 +97,117 @@ app.get('*', (req, res) => {
   res.sendFile(path.join(__dirname, '../client/build/index.html'));
 });
 
+
+const cron = require('node-cron');
+
+// =============================
+// CRON JOB: Notify Drivers for Stale Orders
+// =============================
+cron.schedule('*/5 * * * *', async () => {
+  console.log('Checking for stale ReadyForPickup orders...');
+
+  try {
+    const fiveMinutesAgo = new Date(Date.now() - 5 * 60 * 1000);
+
+    const staleOrders = await Order.find({
+      'delivery.option': 'platform',
+      status: { $nin: ['Delivered', 'Confirmed Delivered'] },
+      $expr: {
+        $and: [
+          { $eq: [{ $size: '$subOrders' }, { $size: { $filter: { input: '$subOrders', cond: { $eq: ['$$this.status', 'ReadyForPickup'] } } } }] },
+        ],
+      },
+      $or: [
+        { driverNotified: false },
+        { driverNotificationSentAt: { $lt: fiveMinutesAgo } }
+      ]
+    }).populate({
+      path: 'subOrders',
+      populate: { path: 'shop', select: 'businessName location' }
+    });
+
+    for (const order of staleOrders) {
+      await notifyDriversForOrder(order);
+    }
+  } catch (err) {
+    console.error('Cron job error:', err);
+  }
+});
+
+async function notifyDriversForOrder(order) {
+  const shopLocations = order.subOrders.map(so => ({
+    name: so.shop.businessName,
+    location: so.shop.location,
+  }));
+
+  let notified = false;
+
+  for (const subOrder of order.subOrders) {
+    const shop = subOrder.shop;
+    if (!shop?.location) continue;
+
+    const shopCoords = await parsePlusCodeToLatLng(shop.location);
+    if (!shopCoords) continue;
+
+    const drivers = await Driver.find({
+      status: 'Available',
+      'currentLocation.location': { $exists: true }
+    });
+
+    for (const driver of drivers) {
+      const driverCoords = await parsePlusCodeToLatLng(driver.currentLocation.location);
+      if (!driverCoords) continue;
+
+      const distance = geolib.getDistance(shopCoords, driverCoords);
+      if (distance > 5000) continue;
+
+      // Send notification
+      notifyDriver(driver._id.toString(), {
+        type: 'AllSubOrdersReady',
+        message: 'All suborders ready for pickup',
+        orderId: order._id,
+        shops: shopLocations,
+      });
+
+      await DriverNotification.create({
+        driver: driver._id,
+        orderId: order._id,
+        message: 'All suborders ready',
+        status: 'ReadyForPickup',
+      }).catch(err => console.error('Notification error:', err));
+
+      notified = true;
+    }
+  }
+
+  // Update order
+  await Order.findByIdAndUpdate(order._id, {
+    driverNotified: true,
+    driverNotificationSentAt: new Date(),
+    lastDriverCheckAt: new Date(),
+  });
+
+  if (notified) {
+    console.log(`Notified drivers for stale order ${order._id}`);
+  }
+}
+
+cron.schedule('0 * * * *', async () => { // every hour
+  const cutoff = new Date(Date.now() - 60 * 60 * 1000);
+  const staleOrders = await Order.find({
+    paymentMethod: 'Mpesa',
+    paymentStatus: 'Pending',
+    createdAt: { $lt: cutoff },
+  });
+
+  for (const order of staleOrders) {
+    if (['own', 'platform'].includes(order.delivery.option)) {
+      await SubOrder.deleteMany({ parentOrder: order._id });
+      await Order.deleteOne({ _id: order._id });
+      console.log(`🧹 Removed stale unpaid order ${order._id}`);
+    }
+  }
+});
 // Error Handler
 function errorHandler(err, req, res, next) {
   console.error(err.stack); 
