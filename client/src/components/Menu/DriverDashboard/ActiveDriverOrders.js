@@ -2,9 +2,10 @@
 import React, { useEffect, useState, useContext } from 'react';
 import axiosInstance from '../../utils/axiosInstance';
 import { DriverContext } from '../../../contexts/DriverContext';
-import styles from './DriverOrders.module.css'; // reuse same styling
+// import styles from './DriverOrders.module.css'; 
 import config from '../../../config';
 import { io } from 'socket.io-client';
+import styles from './ActiveDriverOrders.module.css';
 
 
 const ActiveDriverOrders = () => {
@@ -209,7 +210,7 @@ const ActiveDriverOrders = () => {
   return (
     <div className={styles.container}>
       <div className={styles.headerRow}>
-        <h1 className={styles.title}>Active Orders</h1>
+        {/* <h1 className={styles.title}>Active Orders</h1> */}
         <button
           className={styles.refreshBtn}
           onClick={handleRefresh}

@@ -1,29 +1,22 @@
-/* Skeleton styles for DriverOrders
-.skeletonContainer { padding: 1rem; }
-.skeletonTitle { width: 40%; height: 18px; background: #eee; border-radius: 6px; margin-bottom: 0.75rem; }
-.skeletonList { display: grid; gap: 0.75rem; }
-.skeletonCard { background: #fff; border: 1px solid #e5e7eb; border-radius: 8px; padding: 0.75rem; }
-.skeletonLine { height: 12px; width: 100%; background: #eee; border-radius: 6px; margin-bottom: 8px; }
-.skeletonLineShort { height: 12px; width: 60%; background: #eee; border-radius: 6px; }
-
-@keyframes skeletonPulse {
-  0% { opacity: 0.6; }
-  50% { opacity: 1; }
-  100% { opacity: 0.6; }
+:root {
+  --green: #1ea509;
+  --orange: #ffa500;
+  --white: #ffffff;
 }
-.skeletonTitle, .skeletonLine, .skeletonLineShort { animation: skeletonPulse 1.5s ease-in-out infinite; } */
 
+/* Main container */
 .container {
   padding: 1rem;
   max-width: 1200px;
   margin: 0 auto;
   font-family: 'Segoe UI', sans-serif;
+  background: var(--white);
 }
 
 .title {
   font-size: 1.8rem;
   font-weight: 600;
-  color: #1a1a1a;
+  color: var(--orange);
   margin-bottom: 1.5rem;
   text-align: center;
 }
@@ -31,18 +24,20 @@
 .noOrders {
   text-align: center;
   font-size: 1.2rem;
-  color: #666;
+  color: #777;
   padding: 2rem;
 }
 
+/* Grid layout */
 .orderGrid {
   display: grid;
   gap: 1.5rem;
   grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
 }
 
+/* Cards */
 .orderCard {
-  background: white;
+  background: var(--white);
   border-radius: 12px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
   overflow: hidden;
@@ -54,9 +49,10 @@
   box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12);
 }
 
+/* Header */
 .header {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  color: white;
+  background: linear-gradient(135deg, var(--orange) 0%, #ffb733 100%);
+  color: var(--white);
   padding: 1rem;
   display: flex;
   justify-content: space-between;
@@ -74,145 +70,17 @@
   opacity: 0.9;
 }
 
-.infoRow {
-  padding: 0.5rem 1rem;
-  background: #f8f9fa;
-  font-size: 0.95rem;
-  border-bottom: 1px solid #eee;
-}
-
-.infoRow strong {
-  color: #2c3e50;
-}
-
-.customer {
-  padding: 0.8rem 1rem;
-  font-size: 0.95rem;
-  line-height: 1.4;
-  color: #2c3e50;
-}
-
-.shopsSection {
-  padding: 0 1rem 1rem;
-}
-
-.shopsSection h4 {
-  margin: 1rem 0 0.5rem;
-  color: #2c3e50;
-  font-size: 1rem;
-}
-
-.shopList {
-  list-style: none;
-  padding: 0;
-  margin: 0;
-}
-
-.shopItem {
-  background: #f5f7fa;
-  border-radius: 8px;
-  padding: 0.8rem;
-  margin-bottom: 0.6rem;
-  border-left: 4px solid #667eea;
-}
-
-.shopName {
-  font-weight: 600;
-  color: #2c3e50;
-  font-size: 0.95rem;
-}
-
-.shopLocation {
-  font-size: 0.85rem;
-  color: #666;
-  margin-top: 0.2rem;
-}
-
-.pickupBtn {
-  margin-top: 0.6rem;
-  background: #28a745;
-  color: white;
-  border: none;
-  padding: 0.5rem 1rem;
-  border-radius: 6px;
-  font-size: 0.9rem;
-  cursor: pointer;
-  width: 100%;
-}
-
-.pickupBtn:disabled {
-  background: #ccc;
-  cursor: not-allowed;
-}
-
-.acceptBtn {
-  width: 100%;
-  background: #007bff;
-  color: white;
-  border: none;
-  padding: 1rem;
-  font-size: 1.1rem;
-  font-weight: 600;
-  cursor: pointer;
-  transition: background 0.2s;
-}
-
-.acceptBtn:hover {
-  background: #0056b3;
-}
-
-/* SKELETON */
-.skeletonContainer {
-  padding: 1rem;
-}
-
-.skeletonTitle {
-  height: 2rem;
-  background: #eee;
-  border-radius: 8px;
-  margin-bottom: 1.5rem;
-  animation: pulse 1.5s infinite;
-}
-
-.skeletonList {
-  display: grid;
-  gap: 1rem;
-  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-}
-
-.skeletonCard {
-  background: white;
-  border-radius: 12px;
-  padding: 1rem;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-}
-
-.skeletonLine {
-  height: 1rem;
-  background: #eee;
-  border-radius: 4px;
-  margin: 0.5rem 0;
-  animation: pulse 1.5s infinite;
-}
-
-.skeletonLineShort {
-  width: 60%;
-}
-
-@keyframes pulse {
-  0% { opacity: 0.6; }
-  50% { opacity: 1; }
-  100% { opacity: 0.6; }
-}
+/* Earnings badge */
 .earnBadge {
-  background: #e3f2fd;
-  color: #1976d2;
+  background: #fff7e6;
+  color: var(--orange);
   font-weight: 600;
   padding: 0.5rem 1rem;
   text-align: center;
-  border-bottom: 1px solid #bbdefb;
+  border-bottom: 1px solid #ffe5b3;
 }
 
+/* Sections */
 .section {
   padding: 0.8rem 1rem;
   border-bottom: 1px solid #eee;
@@ -225,7 +93,7 @@
 }
 
 .phoneLink {
-  color: #007bff;
+  color: var(--orange);
   text-decoration: none;
 }
 
@@ -241,21 +109,36 @@
 
 .instructions {
   font-size: 0.85rem;
-  color: #d32f2f;
-  background: #ffebee;
+  color: var(--green);
+  background: #f1fdf0;
   padding: 0.4rem;
   border-radius: 4px;
   margin-top: 0.5rem;
 }
 
 .cashToCollect {
-  color: #d32f2f;
+  color: var(--orange);
   font-weight: 600;
 }
 
+/* Shops list */
+.shopList {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.shopItem {
+  background: #fff9f0;
+  border-radius: 8px;
+  padding: 0.8rem;
+  margin-bottom: 0.6rem;
+  border-left: 4px solid var(--orange);
+}
+
 .firstPickup {
-  background: #4caf50;
-  color: white;
+  background: var(--green);
+  color: var(--white);
   font-size: 0.7rem;
   padding: 2px 6px;
   border-radius: 4px;
@@ -264,377 +147,129 @@
 
 .readyTime {
   font-size: 0.8rem;
-  color: #2e7d32;
+  color: var(--green);
   margin-top: 0.3rem;
 }
 
+/* Buttons */
+.pickupBtn {
+  margin-top: 0.6rem;
+  background: var(--green);
+  color: var(--white);
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: 6px;
+  font-size: 0.9rem;
+  cursor: pointer;
+  width: 100%;
+}
+
+.pickupBtn:disabled {
+  background: #ccc;
+  cursor: not-allowed;
+}
+
+.acceptBtn {
+  width: 100%;
+  background: var(--orange);
+  color: var(--white);
+  border: none;
+  padding: 1rem;
+  font-size: 1.1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.acceptBtn:hover {
+  background: #e69400;
+}
+
+/* ETA */
 .eta {
   text-align: center;
   padding: 0.8rem;
-  background: #f5f5f5;
+  background: #fff7e6;
   font-weight: 600;
-  color: #424242;
+  color: var(--orange);
 }
 
-/* Activesriverorders styles  */
-.headerRow {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 20px;
+/* Skeleton Loaders */
+.skeletonContainer {
+  padding: 1rem;
 }
 
-.refreshBtn {
-  padding: 8px 16px;
-  background: #007bff;
-  color: white;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
+.skeletonTitle {
+  height: 2rem;
+  background: #fcefd6;
+  border-radius: 8px;
+  margin-bottom: 1.5rem;
+  animation: pulse 1.5s infinite;
 }
 
-.refreshBtn:disabled {
-  background: #6c757d;
-  cursor: not-allowed;
+.skeletonList {
+  display: grid;
+  gap: 1rem;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
 }
 
-.paidStatus {
-  color: #28a745;
-  font-weight: bold;
-}
-
-.pendingStatus {
-  color: #ffc107;
-  font-weight: bold;
-}
-
-.defaultStatus {
-  color: #6c757d;
-}
-
-.pollingNote {
-  font-size: 12px;
-  color: #6c757d;
-  margin-top: 10px;
-  text-align: center;
-}
-
-/* Payment Modal Styles */
-.paymentModal {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  z-index: 1000;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  padding: 20px;
-  box-sizing: border-box;
-}
-
-.modalOverlay {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: rgba(0, 0, 0, 0.6);
-  backdrop-filter: blur(4px);
-}
-
-.modalContent {
-  position: relative;
-  background: white;
+.skeletonCard {
+  background: var(--white);
   border-radius: 12px;
-  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
-  width: 100%;
-  max-width: 500px;
-  max-height: 90vh;
-  overflow-y: auto;
-  animation: modalSlideIn 0.3s ease-out;
+  padding: 1rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
-@keyframes modalSlideIn {
-  from {
-    opacity: 0;
-    transform: translateY(-30px) scale(0.95);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0) scale(1);
-  }
+.skeletonLine {
+  height: 1rem;
+  background: #fcefd6;
+  border-radius: 4px;
+  margin: 0.5rem 0;
+  animation: pulse 1.5s infinite;
 }
 
-.modalHeader {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 24px 24px 0;
-  border-bottom: 1px solid #e9ecef;
-  padding-bottom: 16px;
+.skeletonLineShort {
+  width: 60%;
 }
 
-.modalHeader h3 {
-  margin: 0;
-  color: #2c3e50;
-  font-size: 1.5rem;
-  font-weight: 600;
+@keyframes pulse {
+  0% { opacity: 0.6; }
+  50% { opacity: 1; }
+  100% { opacity: 0.6; }
+}
+
+/* Modal & Misc colors adjusted */
+.modalOverlay {
+  background: rgba(0, 0, 0, 0.5);
 }
 
 .closeButton {
-  background: none;
-  border: none;
-  font-size: 2rem;
-  color: #6c757d;
-  cursor: pointer;
-  padding: 0;
-  width: 40px;
-  height: 40px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: 50%;
-  transition: all 0.2s ease;
+  color: var(--orange);
 }
 
 .closeButton:hover {
-  background: #f8f9fa;
-  color: #495057;
-}
-
-.modalBody {
-  padding: 24px;
-}
-
-.balanceAmount {
-  text-align: center;
-  font-size: 1.2rem;
-  margin-bottom: 24px;
-  color: #495057;
-}
-
-.balanceAmount strong {
-  color: #e74c3c;
-  font-size: 1.4rem;
-}
-
-.inputGroup {
-  margin-bottom: 16px;
-}
-
-.inputLabel {
-  display: block;
-  margin-bottom: 8px;
-  font-weight: 600;
-  color: #495057;
-  font-size: 0.95rem;
-}
-
-.mpesaInput {
-  width: 100%;
-  padding: 12px 16px;
-  border: 2px solid #e9ecef;
-  border-radius: 8px;
-  font-size: 1rem;
-  transition: all 0.2s ease;
-  box-sizing: border-box;
-}
-
-.mpesaInput:focus {
-  outline: none;
-  border-color: #007bff;
-  box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.1);
-}
-
-.mpesaInput:disabled {
-  background-color: #f8f9fa;
-  color: #6c757d;
-  cursor: not-allowed;
-}
-
-.inputHelp {
-  display: block;
-  margin-top: 6px;
-  color: #6c757d;
-  font-size: 0.85rem;
-}
-
-.modalFooter {
-  padding: 0 24px 24px;
-}
-
-.modalActions {
-  display: flex;
-  gap: 12px;
-  flex-wrap: wrap;
+  background: #fff3e0;
 }
 
 .stkBtn {
-  flex: 1;
-  padding: 14px 20px;
-  background: linear-gradient(135deg, #007bff, #0056b3);
-  color: white;
-  border: none;
-  border-radius: 8px;
-  font-size: 1rem;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  min-width: 140px;
+  background: linear-gradient(135deg, var(--green), #178207);
+  color: var(--white);
 }
 
 .stkBtn:hover:not(:disabled) {
-  background: linear-gradient(135deg, #0056b3, #004085);
-  transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(0, 123, 255, 0.3);
-}
-
-.stkBtn:disabled {
-  background: #6c757d;
-  cursor: not-allowed;
-  transform: none;
-  box-shadow: none;
+  background: linear-gradient(135deg, #178207, #126d05);
 }
 
 .cancelBtn {
-  padding: 14px 20px;
-  background: #6c757d;
-  color: white;
-  border: none;
-  border-radius: 8px;
-  font-size: 1rem;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  min-width: 100px;
+  background: var(--orange);
+  color: var(--white);
 }
 
 .cancelBtn:hover:not(:disabled) {
-  background: #5a6268;
-  transform: translateY(-1px);
+  background: #e69400;
 }
 
-.cancelBtn:disabled {
-  opacity: 0.6;
-  cursor: not-allowed;
-}
-
+/* Indicator */
 .pollingIndicator {
-  margin-top: 20px;
-  padding: 16px;
-  background: #f8f9fa;
-  border-radius: 8px;
-  text-align: center;
-  border-left: 4px solid #007bff;
-}
-
-.loadingSpinner {
-  width: 24px;
-  height: 24px;
-  border: 3px solid #f3f3f3;
-  border-top: 3px solid #007bff;
-  border-radius: 50%;
-  animation: spin 1s linear infinite;
-  margin: 0 auto 12px;
-}
-
-@keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
-}
-
-.pollingNote {
-  margin: 0;
-  color: #495057;
-  font-size: 0.9rem;
-  line-height: 1.4;
-}
-
-/* Responsive Design */
-@media (max-width: 768px) {
-  .paymentModal {
-    padding: 10px;
-  }
-  
-  .modalContent {
-    max-width: 100%;
-    max-height: 95vh;
-    border-radius: 8px;
-  }
-  
-  .modalHeader {
-    padding: 20px 20px 0;
-  }
-  
-  .modalHeader h3 {
-    font-size: 1.3rem;
-  }
-  
-  .modalBody {
-    padding: 20px;
-  }
-  
-  .modalFooter {
-    padding: 0 20px 20px;
-  }
-  
-  .modalActions {
-    flex-direction: column;
-  }
-  
-  .stkBtn,
-  .cancelBtn {
-    min-width: auto;
-    width: 100%;
-  }
-  
-  .balanceAmount {
-    font-size: 1.1rem;
-  }
-  
-  .balanceAmount strong {
-    font-size: 1.2rem;
-  }
-}
-
-@media (max-width: 480px) {
-  .modalHeader {
-    padding: 16px 16px 0;
-  }
-  
-  .modalBody {
-    padding: 16px;
-  }
-  
-  .modalFooter {
-    padding: 0 16px 16px;
-  }
-  
-  .modalHeader h3 {
-    font-size: 1.2rem;
-  }
-  
-  .closeButton {
-    width: 35px;
-    height: 35px;
-    font-size: 1.5rem;
-  }
-  
-  .mpesaInput {
-    padding: 10px 14px;
-    font-size: 0.95rem;
-  }
-  
-  .stkBtn,
-  .cancelBtn {
-    padding: 12px 16px;
-    font-size: 0.95rem;
-  }
-}
-
-/* Prevent body scroll when modal is open */
-body.modal-open {
-  overflow: hidden;
+  border-left: 4px solid var(--orange);
 }

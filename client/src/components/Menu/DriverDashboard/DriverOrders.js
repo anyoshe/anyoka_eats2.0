@@ -125,7 +125,7 @@ const DriverOrders = () => {
 
   return (
     <div className={styles.container}>
-      <h1 className={styles.title}>Available Orders</h1>
+      {/* <h1 className={styles.title}>Available Orders</h1> */}
       <div className={styles.orderGrid}>
         {orders.map((order) => (
 
