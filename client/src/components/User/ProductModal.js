@@ -255,8 +255,8 @@ const ProductModal = ({ isOpen, onClose, onSubmit, editingProduct, onProductUpda
           </div>
           <div className={styles.formGroup}>
             <label className={`${styles.productCategoryLabel} ${styles.productLabel}`}>Category:</label>
-            <input
-              type="text"
+
+            <select
               id="productCategoryInput"
               className={`${styles.productCategoryInput} ${styles.formInput}`}
               list="productCategories"
@@ -264,18 +264,18 @@ const ProductModal = ({ isOpen, onClose, onSubmit, editingProduct, onProductUpda
               onChange={(e) => setProductCategory(e.target.value)}
               placeholder="Select a category"
               required
-            />
-            <datalist id="productCategories">
-              <option value="Electronics" />
-              <option value="Fashion" />
-              <option value="Home & Kitchen" />
-              <option value="Beauty & Personal Care" />
-              <option value="Sports & Outdoors" />
-              <option value="Food" />
-              <option value="Toys And Games" />
-              <option value="Health" />
-              <option value="Pet Supplies" />
-            </datalist>
+            >
+              <option value="">Select a category</option>
+              <option value="Electronics">Electronics</option>
+              <option value="Fashion">Fashion</option>
+              <option value="Home & Kitchen">Home & Kitchen</option>
+              <option value="Beauty & Personal Care">Beauty & Personal Care</option>
+              <option value="Sports & Outdoors">Sports & Outdoors</option>
+              <option value="Food">Food</option>
+              <option value="Toys And Games">Toys And Games</option>
+              <option value="Health">Health</option>
+              <option value="Pet Supplies">Pet Supplies</option>
+            </select>
           </div>
           <div className={styles.formGroup}>
             <label className={`${styles.productSubcategoryLabel} ${styles.productLabel}`}>Subcategory:</label>
