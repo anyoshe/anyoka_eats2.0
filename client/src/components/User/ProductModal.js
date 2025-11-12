@@ -267,9 +267,10 @@ const ProductModal = ({ isOpen, onClose, onSubmit, editingProduct, onProductUpda
             >
               <option value="">Select a category</option>
               <option value="Electronics">Electronics</option>
-              <option value="Fashion">Fashion</option>
+              <option value="Fashion & Clothing">Fashion & Clothing</option>
               <option value="Home & Kitchen">Home & Kitchen</option>
               <option value="Beauty & Personal Care">Beauty & Personal Care</option>
+               <option value="Books & Stationary">Books & Stationary</option>
               <option value="Sports & Outdoors">Sports & Outdoors</option>
               <option value="Food">Food</option>
               <option value="Toys And Games">Toys And Games</option>
