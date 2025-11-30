@@ -52,7 +52,7 @@ const handleSubmit = async (event) => {
 
           <h3 className="top_header_divs_headers">Phone</h3>
 
-          <p className="top_header_divs_para">0706251573</p>
+          <p className="top_header_divs_para">0720 518542 or 0736 88988</p>
         </div>
 
         <div className="top_header_divs">
@@ -79,7 +79,7 @@ const handleSubmit = async (event) => {
 
               <div className="footer-text">
                 <p className="footer-logo-text"> 
-                  "Anyoka Eats – Savor Every Moment, Anytime, Anywhere."
+                  "Making Everything Accessible To Shoppers – EATS"
                 </p>
               </div>
 
