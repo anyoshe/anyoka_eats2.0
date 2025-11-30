@@ -52,7 +52,7 @@ const handleSubmit = async (event) => {
 
           <h3 className="top_header_divs_headers">Phone</h3>
 
-          <p className="top_header_divs_para">0720 518542 or 0736 88988</p>
+          <p className="top_header_divs_para">0720 518542 or 0736 889880</p>
         </div>
 
         <div className="top_header_divs">
