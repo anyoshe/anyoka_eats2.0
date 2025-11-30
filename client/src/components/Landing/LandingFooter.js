@@ -44,7 +44,7 @@ const handleSubmit = async (event) => {
 
           <h3 className="top_header_divs_headers">Location</h3>
 
-          <p className="top_header_divs_para">Malindi,Kenya</p>
+          <p className="top_header_divs_para">Kenya</p>
         </div>
 
         <div className="top_header_divs">
